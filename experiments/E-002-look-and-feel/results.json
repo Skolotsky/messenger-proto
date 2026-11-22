@@ -317,6 +317,13 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "the product has no notification bell",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "tray lists notifications and shows the current truth",
   "pass": true,
   "detail": ""
@@ -324,7 +331,7 @@
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "\"Focus only\" narrows the tray",
+  "check": "\"Focus only\", set in the product, narrows what the notification app receives",
   "pass": true,
   "detail": ""
  },
@@ -407,6 +414,69 @@
  },
  {
   "page": "slack-like",
+  "width": "desktop",
+  "check": "the reason line opens the explanation without reading the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "removing a person from the row acts at once, informs and offers undo",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the row does not move while it is looked at",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "only that person left the Focus people",
+  "pass": true,
+  "detail": "['Sam Whitaker', 'Marco Bianchi', 'Lena Fischer', 'Tomás Rivera']"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "switching the option off asks about people already added, and keeps them by default",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "keeping them leaves the list as it was",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "people can be removed one by one in settings",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "after leaving the feed, Anna's message is in Needs you",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a removed person is not added back when they write again",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
   "width": "phone",
   "check": "focus: every row gives its reason",
   "pass": true,
@@ -723,6 +793,13 @@
  {
   "page": "slack-like",
   "width": "phone",
+  "check": "the product has no notification bell",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
   "check": "tray lists notifications and shows the current truth",
   "pass": true,
   "detail": ""
@@ -730,7 +807,7 @@
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "\"Focus only\" narrows the tray",
+  "check": "\"Focus only\", set in the product, narrows what the notification app receives",
   "pass": true,
   "detail": ""
  },
@@ -803,6 +880,69 @@
   "check": "opening an entry clears its mark and lowers the count; the entry stays",
   "pass": true,
   "detail": "7"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "the reason line opens the explanation without reading the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "removing a person from the row acts at once, informs and offers undo",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "the row does not move while it is looked at",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "only that person left the Focus people",
+  "pass": true,
+  "detail": "['Sam Whitaker', 'Marco Bianchi', 'Lena Fischer', 'Tomás Rivera']"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "switching the option off asks about people already added, and keeps them by default",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "keeping them leaves the list as it was",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "people can be removed one by one in settings",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "after leaving the feed, Anna's message is in Needs you",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "a removed person is not added back when they write again",
+  "pass": true,
+  "detail": ""
  },
  {
   "page": "telegram-like",
@@ -1122,6 +1262,13 @@
  {
   "page": "telegram-like",
   "width": "desktop",
+  "check": "the product has no notification bell",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
   "check": "tray lists notifications and shows the current truth",
   "pass": true,
   "detail": ""
@@ -1129,7 +1276,7 @@
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "\"Focus only\" narrows the tray",
+  "check": "\"Focus only\", set in the product, narrows what the notification app receives",
   "pass": true,
   "detail": ""
  },
@@ -1202,6 +1349,69 @@
   "check": "opening an entry clears its mark and lowers the count; the entry stays",
   "pass": true,
   "detail": "7"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "the reason line opens the explanation without reading the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "removing a person from the row acts at once, informs and offers undo",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "the row does not move while it is looked at",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "only that person left the Focus people",
+  "pass": true,
+  "detail": "['Sam Whitaker', 'Marco Bianchi', 'Lena Fischer', 'Tomás Rivera']"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "switching the option off asks about people already added, and keeps them by default",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "keeping them leaves the list as it was",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "people can be removed one by one in settings",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "after leaving the feed, Anna's message is in Needs you",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "a removed person is not added back when they write again",
+  "pass": true,
+  "detail": ""
  },
  {
   "page": "telegram-like",
@@ -1521,6 +1731,13 @@
  {
   "page": "telegram-like",
   "width": "phone",
+  "check": "the product has no notification bell",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
   "check": "tray lists notifications and shows the current truth",
   "pass": true,
   "detail": ""
@@ -1528,7 +1745,7 @@
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "\"Focus only\" narrows the tray",
+  "check": "\"Focus only\", set in the product, narrows what the notification app receives",
   "pass": true,
   "detail": ""
  },
@@ -1601,6 +1818,69 @@
   "check": "opening an entry clears its mark and lowers the count; the entry stays",
   "pass": true,
   "detail": "7"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "the reason line opens the explanation without reading the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "removing a person from the row acts at once, informs and offers undo",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "the row does not move while it is looked at",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "only that person left the Focus people",
+  "pass": true,
+  "detail": "['Sam Whitaker', 'Marco Bianchi', 'Lena Fischer', 'Tomás Rivera']"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "switching the option off asks about people already added, and keeps them by default",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "keeping them leaves the list as it was",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "people can be removed one by one in settings",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "after leaving the feed, Anna's message is in Needs you",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "a removed person is not added back when they write again",
+  "pass": true,
+  "detail": ""
  },
  {
   "page": "own",
@@ -1920,6 +2200,13 @@
  {
   "page": "own",
   "width": "desktop",
+  "check": "the product has no notification bell",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
   "check": "tray lists notifications and shows the current truth",
   "pass": true,
   "detail": ""
@@ -1927,7 +2214,7 @@
  {
   "page": "own",
   "width": "desktop",
-  "check": "\"Focus only\" narrows the tray",
+  "check": "\"Focus only\", set in the product, narrows what the notification app receives",
   "pass": true,
   "detail": ""
  },
@@ -2000,6 +2287,69 @@
   "check": "opening an entry clears its mark and lowers the count; the entry stays",
   "pass": true,
   "detail": "7"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "the reason line opens the explanation without reading the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "removing a person from the row acts at once, informs and offers undo",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "the row does not move while it is looked at",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "only that person left the Focus people",
+  "pass": true,
+  "detail": "['Sam Whitaker', 'Marco Bianchi', 'Lena Fischer', 'Tomás Rivera']"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "switching the option off asks about people already added, and keeps them by default",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "keeping them leaves the list as it was",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "people can be removed one by one in settings",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "after leaving the feed, Anna's message is in Needs you",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "a removed person is not added back when they write again",
+  "pass": true,
+  "detail": ""
  },
  {
   "page": "own",
@@ -2319,6 +2669,13 @@
  {
   "page": "own",
   "width": "phone",
+  "check": "the product has no notification bell",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
   "check": "tray lists notifications and shows the current truth",
   "pass": true,
   "detail": ""
@@ -2326,7 +2683,7 @@
  {
   "page": "own",
   "width": "phone",
-  "check": "\"Focus only\" narrows the tray",
+  "check": "\"Focus only\", set in the product, narrows what the notification app receives",
   "pass": true,
   "detail": ""
  },
@@ -2399,5 +2756,68 @@
   "check": "opening an entry clears its mark and lowers the count; the entry stays",
   "pass": true,
   "detail": "7"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "the reason line opens the explanation without reading the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "removing a person from the row acts at once, informs and offers undo",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "the row does not move while it is looked at",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "only that person left the Focus people",
+  "pass": true,
+  "detail": "['Sam Whitaker', 'Marco Bianchi', 'Lena Fischer', 'Tomás Rivera']"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "switching the option off asks about people already added, and keeps them by default",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "keeping them leaves the list as it was",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "people can be removed one by one in settings",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "after leaving the feed, Anna's message is in Needs you",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "a removed person is not added back when they write again",
+  "pass": true,
+  "detail": ""
  }
 ]

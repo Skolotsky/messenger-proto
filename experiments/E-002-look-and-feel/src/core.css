@@ -238,3 +238,13 @@ h1,h2,h3,p{margin:0}
 .mark-read{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--muted);text-align:center;font-size:14px;line-height:1}
 .mark-read:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
 @media (hover:hover) and (min-width:761px){.mark-read{opacity:0}.row-main:hover .mark-read,.mark-read:focus-visible{opacity:1}}
+.ask{border:1px solid var(--focus);border-radius:8px;padding:10px 12px;margin:0 0 8px;display:flex;flex-wrap:wrap;gap:6px;font-size:13.5px;background:color-mix(in srgb,var(--focus) 8%,transparent)}
+.ask p{width:100%}
+.rule.person{padding:7px 0}
+.rm-all{display:block;margin:8px 0 0}
+.napp{background:#111;color:#eee;margin:-18px -16px 12px;padding:16px;font-family:ui-monospace,Menlo,monospace}
+.napp small{text-transform:uppercase;letter-spacing:.08em;color:#ffd479;font-size:11px}
+.napp .sheet-note{color:#bbb}
+.napp .switch{border:0;margin:0;padding:0;color:#eee}
+.napp select{font:inherit;background:#222;color:#eee;border:1px solid #555;border-radius:4px;padding:2px 6px}
+.rule>.av{flex:none}

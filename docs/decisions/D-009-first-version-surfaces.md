@@ -1,6 +1,6 @@
 # D-009: Which surfaces the first version includes
 
-- Status: accepted
+- Status: accepted; superseded in part (the notification tray: D-022)
 - Level: product
 - Date: 2026-11-22
 - Decided by: user

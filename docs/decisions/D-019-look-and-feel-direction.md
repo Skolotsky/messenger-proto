@@ -53,6 +53,10 @@ With it, one addition to the history tabs (D-016): **each history tab shows a co
 
 The agent chose against, so the risk is stated once: the three strains listed under A remain, and a count on every history tab makes the tabs look more like inboxes beside the feed. What is done about it inside this direction, as the agent's choice of detail: the history counts are grey and small, and only the feed's count is coloured, so one number calls for attention.
 
+### Added by the user, 2026-11-22 (after acceptance; the decision is unchanged)
+
+On a phone the first screen is Activity, "with an easy way to switch to channels of course". The bottom bar is Activity, Channels, Settings.
+
 ## Consequences
 
 - Easier: the layout needs no explaining, and the channel list, unread marks and the conversation pane come with habits attached. The Telegram-like and the agent's own pages stay in the experiment folder as a record and are not developed further.
@@ -62,5 +66,4 @@ The agent chose against, so the risk is stated once: the three strains listed un
 ## Follow-ups
 
 - Still to confirm with the user (from D-016): the history tabs replace the single Earlier list.
-- To raise with the user before the phone layout is built: whether Activity or the channel list is the first screen on a phone.
 - The mock-up's shell and styles (`experiments/E-002-look-and-feel/src/slack-like.*`) are a reference for the look, not code to reuse (the experiment rule).

@@ -9,5 +9,5 @@ window.Skin = { file: 'slack-like', title: 'Slack-like', buckets: 'stack', shell
     <nav class="tabs"><button class="tab${S.view !== 'history' ? ' on' : ''}" data-act="view" data-v="feed">Feed ${h.badge()}</button><span class="tabs-sep">History</span>${h.histTabs(true)}</nav>
     ${S.view === 'history' ? h.history() : h.feed()}</main>
   <section class="pane">${h.conv()}</section>
-  <nav class="bottom">${h.nav('chats', 'Home', 'home')}<button class="nav${S.view !== 'chats' ? ' on' : ''}" data-act="view" data-v="feed">${h.ic('bell')}<span>Activity</span>${h.badge()}</button><button class="nav" data-act="modal" data-m="tray">${h.ic('feed')}<span>Notifications</span></button></nav>
+  <nav class="bottom"><button class="nav${S.view !== 'chats' ? ' on' : ''}" data-act="view" data-v="feed">${h.ic('bell')}<span>Activity</span>${h.badge()}</button>${h.nav('chats', 'Channels', 'chat')}<button class="nav" data-act="modal" data-m="rules">${h.ic('rules')}<span>Settings</span></button></nav>
 </div>`; } };

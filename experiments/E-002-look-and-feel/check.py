@@ -22,7 +22,9 @@ def run(browser, slug, size, vp, scale):
         results.append({"page": slug, "width": size, "check": name, "pass": bool(cond), "detail": str(detail)})
         if not cond: failures.append(f"{tag}: {name} {detail}")
     def vis(sel): return pg.locator(sel).locator("visible=true")
-    def click(sel): vis(sel).first.click()
+    def click(sel):  # a row is opened by its avatar corner, since the reason line is a control of its own
+        if sel.endswith(" .row-main"): vis(sel).first.click(position={"x": 24, "y": 24})
+        else: vis(sel).first.click()
     def shot(name): pg.screenshot(path=str(shots / f"{slug}-{size}-{name}.jpg"), type="jpeg", quality=80)
     def bucket(b):
         if tabs: click(f'[data-act="btab"][data-b="{b}"]')
@@ -187,14 +189,17 @@ def run(browser, slug, size, vp, scale):
     ok("the rule is in the Focus rules list", pg.locator(".sheet .rule").count() >= 5)
     click('.sheet [data-act="closeModal"]')
 
-    # 12. the notification tray
-    click('[data-act="modal"][data-m="tray"]')
+    # 12. notifications, shown outside the product (D-022)
+    ok("the product has no notification bell", pg.locator(".bell").count() == 0)
+    click(".demo-btn"); click('.demo [data-act="modal"][data-m="tray"]')
     t = pg.locator(".sheet").inner_text()
-    ok("tray lists notifications and shows the current truth", pg.locator(".sheet .tray-e").count() >= 10 and "Message deleted" in t and "For your information" not in t.split("Notify me")[1])
+    ok("tray lists notifications and shows the current truth", pg.locator(".sheet .tray-e").count() >= 10 and "Message deleted" in t and "For your information ·" not in t)
     shot("12-notification-tray")
-    pg.locator('.sheet input[type="checkbox"]').check()
-    ok('"Focus only" narrows the tray', all("Focus" in x for x in pg.locator(".sheet .tray-e small").all_inner_texts()))
-    click('.sheet [data-act="closeModal"]')
+    click('.sheet [data-act="closeModal"]'); click(".demo-btn")
+    click('[data-act="modal"][data-m="rules"]'); pg.locator('.sheet input[data-act="focusOnly"]').check(); click('.sheet [data-act="closeModal"]')
+    click(".demo-btn"); click('.demo [data-act="modal"][data-m="tray"]')
+    ok('"Focus only", set in the product, narrows what the notification app receives', all("Focus" in x for x in pg.locator(".sheet .tray-e small").all_inner_texts()))
+    click('.sheet [data-act="closeModal"]'); click(".demo-btn")
 
     # search (on the Slack-like phone layout the search box lives under Home)
     if slug == "slack-like" and phone: click('[data-act="view"][data-v="chats"]')
@@ -229,6 +234,46 @@ def conv_edit(browser, slug, size, vp, scale):
     check("ch-sales", "j1", "j2", "playDelete", "in the conversation, a delete does not move the next message")
     ctx.close()
 
+def why_and_people(browser, slug, size, vp, scale):
+    """Why a row is in Focus (D-020) and how direct messages enter and leave Focus (D-021)."""
+    ctx = browser.new_context(viewport=vp, device_scale_factor=scale, has_touch=size == "phone")
+    pg = ctx.new_page(); pg.goto(f"file://{here.resolve()}/{slug}.html")
+    def ok(name, cond, detail=""):
+        results.append({"page": slug, "width": size, "check": name, "pass": bool(cond), "detail": str(detail)})
+        if not cond: failures.append(f"{slug} @ {size}: {name} {detail}")
+    def vis(sel): return pg.locator(sel).locator("visible=true")
+    def goto_feed():
+        vis('[data-act="view"][data-v="feed"]').first.click()
+    def needs():
+        if slug == "telegram-like": vis('[data-act="btab"][data-b="needs"]').first.click()
+    pg.locator('article[data-row="r-anna"] .why-btn').click()
+    t = pg.locator(".why-pop").inner_text()
+    ok("the reason line opens the explanation without reading the row", "A direct message from Anna Lindqvist" in t and "Focus people" in t and "unread" in pg.locator('[data-row="r-anna"]').get_attribute("class").split())
+    pg.screenshot(path=str(shots / f"{slug}-{size}-15-why.jpg"), type="jpeg", quality=80)
+    pg.locator('.why-pop [data-act="rmPerson"]').click()
+    t = pg.locator(".why-pop").inner_text()
+    ok("removing a person from the row acts at once, informs and offers undo", "Anna is removed from Focus" in t and pg.locator('.why-pop [data-act="undoPerson"]').count() == 1 and pg.locator(".scrim").count() == 0)
+    ok("the row does not move while it is looked at", pg.locator('.bucket.b-focus [data-row="r-anna"]').count() == 1)
+    pg.screenshot(path=str(shots / f"{slug}-{size}-16-person-removed.jpg"), type="jpeg", quality=80)
+    vis('[data-act="modal"][data-m="rules"]').first.click()
+    names = pg.locator(".sheet .rule.person b").all_inner_texts()
+    ok("only that person left the Focus people", "Anna Lindqvist" not in names and len(names) == 4, names)
+    pg.locator('.sheet [data-act="dmAuto"]').uncheck()
+    ok("switching the option off asks about people already added, and keeps them by default", "already in Focus and stay there" in pg.locator(".sheet .ask").inner_text() and pg.locator(".sheet .rule.person").count() == 4)
+    pg.screenshot(path=str(shots / f"{slug}-{size}-17-people-settings.jpg"), type="jpeg", quality=80)
+    pg.locator('.sheet [data-act="keepPeople"]').click()
+    ok("keeping them leaves the list as it was", pg.locator(".sheet .rule.person").count() == 4 and pg.locator(".sheet .ask").count() == 0)
+    pg.locator('.sheet [data-act="rmPerson"][data-p="sam"]').click()
+    ok("people can be removed one by one in settings", pg.locator(".sheet .rule.person").count() == 3)
+    pg.locator('.sheet [data-act="closeModal"]').first.click()
+    # with the option off and Sam removed, Sam's next message is not added back
+    pg.locator(".demo-btn").click(); pg.locator('.demo [data-act="playNew"]').click(); pg.locator('.demo [data-act="leave"]').click(); pg.locator(".demo-btn").click()
+    if slug == "telegram-like": needs()
+    ok("after leaving the feed, Anna's message is in Needs you", pg.locator('.bucket.b-needs [data-row="r-anna"]').count() == 1)
+    vis(".newpill").first.click()
+    ok("a removed person is not added back when they write again", pg.locator('.bucket.b-needs [data-row="r-sam"]').count() == 1)
+    ctx.close()
+
 def hist_unread(browser, slug, size, vp, scale):
     """History tabs carry an unread count, and unread entries a mark; opening one clears both (user, 2026-11-22)."""
     ctx = browser.new_context(viewport=vp, device_scale_factor=scale, has_touch=size == "phone")
@@ -257,6 +302,7 @@ with sync_playwright() as p:
                 run(b, slug, size, vp, scale)
                 conv_edit(b, slug, size, vp, scale)
                 hist_unread(b, slug, size, vp, scale)
+                why_and_people(b, slug, size, vp, scale)
             except Exception as e:
                 failures.append(f"{slug} @ {size}: stopped: {str(e).splitlines()[0][:300]}")
     b.close()

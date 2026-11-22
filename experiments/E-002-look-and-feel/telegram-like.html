@@ -246,6 +246,16 @@ h1,h2,h3,p{margin:0}
 .mark-read{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--muted);text-align:center;font-size:14px;line-height:1}
 .mark-read:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
 @media (hover:hover) and (min-width:761px){.mark-read{opacity:0}.row-main:hover .mark-read,.mark-read:focus-visible{opacity:1}}
+.ask{border:1px solid var(--focus);border-radius:8px;padding:10px 12px;margin:0 0 8px;display:flex;flex-wrap:wrap;gap:6px;font-size:13.5px;background:color-mix(in srgb,var(--focus) 8%,transparent)}
+.ask p{width:100%}
+.rule.person{padding:7px 0}
+.rm-all{display:block;margin:8px 0 0}
+.napp{background:#111;color:#eee;margin:-18px -16px 12px;padding:16px;font-family:ui-monospace,Menlo,monospace}
+.napp small{text-transform:uppercase;letter-spacing:.08em;color:#ffd479;font-size:11px}
+.napp .sheet-note{color:#bbb}
+.napp .switch{border:0;margin:0;padding:0;color:#eee}
+.napp select{font:inherit;background:#222;color:#eee;border:1px solid #555;border-radius:4px;padding:2px 6px}
+.rule>.av{flex:none}
 
 /* Telegram-like: one list, round avatars, big targets, folders for buckets, bubbles. Own colours. */
 :root{--accent:#6a4fd0;--accent-soft:#ebe6fb;--r:14px;--wall:#eeebe4}
@@ -469,7 +479,7 @@ function seed() {
     M('d00', 'omar', 'Mon 09:40', 'I need the revenue one by Wednesday noon.')]);
   const R = (id, conv, bucket, items, by, t, reason, why, o) => Object.assign({ id, conv, bucket, items, by, t, reason, why, sec: 'new', read: false, kept: null, done: false, replies: [] }, o || {});
   const rows = [
-    R('r-anna', 'dm-anna', 'focus', ['a1', 'a2'], 'anna', '10:37', 'In Focus: direct message from Anna', 'Your Focus rule "Direct messages from people" matched.', { rule: 'dm' }),
+    R('r-anna', 'dm-anna', 'focus', ['a1', 'a2'], 'anna', '10:37', 'In Focus: direct message from Anna', 'Anna is one of your Focus people: everyone who writes to you directly is added.', { rule: 'dm' }),
     R('r-rc', 'th-rc', 'focus', ['rc4'], 'ship', '10:21', 'In Focus: Shipwright flagged this for you', 'A flag that names you lands in Focus and is kept for you until you press Done, reply or react. Shipwright has stopped and is waiting for you.', { kept: 'flag', rule: 'flag' }),
     R('r-inc', 'ch-incidents', 'focus', ['i1', 'i2', 'i3', 'i4', 'i5', 'i6'], 'yuki', '10:24', 'In Focus: #incidents is set to Focus', 'You set this channel\'s dial to Focus, so every new post lands here, as one row however many there are.', { drive: 'channel', chan: 1 }),
     R('r-go', 'ch-launch', 'focus', ['l3'], 'anna', '09:12', 'Flagged by Anna', 'Anna flagged this and named you. You read it at 09:20, so it is kept for you until you press Done, reply or react. Nobody else\'s answer changes that.', { sec: 'kept', kept: 'flag', read: true, rule: 'flag' }),
@@ -490,7 +500,8 @@ function seed() {
   return {
     msgs, convs, rows, view: 'feed', btab: 'focus', htab: 'dms', conv: null, exp: new Set(), open: new Set(), lock: {}, menu: null, modal: null,
     pending: null, arrived: false, fyiSeen: false, level: '', focusOnly: false, demo: false, note: '', q: '', resort: false,
-    rules: [{ id: 'dm', label: 'Direct messages from people', n: 31, start: 1 }, { id: 'flag', label: 'Flags that name you', n: 6, start: 1 }, { id: 'ch:incidents', label: 'Every new post in #incidents', n: 23, kind: 'channel', target: 'incidents' }],
+    dmAuto: true, dmPeople: ['anna', 'sam', 'marco', 'lena', 'tomas'], dmRemoved: [], dmAsk: false, off: {},
+    rules: [{ id: 'flag', label: 'Flags that name you', n: 6, start: 1 }, { id: 'ch:incidents', label: 'Every new post in #incidents', n: 23, kind: 'channel', target: 'incidents' }],
     tray: [T('r-anna', 'a2', 'focus'), T('r-check', 'c5', 'needs'), T('r-export', 't1', 'needs'), T('r-sso', 'j1', 'needs'), T('r-inc', 'i6', 'focus'), T('r-rc', 'rc4', 'focus'), Object.assign(T('r-mig', 'mig1', 'needs'), { as: 'marco', lead: 'Reacted ✅ to your message: ', at: '10:16' }), T('r-comp', 'p3', 'needs'), T('r-triage', 'u2', 'needs'), T('r-go', 'l3', 'focus')],
     kept: new Set(), nid: 0
   };
@@ -550,22 +561,23 @@ function dialCtl(c, ctx) {
   return '';
 }
 /* ---- "why is this here, and I do not want it here": three ways to show it, picked with #why=a, b or c (E-002 follow-up) ---- */
-const WHY = (location.hash.match(/why=([abc])/) || [])[1] || '';
+const WHY = (location.hash.match(/why=([abc])/) || [])[1] || 'a'; // the user chose a (D-020)
+const ruleOn = r => r.rule === 'dm' ? S.dmPeople.includes(conv(r.conv).with) : S.rules.some(x => x.id === r.rule);
 function explain(r) {
   const c = conv(r.conv), rule = id => S.rules.find(x => x.id === id), acts = [];
-  const off = S.off && S.off[r.id];
+  const off = S.off[r.id];
   let what = r.why, by = r.reason, alt = '';
   if (r.kept === 'you') { what = 'You pressed Keep on this row.'; by = 'Kept by you'; alt = 'It stays until you press Done, reply or react.'; }
   else if (r.rule === 'flag') {
     const x = rule('flag'); what = `${pn(r.by)} flagged this message and named you.`; by = 'Your rule "Flags that name you"'; alt = 'Without the rule it would be in Needs you, as a direct mention.';
-    if (x) acts.push({ label: 'Stop putting flags in Focus', act: 'rmRuleId', d: `data-id="flag" data-row="${r.id}" data-to="Needs you"`, note: `Removes the rule. ${x.n} items in the last 7 days would have gone to Needs you instead.` });
-  } else if (r.rule === 'dm') {
-    const x = rule('dm'); what = `A direct message from ${pn(r.by)}, a person.`; by = 'Your rule "Direct messages from people"'; alt = 'Without the rule it would be in Needs you.';
-    if (x) acts.push({ label: 'Stop putting direct messages in Focus', act: 'rmRuleId', d: `data-id="dm" data-row="${r.id}" data-to="Needs you"`, note: `Removes the rule. ${x.n} items in the last 7 days would have gone to Needs you instead.` });
+    if (x) acts.push({ label: 'Stop putting flags in Focus', act: 'rmRuleId', d: `data-id="flag" data-rid="${r.id}" data-to="Needs you"`, note: `Removes the rule. ${x.n} items in the last 7 days would have gone to Needs you instead.` });
+  } else if (r.rule === 'dm') { // Focus people: one entry per person who wrote to you directly (D-021)
+    const p = c.with; what = `A direct message from ${pn(p)}, a person.`; by = `${first(p)} is one of your Focus people${S.dmAuto ? ', added the first time they wrote to you' : ''}`; alt = 'A direct message from someone who is not one of them lands in Needs you.';
+    if (S.dmPeople.includes(p)) acts.push({ label: `Remove ${first(p)} from Focus`, act: 'rmPerson', d: `data-p="${p}" data-rid="${r.id}"`, note: `Only ${first(p)}; everyone else stays. ${RCOUNT[p] || 5} items in the last 7 days would have gone to Needs you instead.` });
   } else if (r.drive === 'channel') {
     what = `${r.items.length} new posts in #${c.name}. None of them names you.`; by = `You set #${c.name} to Focus`; alt = 'At Default they would not be in your feed at all.';
-    acts.push({ label: `Set #${c.name} to All activity`, act: 'dialFrom', d: `data-c="${c.id}" data-l="all" data-row="${r.id}" data-to="For your information"`, note: `${CVOL[c.name] || 20} posts in the last 7 days would have gone to For your information.` });
-    acts.push({ label: `Set #${c.name} to Default`, act: 'dialFrom', d: `data-c="${c.id}" data-l="default" data-row="${r.id}" data-to="nowhere in your feed"`, note: 'Only what names you, and your own threads, would reach you from it.' });
+    acts.push({ label: `Set #${c.name} to All activity`, act: 'dialFrom', d: `data-c="${c.id}" data-l="all" data-rid="${r.id}" data-to="For your information"`, note: `${CVOL[c.name] || 20} posts in the last 7 days would have gone to For your information.` });
+    acts.push({ label: `Set #${c.name} to Default`, act: 'dialFrom', d: `data-c="${c.id}" data-l="default" data-rid="${r.id}" data-to="nowhere in your feed"`, note: 'Only what names you, and your own threads, would reach you from it.' });
   }
   if (r.kept && !r.done) acts.unshift({ label: 'Done with this one', act: 'done', d: `data-id="${r.id}"`, note: 'Releases this row only. The rule stays.' });
   return { what, by, alt, acts, off };
@@ -573,7 +585,7 @@ function explain(r) {
 function whyBody(r, full) {
   const e = explain(r), b = BK[r.bucket][0];
   const path = full ? `<ol class="why-path">${['focus', 'needs', 'fyi'].map(k => `<li class="${k === r.bucket ? 'hit' : ''}"><b>${BK[k][0]}</b><span>${k === r.bucket ? esc(e.by) + ' — decided here' : (['focus', 'needs', 'fyi'].indexOf(k) < ['focus', 'needs', 'fyi'].indexOf(r.bucket) ? 'no rule of yours matched' : k === 'needs' ? esc(e.alt || 'not reached') : 'not reached')}</span></li>`).join('')}</ol>` : '';
-  const done = e.off ? `<p class="why-off">Changed. From the next time you open the feed, rows like this land in ${esc(e.off)}. <button class="link" data-act="modal" data-m="rules">See your rules</button></p>` : '';
+  const done = e.off ? `<p class="why-off">${e.off.msg ? esc(e.off.msg) + ` <button class="link" data-act="undoPerson" data-p="${e.off.p}" data-rid="${r.id}">Undo</button> · ` : `Changed. From the next time you open the feed, rows like this land in ${esc(e.off)}. `}<button class="link" data-act="modal" data-m="rules">Feed settings</button></p>` : '';
   const acts = e.off ? '' : e.acts.map(a => `<div class="why-act"><button class="btn sm" data-act="${a.act}" ${a.d}>${esc(a.label)}</button><small>${esc(a.note)}</small></div>`).join('');
   return `<div class="why-steps"><div><i>1</i><span><b>What it is</b>${esc(e.what)}</span></div><div><i>2</i><span><b>What put it in ${b}</b>${esc(e.by)}</span></div>${e.alt && !full ? `<div><i>3</i><span><b>Otherwise</b>${esc(e.alt)}</span></div>` : ''}</div>${path}${acts || done ? `<div class="why-acts"><b class="why-q">Not what you want in ${b}?</b>${acts}${done}</div>` : ''}`;
 }
@@ -612,7 +624,7 @@ function bucketHTML(b) {
   const cnt = b === 'fyi' ? (n ? '<span class="bk-dot" title="Something new"></span>' : '') : `<span class="bk-count">${n}</span>`;
   let body = nw.length ? nw.map(rowHTML).join('') : `<div class="empty">${SUN}<p>${EMPTY[b]}</p></div>`;
   if (kp.length) body += `<div class="kept-head"><b>Kept · ${kp.length}</b><small>Stays until you press Done, reply or react</small></div>` + kp.map(rowHTML).join('');
-  return `<section class="bucket b-${b}" data-b="${b}"><header class="bk-head"><h2>${BK[b][0]}</h2>${cnt}<span class="bk-desc">${BK[b][1]}</span><span class="bk-acts">${b === 'focus' ? `<button class="btn sm" data-act="modal" data-m="rules">Rules · ${S.rules.length}</button>` : ''}<button class="btn sm" data-act="markAll" data-b="${b}">Mark all read</button></span></header>${body}</section>`;
+  return `<section class="bucket b-${b}" data-b="${b}"><header class="bk-head"><h2>${BK[b][0]}</h2>${cnt}<span class="bk-desc">${BK[b][1]}</span><span class="bk-acts">${b === 'focus' ? `<button class="btn sm" data-act="modal" data-m="rules">Rules · ${S.rules.length + S.dmPeople.length}</button>` : ''}<button class="btn sm" data-act="markAll" data-b="${b}">Mark all read</button></span></header>${body}</section>`;
 }
 const counts = () => ({ focus: S.rows.filter(r => r.bucket === 'focus' && r.sec !== 'kept' && !r.read).length, needs: S.rows.filter(r => r.bucket === 'needs' && !r.read).length, fyi: S.rows.filter(r => r.bucket === 'fyi' && !r.read).length });
 function feed() {
@@ -670,9 +682,11 @@ function modalHTML() {
       const who = e.as || msg.by;
       return `<button class="tray-e${read ? ' read' : ''}" data-act="openConv" data-c="${msg.conv}" data-id="${e.row}">${av(who, 'xs')}<span class="tray-t"><b>${pn(who)}</b> <small>${where} · ${BK[e.bucket][0]} · ${e.at || msg.t}</small><span>${msg.deleted ? '<em>Message deleted</em>' : esc(e.lead || '') + rich(msg.text) + (msg.edited ? ' <em>(edited)</em>' : '')}</span></span></button>`;
     }).join('');
-    h = `<h2>Notifications</h2><p class="sheet-note">Stands in for push. One per row, sent when a row becomes unread in Focus or Needs you. For your information never notifies.</p><label class="switch"><input type="checkbox" data-act="focusOnly"${S.focusOnly ? ' checked' : ''}> Notify me for Focus only <button class="link sw-link" data-act="modal" data-m="rules">Feed and notification settings</button></label>${es}`;
+    h = `<div class="napp"><small>Not part of the product</small><h2>Notification app</h2><p class="sheet-note">A stand-in for the phone: what the notification sender delivered. In the real mock it is its own small web page, with a person to choose.</p><label class="switch">Delivered to <select disabled aria-label="Person"><option>Maya Okafor</option></select></label></div><p class="sheet-note">One per row, sent when a row becomes unread in Focus or Needs you${S.focusOnly ? ' (this person chose Focus only)' : ''}. For your information never notifies.</p>${es}`;
   } else if (m.type === 'rules') {
-    h = `<h2>Feed and notifications</h2><h3>Focus rules</h3><p class="sheet-note">Focus holds what matches these, and nothing else. Changes apply the next time you open the feed.</p>${S.rules.map((r, i) => `<div class="rule"><span><b>${esc(r.label)}</b><small>${r.n} items in the last 7 days${r.start ? ' · starting rule' : ''}</small></span><button class="btn sm" data-act="rmRule" data-i="${i}">Remove</button></div>`).join('')}
+    const ppl = S.dmPeople;
+    const dm = `<h3>Direct messages in Focus</h3><label class="switch"><input type="checkbox" data-act="dmAuto"${S.dmAuto ? ' checked' : ''}> Add everyone who writes to me directly</label>${S.dmAsk ? `<div class="ask"><p>New people will no longer be added. ${ppl.length} ${ppl.length === 1 ? 'person is' : 'people are'} already in Focus and stay there. Remove them too?</p><button class="btn sm pri" data-act="keepPeople">Keep them</button><button class="btn sm" data-act="rmAllPeople">Remove all ${ppl.length}</button></div>` : ''}${ppl.map(x => `<div class="rule person">${av(x, 'xs')}<span><b>${pn(x)}</b><small>${RCOUNT[x] || 5} items in the last 7 days</small></span><button class="btn sm" data-act="rmPerson" data-p="${x}">Remove</button></div>`).join('') || '<p class="sheet-note">Nobody. Direct messages land in Needs you.</p>'}${ppl.length > 1 && !S.dmAsk ? '<button class="link rm-all" data-act="rmAllPeople">Remove all</button>' : ''}`;
+    h = `<h2>Feed and notifications</h2>${dm}<h3>Focus rules</h3><p class="sheet-note">Focus holds what matches these, and nothing else. Changes apply the next time you open the feed.</p>${S.rules.map((r, i) => `<div class="rule"><span><b>${esc(r.label)}</b><small>${r.n} items in the last 7 days${r.start ? ' · starting rule' : ''}</small></span><button class="btn sm" data-act="rmRule" data-i="${i}">Remove</button></div>`).join('')}
       <h3>Suggested</h3>${S.rules.some(r => r.id === 'mention') ? '' : `<div class="rule"><span><b>Any direct mention</b><small>Would have pulled in 23 items in the last 7 days. They are in Needs you today.</small></span><button class="btn sm pri" data-act="addRule" data-id="mention" data-label="Any direct mention" data-n="23">Add</button></div>`}<p class="sheet-note">Add a person, a channel or a thread from "Add to Focus…" wherever you see it.</p>
       <h3>Channel dials</h3><p class="sheet-note">Channels that are not at Default. Change a dial from the channel itself.</p>${CH.map(([n, d]) => [n, (S.convs['ch-' + n] && S.convs['ch-' + n].dial) || d]).filter(x => x[1] !== 'default').map(([n, d]) => `<div class="rule"><span><b>#${n}</b><small>${DIAL[d][0]}: ${DIAL[d][1]}</small></span><button class="btn sm" data-act="openConv" data-c="ch-${n}">Open</button></div>`).join('')}
       <h3 id="set-notif">Notifications</h3><p class="sheet-note">A notification is sent once per row, when it becomes unread in a bucket that notifies. There are no notification settings per channel: the dials above decide through the bucket.</p>
@@ -692,7 +706,7 @@ const OTHER = { 'slack-like': 'Slack-like', 'telegram-like': 'Telegram-like', 'o
 function demoHTML() {
   const b = (a, t) => `<button class="btn sm" data-act="${a}">${t}</button>`;
   const panel = S.demo ? `<div class="demo" data-stop="1"><h2>Demo controls</h2><p>Not part of the product. They stand in for the team acting while you watch.</p>
-    ${b('playEdit', 'Tomás edits his message, longer')}${b('playDelete', 'Jonas deletes his message')}${b('playNew', 'Three new things arrive')}${b('leave', 'Leave the feed and come back')}${b('reset', 'Reset')}
+    ${b('playEdit', 'Tomás edits his message, longer')}${b('playDelete', 'Jonas deletes his message')}${b('playNew', 'Three new things arrive')}${b('leave', 'Leave the feed and come back')}<button class="btn sm" data-act="modal" data-m="tray">Open the notification app (outside the product)</button>${b('reset', 'Reset')}
     <p class="demo-note">${esc(S.note) || 'Tomás and Jonas are in Needs you.'}</p>
     <div class="demo-row">Theme ${['auto', 'light', 'dark'].map(t => `<button class="btn sm${(document.documentElement.dataset.theme || 'auto') === t ? ' on' : ''}" data-act="theme" data-t="${t}">${t}</button>`).join('')}</div>
     <div class="demo-row">Version ${Object.keys(OTHER).map(k => k === Skin.file ? `<b>${OTHER[k]}</b>` : `<a href="${k}.html">${OTHER[k]}</a>`).join(' · ')}</div></div>` : '';
@@ -701,7 +715,8 @@ function demoHTML() {
 const h = {
   get S() { return S; }, feed, history, chats, conv: convPane, bucketTabs, histTabs, counts, ic, HT, BK,
   badge() { const c = counts(), n = c.focus + c.needs; return n ? `<span class="badge">${n}</span>` : ''; },
-  bell() { const n = S.tray.filter(e => { const r = S.rows.find(x => x.id === e.row); return r && !r.read && (!S.focusOnly || e.bucket === 'focus'); }).length; return `<button class="icon-btn bell" data-act="modal" data-m="tray" aria-label="Notifications">${ic('bell')}${n ? `<span class="badge">${n}</span>` : ''}</button>`; },
+  bell() { return ''; },
+  bellOld() { const n = S.tray.filter(e => { const r = S.rows.find(x => x.id === e.row); return r && !r.read && (!S.focusOnly || e.bucket === 'focus'); }).length; return `<button class="icon-btn bell" data-act="modal" data-m="tray" aria-label="Notifications">${ic('bell')}${n ? `<span class="badge">${n}</span>` : ''}</button>`; },
   search() { return `<div class="search">${ic('search')}<input type="search" data-search="1" aria-label="Search messages" placeholder="Search messages" value="${esc(S.q)}"><div class="sr" id="sr"></div></div>`; },
   nav(v, label, icon, extra) { return `<button class="nav${S.view === v ? ' on' : ''}" data-act="view" data-v="${v}">${ic(icon)}<span>${label}</span>${extra || ''}</button>`; }
 };
@@ -734,7 +749,8 @@ function settle() { // the person leaves the feed: read rows go, kept rows move 
     const c = conv(r.conv), info = r.items.every(i => S.msgs[i].info);
     if (r.drive === 'channel') { if (c.dial === 'all') { r.bucket = 'fyi'; r.reason = `For your information: #${c.name} is set to All activity`; } else if (c.dial === 'focus') { r.bucket = 'focus'; r.reason = `In Focus: #${c.name} is set to Focus`; } else return false; }
     if (r.drive === 'thread' && !info) { if (c.tdial === 'off') return false; if (c.tset) { r.bucket = c.tdial; r.reason = `${BK[c.tdial][0]}: you set this thread to ${TDIAL[c.tdial][0]}`; } }
-    if (r.rule && !S.rules.some(x => x.id === r.rule) && r.bucket === 'focus' && !r.kept) { r.bucket = 'needs'; r.reason = 'Needs you: ' + r.reason.replace('In Focus: ', '') + ' (your Focus rule for it is off)'; }
+    if (r.rule && !ruleOn(r) && r.bucket === 'focus' && !r.kept) { r.bucket = 'needs'; r.reason = 'Needs you: ' + r.reason.replace('In Focus: ', '') + (r.rule === 'dm' ? '' : ' (your Focus rule for it is off)'); r.why = r.rule === 'dm' ? `${first(r.by)} is not one of your Focus people, so a direct message lands in Needs you.` : r.why; }
+    if (r.rule === 'dm' && ruleOn(r) && r.bucket === 'needs') { r.bucket = 'focus'; r.reason = 'In Focus: direct message from ' + first(r.by); }
     if (!info) { const hit = S.rules.find(x => (x.kind === 'person' && x.target === r.by) || (x.kind === 'channel' && (c.name === x.target) && r.bucket !== 'focus') || (x.kind === 'thread' && x.target === c.id) || (x.id === 'mention' && /mentioned you/.test(r.reason))); if (hit && r.bucket !== 'focus') { r.bucket = 'focus'; r.reason = `In Focus: your rule "${hit.label}"`; r.why = 'Your own Focus rule matched. You can remove it under Rules.'; } }
     return true;
   });
@@ -774,8 +790,13 @@ const A = {
   closeModal() { S.modal = null; },
   why(d) { S.whyOpen = S.whyOpen === d.id ? null : d.id; },
   whySheet(d) { S.modal = { type: 'why', id: d.id }; },
-  rmRuleId(d) { S.rules = S.rules.filter(x => x.id !== d.id); (S.off = S.off || {})[d.row] = d.to; },
-  dialFrom(d) { conv(d.c).dial = d.l; S.rules = S.rules.filter(x => x.id !== 'ch:' + conv(d.c).name); (S.off = S.off || {})[d.row] = d.to; },
+  rmRuleId(d) { S.rules = S.rules.filter(x => x.id !== d.id); S.off[d.rid] = d.to; },
+  rmPerson(d) { S.dmPeople = S.dmPeople.filter(x => x !== d.p); S.dmRemoved.push(d.p); if (d.rid) S.off[d.rid] = { p: d.p, msg: `${first(d.p)} is removed from Focus. Direct messages from ${first(d.p)} land in Needs you, starting the next time you open the feed.` }; },
+  undoPerson(d) { if (!S.dmPeople.includes(d.p)) S.dmPeople.push(d.p); S.dmRemoved = S.dmRemoved.filter(x => x !== d.p); delete S.off[d.rid]; },
+  dmAuto() { S.dmAuto = !S.dmAuto; S.dmAsk = !S.dmAuto && S.dmPeople.length > 0; },
+  keepPeople() { S.dmAsk = false; },
+  rmAllPeople() { S.dmRemoved.push(...S.dmPeople); S.dmPeople = []; S.dmAsk = false; },
+  dialFrom(d) { conv(d.c).dial = d.l; S.rules = S.rules.filter(x => x.id !== 'ch:' + conv(d.c).name); S.off[d.rid] = d.to; },
   focusOnly() { S.focusOnly = !S.focusOnly; },
   openMsg(d) { S.open.add(d.k); },
   keepH(d) { if (S.kept.has(d.k)) S.kept.delete(d.k); else S.kept.add(d.k); },
@@ -799,11 +820,13 @@ const A = {
     mk('d1', 'dele', '10:43', '@Maya activation dropped 4 points after Friday\'s onboarding change. Worth a look before the go/no-go?', 'ch-data');
     mk('k5', 'kofi', '10:44', '1.75 works on Android. Ship it.', 'th-icons');
     const base = { sec: 'new', read: false, kept: null, done: false, replies: [] };
+    if (S.dmAuto && !S.dmRemoved.includes('sam') && !S.dmPeople.includes('sam')) S.dmPeople.push('sam');
+    const samIn = S.dmPeople.includes('sam');
     S.pending = [
-      { row: Object.assign({ id: 'r-sam', conv: 'dm-sam', bucket: 'focus', items: ['s1'], by: 'sam', t: '10:43', reason: 'In Focus: direct message from Sam', why: 'Your Focus rule "Direct messages from people" matched.', rule: 'dm' }, base) },
+      { row: Object.assign({ id: 'r-sam', conv: 'dm-sam', bucket: samIn ? 'focus' : 'needs', items: ['s1'], by: 'sam', t: '10:43', reason: (samIn ? 'In Focus' : 'Needs you') + ': direct message from Sam', why: samIn ? 'Sam is one of your Focus people.' : 'Sam is not one of your Focus people, so a direct message lands in Needs you.', rule: 'dm' }, base) },
       { row: Object.assign({ id: 'r-dele', conv: 'ch-data', bucket: 'needs', items: ['d1'], by: 'dele', t: '10:43', reason: 'Needs you: Dele mentioned you', why: 'A direct mention lands in Needs you. #data is at Default.' }, base, { replies: [] }) },
       { into: 'r-icons', items: ['k5'], t: '10:44', by: 'kofi', row: Object.assign({ id: 'r-icons', conv: 'th-icons', bucket: 'fyi', items: ['k5'], by: 'kofi', t: '10:44', reason: 'For your information: a thread you follow', why: 'You clicked Follow on this thread, so its replies land here.', drive: 'thread' }, base, { replies: [] }) }];
-    S.tray.unshift({ row: 'r-sam', mid: 's1', bucket: 'focus' }, { row: 'r-dele', mid: 'd1', bucket: 'needs' });
+    S.tray.unshift({ row: 'r-sam', mid: 's1', bucket: samIn ? 'focus' : 'needs' }, { row: 'r-dele', mid: 'd1', bucket: 'needs' });
     S.note = 'Three arrived. Nothing in the list moved; they wait behind "3 new".';
   },
   leave() { settle(); S.note = 'You left and came back: read rows are in History, kept rows are under Kept, rule and dial changes are applied.'; },
