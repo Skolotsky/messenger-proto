@@ -310,7 +310,7 @@
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "the rule is in the Focus rules list",
+  "check": "the rule is in its own list in settings",
   "pass": true,
   "detail": ""
  },
@@ -415,14 +415,98 @@
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "settings is one screen with sections, opened on Activity feed when reached from the feed",
+  "check": "settings is one screen, opened on Activity feed when reached from the feed",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "notifications are a section of the same screen",
+  "check": "the Activity feed page keeps the general rules and links to the lists",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a general rule is switched off and on in the same place",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "and back on",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Focus people is its own list",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a removed person stays listed with a way back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "adding the person back restores them",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Focus threads says how to add one when empty",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "notifications are a section of the same screen: one question, two choices",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "choosing Focus only selects it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "channel levels sit under Activity feed",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "channels lists every channel with its level, changed ones first",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a channel's level is changed in place",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a channel can be taken out of Focus and put back in the same place",
   "pass": true,
   "detail": ""
  },
@@ -576,6 +660,13 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "the panel says where the rule lives in settings",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "removing a person from the row acts at once, informs and offers undo",
   "pass": true,
   "detail": ""
@@ -597,7 +688,7 @@
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "switching the option off asks about people already added, and keeps them by default",
+  "check": "switching the option off asks about people already added",
   "pass": true,
   "detail": ""
  },
@@ -947,7 +1038,7 @@
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "the rule is in the Focus rules list",
+  "check": "the rule is in its own list in settings",
   "pass": true,
   "detail": ""
  },
@@ -1045,21 +1136,112 @@
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "settings is one screen with sections, opened on Activity feed when reached from the feed",
+  "check": "settings is one screen, opened on Activity feed when reached from the feed",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "notifications are a section of the same screen",
+  "check": "the Activity feed page keeps the general rules and links to the lists",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "no row toolbar on a phone",
+  "check": "a general rule is switched off and on in the same place",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "and back on",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "Focus people is its own list",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "a removed person stays listed with a way back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "adding the person back restores them",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "Focus threads says how to add one when empty",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "notifications are a section of the same screen: one question, two choices",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "choosing Focus only selects it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "channel levels sit under Activity feed",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "channels lists every channel with its level, changed ones first",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "a channel's level is changed in place",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "a channel can be taken out of Focus and put back in the same place",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "on a phone a row shows one button, React; mark read and open are the swipe and the tap",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "the React button on a row reacts from the feed, without opening anything",
   "pass": true,
   "detail": ""
  },
@@ -1080,21 +1262,14 @@
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "a swipe to the left uncovers React and Keep",
+  "check": "a swipe to the left keeps the row, without opening it, and the row stays in place",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "React from the swipe puts the reaction on the row's message",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "slack-like",
-  "width": "phone",
-  "check": "Keep from the swipe keeps the row",
+  "check": "no reaction hides behind a swipe",
   "pass": true,
   "detail": ""
  },
@@ -1102,6 +1277,13 @@
   "page": "slack-like",
   "width": "phone",
   "check": "the reason line opens the explanation without reading the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "the panel says where the rule lives in settings",
   "pass": true,
   "detail": ""
  },
@@ -1129,7 +1311,7 @@
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "switching the option off asks about people already added, and keeps them by default",
+  "check": "switching the option off asks about people already added",
   "pass": true,
   "detail": ""
  },
@@ -1472,7 +1654,7 @@
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "the rule is in the Focus rules list",
+  "check": "the rule is in its own list in settings",
   "pass": true,
   "detail": ""
  },
@@ -1675,6 +1857,13 @@
  {
   "page": "telegram-like",
   "width": "desktop",
+  "check": "the panel says where the rule lives in settings",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
   "check": "removing a person from the row acts at once, informs and offers undo",
   "pass": true,
   "detail": ""
@@ -1696,7 +1885,7 @@
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "switching the option off asks about people already added, and keeps them by default",
+  "check": "switching the option off asks about people already added",
   "pass": true,
   "detail": ""
  },
@@ -2046,7 +2235,7 @@
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "the rule is in the Focus rules list",
+  "check": "the rule is in its own list in settings",
   "pass": true,
   "detail": ""
  },
@@ -2144,7 +2333,14 @@
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "no row toolbar on a phone",
+  "check": "on a phone a row shows one button, React; mark read and open are the swipe and the tap",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "the React button on a row reacts from the feed, without opening anything",
   "pass": true,
   "detail": ""
  },
@@ -2165,21 +2361,14 @@
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "a swipe to the left uncovers React and Keep",
+  "check": "a swipe to the left keeps the row, without opening it, and the row stays in place",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "React from the swipe puts the reaction on the row's message",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "telegram-like",
-  "width": "phone",
-  "check": "Keep from the swipe keeps the row",
+  "check": "no reaction hides behind a swipe",
   "pass": true,
   "detail": ""
  },
@@ -2187,6 +2376,13 @@
   "page": "telegram-like",
   "width": "phone",
   "check": "the reason line opens the explanation without reading the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "the panel says where the rule lives in settings",
   "pass": true,
   "detail": ""
  },
@@ -2214,7 +2410,7 @@
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "switching the option off asks about people already added, and keeps them by default",
+  "check": "switching the option off asks about people already added",
   "pass": true,
   "detail": ""
  },
@@ -2557,7 +2753,7 @@
  {
   "page": "own",
   "width": "desktop",
-  "check": "the rule is in the Focus rules list",
+  "check": "the rule is in its own list in settings",
   "pass": true,
   "detail": ""
  },
@@ -2760,6 +2956,13 @@
  {
   "page": "own",
   "width": "desktop",
+  "check": "the panel says where the rule lives in settings",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
   "check": "removing a person from the row acts at once, informs and offers undo",
   "pass": true,
   "detail": ""
@@ -2781,7 +2984,7 @@
  {
   "page": "own",
   "width": "desktop",
-  "check": "switching the option off asks about people already added, and keeps them by default",
+  "check": "switching the option off asks about people already added",
   "pass": true,
   "detail": ""
  },
@@ -3131,7 +3334,7 @@
  {
   "page": "own",
   "width": "phone",
-  "check": "the rule is in the Focus rules list",
+  "check": "the rule is in its own list in settings",
   "pass": true,
   "detail": ""
  },
@@ -3229,7 +3432,14 @@
  {
   "page": "own",
   "width": "phone",
-  "check": "no row toolbar on a phone",
+  "check": "on a phone a row shows one button, React; mark read and open are the swipe and the tap",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "the React button on a row reacts from the feed, without opening anything",
   "pass": true,
   "detail": ""
  },
@@ -3250,21 +3460,14 @@
  {
   "page": "own",
   "width": "phone",
-  "check": "a swipe to the left uncovers React and Keep",
+  "check": "a swipe to the left keeps the row, without opening it, and the row stays in place",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "phone",
-  "check": "React from the swipe puts the reaction on the row's message",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "own",
-  "width": "phone",
-  "check": "Keep from the swipe keeps the row",
+  "check": "no reaction hides behind a swipe",
   "pass": true,
   "detail": ""
  },
@@ -3272,6 +3475,13 @@
   "page": "own",
   "width": "phone",
   "check": "the reason line opens the explanation without reading the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "the panel says where the rule lives in settings",
   "pass": true,
   "detail": ""
  },
@@ -3299,7 +3509,7 @@
  {
   "page": "own",
   "width": "phone",
-  "check": "switching the option off asks about people already added, and keeps them by default",
+  "check": "switching the option off asks about people already added",
   "pass": true,
   "detail": ""
  },

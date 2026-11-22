@@ -361,6 +361,46 @@ button.rx:hover{border-color:var(--accent)}
   .set-item{white-space:nowrap}
   .act-close{display:none}
 }
+/* phone: a visible react button on every row; mark read and open are the swipe and the tap */
+@media (max-width:760px){
+  .row-btns{display:flex;border:0;background:none;box-shadow:none}
+  .row-btns .mark-read,.row-btns .open-btn{display:none}
+  .row-btns .rx-pick{width:36px;height:34px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+}
+.gone-rule>span b{color:var(--muted)}
+.sw-k{flex:1;display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:0 18px;background:#9a5b13;color:#fff;font-weight:600}
+/* settings: notifications as one question, channels as a list changed in place */
+.set-q{font-size:16px;font-weight:600;margin:4px 0 10px}
+.n-group{display:grid;gap:8px}
+.n-opt{display:flex;align-items:flex-start;gap:12px;width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--panel)}
+.n-opt:hover{border-color:var(--muted)}
+.n-opt.on{border-color:var(--accent);background:var(--accent-soft)}
+.n-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--muted);flex:none;margin-top:2px}
+.n-opt.on .n-radio{border-color:var(--accent);box-shadow:inset 0 0 0 3.5px var(--panel);background:var(--accent)}
+.n-text{flex:1;display:flex;flex-direction:column;min-width:0}
+.n-text small{color:var(--muted);font-size:13px}
+.n-opt em{font-style:normal;font-size:12.5px;color:var(--muted);white-space:nowrap;margin-top:2px}
+.set-list{margin:4px 0 0;padding-left:18px;font-size:14px;color:var(--text);display:grid;gap:4px}
+.lv-legend{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 14px;padding:10px 12px;background:var(--panel2);border-radius:8px;margin:8px 0 4px;font-size:13px}
+.lv-legend div{display:flex;flex-direction:column}
+.lv-legend span{color:var(--muted)}
+.ch-row{padding:7px 0}
+.ch-row select{font:inherit;font-size:14px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--text);min-width:128px}
+@media (max-width:760px){.lv-legend{grid-template-columns:1fr}.n-opt em{display:none}}
+/* activity feed settings: general rules on the page, lists on their own pages */
+.set-item.sub{padding-left:26px;font-size:13.5px;color:var(--muted)}
+.set-item.sub.on{color:var(--on-accent)}
+.set-item.parent{font-weight:600}
+.set-sw{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.set-sw input{width:18px;height:18px;margin-top:2px;accent-color:var(--accent);flex:none}
+.set-sw span{display:flex;flex-direction:column}
+.set-sw small{color:var(--muted);font-size:13px}
+.set-link{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px}
+.set-link:hover{background:var(--hover)}
+.set-link span{flex:1;display:flex;flex-direction:column}
+.set-link small{color:var(--muted);font-size:13px}
+.set-link .ic{transform:rotate(-90deg);color:var(--muted)}
+.set-back{display:inline-block;margin:-2px 0 6px}
 
 /* Slack-like: dark sidebar, dense rows, square avatars, flat messages. Own colours, no borrowed marks. */
 :root{--accent:#0f6e64;--side:#1d2b2a;--side-text:#cfdcda;--side-hover:#2a3d3b}
@@ -453,6 +493,7 @@ const IC = {
   feed: '<path d="M4 6h16M4 12h16M4 18h10"/>', clock: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
   chat: '<path d="M4 5h16v11H9l-5 4z"/>', home: '<path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/>',
   check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  pin: '<path d="M7 4h10v16l-5-4-5 4z"/>',
   smile: '<circle cx="11" cy="13" r="7"/><path d="M8.5 14.5a3 3 0 0 0 5 0M9 11h.01M13 11h.01M19 3v4M17 5h4"/>',
   open: '<path d="M14 5h5v5"/><path d="M19 5l-8 8"/><path d="M10 6H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3"/>',
   rules: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>'
@@ -603,7 +644,7 @@ function seed() {
   return {
     msgs, convs, rows, view: 'feed', btab: 'focus', htab: 'dms', conv: null, exp: new Set(), open: new Set(), lock: {}, menu: null, modal: null,
     pending: null, arrived: false, fyiSeen: false, level: '', focusOnly: false, demo: false, note: '', q: '', resort: false,
-    dmAuto: true, dmPeople: ['anna', 'sam', 'marco', 'lena', 'tomas'], dmRemoved: [], dmAsk: false, off: {},
+    dmAuto: true, dmPeople: ['anna', 'sam', 'marco', 'lena', 'tomas'], dmRemoved: [], dmAsk: false, off: {}, gone: [],
     rules: [{ id: 'flag', label: 'Flags that name you', n: 6, start: 1 }, { id: 'ch:incidents', label: 'Every new post in #incidents', n: 23, kind: 'channel', target: 'incidents' }],
     tray: [T('r-anna', 'a10', 'focus'), T('r-check', 'c5', 'needs'), T('r-export', 't1', 'needs'), T('r-sso', 'j1', 'needs'), T('r-inc', 'i6', 'focus'), T('r-rc', 'rc4', 'focus'), Object.assign(T('r-mig', 'mig1', 'needs'), { as: 'marco', lead: 'Reacted ✅ to your message: ', at: '10:16' }), T('r-comp', 'p3', 'needs'), T('r-triage', 'u2', 'needs'), T('r-go', 'l3', 'focus')],
     kept: new Set(), nid: 0
@@ -699,14 +740,14 @@ function explain(r) {
     acts.push({ label: `Set #${c.name} to Default`, act: 'dialFrom', d: `data-c="${c.id}" data-l="default" data-rid="${r.id}" data-to="nowhere in your feed"`, note: 'Only what names you, and your own threads, would reach you from it.' });
   }
   if (r.kept && !r.done) acts.unshift({ label: 'Done with this one', act: 'done', d: `data-id="${r.id}"`, note: 'Releases this row only. The rule stays.' });
-  return { what, by, alt, acts, off };
+  return { what, by, alt, acts, off, sec: r.rule === 'dm' ? 'people' : r.drive === 'channel' ? 'channels' : 'feed' };
 }
 function whyBody(r, full) {
   const e = explain(r), b = BK[r.bucket][0];
   const path = full ? `<ol class="why-path">${['focus', 'needs', 'fyi'].map(k => `<li class="${k === r.bucket ? 'hit' : ''}"><b>${BK[k][0]}</b><span>${k === r.bucket ? esc(e.by) + ' — decided here' : (['focus', 'needs', 'fyi'].indexOf(k) < ['focus', 'needs', 'fyi'].indexOf(r.bucket) ? 'no rule of yours matched' : k === 'needs' ? esc(e.alt || 'not reached') : 'not reached')}</span></li>`).join('')}</ol>` : '';
   const done = e.off ? `<p class="why-off">${e.off.msg ? esc(e.off.msg) + ` <button class="link" data-act="undoPerson" data-p="${e.off.p}" data-rid="${r.id}">Undo</button> · ` : `Changed. From the next time you open the feed, rows like this land in ${esc(e.off)}. `}<button class="link" data-act="modal" data-m="rules">Feed settings</button></p>` : '';
   const acts = e.off ? '' : e.acts.map(a => `<div class="why-act"><button class="btn sm" data-act="${a.act}" ${a.d}>${esc(a.label)}</button><small>${esc(a.note)}</small></div>`).join('');
-  return `<div class="why-steps"><div><i>1</i><span><b>What it is</b>${esc(e.what)}</span></div><div><i>2</i><span><b>What put it in ${b}</b>${esc(e.by)}</span></div>${e.alt && !full ? `<div><i>3</i><span><b>Otherwise</b>${esc(e.alt)}</span></div>` : ''}</div>${path}${acts || done ? `<div class="why-acts"><b class="why-q">Not what you want in ${b}?</b>${acts}${done}</div>` : ''}`;
+  return `<div class="why-steps"><div><i>1</i><span><b>What it is</b>${esc(e.what)}</span></div><div><i>2</i><span><b>What put it in ${b}</b>${esc(e.by)}</span></div>${e.alt && !full ? `<div><i>3</i><span><b>Otherwise</b>${esc(e.alt)}</span></div>` : ''}</div>${path}${acts || done ? `<div class="why-acts"><b class="why-q">Not what you want in ${b}?</b>${acts}${done}${e.off ? '' : `<button class="link" data-act="modal" data-m="rules" data-s="${e.sec}">Manage this in settings</button>`}</div>` : ''}`;
 }
 const isPhone = () => matchMedia('(max-width:760px)').matches;
 const CAP = 6; // a long burst shows its newest messages by the reply box; the earlier new ones are one click above them
@@ -740,8 +781,8 @@ function rowHTML(r) {
       <form class="reply" data-form="reply" data-id="${r.id}"><input name="t" autocomplete="off" aria-label="Reply" placeholder="Reply ${c.kind === 'dm' ? 'to ' + first(c.with) : 'in ' + where}…"><button class="btn pri">Send</button></form></div>`;
   }
   return `<article class="row b-${r.bucket} ${r.read ? 'read' : 'unread'}${exp ? ' expanded' : ''}${r.fresh ? ' fresh' : ''}${r.sec === 'kept' ? ' kept' : ''}${r.done ? ' done' : ''}" data-row="${r.id}">
-    <div class="sw-under" aria-hidden="true"><span class="sw-l">${ic('check')} ${r.sec === 'kept' ? 'Done' : 'Mark read'}</span><span class="sw-r"><button data-act="pick" data-m="${last.id}">${ic('smile')}<small>React</small></button><button data-act="${r.kept && !r.done ? 'done' : 'keep'}" data-id="${r.id}">${ic('check')}<small>${r.kept && !r.done ? 'Done' : 'Keep'}</small></button></span></div>
-    <div class="row-main" role="button" tabindex="0" data-act="toggle" data-id="${r.id}" aria-expanded="${exp}"${S.swipe === r.id ? ' style="transform:translateX(-144px)"' : ''}>${av(r.chan ? '#' : r.kind === 'rx' ? r.by : last.by)}
+    <div class="sw-under" aria-hidden="true"><span class="sw-l">${ic('check')} ${r.sec === 'kept' ? 'Done' : 'Mark read'}</span><span class="sw-k">${r.kept && !r.done ? 'Kept' : 'Keep'} ${ic('pin')}</span></div>
+    <div class="row-main" role="button" tabindex="0" data-act="toggle" data-id="${r.id}" aria-expanded="${exp}">${av(r.chan ? '#' : r.kind === 'rx' ? r.by : last.by)}
       <div class="row-text"><div class="row-head"><span class="row-title">${esc(title)}</span>${sub ? `<span class="row-sub">${sub}</span>` : ''}${marks}${cnt}<span class="row-time">${r.t}${last.edited ? ' · edited' : ''}</span></div>
         <div class="row-reason"><span class="why-dot"></span>${WHY === 'a' ? `<button class="why-btn" data-act="why" data-id="${r.id}" aria-expanded="${S.whyOpen === r.id}">${esc(r.reason)} ${ic('chev')}</button>` : esc(r.reason)}${r.note ? ` · <em>${r.note}</em>` : ''}${WHY === 'c' ? `<button class="why-btn c" data-act="whySheet" data-id="${r.id}">Why? Change…</button>` : ''}</div>
         <div class="row-preview" data-k="${k}"${lockS}>${r.replies.length ? `<b>You:</b> ${rich(S.msgs[r.replies[r.replies.length - 1]].text)}` : `<b>${last.by === ME ? 'You' : first(last.by)}:</b> ${rich(last.text)}`}</div>
@@ -821,8 +862,9 @@ function modalHTML() {
     h = `<div class="napp"><small>Not part of the product</small><h2>Notification app</h2><p class="sheet-note">A stand-in for the phone: what the notification sender delivered. In the real mock it is its own small web page, with a person to choose.</p><label class="switch">Delivered to <select disabled aria-label="Person"><option>Maya Okafor</option></select></label></div><p class="sheet-note">One per row, sent when a row becomes unread in Focus or Needs you${S.focusOnly ? ' (this person chose Focus only)' : ''}. For your information never notifies.</p>${es}`;
   } else if (m.type === 'rules') {
     const ppl = S.dmPeople;
-    const dm = `<h3>Direct messages in Focus</h3><label class="switch"><input type="checkbox" data-act="dmAuto"${S.dmAuto ? ' checked' : ''}> Add everyone who writes to me directly</label>${S.dmAsk ? `<div class="ask"><p>New people will no longer be added. ${ppl.length} ${ppl.length === 1 ? 'person is' : 'people are'} already in Focus and stay there. Remove them too?</p><button class="btn sm pri" data-act="keepPeople">Keep them</button><button class="btn sm" data-act="rmAllPeople">Remove all ${ppl.length}</button></div>` : ''}${ppl.map(x => `<div class="rule person">${av(x, 'xs')}<span><b>${pn(x)}</b><small>${RCOUNT[x] || 5} items in the last 7 days</small></span><button class="btn sm" data-act="rmPerson" data-p="${x}">Remove</button></div>`).join('') || '<p class="sheet-note">Nobody. Direct messages land in Needs you.</p>'}${ppl.length > 1 && !S.dmAsk ? '<button class="link rm-all" data-act="rmAllPeople">Remove all</button>' : ''}`;
+    const dm = `<h3>Direct messages in Focus</h3><label class="switch"><input type="checkbox" data-act="dmAuto"${S.dmAuto ? ' checked' : ''}> Add everyone who writes to me directly</label>${S.dmAsk ? `<div class="ask"><p>New people will no longer be added. ${ppl.length} ${ppl.length === 1 ? 'person is' : 'people are'} already in Focus and stay there. Remove them too?</p><button class="btn sm pri" data-act="keepPeople">Keep them</button><button class="btn sm" data-act="rmAllPeople">Remove all ${ppl.length}</button></div>` : ''}${ppl.map(x => `<div class="rule person">${av(x, 'xs')}<span><b>${pn(x)}</b><small>${RCOUNT[x] || 5} items in the last 7 days</small></span><button class="btn sm" data-act="rmPerson" data-p="${x}">Remove</button></div>`).join('') || '<p class="sheet-note">Nobody. Direct messages land in Needs you.</p>'}${ppl.length > 1 && !S.dmAsk ? '<button class="link rm-all" data-act="rmAllPeople">Remove all</button>' : ''}${S.dmRemoved.length ? `<h3>Removed people</h3><p class="sheet-note">Not added again when they write. Their direct messages land in Needs you.</p>${S.dmRemoved.map(x => `<div class="rule person gone-rule">${av(x, 'xs')}<span><b>${pn(x)}</b><small>${RCOUNT[x] || 5} items in the last 7 days</small></span><button class="btn sm pri" data-act="undoPerson" data-p="${x}">Add back</button></div>`).join('')}` : ''}`;
     h = `<h2>Feed and notifications</h2>${dm}<h3>Focus rules</h3><p class="sheet-note">Focus holds what matches these, and nothing else. Changes apply the next time you open the feed.</p>${S.rules.map((r, i) => `<div class="rule"><span><b>${esc(r.label)}</b><small>${r.n} items in the last 7 days${r.start ? ' · starting rule' : ''}</small></span><button class="btn sm" data-act="rmRule" data-i="${i}">Remove</button></div>`).join('')}
+      ${S.gone.length ? `<h3>Removed</h3>${S.gone.map(r => `<div class="rule gone-rule"><span><b>${esc(r.label)}</b><small>Not in Focus now. ${r.n} items in the last 7 days${r.start ? ' · starting rule' : ''}</small></span><button class="btn sm pri" data-act="addRule" data-id="${r.id}" data-label="${esc(r.label)}" data-n="${r.n}" data-kind="${r.kind || ''}" data-target="${r.target || ''}" data-start="${r.start ? 1 : ''}">Add back</button></div>`).join('')}` : ''}
       <h3>Suggested</h3>${S.rules.some(r => r.id === 'mention') ? '' : `<div class="rule"><span><b>Any direct mention</b><small>Would have pulled in 23 items in the last 7 days. They are in Needs you today.</small></span><button class="btn sm pri" data-act="addRule" data-id="mention" data-label="Any direct mention" data-n="23">Add</button></div>`}<p class="sheet-note">Add a person, a channel or a thread from "Add to Focus…" wherever you see it.</p>
       <h3>Channel dials</h3><p class="sheet-note">Channels that are not at Default. Change a dial from the channel itself.</p>${CH.map(([n, d]) => [n, (S.convs['ch-' + n] && S.convs['ch-' + n].dial) || d]).filter(x => x[1] !== 'default').map(([n, d]) => `<div class="rule"><span><b>#${n}</b><small>${DIAL[d][0]}: ${DIAL[d][1]}</small></span><button class="btn sm" data-act="openConv" data-c="ch-${n}">Open</button></div>`).join('')}
       <h3 id="set-notif">Notifications</h3><p class="sheet-note">A notification is sent once per row, when it becomes unread in a bucket that notifies. There are no notification settings per channel: the dials above decide through the bucket.</p>
@@ -836,10 +878,30 @@ function modalHTML() {
     h = `<h2>Add to Focus</h2><p class="sheet-note">Each rule shows what it would have pulled into Focus over the last 7 days, before you save it.</p>${opts.map(o => { const has = S.rules.some(r => r.id === o[0]); return `<div class="rule"><span><b>${esc(o[1])}</b><small class="rule-n">${o[2]} items in the last 7 days${o[2] > 30 ? `, about ${Math.round(o[2] / 7)} a day. That would make Focus a long list.` : ''}</small></span><button class="btn sm pri" ${has ? 'disabled' : ''} data-act="addRule" data-id="${o[0]}" data-label="${esc(o[1])}" data-n="${o[2]}" data-kind="${o[3]}" data-target="${o[4]}">${has ? 'Added' : 'Add rule'}</button></div>`; }).join('')}`;
   }
   if (m.type === 'rules') {
-    const [feedPart, rest] = h.replace('<h2>Feed and notifications</h2>', '').split('<h3>Channel dials</h3>'), [chPart, nPart] = rest.split('<h3 id="set-notif">Notifications</h3>');
     const acct = `<div class="rule person">${av(ME)}<span><b>${pn(ME)}</b><small>${P[ME][1]} · Larkspur</small></span></div><p class="sheet-note">You are looking at the product as ${first(ME)}. Switching to another person, and signing out, belong to the running product; the first version has a person switcher in place of sign-in.</p>`;
-    const secs = { account: ['Account', acct], feed: ['Activity feed', feedPart], notif: ['Notifications', nPart], channels: ['Channels', chPart] }, cur = S.setSec || 'feed';
-    return `<div class="scrim center" data-act="closeModal"><div class="sheet settings" role="dialog" aria-modal="true" aria-label="Settings" data-stop="1"><button class="icon-btn close" data-act="closeModal" aria-label="Close">×</button><nav class="set-nav"><h2>Settings</h2>${Object.keys(secs).map(k => `<button class="set-item${k === cur ? ' on' : ''}" data-act="setSec" data-s="${k}">${secs[k][0]}</button>`).join('')}</nav><div class="set-body"><h2>${secs[cur][0]}</h2>${secs[cur][1]}</div></div></div>`;
+    // Activity feed: the page keeps the general rules; what was added to Focus one by one lives in its own lists
+    const cur = S.setSec || 'feed', ppl = S.dmPeople, has = id => S.rules.some(r => r.id === id), of = k => S.rules.filter(r => r.kind === k), goneOf = k => S.gone.filter(r => r.kind === k);
+    const sw = (act, id, on, t, d) => `<label class="set-sw"><input type="checkbox" data-act="${act}"${id ? ` data-id="${id}"` : ''}${on ? ' checked' : ''}><span><b>${t}</b><small>${d}</small></span></label>`;
+    const ruleRow = r => `<div class="rule"><span><b>${esc(r.label)}</b><small>${r.n} items in the last 7 days</small></span><button class="btn sm" data-act="rmRuleId" data-id="${r.id}">Remove</button></div>`;
+    const goneRow = r => `<div class="rule gone-rule"><span><b>${esc(r.label)}</b><small>Removed. ${r.n} items in the last 7 days</small></span><button class="btn sm pri" data-act="addRule" data-id="${r.id}" data-label="${esc(r.label)}" data-n="${r.n}" data-kind="${r.kind || ''}" data-target="${r.target || ''}">Add back</button></div>`;
+    const list = (k, none) => (of(k).map(ruleRow).join('') || `<p class="sheet-note">${none}</p>`) + (goneOf(k).length ? `<h3>Removed</h3>${goneOf(k).map(goneRow).join('')}` : '');
+    const link = (to, t, n, d) => `<button class="set-link" data-act="setSec" data-s="${to}"><span><b>${t} · ${n}</b><small>${d}</small></span>${ic('chev')}</button>`;
+    const ask = S.dmAsk ? `<div class="ask"><p>New people will no longer be added. ${ppl.length} ${ppl.length === 1 ? 'person is' : 'people are'} already in Focus and stay there. Remove them too?</p><button class="btn sm pri" data-act="keepPeople">Keep them</button><button class="btn sm" data-act="rmAllPeople">Remove all ${ppl.length}</button></div>` : '';
+    const feedPart = `<p class="set-q">What goes to Focus?</p><p class="sheet-note">Focus holds what matches these rules and lists, and nothing else. Changes apply the next time you open the feed.</p>
+      <h3>General rules</h3>${sw('dmAuto', '', S.dmAuto, 'Direct messages from people', 'Everyone who writes to you directly is added to your Focus people. Off: nobody new is added.')}${ask}${sw('ruleToggle', 'flag', has('flag'), 'Flags that name you', 'A flag that mentions you or is sent to you directly. 6 items in the last 7 days.')}${sw('ruleToggle', 'mention', has('mention'), 'Any direct mention', 'Off: mentions land in Needs you. 23 items in the last 7 days.')}
+      <h3>What you added to Focus</h3>${link('people', 'People', ppl.length + of('person').length, 'Whose direct messages land in Focus')}${link('threads', 'Threads', of('thread').length, 'Threads where every reply lands in Focus')}
+      <h3>Channels</h3>${link('channels', 'Channel levels', CH.filter(x => ((S.convs['ch-' + x[0]] && S.convs['ch-' + x[0]].dial) || x[1]) !== 'default').length + ' changed', 'How much of each channel reaches your feed: Focus, All activity, Default or Muted')}`;
+    const back = '<button class="link set-back" data-act="setSec" data-s="feed">‹ Activity feed</button>';
+    const people = `${back}<p class="sheet-note">Direct messages from these people land in Focus. Remove someone here, or from the reason line on one of their rows.</p><h3>Direct messages from · ${ppl.length}</h3>${ppl.map(x => `<div class="rule person">${av(x, 'xs')}<span><b>${pn(x)}</b><small>${RCOUNT[x] || 5} items in the last 7 days</small></span><button class="btn sm" data-act="rmPerson" data-p="${x}">Remove</button></div>`).join('') || '<p class="sheet-note">Nobody. Direct messages land in Needs you.</p>'}${ppl.length > 1 ? '<button class="link rm-all" data-act="rmAllPeople">Remove all</button>' : ''}${S.dmRemoved.length ? `<h3>Removed · ${S.dmRemoved.length}</h3><p class="sheet-note">Not added again when they write.</p>${S.dmRemoved.map(x => `<div class="rule person gone-rule">${av(x, 'xs')}<span><b>${pn(x)}</b><small>${RCOUNT[x] || 5} items in the last 7 days</small></span><button class="btn sm pri" data-act="undoPerson" data-p="${x}">Add back</button></div>`).join('')}` : ''}<h3>Everything from · ${of('person').length}</h3>${list('person', 'Nobody yet. Use "Add to Focus…" on a message to lift everything that reaches you from its sender.')}`;
+    const thr = `${back}<p class="sheet-note">Every reply in these threads lands in Focus.</p>${list('thread', 'No threads yet. Use "Add to Focus…" in a thread to add one.')}`;
+    const nOpt = (v, t, d, n) => { const on = (S.focusOnly ? 'focus' : 'all') === v; return `<button class="n-opt${on ? ' on' : ''}" data-act="notify" data-v="${v}" role="radio" aria-checked="${on}"><span class="n-radio"></span><span class="n-text"><b>${t}</b><small>${d}</small></span><em>${n}</em></button>`; };
+    const notif = `<p class="set-q">What should send you a notification?</p><div role="radiogroup" class="n-group">${nOpt('all', 'Focus and Needs you', 'Everything directed at you: what your Focus rules catch, mentions, replies in your threads, flags.', 'about 29 a day')}${nOpt('focus', 'Focus only', 'Only what you chose for Focus yourself, and flags that name you. Mentions and replies wait in the feed.', 'about 5 a day')}</div><p class="sheet-note">The daily figures come from a simulated team of 30, not from your own history.</p><h3>Always</h3><ul class="set-list"><li>For your information never sends a notification.</li><li>One notification per conversation, not one per message.</li><li>Nothing is sent for a conversation you are looking at.</li><li>There is no separate notification setting per channel: a channel's level decides what reaches Focus and Needs you, and that decides what notifies.</li></ul>`;
+    const lvOf = n => (S.convs['ch-' + n] && S.convs['ch-' + n].dial) || CH.find(x => x[0] === n)[1];
+    const chRow = n => `<div class="rule ch-row"><span><b>#${n}</b><small>${DIAL[lvOf(n)][1]}</small></span><select data-dial="ch-${n}" aria-label="Level for #${n}">${Object.keys(DIAL).map(l => `<option value="${l}"${lvOf(n) === l ? ' selected' : ''}>${DIAL[l][0]}</option>`).join('')}</select></div>`;
+    const chd = CH.map(x => x[0]).filter(n => lvOf(n) !== 'default'), dfl = CH.map(x => x[0]).filter(n => lvOf(n) === 'default');
+    const chans = `${back}<p class="set-q">How much of each channel reaches your feed?</p><p class="sheet-note">Every channel has one level. You can also change it from the channel itself. A mention or a flag that names you gets through at every level.</p><div class="lv-legend">${Object.keys(DIAL).map(l => `<div><b>${DIAL[l][0]}</b><span>${DIAL[l][1]}</span></div>`).join('')}</div>${chd.length ? `<h3>Changed by you · ${chd.length}</h3>${chd.map(chRow).join('')}` : ''}<h3>At Default · ${dfl.length}</h3>${dfl.map(chRow).join('')}`;
+    const secs = { account: ['Account', acct], feed: ['Activity feed', feedPart], people: ['Focus people', people, 1], threads: ['Focus threads', thr, 1], channels: ['Channel levels', chans, 1], notif: ['Notifications', notif] };
+    return `<div class="scrim center" data-act="closeModal"><div class="sheet settings" role="dialog" aria-modal="true" aria-label="Settings" data-stop="1"><button class="icon-btn close" data-act="closeModal" aria-label="Close">×</button><nav class="set-nav"><h2>Settings</h2>${Object.keys(secs).map(k => `<button class="set-item${secs[k][2] ? ' sub' : ''}${k === cur ? ' on' : ''}${k === 'feed' && secs[cur][2] ? ' parent' : ''}" data-act="setSec" data-s="${k}">${secs[k][0]}</button>`).join('')}</nav><div class="set-body"><h2>${secs[cur][0]}</h2>${secs[cur][1]}</div></div></div>`;
   }
   if (m.type === 'why') { const r = row(m.id); h = r ? `<h2>Why this is in ${BK[r.bucket][0]}</h2><p class="sheet-note">${esc(r.title || (conv(r.conv).kind === 'dm' ? pn(conv(r.conv).with) : conv(r.conv).title || '#' + conv(r.conv).name))} · ${r.t}. Every row is tested against the buckets from the top; the first that matches holds it.</p>${whyBody(r, true)}` : ''; }
   return `<div class="scrim" data-act="closeModal"><div class="sheet" role="dialog" aria-modal="true" data-stop="1"><button class="icon-btn close" data-act="closeModal" aria-label="Close">×</button>${h}</div></div>`;
@@ -910,6 +972,7 @@ function snap(mid) { // remember the size of everything showing this message, so
 function below(rid) { const el = document.querySelector(`[data-row="${rid}"]`); const nx = el && el.nextElementSibling; return nx ? nx.getBoundingClientRect().top : null; }
 function onScreen(rid) { const el = document.querySelector(`[data-row="${rid}"]`); if (!el) return false; const b = el.getBoundingClientRect(); return b.bottom > 0 && b.top < innerHeight; }
 function measured(rid, fn, what) { const a = below(rid); fn(); render(); const b = below(rid); S.note = a === null || b === null ? what + ' The row was not on screen.' : `${what} The row below moved by ${Math.abs(b - a).toFixed(1)} px.`; render(); }
+function setLevel(c, v) { c.dial = v; const id = 'ch:' + c.name; S.rules = S.rules.filter(r => r.id !== id); S.gone = S.gone.filter(r => r.id !== id); if (v === 'focus') S.rules.push({ id, label: `Every new post in #${c.name}`, n: CVOL[c.name] || 20, kind: 'channel', target: c.name }); }
 const A = {
   toggle(d) { const r = row(d.id); if (S.exp.has(d.id)) S.exp.delete(d.id); else { S.exp.add(d.id); r.read = true; } },
   more(d) { row(d.id).all = true; },
@@ -926,25 +989,27 @@ const A = {
   btab(d) { S.btab = d.b; if (d.b === 'fyi') S.fyiSeen = true; },
   htab(d) { if (S.view === 'feed') settle(); S.view = 'history'; S.htab = d.t; },
   menu(d) { S.menu = S.menu === d.key ? null : d.key; },
-  setDial(d) { conv(d.c).dial = d.l; S.menu = null; S.note = 'Dial changed. Unread rows are re-sorted the next time the feed is opened.'; },
+  setDial(d) { setLevel(conv(d.c), d.l); S.menu = null; S.note = 'Dial changed. Unread rows are re-sorted the next time the feed is opened.'; },
   setT(d) { const c = conv(d.c); c.tdial = d.l; c.tset = true; S.menu = null; },
   follow(d) { const c = conv(d.c); c.tdial = c.tdial === 'off' ? 'fyi' : 'off'; c.tset = true; S.menu = null; },
   modal(d) { S.modal = { type: d.m }; S.menu = null; if (d.m === 'rules') S.setSec = d.s || 'feed'; },
   setSec(d) { S.setSec = d.s; },
+  notify(d) { S.focusOnly = d.v === 'focus'; },
   actToggle() { if (S.actOpen === false) { S.actOpen = true; S.view = 'feed'; } else { if (S.view === 'feed') settle(); S.actOpen = false; } S.menu = null; },
   ruleFor(d) { S.modal = { type: 'rule', conv: d.c, by: d.by }; S.menu = null; },
-  addRule(d) { S.rules.push({ id: d.id, label: d.label, n: +d.n, kind: d.kind, target: d.target }); if (d.kind === 'channel') { const c = conv('ch-' + d.target); if (c) c.dial = 'focus'; } },
-  rmRule(d) { const r = S.rules.splice(+d.i, 1)[0]; if (r.kind === 'channel') { const c = conv('ch-' + r.target); if (c) c.dial = 'default'; } },
+  addRule(d) { S.rules.push({ id: d.id, label: d.label, n: +d.n, kind: d.kind || undefined, target: d.target || undefined, start: d.start ? 1 : 0 }); S.gone = S.gone.filter(x => x.id !== d.id); if (d.kind === 'channel') { const c = conv('ch-' + d.target); if (c) c.dial = 'focus'; } },
+  rmRule(d) { const r = S.rules.splice(+d.i, 1)[0]; S.gone.push(r); if (r.kind === 'channel') { const c = conv('ch-' + r.target); if (c) c.dial = 'default'; } },
   closeModal() { S.modal = null; },
   why(d) { S.whyOpen = S.whyOpen === d.id ? null : d.id; },
   whySheet(d) { S.modal = { type: 'why', id: d.id }; },
-  rmRuleId(d) { S.rules = S.rules.filter(x => x.id !== d.id); S.off[d.rid] = d.to; },
-  rmPerson(d) { S.dmPeople = S.dmPeople.filter(x => x !== d.p); S.dmRemoved.push(d.p); if (d.rid) S.off[d.rid] = { p: d.p, msg: `${first(d.p)} is removed from Focus. Direct messages from ${first(d.p)} land in Needs you, starting the next time you open the feed.` }; },
+  ruleToggle(d) { const DEF = { flag: ['Flags that name you', 6, 1], mention: ['Any direct mention', 23, 0] }; if (S.rules.some(r => r.id === d.id)) S.rules = S.rules.filter(r => r.id !== d.id); else S.rules.push({ id: d.id, label: DEF[d.id][0], n: DEF[d.id][1], start: DEF[d.id][2] }); },
+  rmRuleId(d) { S.gone.push(...S.rules.filter(x => x.id === d.id)); S.rules.filter(x => x.id === d.id && x.kind === 'channel').forEach(x => { const c = conv('ch-' + x.target); if (c) c.dial = 'default'; }); S.rules = S.rules.filter(x => x.id !== d.id); if (d.rid) S.off[d.rid] = d.to; },
+  rmPerson(d) { S.dmPeople = S.dmPeople.filter(x => x !== d.p); if (!S.dmRemoved.includes(d.p)) S.dmRemoved.push(d.p); if (d.rid) S.off[d.rid] = { p: d.p, msg: `${first(d.p)} is removed from Focus. Direct messages from ${first(d.p)} land in Needs you, starting the next time you open the feed.` }; },
   undoPerson(d) { if (!S.dmPeople.includes(d.p)) S.dmPeople.push(d.p); S.dmRemoved = S.dmRemoved.filter(x => x !== d.p); delete S.off[d.rid]; },
   dmAuto() { S.dmAuto = !S.dmAuto; S.dmAsk = !S.dmAuto && S.dmPeople.length > 0; },
   keepPeople() { S.dmAsk = false; },
-  rmAllPeople() { S.dmRemoved.push(...S.dmPeople); S.dmPeople = []; S.dmAsk = false; },
-  dialFrom(d) { conv(d.c).dial = d.l; S.rules = S.rules.filter(x => x.id !== 'ch:' + conv(d.c).name); S.off[d.rid] = d.to; },
+  rmAllPeople() { S.dmRemoved.push(...S.dmPeople.filter(x => !S.dmRemoved.includes(x))); S.dmPeople = []; S.dmAsk = false; },
+  dialFrom(d) { setLevel(conv(d.c), d.l); S.off[d.rid] = d.to; },
   focusOnly() { S.focusOnly = !S.focusOnly; },
   openMsg(d) { S.open.add(d.k); },
   keepH(d) { if (S.kept.has(d.k)) S.kept.delete(d.k); else S.kept.add(d.k); },
@@ -995,7 +1060,7 @@ function search(q) {
   const hits = Object.values(S.msgs).filter(m => !m.deleted && m.conv && m.text.toLowerCase().includes(q.trim().toLowerCase())).slice(0, 7);
   sr.innerHTML = `<div class="sr-box">${hits.length ? hits.map(m => { const c = conv(m.conv); return `<button class="tray-e" data-act="openConv" data-c="${m.conv}">${av(m.by, 'xs')}<span class="tray-t"><b>${pn(m.by)}</b> <small>${c.kind === 'dm' ? 'Direct message' : '#' + (c.name || c.where)} · ${m.t}${m.edited ? ' · edited' : ''}</small><span>${rich(m.text)}</span></span></button>`; }).join('') : '<p class="sheet-note">Nothing found. Deleted messages are not searchable.</p>'}</div>`;
 }
-/* swipe on a phone: right marks read (Done on a kept row), left uncovers React and Keep. The row itself never leaves under the finger. */
+/* swipe on a phone: to the right marks read (Done on a kept row), to the left keeps. Reacting is a button on the row, not a swipe (user, 2026-11-22). */
 let sw = null, swallow = false;
 document.addEventListener('pointerdown', e => {
   swallow = false;
@@ -1011,7 +1076,8 @@ document.addEventListener('pointermove', e => {
 const swEnd = () => {
   if (!sw) return; const w = sw; sw = null; if (!w.on) return;
   swallow = true; setTimeout(() => { swallow = false; }, 60); const r = row(w.id); // eat only the click this drag itself produces
-  if (w.dx < -50) S.swipe = w.id; else { S.swipe = null; if (w.dx > 70 && r) { if (r.sec === 'kept') r.done = true; r.read = true; } }
+  if (r && w.dx > 70) { if (r.sec === 'kept') r.done = true; r.read = true; }        // to the right: read (Done on a kept row)
+  else if (r && w.dx < -70 && !r.done) { r.kept = r.kept || 'you'; r.read = true; if (r.sec !== 'kept') r.keptNow = true; } // to the left: keep
   render();
 };
 document.addEventListener('pointerup', swEnd); document.addEventListener('pointercancel', swEnd);
@@ -1037,6 +1103,7 @@ document.addEventListener('click', e => {
   if (an === 'openConv') { const nl = document.querySelector('.conv .newline'); if (nl) nl.scrollIntoView({ block: 'start' }); }
 });
 document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"]')) { e.preventDefault(); e.target.click(); } if (e.key === 'Escape' && (S.modal || S.menu || S.pick)) { S.modal = null; S.menu = null; S.pick = null; render(); } });
+document.addEventListener('change', e => { if (e.target.dataset.dial) { setLevel(conv(e.target.dataset.dial), e.target.value); render(); } });
 document.addEventListener('submit', e => { e.preventDefault(); submit(e.target); });
 document.addEventListener('input', e => {
   if (e.target.dataset.search) search(e.target.value);

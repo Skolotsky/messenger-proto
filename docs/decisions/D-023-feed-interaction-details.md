@@ -42,20 +42,28 @@ As listed under "Decided"; where the agent had built something else first, the r
 11. **The sidebar holds the person's own avatar and menu**, "for typical things like logout, settings".
 12. **Activity can be closed on a wide screen**: a close button on it, and clicking "Activity" in the sidebar opens and closes it. Its count stays on the sidebar while it is closed. Closing it counts as leaving the feed (D-003).
 
+13. **On a phone a row still takes a reaction from the feed**, through a visible React button on the row. "On mobile I still want to be able to put reaction right from activity feed."
+14. **The two swipes on a phone are Keep and Mark read**, one in each direction. "Reaction shouldn't be on a swipe." As built: to the right marks read (Done on a kept row), to the left keeps; the row stays in place either way.
+15. **What can be removed in settings can be added back in the same place.** "Here I can remove, but can't add them back. Please make it consistent." General rules are switches; a removed person, thread or sender stays listed under Removed with Add back.
+16. **The Activity feed page of settings keeps the general rules; what was added one by one lives in its own lists**: Focus people, Focus threads. "So I can conveniently manage these lists separately, when the main activity settings page keeps general rules."
+17. **Channel levels belong to Activity feed** in settings, as one more page under it, listing every channel with its level, changed in place.
+18. **Whatever the reason panel on a row can change is also in settings**, and the panel links to that place. "Ensure the rule is in settings, not only here."
+
 ### Still the agent's proposal, shown in the mock-up, awaiting the user's word
 
 - **Context in an opened row:** the message before the new ones in a direct conversation; the start of the thread and the reply before in a thread; none for a mention in a channel.
 - **A long burst** shows its six newest messages by the reply box, with the earlier new ones one click above; opening reads the whole row (D-015). The number six is the agent's.
 - **The arrivals button is called "Show"**, and the control names how many arrived in Focus and Needs you.
-- **Swipe on a phone:** to the right marks the row read (Done on a kept row); to the left uncovers React and Keep. The row stays in place either way.
+- **Which swipe is which:** the user set the pair; that right is read and left is keep is the agent's pick.
 - **On a phone the reply box is not given the cursor automatically**, since that opens the keyboard.
-- **The settings sections** are Account, Activity feed, Notifications, Channels. Sign out and switching person are named in the menu but not built: the first version has a person switcher in place of sign-in (D-009).
+- **The settings sections** are Account, Activity feed (with Focus people, Focus threads, Channel levels under it) and Notifications. Sign out and switching person are named in the menu but not built: the first version has a person switcher in place of sign-in (D-009).
+- **The Notifications page** asks one question, "What should send you a notification?", with two choices and their daily figures from E-001. The user disliked the first form and did not understand the first Channels page; both were redrawn and not yet reviewed.
 
 ## Consequences
 
 - Easier: one way to each thing, and a phone layout with two states, list and conversation.
 - Harder: two interaction models for a row, by width. The settings screen becomes a surface of its own that every later setting must fit into.
-- Committed to: the twelve points above.
+- Committed to: the eighteen points above.
 
 ## Follow-ups
 

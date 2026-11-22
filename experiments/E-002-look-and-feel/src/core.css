@@ -353,3 +353,43 @@ button.rx:hover{border-color:var(--accent)}
   .set-item{white-space:nowrap}
   .act-close{display:none}
 }
+/* phone: a visible react button on every row; mark read and open are the swipe and the tap */
+@media (max-width:760px){
+  .row-btns{display:flex;border:0;background:none;box-shadow:none}
+  .row-btns .mark-read,.row-btns .open-btn{display:none}
+  .row-btns .rx-pick{width:36px;height:34px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+}
+.gone-rule>span b{color:var(--muted)}
+.sw-k{flex:1;display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:0 18px;background:#9a5b13;color:#fff;font-weight:600}
+/* settings: notifications as one question, channels as a list changed in place */
+.set-q{font-size:16px;font-weight:600;margin:4px 0 10px}
+.n-group{display:grid;gap:8px}
+.n-opt{display:flex;align-items:flex-start;gap:12px;width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--panel)}
+.n-opt:hover{border-color:var(--muted)}
+.n-opt.on{border-color:var(--accent);background:var(--accent-soft)}
+.n-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--muted);flex:none;margin-top:2px}
+.n-opt.on .n-radio{border-color:var(--accent);box-shadow:inset 0 0 0 3.5px var(--panel);background:var(--accent)}
+.n-text{flex:1;display:flex;flex-direction:column;min-width:0}
+.n-text small{color:var(--muted);font-size:13px}
+.n-opt em{font-style:normal;font-size:12.5px;color:var(--muted);white-space:nowrap;margin-top:2px}
+.set-list{margin:4px 0 0;padding-left:18px;font-size:14px;color:var(--text);display:grid;gap:4px}
+.lv-legend{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 14px;padding:10px 12px;background:var(--panel2);border-radius:8px;margin:8px 0 4px;font-size:13px}
+.lv-legend div{display:flex;flex-direction:column}
+.lv-legend span{color:var(--muted)}
+.ch-row{padding:7px 0}
+.ch-row select{font:inherit;font-size:14px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--text);min-width:128px}
+@media (max-width:760px){.lv-legend{grid-template-columns:1fr}.n-opt em{display:none}}
+/* activity feed settings: general rules on the page, lists on their own pages */
+.set-item.sub{padding-left:26px;font-size:13.5px;color:var(--muted)}
+.set-item.sub.on{color:var(--on-accent)}
+.set-item.parent{font-weight:600}
+.set-sw{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.set-sw input{width:18px;height:18px;margin-top:2px;accent-color:var(--accent);flex:none}
+.set-sw span{display:flex;flex-direction:column}
+.set-sw small{color:var(--muted);font-size:13px}
+.set-link{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px}
+.set-link:hover{background:var(--hover)}
+.set-link span{flex:1;display:flex;flex-direction:column}
+.set-link small{color:var(--muted);font-size:13px}
+.set-link .ic{transform:rotate(-90deg);color:var(--muted)}
+.set-back{display:inline-block;margin:-2px 0 6px}
