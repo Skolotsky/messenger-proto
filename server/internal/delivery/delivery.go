@@ -33,8 +33,8 @@ const (
 	batchSize   = 100
 	turnBudget  = 200
 	triesToPark = 3
-	refusalsTo  = 3 // different changes refused in a row that pause an organization
-	maxBackoff  = 60 * time.Second
+	refusalsTo  = 3                // different changes refused in a row that pause an organization
+	maxBackoff  = 20 * time.Second // D-035: a receiver back can be level within G-006's 30 s
 	probeFor    = call.Limit + time.Second
 )
 
@@ -68,6 +68,10 @@ type Config struct {
 	Conversations string
 	Seed          int64  // for the jitter of retries
 	Worker        string // this copy's name in claims; random when empty
+	// ClaimFor shortens the claim for a test, so a receiver slower than the claim
+	// takes less than a minute to show. It must stay longer than any call the test
+	// makes. Zero is the real value.
+	ClaimFor time.Duration
 }
 
 // Service runs one lane per receiver and database.
@@ -87,6 +91,9 @@ type Service struct {
 func New(cfg Config) *Service {
 	if cfg.Clock == nil {
 		cfg.Clock = clock.Default()
+	}
+	if cfg.ClaimFor == 0 {
+		cfg.ClaimFor = claimFor
 	}
 	me := cfg.Worker
 	if me == "" {
@@ -117,12 +124,12 @@ func (s *Service) Run(ctx context.Context) {
 	wg.Wait()
 }
 
-// backoff is the wait before try number failures+1: 1, 2, 4 … 60 s, each varied
-// by up to a fifth either way so retries do not arrive in step.
+// backoff is the wait before try number failures+1: 1, 2, 4 … up to 20 s, each
+// varied by up to a fifth either way so retries do not arrive in step (D-035).
 func (s *Service) backoff(failures int) time.Duration {
 	d := maxBackoff
-	if failures <= 6 {
-		d = time.Second << max(failures-1, 0)
+	if failures <= 5 {
+		d = min(time.Second<<max(failures-1, 0), maxBackoff)
 	}
 	s.mu.Lock()
 	j := 0.8 + 0.4*s.rng.Float64()

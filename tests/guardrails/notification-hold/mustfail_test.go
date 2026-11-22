@@ -5,16 +5,18 @@ package notificationhold
 import (
 	"testing"
 
-	"contexia/internal/standins"
+	"contexia/internal/feed/rules"
 )
 
-// G-011 must fail when the hold is counted from arrival, and when the clock is
-// moved by any later note instead of by clock notes only.
+func init() { machine = rules.SetArrival }
+
+// G-011 must fail when the hold is counted from arrival, when any change
+// releases instead of a tick, and when a read inside the hold leaves the entry.
 func TestFailsWhenBroken(t *testing.T) {
-	for _, f := range []string{standins.FaultHoldArrival, standins.FaultAnyNoteTime} {
+	for _, f := range []string{rules.FaultHoldArrival, rules.FaultAnyChange, rules.FaultReadKeepsHold} {
 		t.Run(f, func(t *testing.T) {
-			standins.SetFault(f)
-			defer standins.SetFault("")
+			rules.SetFault(f)
+			defer rules.SetFault("")
 			bad := scenarios(t)
 			if len(bad) == 0 {
 				t.Fatal("the check passed with the rule switched off")

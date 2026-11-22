@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# No program reaches a database except through internal/shared/orgdb (D-029, D-034).
+# Usage: scripts/lint-database-access [folder], default server. Test files are left out.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+root="${1:-server}"
+pattern='pgxpool\.(New|NewWithConfig|ParseConfig)\(|pgx\.(Connect|ConnectConfig|ParseConfig)\(|sql\.Open(DB)?\(|pgconn\.Connect'
+found=$(grep -rnE "$pattern" "$root" --include='*.go' --exclude='*_test.go' | grep -v '/internal/shared/orgdb/' || true)
+if [ -n "$found" ]; then
+  echo "lint-database-access: FAIL these lines open a database connection outside orgdb:"
+  echo "$found"
+  echo "Fix: get the pool from orgdb.Open and reach it with orgdb.InOrg or Directory.PoolFor."
+  exit 1
+fi
+echo "lint-database-access: ok, every database connection is opened by orgdb"

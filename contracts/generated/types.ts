@@ -46,14 +46,9 @@ export type Stream = "conversations" | "feed";
 export type NoteNow = "read" | "deleted";
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "WithdrawReason".
- */
-export type WithdrawReason = "read" | "deleted" | "fenced" | "rule_changed";
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "RuleType".
  */
-export type RuleType = "person" | "conversation" | "item_kind" | "text";
+export type RuleType = "person" | "conversation" | "item_kind";
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "KeptBy".
@@ -93,7 +88,7 @@ export type ReceiverName = "search" | "feed" | "sender";
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "NoteState".
  */
-export type NoteState = "held" | "sent" | "withdrawn" | "history";
+export type NoteState = "sent" | "history";
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "AgentState".
@@ -213,9 +208,16 @@ export type LiveOut =
 export type SearchChange = SearchCreated | SearchChanged | SearchDeletedChange;
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "NoteUpdate".
+ */
+export type NoteUpdate = {
+  [k: string]: unknown;
+};
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "Note".
  */
-export type Note = NoteDue | NoteChanged | NoteWithdrawn | NoteClock;
+export type Note = NoteSend | NoteUpdate;
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "AgentEvent".
@@ -240,7 +242,6 @@ export interface ContractTypes {
   ItemKind?: ItemKind;
   Stream?: Stream;
   NoteNow?: NoteNow;
-  WithdrawReason?: WithdrawReason;
   RuleType?: RuleType;
   KeptBy?: KeptBy;
   RowState?: RowState;
@@ -390,10 +391,8 @@ export interface ContractTypes {
   SearchChange?: SearchChange;
   SearchApplied?: SearchApplied;
   SearchRefusal?: SearchRefusal;
-  NoteDue?: NoteDue;
-  NoteChanged?: NoteChanged;
-  NoteWithdrawn?: NoteWithdrawn;
-  NoteClock?: NoteClock;
+  NoteSend?: NoteSend;
+  NoteUpdate?: NoteUpdate;
   Note?: Note;
   NoteTaken?: NoteTaken;
   NoteBehind?: NoteBehind;
@@ -1881,10 +1880,10 @@ export interface SearchRefusal {
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "NoteDue".
+ * via the `definition` "NoteSend".
  */
-export interface NoteDue {
-  kind: "due";
+export interface NoteSend {
+  kind: "send";
   org: string;
   number: number;
   previous: number;
@@ -1896,46 +1895,9 @@ export interface NoteDue {
   bucket: Bucket;
   why: string;
   text: string;
-}
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "NoteChanged".
- */
-export interface NoteChanged {
-  kind: "changed";
-  org: string;
-  number: number;
-  previous: number;
-  edition: number;
-  at: string;
-  name: string;
-  text: string;
-}
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "NoteWithdrawn".
- */
-export interface NoteWithdrawn {
-  kind: "withdrawn";
-  org: string;
-  number: number;
-  previous: number;
-  edition: number;
-  at: string;
-  name: string;
-  because: WithdrawReason;
-}
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "NoteClock".
- */
-export interface NoteClock {
-  kind: "clock";
-  org: string;
-  number: number;
-  previous: number;
-  edition: number;
-  at: string;
+  due_at: string;
+  history?: boolean;
+  skip?: boolean;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema

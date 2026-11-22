@@ -7,7 +7,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"sort"
 	"testing"
 	"time"
 
@@ -71,7 +70,7 @@ func addBusy(t *testing.T, b *rig.Bench) {
 				t.Fatal(err)
 			}
 		}
-		if _, err := b.DB.SaveNote(bg, org, "clock"); err != nil {
+		if _, err := b.DB.SaveNote(bg, org, "update"); err != nil {
 			t.Fatal(err)
 		}
 		for _, q := range []string{
@@ -86,9 +85,8 @@ func addBusy(t *testing.T, b *rig.Bench) {
 }
 
 type measured struct {
-	millis float64
-	read   float64 // rows the plan read from tables that hold every organization
-	seq    []string
+	read float64 // rows the plan read from tables that hold every organization
+	seq  []string
 }
 
 var wide = map[string]bool{"org_log": true, "delivery_places": true, "note_heads": true, "note_places": true}
@@ -120,6 +118,12 @@ func ask(t *testing.T, b *rig.Bench, q delivery.Question) measured {
 		t.Fatal(err)
 	}
 	defer tx.Rollback(bg)
+	// At these small sizes a table scan looks as cheap as an index to the planner,
+	// so the plan would say nothing about larger ones. With scans priced out, a
+	// question that has no index path to its rows still scans, and is caught.
+	if _, err := tx.Exec(bg, "SET LOCAL enable_seqscan = off"); err != nil {
+		t.Fatal(err)
+	}
 	var raw string
 	if err := tx.QueryRow(bg, "EXPLAIN (ANALYZE, FORMAT JSON) "+q.SQL, q.Args...).Scan(&raw); err != nil {
 		t.Fatalf("%s: %v", q.Name, err)
@@ -128,7 +132,6 @@ func ask(t *testing.T, b *rig.Bench, q delivery.Question) measured {
 	if err := json.Unmarshal([]byte(raw), &plans); err != nil {
 		t.Fatal(err)
 	}
-	m.millis, _ = plans[0]["Execution Time"].(float64)
 	walk(plans[0]["Plan"].(map[string]any), &m)
 	return m
 }
@@ -138,45 +141,40 @@ func measure(t *testing.T, b *rig.Bench, s *delivery.Service) map[string]measure
 	out := map[string]measured{}
 	now := time.Now()
 	for _, q := range s.Questions(now) {
-		var times []float64
-		var last measured
-		for range 41 {
-			last = ask(t, b, q)
-			times = append(times, last.millis)
-		}
-		sort.Float64s(times)
-		last.millis = times[len(times)/2]
-		out[q.Name] = last
+		out[q.Name] = ask(t, b, q)
 	}
 	return out
 }
 
-// TestIdleOrganizationsCostNothing compares every timer question beside 1,000
-// and beside 20,000 idle organizations, with ten busy ones. The service is built
-// but not run, so the busy organizations stay due for the whole measurement.
+// TestIdleOrganizationsCostNothing compares every timer question beside 50 and
+// beside 500 idle organizations, with ten busy ones, by the rows each reads
+// (D-034: no timing limit, no large runs). The service is built but not run, so
+// the busy organizations stay due for the whole measurement.
 func TestIdleOrganizationsCostNothing(t *testing.T) {
 	b := rig.NewBench(t, nil)
 	s := delivery.New(delivery.Config{DB: b.DB.Directory(), Search: b.Search.URL, Feed: b.Feed.URL, Sender: b.Sender.URL, Seed: 47, Worker: "w"})
 	addBusy(t, b)
 
-	addIdle(t, b, 1, 1000)
+	addIdle(t, b, 1, 50)
 	small := measure(t, b, s)
-	addIdle(t, b, 1001, 20000)
+	addIdle(t, b, 51, 500)
 	large := measure(t, b, s)
 
 	for name, a := range small {
 		z := large[name]
-		t.Logf("%-48s %7.3f ms -> %7.3f ms; rows read %.0f -> %.0f", name, a.millis, z.millis, a.read, z.read)
+		t.Logf("%-48s rows read %.0f -> %.0f", name, a.read, z.read)
 		if len(z.seq) > 0 {
-			t.Errorf("%s reads every row of %v beside 20,000 idle organizations. Reach those tables per due row (G-029)", name, z.seq)
+			t.Errorf("%s reads every row of %v beside 500 idle organizations. Reach those tables per due row (G-029)", name, z.seq)
 		}
-		// A question touches each busy organization's rows a few times; what it
-		// may not do is read in proportion to the idle ones, at either size.
-		if limit := float64(perBusy * busy); a.read > limit || z.read > limit {
-			t.Errorf("%s read %.0f and %.0f rows of the tables that hold every organization, with only %d busy. It must not read the idle ones (G-029)", name, a.read, z.read, busy)
+		// A question touches each busy organization's rows a few times; what it may
+		// not do is read in proportion to the idle ones. The limit is judged at the
+		// larger size, where a read of the idle ones cannot hide; at 50 the planner
+		// may reach a busy row by a wider index, which the next check compares.
+		if limit := float64(perBusy * busy); z.read > limit {
+			t.Errorf("%s read %.0f rows of the tables that hold every organization beside 500 idle ones, with only %d busy. It must not read the idle ones (G-029)", name, z.read, busy)
 		}
-		if z.millis > a.millis*1.5 {
-			t.Errorf("%s rose from %.3f ms to %.3f ms between 1,000 and 20,000 idle organizations, more than half (G-029)", name, a.millis, z.millis)
+		if z.read > a.read {
+			t.Errorf("%s read %.0f rows beside 50 idle organizations and %.0f beside 500. Rows read may not rise (G-029)", name, a.read, z.read)
 		}
 	}
 }

@@ -59,7 +59,7 @@ func (w *W) apply(build func(hdr) any) Effects {
 	if err != nil {
 		w.t.Fatalf("apply: %v", err)
 	}
-	w.notes = append(w.notes, fx.Notes...)
+	w.notes = append(append(w.notes, fx.Held...), fx.Notes...)
 	w.last = fx
 	return fx
 }
@@ -263,10 +263,13 @@ func (w *W) row(p, id string) contract.FeedRow {
 func (w *W) kinds(person string) string {
 	var out []string
 	for _, n := range w.notes {
-		if n.Kind == "clock" || n.Person == person {
+		if n.Person == person {
 			s := n.Kind
-			if n.Because != "" {
-				s += ":" + string(n.Because)
+			if n.Now != "" {
+				s += ":" + string(n.Now)
+			}
+			if n.HasText {
+				s += ":text"
 			}
 			out = append(out, s)
 		}
@@ -510,10 +513,6 @@ func TestFocusRules(t *testing.T) {
 			id := w.dm("bot", "you")
 			w.rule("you", "conversation", id, true)
 			return w.where("you", w.post("bot", id)), "Focus/new"
-		}},
-		{"a text rule is held and moves nothing yet (T-062)", func(w *W) (any, any) {
-			w.rule("you", "text", "pricing", true)
-			return w.where("you", w.post("anna", "#a", to("you"))), "Needs you"
 		}},
 		{"muting re-sorts: an unaddressed row leaves, a mention stays", func(w *W) (any, any) {
 			w.dial("you", "#a", nil, "all")
@@ -826,7 +825,7 @@ func TestEditsAndDeletes(t *testing.T) {
 			m := w.post("anna", "#a")
 			w.read("you", "#a", nil)
 			w.edit(m, "now @you", to("you"))
-			return []string{w.where("you", m), w.kinds("you")}, []string{"Needs you", "due"}
+			return []string{w.where("you", m), w.kinds("you")}, []string{"Needs you", "held"}
 		}},
 		{"a second edit that removes it before reading leaves no trace", func(w *W) (any, any) {
 			m := w.post("anna", "#a")
@@ -1028,7 +1027,7 @@ func TestNotifications(t *testing.T) {
 		{"a row becoming unread in Needs you is due, with the contract's name", func(w *W) (any, any) {
 			m := w.post("anna", "#a", to("you"))
 			n := w.notes[len(w.notes)-1]
-			return []any{n.Kind, n.Name, n.Bucket, n.Text, *n.Row.Thread}, []any{"due", fmt.Sprintf("acme / you / #a:%s / %d", m, w.n), contract.Bucket("needs_you"), "text of " + m, m}
+			return []any{n.Kind, n.Name, n.Bucket, n.Text, *n.Row.Thread}, []any{"held", fmt.Sprintf("acme / you / #a:%s / %d", m, w.n), contract.Bucket("needs_you"), "text of " + m, m}
 		}},
 		{"For your information never notifies", func(w *W) (any, any) {
 			w.post("anna", "#a", to("channel"))
@@ -1042,21 +1041,22 @@ func TestNotifications(t *testing.T) {
 			r := w.post("you", "#a")
 			w.post("anna", "#a", in(r))
 			w.post("marco", "#a", in(r))
-			return w.kinds("you"), "due"
+			return w.kinds("you"), "held"
 		}},
 		{"a row moving up into Focus notifies once more", func(w *W) (any, any) {
 			r := w.post("you", "#a")
 			w.post("anna", "#a", in(r))
 			w.post("marco", "#a", in(r), to("you"), flag)
-			return w.kinds("you"), "due due"
+			return w.kinds("you"), "held held"
 		}},
 		{"a row read and active again notifies again", func(w *W) (any, any) {
 			r := w.post("you", "#a")
 			w.post("anna", "#a", in(r))
 			w.wait(6)
+			w.tick()
 			w.read("you", "#a", th(r))
 			w.post("anna", "#a", in(r))
-			return w.kinds("you"), "due withdrawn:read due"
+			return w.kinds("you"), "held send update:read held"
 		}},
 		{"Focus only: a Needs you row sends nothing", func(w *W) (any, any) {
 			w.focusOnly("you", true)
@@ -1066,7 +1066,7 @@ func TestNotifications(t *testing.T) {
 		{"Focus only: a Focus row is due", func(w *W) (any, any) {
 			w.focusOnly("you", true)
 			w.post("anna", w.dm("anna", "you"))
-			return w.kinds("you"), "due"
+			return w.kinds("you"), "held"
 		}},
 		{"an arrival in a watched conversation sends nothing", func(w *W) (any, any) {
 			r := w.post("you", "#a")
@@ -1074,71 +1074,137 @@ func TestNotifications(t *testing.T) {
 			w.post("anna", "#a", in(r))
 			return w.kinds("you"), ""
 		}},
-		{"read within the hold is withdrawn", func(w *W) (any, any) {
+		{"read within the hold removes the entry and writes nothing", func(w *W) (any, any) {
 			m := w.post("anna", "#a", to("you"))
 			w.wait(0.3)
 			w.read("you", "#a", th(m))
-			return w.kinds("you"), "due withdrawn:read"
+			w.wait(6)
+			w.tick()
+			return []any{w.kinds("you"), len(w.e.Held("you"))}, []any{"held", 0}
 		}},
-		{"deleted within the hold is withdrawn", func(w *W) (any, any) {
+		{"deleted within the hold removes the entry and writes nothing", func(w *W) (any, any) {
 			m := w.post("anna", "#a", to("you"))
 			w.wait(0.3)
 			w.del(m)
-			return w.kinds("you"), "due withdrawn:deleted"
+			w.wait(6)
+			w.tick()
+			return w.kinds("you"), "held"
 		}},
-		{"read after the hold still updates the entry", func(w *W) (any, any) {
+		{"read after the send updates the entry", func(w *W) (any, any) {
 			m := w.post("anna", "#a", to("you"))
+			w.wait(6)
+			w.tick()
 			w.wait(60)
 			w.read("you", "#a", th(m))
-			return w.kinds("you"), "due withdrawn:read"
+			return w.kinds("you"), "held send update:read"
 		}},
-		{"an edit carries the new text", func(w *W) (any, any) {
+		{"deleted after the send updates the entry, also once read", func(w *W) (any, any) {
+			m := w.post("anna", "#a", to("you"))
+			w.wait(6)
+			w.tick()
+			w.read("you", "#a", th(m))
+			w.del(m)
+			return w.kinds("you"), "held send update:read update:deleted"
+		}},
+		{"an edit during the hold is in the send, with no note of its own", func(w *W) (any, any) {
 			m := w.post("anna", "#a", to("you"))
 			w.edit(m, "new text", to("you"))
+			w.wait(6)
+			w.tick()
 			n := w.notes[len(w.notes)-1]
-			return []string{n.Kind, n.Text}, []string{"changed", "new text"}
+			return []string{w.kinds("you"), n.Text}, []string{"held send", "new text"}
 		}},
-		{"a mention edited away within the hold is withdrawn", func(w *W) (any, any) {
+		{"an edit after the send carries the new text", func(w *W) (any, any) {
+			m := w.post("anna", "#a", to("you"))
+			w.wait(6)
+			w.tick()
+			w.edit(m, "new text", to("you"))
+			n := w.notes[len(w.notes)-1]
+			return []string{n.Kind, n.Text}, []string{"update", "new text"}
+		}},
+		{"a mention edited away within the hold removes the entry", func(w *W) (any, any) {
 			m := w.post("anna", "#a", to("you"))
 			w.wait(1)
 			w.edit(m, "no mention")
-			return w.kinds("you"), "due withdrawn:rule_changed"
+			w.wait(6)
+			w.tick()
+			return w.kinds("you"), "held"
 		}},
-		{"a muted row within the hold is withdrawn", func(w *W) (any, any) {
+		{"a reaction taken back within the hold removes the entry", func(w *W) (any, any) {
+			m := w.post("you", "#a", to("marco"))
+			w.react("marco", m, "+1")
+			w.wait(1)
+			w.unreact("marco", m, "+1")
+			w.wait(6)
+			w.tick()
+			return w.kinds("you"), "held"
+		}},
+		{"a dial change within the hold removes the entry", func(w *W) (any, any) {
 			r := w.post("you", "#a")
 			w.post("anna", "#a", in(r))
 			w.wait(1)
 			w.dial("you", "#a", th(r), "off")
-			return w.kinds("you"), "due withdrawn:rule_changed"
+			w.wait(6)
+			w.tick()
+			return w.kinds("you"), "held"
 		}},
-		{"a dial change after the hold withdraws nothing", func(w *W) (any, any) {
+		{"a dial change after the send writes nothing", func(w *W) (any, any) {
 			r := w.post("you", "#a")
 			w.post("anna", "#a", in(r))
 			w.wait(6)
+			w.tick()
 			w.dial("you", "#a", th(r), "off")
-			return w.kinds("you"), "due"
+			return w.kinds("you"), "held send"
 		}},
 		{"a row lifted by your own rule sends nothing (R40)", func(w *W) (any, any) {
 			w.post("anna", "#a", to("you"))
 			w.rule("you", "item_kind", "mentions", true)
-			return w.kinds("you"), "due"
+			return w.kinds("you"), "held"
 		}},
-		{"a deleted message's text is not left on a row still due", func(w *W) (any, any) {
+		{"a deleted message's text is not sent from a row still due", func(w *W) (any, any) {
 			r := w.post("you", "#a")
 			a := w.post("anna", "#a", in(r))
 			b := w.post("marco", "#a", in(r))
 			w.del(a)
+			w.wait(6)
+			w.tick()
 			n := w.notes[len(w.notes)-1]
-			return []string{n.Kind, n.Text}, []string{"changed", "text of " + b}
+			return []string{n.Kind, n.Text}, []string{"send", "text of " + b}
 		}},
-		{"a tick writes a clock note", func(w *W) (any, any) {
+		{"a sent entry whose message goes takes the text of what is left", func(w *W) (any, any) {
+			r := w.post("you", "#a")
+			a := w.post("anna", "#a", in(r))
+			b := w.post("marco", "#a", in(r))
+			w.wait(6)
+			w.tick()
+			w.del(a)
+			n := w.notes[len(w.notes)-1]
+			return []string{n.Kind, n.Text}, []string{"update", "text of " + b}
+		}},
+		{"\"Focus only\" switched on during the hold removes a Needs you entry", func(w *W) (any, any) {
+			w.post("anna", "#a", to("you"))
+			w.focusOnly("you", true)
+			w.wait(6)
+			w.tick()
+			return w.kinds("you"), "held"
+		}},
+		{"a tick writes nothing when nothing is due", func(w *W) (any, any) {
 			fx := w.tick()
-			return []string{fx.Notes[0].Kind, fx.Notes[0].At}, []string{"clock", w.time()}
+			return len(fx.Notes), 0
+		}},
+		{"a fence removes what is on hold, and only inside it", func(w *W) (any, any) {
+			w.post("anna", "#a", to("you"))
+			w.post("anna", "#a", to("marco"))
+			w.post("anna", "#b", to("you"))
+			removed := w.e.Fence("#a", "you")
+			w.wait(6)
+			w.tick()
+			return []any{len(removed), w.kinds("you"), w.kinds("marco")}, []any{1, "held held send", "held send"}
 		}},
 		{"an edit that newly names you notifies (R36)", func(w *W) (any, any) {
 			m := w.post("anna", "#a")
 			w.edit(m, "x", to("you"))
-			return w.kinds("you"), "due"
+			return w.kinds("you"), "held"
 		}},
 	})
 }
@@ -1236,8 +1302,8 @@ func TestSeededHistoryWritesNoNotes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(fx.Notes) != 0 {
-		t.Fatalf("seeded history wrote notes: %v", fx.Notes)
+	if len(fx.Notes) != 0 || len(fx.Held) != 0 {
+		t.Fatalf("seeded history wrote notes %v or held %v", fx.Notes, fx.Held)
 	}
 	if w.where("you", "s1") != "Needs you" {
 		t.Fatalf("seeded history did not reach the feed: %s", w.where("you", "s1"))
@@ -1281,8 +1347,8 @@ func TestNoNotesUpToTheSeal(t *testing.T) {
 	apply(func(n, prev int64) any {
 		return contract.ChangeChannelCreated{Kind: "channel.created", Org: "acme", Number: n, Previous: prev, At: at, Conversation: "#a", Name: "a", People: []string{"anna", "you"}}
 	})
-	if fx := apply(mention("seeded")); len(fx.Notes) != 0 {
-		t.Fatalf("a seeded mention wrote notes: %v", fx.Notes)
+	if fx := apply(mention("seeded")); len(fx.Notes) != 0 || len(fx.Held) != 0 {
+		t.Fatalf("a seeded mention wrote notes %v or held %v", fx.Notes, fx.Held)
 	}
 	if fx := apply(func(n, prev int64) any {
 		return contract.ChangeTick{Kind: "tick", Org: "acme", Number: n, Previous: prev, At: at}
@@ -1297,8 +1363,8 @@ func TestNoNotesUpToTheSeal(t *testing.T) {
 	if !fx.Known || len(fx.Notes) != 0 {
 		t.Fatalf("the seal: known %v, notes %v", fx.Known, fx.Notes)
 	}
-	if fx := apply(mention("live")); len(fx.Notes) == 0 {
-		t.Fatal("the first mention after the seal wrote no note")
+	if fx := apply(mention("live")); len(fx.Held) == 0 {
+		t.Fatal("the first mention after the seal put nothing on hold")
 	}
 
 	plain := New("acme")
@@ -1315,8 +1381,8 @@ func TestNoNotesUpToTheSeal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(fx.Notes) == 0 {
-		t.Fatal("a log without the opener wrote no note for a mention")
+	if len(fx.Held) == 0 {
+		t.Fatal("a log without the opener put nothing on hold for a mention")
 	}
 }
 
@@ -1579,15 +1645,21 @@ func TestKindsWithNoEffectAreCounted(t *testing.T) {
 
 func TestNoteContractForm(t *testing.T) {
 	// The drafts become the contract's notes with the feed's own numbers.
-	due := NoteDraft{Kind: "due", At: "t", Name: "n", Person: "you", Bucket: "focus", Why: "w", Text: "x"}.Contract("acme", 10, 9, 7)
-	v, ok := due.Value.(contract.NoteDue)
-	if !ok || v.Number != 10 || v.Previous != 9 || v.Edition != 7 || v.Org != "acme" || v.Name != "n" {
-		t.Errorf("due note: %+v", due.Value)
+	send := NoteDraft{Kind: "send", At: "t", Name: "n", Person: "you", Bucket: "focus", Why: "w", Text: "x", DueAt: "d"}.Contract("acme", 10, 9, 7)
+	v, ok := send.Value.(contract.NoteSend)
+	if !ok || v.Number != 10 || v.Previous != 9 || v.Edition != 7 || v.Org != "acme" || v.Name != "n" || v.DueAt != "d" || v.History != nil {
+		t.Errorf("send note: %+v", send.Value)
 	}
-	if _, ok := (NoteDraft{Kind: "clock", At: "t"}).Contract("acme", 11, 10, 7).Value.(contract.NoteClock); !ok {
-		t.Error("clock note has the wrong form")
+	hist := NoteDraft{Kind: "send", History: true}.Contract("acme", 11, 10, 7).Value.(contract.NoteSend)
+	if hist.History == nil || !*hist.History {
+		t.Error("a history send has no mark")
 	}
-	if w, ok := (NoteDraft{Kind: "withdrawn", Name: "n", Because: "read"}).Contract("acme", 12, 11, 7).Value.(contract.NoteWithdrawn); !ok || w.Because != "read" {
-		t.Error("withdrawn note has the wrong form")
+	u, ok := NoteDraft{Kind: "update", Name: "n", Now: "read"}.Contract("acme", 12, 11, 7).Value.(contract.NoteUpdate)
+	if !ok || u.Now == nil || *u.Now != "read" || u.Text != nil {
+		t.Errorf("update note: %+v", u)
+	}
+	x, _ := NoteDraft{Kind: "update", Name: "n", Text: "", HasText: true}.Contract("acme", 13, 12, 7).Value.(contract.NoteUpdate)
+	if x.Text == nil {
+		t.Error("an update to an empty text lost it")
 	}
 }

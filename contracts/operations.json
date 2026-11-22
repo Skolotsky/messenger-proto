@@ -595,7 +595,9 @@
   "answers": {
    "Empty": 200
   },
-  "also": []
+  "also": [
+   404
+  ]
  },
  {
   "contract": "operations-and-control",
@@ -607,7 +609,9 @@
   "answers": {
    "Empty": 200
   },
-  "also": []
+  "also": [
+   404
+  ]
  },
  {
   "contract": "operations-and-control",
@@ -705,7 +709,9 @@
   "answers": {
    "PeopleList": 200
   },
-  "also": []
+  "also": [
+   404
+  ]
  },
  {
   "contract": "operations-and-control",

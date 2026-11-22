@@ -1,9 +1,10 @@
-// Package notificationonce holds G-010: every notification that is due and not
-// withdrawn within its hold is sent exactly once.
+// Package notificationonce holds G-010: every notification the feed releases
+// from its hold is sent exactly once. The sender only delivers (D-034).
 package notificationonce
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"testing"
@@ -74,15 +75,12 @@ func TestDelayedMarkAndTheListSurvivesAWipe(t *testing.T) {
 	org := rig.NewOrg("delayed")
 	b := &rig.Builder{Org: org, Edition: 1}
 	t0 := rig.Start
-	onTime := b.Due("marco", "#a", 1, t0)
-	late := b.Due("marco", "#b", 2, t0.Add(time.Second))
-	b.Add("clock", "", t0.Add(5*time.Second+time.Millisecond), nil) // past the first hold only
+	onTime := b.Send("marco", "#a", 1, t0)
 	rig.DeliverNotes(t, r.Direct, b.Notes)
 
 	r.Clock.Advance(10*time.Minute + 2*time.Second)
-	more := &rig.Builder{Org: org, Edition: 1, Notes: b.Notes}
-	more.Add("clock", "", t0.Add(7*time.Second), nil)
-	rig.DeliverNotes(t, r.Direct, more.Notes)
+	late := b.Send("marco", "#b", 2, t0.Add(time.Second))
+	rig.DeliverNotes(t, r.Direct, b.Notes)
 
 	got := list(r, org, "marco")
 	if e := got[onTime]; e.State != "sent" || e.Delayed || e.At == nil {
@@ -103,9 +101,26 @@ func TestDelayedMarkAndTheListSurvivesAWipe(t *testing.T) {
 	if e := after[late]; e.State != "sent" || !e.Delayed || e.At == nil || *e.At != sentAt {
 		t.Errorf("the list of what was sent did not survive the wipe: %+v", e)
 	}
-	rig.DeliverNotes(t, r.Direct, more.Notes)
+	rig.DeliverNotes(t, r.Direct, b.Notes)
 	if n := rig.Deliveries(t, r.Dir, org)[late]; n != 1 {
 		t.Errorf("sent %d times after the refill", n)
+	}
+}
+
+// The notes' own times count too: a machine clock that stepped back does not
+// hide a notification released more than ten minutes after it became due.
+func TestDelayedByTheNotesTimesWhenTheClockSteppedBack(t *testing.T) {
+	r := rig.New(t, "sender", 7)
+	org := rig.NewOrg("delayed")
+	b := &rig.Builder{Org: org, Edition: 1}
+	t0 := rig.Start
+	r.Clock.Set(t0.Add(-time.Hour))
+	name := fmt.Sprintf("%s / marco / #a / 1", org)
+	b.Add("send", name, t0.Add(11*time.Minute), map[string]any{"row": map[string]any{"conversation": "#a", "thread": nil},
+		"person": "marco", "bucket": "needs_you", "why": "w", "text": "x", "due_at": t0.Format(time.RFC3339Nano)})
+	rig.DeliverNotes(t, r.Direct, b.Notes)
+	if e := list(r, org, "marco")[name]; !e.Delayed {
+		t.Errorf("not marked delayed: %+v", e)
 	}
 }
 
@@ -113,17 +128,14 @@ func TestEditions(t *testing.T) {
 	r := rig.New(t, "sender", 2)
 	org := rig.NewOrg("edition")
 	first := &rig.Builder{Org: org, Edition: 3}
-	dropped := first.Due("marco", "#a", 1, rig.Start)
+	name := first.Send("marco", "#a", 1, rig.Start)
 	rig.DeliverNotes(t, r.Direct, first.Notes)
 
 	second := &rig.Builder{Org: org, Edition: 4}
-	second.Add("clock", "", rig.Start.Add(time.Minute), nil)
+	second.Send("marco", "#a", 1, rig.Start)
 	rig.DeliverNotes(t, r.Direct, second.Notes)
-	if _, kept := list(r, org, "marco")[dropped]; kept {
-		t.Error("a higher edition must drop what is on hold")
-	}
-	if n := rig.Deliveries(t, r.Dir, org)[dropped]; n != 0 {
-		t.Errorf("a dropped notification was sent %d times", n)
+	if n := rig.Deliveries(t, r.Dir, org)[name]; n != 1 {
+		t.Errorf("a name replayed under a new edition was sent %d times", n)
 	}
 	var place contract.SenderPlace
 	r.Must("GET", "/orgs/"+org+"/place", nil, &place)
@@ -143,9 +155,9 @@ func TestGapRefusalAndOrganizations(t *testing.T) {
 	r := rig.New(t, "sender", 3)
 	org, other := rig.NewOrg("gaps"), rig.NewOrg("gaps")
 	b := &rig.Builder{Org: org, Edition: 1}
-	name := b.Due("marco", "#a", 1, rig.Start)
-	b.Add("clock", "", rig.Start.Add(time.Second), nil)
-	b.Add("clock", "", rig.Start.Add(2*time.Second), nil)
+	name := b.Send("marco", "#a", 1, rig.Start)
+	b.Send("marco", "#b", 2, rig.Start)
+	b.Send("marco", "#c", 3, rig.Start)
 
 	a := rig.Do(r.Direct, "POST", "/notes", b.Notes[2].Body, time.Second)
 	var behind contract.NoteBehind
@@ -184,17 +196,26 @@ func TestGapRefusalAndOrganizations(t *testing.T) {
 	}
 }
 
-func TestRebuildAfterARuleChangeListsHistory(t *testing.T) {
+// A rebuild after a rule change lists its sends as history: never delivered,
+// also when an ordinary replay later sends the same name, and after a wipe.
+func TestHistoryIsListedAndNeverDelivered(t *testing.T) {
 	r := rig.New(t, "sender", 4)
 	org := rig.NewOrg("rules")
 	b := &rig.Builder{Org: org, Edition: 2}
-	name := b.Due("marco", "#a", 1, rig.Start)
-	b.Add("withdrawn", name, rig.Start, map[string]any{"because": "rule_changed"})
-	b.Add("clock", "", rig.Start.Add(time.Minute), nil)
+	name := b.Send("marco", "#a", 1, rig.Start)
+	b.Notes[0].Body["history"] = true
 	rig.DeliverNotes(t, r.Direct, b.Notes)
 	if e := list(r, org, "marco")[name]; e.State != "history" {
 		t.Errorf("listed as %q, want history", e.State)
 	}
+
+	r.Wipe(org)
+	if e, ok := list(r, org, "marco")[name]; !ok || e.State != "history" {
+		t.Errorf("history did not survive the wipe: %+v", e)
+	}
+	later := &rig.Builder{Org: org, Edition: 3}
+	later.Send("marco", "#a", 1, rig.Start)
+	rig.DeliverNotes(t, r.Direct, later.Notes)
 	if n := rig.Deliveries(t, r.Dir, org)[name]; n != 0 {
 		t.Errorf("history was sent %d times", n)
 	}
@@ -204,14 +225,15 @@ func TestEntryShowsTheCurrentTruth(t *testing.T) {
 	r := rig.New(t, "sender", 5)
 	org := rig.NewOrg("truth")
 	b := &rig.Builder{Org: org, Edition: 1}
-	edited := b.Due("marco", "#a", 1, rig.Start)
-	read := b.Due("marco", "#b", 2, rig.Start)
-	gone := b.Due("marco", "#c", 3, rig.Start)
-	after := rig.Start.Add(6 * time.Second)
-	b.Add("clock", "", after, nil)
-	b.Add("changed", edited, after, map[string]any{"text": "new text"})
-	b.Add("withdrawn", read, after, map[string]any{"because": "read"})
-	b.Add("withdrawn", gone, after, map[string]any{"because": "deleted"})
+	edited := b.Send("marco", "#a", 1, rig.Start)
+	read := b.Send("marco", "#b", 2, rig.Start)
+	gone := b.Send("marco", "#c", 3, rig.Start)
+	after := rig.Start.Add(7 * time.Second)
+	b.Add("update", edited, after, map[string]any{"text": "new text"})
+	b.Add("update", read, after, map[string]any{"now": "read"})
+	b.Add("update", gone, after, map[string]any{"now": "deleted"})
+	b.Add("update", gone, after, map[string]any{"now": "read"})
+	b.Add("update", gone, after, map[string]any{"text": "back from the dead"})
 	rig.DeliverNotes(t, r.Direct, b.Notes)
 	got := list(r, org, "marco")
 	if got[edited].Text != "new text" {
@@ -221,7 +243,67 @@ func TestEntryShowsTheCurrentTruth(t *testing.T) {
 		t.Errorf("read: %+v", e)
 	}
 	if e := got[gone]; e.State != "sent" || e.Now == nil || *e.Now != "deleted" || e.Text != "" {
-		t.Errorf("deleted: %+v", e)
+		t.Errorf("a delete must win: %+v", e)
+	}
+}
+
+// An update for a name the sender does not know yet is remembered, not lost.
+func TestAnUpdateBeforeItsSendIsRemembered(t *testing.T) {
+	r := rig.New(t, "sender", 8)
+	org := rig.NewOrg("early")
+	send := &rig.Builder{Org: org, Edition: 1}
+	name := send.Send("marco", "#a", 1, rig.Start)
+
+	// The send is refused and stepped over; its update goes through first.
+	skip := map[string]any{}
+	for k, v := range send.Notes[0].Body {
+		skip[k] = v
+	}
+	skip["skip"] = true
+	r.Must("POST", "/notes", skip, nil)
+	all := &rig.Builder{Org: org, Edition: 1, Notes: send.Notes}
+	all.Add("update", name, rig.Start.Add(7*time.Second), map[string]any{"text": "newer text"})
+	all.Add("update", name, rig.Start.Add(8*time.Second), map[string]any{"now": "read"})
+	rig.DeliverNotes(t, r.Direct, all.Notes[1:])
+	if got := list(r, org, "marco"); len(got) != 0 {
+		t.Fatalf("an update alone made an entry: %+v", got)
+	}
+
+	// Tried again: it goes out once, showing what the updates said.
+	r.Must("POST", "/notes", send.Notes[0].Body, nil)
+	e := list(r, org, "marco")[name]
+	if e.Text != "newer text" || e.Now == nil || *e.Now != "read" {
+		t.Errorf("the remembered update was lost: %+v", e)
+	}
+	if n := rig.Deliveries(t, r.Dir, org)[name]; n != 1 {
+		t.Errorf("sent %d times", n)
+	}
+	var place contract.SenderPlace
+	r.Must("GET", "/orgs/"+org+"/place", nil, &place)
+	if place.Through != 3 {
+		t.Errorf("a retry moved the place to %d", place.Through)
+	}
+}
+
+// A parked update tried again after a newer one must not bring the old text back.
+func TestAnOldUpdateTriedLaterDoesNotOverwrite(t *testing.T) {
+	r := rig.New(t, "sender", 9)
+	org := rig.NewOrg("order")
+	b := &rig.Builder{Org: org, Edition: 1}
+	name := b.Send("marco", "#a", 1, rig.Start)
+	b.Add("update", name, rig.Start.Add(7*time.Second), map[string]any{"text": "older"})
+	b.Add("update", name, rig.Start.Add(8*time.Second), map[string]any{"text": "newer"})
+	rig.DeliverNotes(t, r.Direct, b.Notes[:1])
+	skip := map[string]any{}
+	for k, v := range b.Notes[1].Body {
+		skip[k] = v
+	}
+	skip["skip"] = true
+	r.Must("POST", "/notes", skip, nil)
+	rig.DeliverNotes(t, r.Direct, b.Notes[2:])
+	r.Must("POST", "/notes", b.Notes[1].Body, nil)
+	if e := list(r, org, "marco")[name]; e.Text != "newer" {
+		t.Errorf("an older update overwrote a newer one: %+v", e)
 	}
 }
 
@@ -229,9 +311,9 @@ func TestSenderModes(t *testing.T) {
 	r := rig.New(t, "sender", 6)
 	org, other := rig.NewOrg("modes"), rig.NewOrg("modes")
 	b := &rig.Builder{Org: org, Edition: 1}
-	b.Add("clock", "", rig.Start, nil)
+	b.Send("marco", "#a", 1, rig.Start)
 	c := &rig.Builder{Org: other, Edition: 1}
-	c.Add("clock", "", rig.Start, nil)
+	c.Send("marco", "#a", 1, rig.Start)
 
 	r.Mode(org, "off")
 	if a := rig.Do(r.Direct, "POST", "/notes", b.Notes[0].Body, 200*time.Millisecond); !a.Outage {

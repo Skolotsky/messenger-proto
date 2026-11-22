@@ -71,20 +71,11 @@
     "deleted"
    ]
   },
-  "WithdrawReason": {
-   "enum": [
-    "read",
-    "deleted",
-    "fenced",
-    "rule_changed"
-   ]
-  },
   "RuleType": {
    "enum": [
     "person",
     "conversation",
-    "item_kind",
-    "text"
+    "item_kind"
    ]
   },
   "KeptBy": {
@@ -139,9 +130,7 @@
   },
   "NoteState": {
    "enum": [
-    "held",
     "sent",
-    "withdrawn",
     "history"
    ]
   },
@@ -4657,11 +4646,11 @@
    ],
    "additionalProperties": false
   },
-  "NoteDue": {
+  "NoteSend": {
    "type": "object",
    "properties": {
     "kind": {
-     "const": "due"
+     "const": "send"
     },
     "org": {
      "type": "string"
@@ -4699,6 +4688,16 @@
     },
     "text": {
      "type": "string"
+    },
+    "due_at": {
+     "type": "string",
+     "format": "date-time"
+    },
+    "history": {
+     "type": "boolean"
+    },
+    "skip": {
+     "type": "boolean"
     }
    },
    "required": [
@@ -4713,15 +4712,16 @@
     "person",
     "bucket",
     "why",
-    "text"
+    "text",
+    "due_at"
    ],
    "additionalProperties": false
   },
-  "NoteChanged": {
+  "NoteUpdate": {
    "type": "object",
    "properties": {
     "kind": {
-     "const": "changed"
+     "const": "update"
     },
     "org": {
      "type": "string"
@@ -4747,6 +4747,12 @@
     },
     "text": {
      "type": "string"
+    },
+    "now": {
+     "$ref": "#/$defs/NoteNow"
+    },
+    "skip": {
+     "type": "boolean"
     }
    },
    "required": [
@@ -4756,104 +4762,29 @@
     "previous",
     "edition",
     "at",
-    "name",
-    "text"
+    "name"
    ],
-   "additionalProperties": false
-  },
-  "NoteWithdrawn": {
-   "type": "object",
-   "properties": {
-    "kind": {
-     "const": "withdrawn"
+   "anyOf": [
+    {
+     "required": [
+      "text"
+     ]
     },
-    "org": {
-     "type": "string"
-    },
-    "number": {
-     "type": "integer",
-     "minimum": 0
-    },
-    "previous": {
-     "type": "integer",
-     "minimum": 0
-    },
-    "edition": {
-     "type": "integer",
-     "minimum": 0
-    },
-    "at": {
-     "type": "string",
-     "format": "date-time"
-    },
-    "name": {
-     "type": "string"
-    },
-    "because": {
-     "$ref": "#/$defs/WithdrawReason"
+    {
+     "required": [
+      "now"
+     ]
     }
-   },
-   "required": [
-    "kind",
-    "org",
-    "number",
-    "previous",
-    "edition",
-    "at",
-    "name",
-    "because"
-   ],
-   "additionalProperties": false
-  },
-  "NoteClock": {
-   "type": "object",
-   "properties": {
-    "kind": {
-     "const": "clock"
-    },
-    "org": {
-     "type": "string"
-    },
-    "number": {
-     "type": "integer",
-     "minimum": 0
-    },
-    "previous": {
-     "type": "integer",
-     "minimum": 0
-    },
-    "edition": {
-     "type": "integer",
-     "minimum": 0
-    },
-    "at": {
-     "type": "string",
-     "format": "date-time"
-    }
-   },
-   "required": [
-    "kind",
-    "org",
-    "number",
-    "previous",
-    "edition",
-    "at"
    ],
    "additionalProperties": false
   },
   "Note": {
    "oneOf": [
     {
-     "$ref": "#/$defs/NoteDue"
+     "$ref": "#/$defs/NoteSend"
     },
     {
-     "$ref": "#/$defs/NoteChanged"
-    },
-    {
-     "$ref": "#/$defs/NoteWithdrawn"
-    },
-    {
-     "$ref": "#/$defs/NoteClock"
+     "$ref": "#/$defs/NoteUpdate"
     }
    ]
   },

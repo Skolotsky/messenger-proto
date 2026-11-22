@@ -64,6 +64,9 @@ var ErrCannotApply = errors.New("rules: change cannot be applied")
 type Options struct {
 	// NoNotes writes no notification notes: seeded history (D-032).
 	NoNotes bool
+	// History marks the send notes of this change as history: listed by the
+	// sender and never delivered. For a rebuild after a rule change (D-034).
+	History bool
 	// NoSummaries leaves out the counts and history parts, which read across
 	// conversations, so that different conversations can be applied at the
 	// same time (D-030). Call Summaries for the readers once they are done.
@@ -82,38 +85,55 @@ type Effects struct {
 	Known   bool
 	Readers []ReaderEffect
 	Notes   []NoteDraft
+	// Held lists the entries this change put on hold. They are kept with their
+	// rows and written nowhere until a tick releases them (D-034).
+	Held []NoteDraft
 	// Touched lists the readers whose counts or tabs may have changed.
 	Touched []string
 }
 
-// NoteDraft is a notification note before the feed gives it its number.
+// NoteDraft is a notification note before the feed gives it its number, or,
+// in Effects.Held, an entry on hold.
 type NoteDraft struct {
-	Kind         string // due, changed, withdrawn, clock
+	Kind         string // send or update; "held" in Effects.Held
 	At           string
 	Name         string
-	Conversation string // empty for a clock note
+	Conversation string
 	Row          contract.RowKey
 	Person       string
 	Bucket       contract.Bucket
 	Why          string
 	Text         string
-	Because      contract.WithdrawReason
-	// Message and Item say what caused a due note. They are not sent.
+	HasText      bool // an update that carries new text
+	Now          contract.NoteNow
+	DueAt        string
+	History      bool
+	// Message and Item say what the notification speaks of. They are not sent.
 	Message string
 	Item    string
 }
 
 // Contract gives the note its place in the feed's numbered log.
 func (n NoteDraft) Contract(org string, number, previous, edition int64) contract.Note {
-	switch n.Kind {
-	case "due":
-		return contract.Note{Value: contract.NoteDue{Kind: "due", Org: org, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name, Row: n.Row, Person: n.Person, Bucket: n.Bucket, Why: n.Why, Text: n.Text}}
-	case "changed":
-		return contract.Note{Value: contract.NoteChanged{Kind: "changed", Org: org, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name, Text: n.Text}}
-	case "withdrawn":
-		return contract.Note{Value: contract.NoteWithdrawn{Kind: "withdrawn", Org: org, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name, Because: n.Because}}
+	if n.Kind == "send" {
+		v := contract.NoteSend{Kind: "send", Org: org, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name,
+			Row: n.Row, Person: n.Person, Bucket: n.Bucket, Why: n.Why, Text: n.Text, DueAt: n.DueAt}
+		if n.History {
+			yes := true
+			v.History = &yes
+		}
+		return contract.Note{Value: v}
 	}
-	return contract.Note{Value: contract.NoteClock{Kind: "clock", Org: org, Number: number, Previous: previous, Edition: edition, At: n.At}}
+	v := contract.NoteUpdate{Kind: "update", Org: org, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name}
+	if n.HasText {
+		text := n.Text
+		v.Text = &text
+	}
+	if n.Now != "" {
+		now := n.Now
+		v.Now = &now
+	}
+	return contract.Note{Value: v}
 }
 
 // Engine is the rules' state for one organization.
@@ -170,6 +190,14 @@ type conv struct {
 	order    []*message
 	replies  map[string][]*message // thread root -> replies, in order
 	readers  map[string]*convReader
+	holding  map[*openDue]bool     // entries on hold, so a tick need not walk the rows
+	sent     map[string][]*openDue // message -> notifications sent about it, whose entries still follow it
+}
+
+func newConv(id, name string, direct bool, people []string) *conv {
+	return &conv{id: id, name: name, direct: direct, members: setOf(people),
+		msgs: map[string]*message{}, replies: map[string][]*message{}, readers: map[string]*convReader{},
+		holding: map[*openDue]bool{}, sent: map[string][]*openDue{}}
 }
 
 // message is the feed's copy of a message.
@@ -260,12 +288,19 @@ type item struct {
 	flag      string
 }
 
-// openDue is a notification that was written due and not withdrawn.
+// openDue is a notification of a row: on hold until a tick releases it, and
+// after that followed so that its entry can show the truth (D-034).
 type openDue struct {
 	name   string
 	item   itemKey
 	at     time.Time
+	atText string
 	number int64
+	person string
+	key    rowKey
+	held   bool
+	shown  contract.NoteNow // what its entry was last told: read or deleted
+	came   time.Time        // only with FaultHoldArrival
 }
 
 func (cv *conv) reader(u string) *convReader {
@@ -321,7 +356,9 @@ type fx struct {
 	atText  string
 	at      time.Time
 	noNotes bool
+	history bool
 	notes   []NoteDraft
+	held    []NoteDraft
 	touched map[string]map[string]map[rowKey]bool // conversation -> reader -> rows
 	readers map[string]bool
 }
@@ -427,13 +464,19 @@ func (e *Engine) Apply(c contract.Change, opt Options) (Effects, error) {
 	if err != nil {
 		return Effects{}, cannot("change %d has a bad time %q", number, atText)
 	}
-	f := &fx{number: number, atText: atText, at: at, noNotes: opt.NoNotes || e.seeding,
+	f := &fx{number: number, atText: atText, at: at, noNotes: opt.NoNotes || e.seeding, history: opt.History,
 		touched: map[string]map[string]map[rowKey]bool{}, readers: map[string]bool{}}
+	if fault(FaultAnyChange) {
+		e.releaseHeld(f)
+	}
+	if fault(FaultHoldArrival) {
+		e.releaseByArrival(f)
+	}
 	known, err := e.dispatch(c, f)
 	if err != nil {
 		return Effects{}, err
 	}
-	out := Effects{Known: known, Notes: f.notes}
+	out := Effects{Known: known, Notes: f.notes, Held: f.held}
 	parts := e.flushRows(f)
 	for u := range f.readers {
 		out.Touched = append(out.Touched, u)
@@ -473,15 +516,13 @@ func (e *Engine) dispatch(c contract.Change, f *fx) (bool, error) {
 		e.personJoined(v)
 		return true, nil
 	case contract.ChangeChannelCreated:
-		e.addConv(&conv{id: v.Conversation, name: v.Name, members: setOf(v.People),
-			msgs: map[string]*message{}, replies: map[string][]*message{}, readers: map[string]*convReader{}})
+		e.addConv(newConv(v.Conversation, v.Name, false, v.People))
 		return true, nil
 	case contract.ChangeDirectCreated:
 		if len(v.People) != 2 {
 			return false, cannot("direct conversation %s does not have two people", v.Conversation)
 		}
-		e.addConv(&conv{id: v.Conversation, name: v.Conversation, direct: true, members: setOf(v.People),
-			msgs: map[string]*message{}, replies: map[string][]*message{}, readers: map[string]*convReader{}})
+		e.addConv(newConv(v.Conversation, v.Conversation, true, v.People))
 		return true, nil
 	case contract.ChangeChannelPeopleAdded:
 		cv := e.conv(v.Conversation)
@@ -533,9 +574,7 @@ func (e *Engine) dispatch(c contract.Change, f *fx) (bool, error) {
 		f.readers[v.Person] = true
 		return true, nil
 	case contract.ChangeTick:
-		if !f.noNotes {
-			f.notes = append(f.notes, NoteDraft{Kind: "clock", At: f.atText})
-		}
+		e.releaseHeld(f)
 		return true, nil
 	case contract.ChangeSeedOpened:
 		e.seeding = true

@@ -184,10 +184,12 @@ func (e *Engine) notify(cv *conv, p *person, rw *row, it *item, prev Bucket, f *
 		return
 	}
 	name := fmt.Sprintf("%s / %s / %s / %d", e.org, p.id, rowName(cv, rw.key), f.number)
-	rw.dues = append(rw.dues, &openDue{name: name, item: itemKey{it.msg.id, it.kind}, at: f.at, number: f.number})
-	f.notes = append(f.notes, NoteDraft{Kind: "due", At: f.atText, Name: name, Conversation: cv.id,
+	d := &openDue{name: name, item: itemKey{it.msg.id, it.kind}, at: f.at, atText: f.atText, number: f.number, person: p.id, key: rw.key, held: true, came: arrivalNow()}
+	rw.dues = append(rw.dues, d)
+	cv.holding[d] = true
+	f.held = append(f.held, NoteDraft{Kind: "held", At: f.atText, Name: name, Conversation: cv.id,
 		Row: contract.RowKey{Conversation: cv.id, Thread: rw.key.thread()}, Person: p.id, Bucket: it.bucket.Contract(),
-		Why: it.reason, Text: it.msg.text, Message: it.msg.id, Item: it.kind})
+		Why: it.reason, Text: it.msg.text, DueAt: f.atText, Message: it.msg.id, Item: it.kind})
 }
 
 func rowName(cv *conv, k rowKey) string {
@@ -207,45 +209,202 @@ func notifying(p *person, it *item) bool {
 	return !it.read && !it.retracted && !it.msg.stopped && it.bucket >= least && !(it.kind == itemMsg && it.msg.level == "info")
 }
 
-// settleDues writes what became of the row's open notifications.
-func (e *Engine) settleDues(cv *conv, p *person, rw *row, f *fx) {
-	if len(rw.dues) == 0 || f.noNotes {
-		return
-	}
+// liveItems is what still earns this row a notification, oldest first.
+func liveItems(p *person, rw *row) []*item {
 	var live []*item
 	for _, it := range sortedItems(rw) {
 		if notifying(p, it) {
 			live = append(live, it)
 		}
 	}
+	return live
+}
+
+// update writes what an entry already sent must now show.
+func (f *fx) update(cv *conv, d *openDue, n NoteDraft) {
+	if f.noNotes {
+		return
+	}
+	n.Kind, n.At, n.Name, n.Conversation, n.Person = "update", f.atText, d.name, cv.id, d.person
+	f.notes = append(f.notes, n)
+}
+
+// follow moves a sent notification to the message it now speaks of.
+func (cv *conv) follow(d *openDue, to itemKey) {
+	if d.item.msg != to.msg {
+		list := cv.sent[d.item.msg]
+		for i, x := range list {
+			if x == d {
+				cv.sent[d.item.msg] = append(list[:i:i], list[i+1:]...)
+				break
+			}
+		}
+		cv.sent[to.msg] = append(cv.sent[to.msg], d)
+	}
+	d.item = to
+}
+
+// settleDues says what became of the row's notifications. One on hold that
+// nothing earns any more is removed and leaves no note (D-034). One already
+// sent cannot be recalled: its entry is told the truth.
+func (e *Engine) settleDues(cv *conv, p *person, rw *row, f *fx) {
+	if len(rw.dues) == 0 {
+		return
+	}
+	live := liveItems(p, rw)
 	keep := rw.dues[:0]
 	for _, d := range rw.dues {
 		src := rw.items[d.item]
-		if len(live) == 0 {
-			because := contract.WithdrawReason("rule_changed")
-			switch {
-			case src != nil && src.msg.deleted:
-				because = "deleted"
-			case src == nil && d.item.kind == itemMsg && cv.msgs[d.item.msg] != nil && cv.msgs[d.item.msg].deleted:
-				because = "deleted"
-			case src != nil && src.read && !src.retracted:
-				because = "read"
+		gone := src == nil || src.retracted
+		if d.held {
+			if len(live) == 0 && !fault(FaultReadKeepsHold) {
+				delete(cv.holding, d)
+				continue
 			}
-			// Once past its hold a notification may be out; only read and
-			// deleted change what its entry shows (D-004).
-			if because != "rule_changed" || f.at.Before(d.at.Add(holdFor)) {
-				f.notes = append(f.notes, NoteDraft{Kind: "withdrawn", At: f.atText, Name: d.name, Conversation: cv.id, Person: p.id, Because: because})
+			if gone && len(live) > 0 { // what it spoke of is gone, the row is still due: it must not show it
+				n := live[len(live)-1]
+				d.item = itemKey{n.msg.id, n.kind}
 			}
+			keep = append(keep, d)
 			continue
 		}
-		if src == nil || src.retracted { // what it spoke of is gone, the row is still due: it must not show it
+		switch {
+		case len(live) == 0:
+			if src != nil && src.read && !src.retracted {
+				d.shown = "read"
+				f.update(cv, d, NoteDraft{Now: "read"})
+			}
+		case gone:
 			n := live[len(live)-1]
-			d.item = itemKey{n.msg.id, n.kind}
-			f.notes = append(f.notes, NoteDraft{Kind: "changed", At: f.atText, Name: d.name, Conversation: cv.id, Person: p.id, Text: n.msg.text})
+			cv.follow(d, itemKey{n.msg.id, n.kind})
+			f.update(cv, d, NoteDraft{Text: n.msg.text, HasText: true})
 		}
-		keep = append(keep, d)
+		if d.shown == "" {
+			keep = append(keep, d)
+		}
 	}
 	rw.dues = keep
+}
+
+// releaseHeld is the only way out of the hold that sends something: a tick from
+// the log ends every hold more than five seconds older than itself, by the
+// log's timestamps. The note carries what is true at that moment.
+func (e *Engine) releaseHeld(f *fx) {
+	if f.noNotes {
+		return
+	}
+	for _, cv := range e.allConvs() {
+		if len(cv.holding) == 0 {
+			continue
+		}
+		list := make([]*openDue, 0, len(cv.holding))
+		for d := range cv.holding {
+			list = append(list, d)
+		}
+		sort.Slice(list, func(i, j int) bool {
+			if !list[i].at.Equal(list[j].at) {
+				return list[i].at.Before(list[j].at)
+			}
+			return list[i].name < list[j].name
+		})
+		for _, d := range list {
+			if !f.at.After(d.at.Add(holdFor)) {
+				continue
+			}
+			delete(cv.holding, d)
+			d.held = false
+			r, p := cv.readers[d.person], e.people[d.person]
+			var rw *row
+			if r != nil {
+				rw = r.rows[d.key]
+			}
+			if rw == nil || p == nil {
+				dropDue(rw, d)
+				continue
+			}
+			live := liveItems(p, rw)
+			if len(live) == 0 && !fault(FaultReadKeepsHold) { // "Focus only" was switched on during the hold
+				dropDue(rw, d)
+				continue
+			}
+			src := rw.items[d.item]
+			if len(live) > 0 && (src == nil || !notifying(p, src)) {
+				src = live[len(live)-1]
+			}
+			if src == nil {
+				dropDue(rw, d)
+				continue
+			}
+			d.item = itemKey{src.msg.id, src.kind}
+			cv.sent[d.item.msg] = append(cv.sent[d.item.msg], d)
+			f.notes = append(f.notes, NoteDraft{Kind: "send", At: f.atText, Name: d.name, Conversation: cv.id,
+				Row: contract.RowKey{Conversation: cv.id, Thread: d.key.thread()}, Person: d.person, Bucket: src.bucket.Contract(),
+				Why: src.reason, Text: src.msg.text, DueAt: d.atText, History: f.history, Message: src.msg.id, Item: src.kind})
+		}
+	}
+}
+
+// releaseByArrival is the planted fault of G-011: a hold counted from when the
+// change reached the feed, which a late feed makes meaningless.
+func (e *Engine) releaseByArrival(f *fx) {
+	now := arrivalNow()
+	for _, cv := range e.allConvs() {
+		for d := range cv.holding {
+			if now.Sub(d.came) > holdFor {
+				d.at = f.at.Add(-holdFor - 1)
+			}
+		}
+	}
+	e.releaseHeld(f)
+}
+
+func dropDue(rw *row, d *openDue) {
+	if rw == nil {
+		return
+	}
+	for i, x := range rw.dues {
+		if x == d {
+			rw.dues = append(rw.dues[:i:i], rw.dues[i+1:]...)
+			return
+		}
+	}
+}
+
+// Fence removes what is on hold inside a fence: the whole conversation, or one
+// reader in it when person is given. It writes no note (D-034). It answers the
+// names removed, so the feed can log them.
+func (e *Engine) Fence(conversation, person string) []string {
+	cv := e.conv(conversation)
+	if cv == nil {
+		return nil
+	}
+	var names []string
+	for d := range cv.holding {
+		if person != "" && d.person != person {
+			continue
+		}
+		delete(cv.holding, d)
+		if r := cv.readers[d.person]; r != nil {
+			dropDue(r.rows[d.key], d)
+		}
+		names = append(names, d.name)
+	}
+	sort.Strings(names)
+	return names
+}
+
+// Held names what is on hold for a person, sorted.
+func (e *Engine) Held(person string) []string {
+	var names []string
+	for _, cv := range e.allConvs() {
+		for d := range cv.holding {
+			if d.person == person {
+				names = append(names, d.name)
+			}
+		}
+	}
+	sort.Strings(names)
+	return names
 }
 
 // settleConversation settles every touched row of this change.
@@ -436,22 +595,11 @@ func (e *Engine) editFor(cv *conv, p *person, m *message, oldMentions map[string
 	}
 }
 
-// noteNewText tells the sender the new text of notifications that speak of
-// this message (D-004): it carries the new text, or shows it once sent.
+// noteNewText gives every entry already sent about this message its new text
+// (D-004). One still on hold needs nothing: it takes the text when released.
 func (e *Engine) noteNewText(cv *conv, m *message, f *fx) {
-	for _, u := range sortedKeys(cv.readers) {
-		r := cv.readers[u]
-		rk, ok := r.itemRow[itemKey{m.id, itemMsg}]
-		if !ok {
-			continue
-		}
-		if rw := r.rows[rk]; rw != nil {
-			for _, d := range rw.dues {
-				if d.item.msg == m.id && d.number != f.number { // a note written by this change already has the text
-					f.notes = append(f.notes, NoteDraft{Kind: "changed", At: f.atText, Name: d.name, Conversation: cv.id, Person: u, Text: m.text})
-				}
-			}
-		}
+	for _, d := range cv.sent[m.id] {
+		f.update(cv, d, NoteDraft{Text: m.text, HasText: true})
 	}
 }
 
@@ -481,6 +629,12 @@ func (e *Engine) messageDeleted(c contract.DeletedMessage, f *fx) error {
 		f.touchReader(cv, u)
 	}
 	e.settleConversation(cv, f)
+	// Entries sent about it that did not move to another message say so.
+	for _, d := range cv.sent[m.id] {
+		d.shown = "deleted"
+		f.update(cv, d, NoteDraft{Now: "deleted"})
+	}
+	delete(cv.sent, m.id)
 	return nil
 }
 

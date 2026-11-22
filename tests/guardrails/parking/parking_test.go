@@ -199,7 +199,9 @@ func TestThreeRefusalsPauseThatOrganizationAndNoOther(t *testing.T) {
 	})
 }
 
-func TestARefusedNoteStopsThatOrganizationsNotesUntilRetried(t *testing.T) {
+// D-034: no later note can release a hold, so a parked note holds nothing back.
+// It is shown, the receiver is reported as not level for it, and a retry applies it.
+func TestARefusedNoteHoldsNothingBackAndCanBeRetried(t *testing.T) {
 	b := rig.NewBench(t, nil)
 	const bad, good = "acme", "globex"
 	b.DB.AddOrg(t, bad, 60)
@@ -210,9 +212,9 @@ func TestARefusedNoteStopsThatOrganizationsNotesUntilRetried(t *testing.T) {
 	b.Start(t, "copy-1")
 	for _, o := range []string{bad, good} {
 		for i := 0; i < 6; i++ {
-			kind := "due"
+			kind := "send"
 			if i%2 == 1 {
-				kind = "clock"
+				kind = "update"
 			}
 			if _, err := b.DB.SaveNote(bg, o, kind); err != nil {
 				t.Fatal(err)
@@ -221,15 +223,18 @@ func TestARefusedNoteStopsThatOrganizationsNotesUntilRetried(t *testing.T) {
 	}
 	rig.Until(t, 15*time.Second, "the note is parked", func() bool { return len(parked(t, b, bad)) == 1 })
 	rig.Until(t, 10*time.Second, "the other organization's notes carry on", func() bool { return b.Sender.Place(good) >= 6 })
-	if s := status(t, b, bad, "sender"); s.State != "paused" || s.Place != 2 {
-		t.Fatalf("status at a refused note: %+v (it must hold there)", s)
+	rig.Until(t, 10*time.Second, "the organization's later notes carry on past the parked one", func() bool {
+		return b.Sender.Place(bad) >= 6 && b.Sender.Has(bad, 4) && b.Sender.Has(bad, 6)
+	})
+	if b.Sender.Has(bad, 3) {
+		t.Fatal("the parked note was applied while it was refused")
 	}
-	if b.Sender.Has(bad, 4) {
-		t.Fatal("a note after the refused one was sent: a clock note could let a notification past a parked withdrawal")
+	if s := status(t, b, bad, "sender"); s.Parked != 1 || s.State != "running" {
+		t.Fatalf("status with a parked note: %+v (it must show the note and keep running)", s)
 	}
 	refusing.Store(false)
 	retry(t, b, bad, "sender", 3)
-	rig.Until(t, 10*time.Second, "the notes carry on after the retry", func() bool { return b.Sender.Place(bad) >= 6 })
+	rig.Until(t, 10*time.Second, "the retried note is applied", func() bool { return b.Sender.Has(bad, 3) })
 	if s := status(t, b, bad, "sender"); s.State != "running" || s.Parked != 0 {
 		t.Fatalf("status after the retry: %+v", s)
 	}
@@ -309,7 +314,7 @@ func TestANewEditionRestartsTheNotesAtZero(t *testing.T) {
 	b.DB.AddOrg(t, org, 60)
 	b.Start(t, "copy-1")
 	for range 5 {
-		if _, err := b.DB.SaveNote(bg, org, "clock"); err != nil {
+		if _, err := b.DB.SaveNote(bg, org, "update"); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -320,7 +325,7 @@ func TestANewEditionRestartsTheNotesAtZero(t *testing.T) {
 		t.Fatal(err)
 	}
 	for range 3 {
-		if _, err := b.DB.SaveNote(bg, org, "clock"); err != nil {
+		if _, err := b.DB.SaveNote(bg, org, "update"); err != nil {
 			t.Fatal(err)
 		}
 	}
