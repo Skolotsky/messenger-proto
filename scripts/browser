@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Run a Python script that drives a headless browser (Playwright, Chromium) against files in this repo.
+# Usage: ./scripts/browser path/to/script.py [args]
+# The repo is mounted at /repo; the script runs from there, as the calling user, with no network.
+# First use builds the image from tools/browser/Dockerfile (needs the base image: about 920 MB, pulled once).
+set -euo pipefail
+cd "$(dirname "$0")/.."
+image=contexia-browser:1.49.0
+if ! docker image inspect "$image" >/dev/null 2>&1; then
+  docker build -q -t "$image" tools/browser >/dev/null
+fi
+exec docker run --rm --network none --ipc=host -u "$(id -u):$(id -g)" -e HOME=/tmp \
+  -v "$PWD":/repo -w /repo "$image" python3 "$@"
