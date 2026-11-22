@@ -274,6 +274,31 @@ def why_and_people(browser, slug, size, vp, scale):
     ok("a removed person is not added back when they write again", pg.locator('.bucket.b-needs [data-row="r-sam"]').count() == 1)
     ctx.close()
 
+def bursts(browser, slug, size, vp, scale):
+    """Ten messages from one person: one row, read in steps, with context, and one click to the conversation (proposal, 2026-11-22)."""
+    ctx = browser.new_context(viewport=vp, device_scale_factor=scale, has_touch=size == "phone")
+    pg = ctx.new_page(); pg.goto(f"file://{here.resolve()}/{slug}.html")
+    def ok(name, cond, detail=""):
+        results.append({"page": slug, "width": size, "check": name, "pass": bool(cond), "detail": str(detail)})
+        if not cond: failures.append(f"{slug} @ {size}: {name} {detail}")
+    row = pg.locator('article[data-row="r-anna"]')
+    ok("ten messages are one row that says so", pg.locator('article[data-row="r-anna"]').count() == 1 and ("10 new" in row.inner_text() or row.locator(".row-badge").inner_text() == "10"), row.inner_text()[:60])
+    row.locator(".row-main").click(position={"x": 24, "y": 24})
+    ok("expanding shows the first six new messages after the one before them", row.locator(".row-exp > .msg").count() == 6 and row.locator(".ctx .msg").count() == 1 and "Draft by Wednesday night" in row.locator(".ctx").inner_text())
+    ok("the four not yet shown stay unread", "unread" in row.get_attribute("class").split() and "4 more new" in row.locator(".more-new").inner_text())
+    pg.screenshot(path=str(shots / f"{slug}-{size}-18-ten-messages.jpg"), type="jpeg", quality=80)
+    row.locator('[data-act="more"]').click()
+    ok("showing the rest reads the row", row.locator(".row-exp > .msg").count() == 10 and "read" in row.get_attribute("class").split())
+    if slug == "telegram-like": pg.locator('[data-act="btab"][data-b="needs"]').click()
+    t = pg.locator('article[data-row="r-check"]')
+    t.locator(".row-main").click(position={"x": 24, "y": 24})
+    ok("a thread row shows the message that started the thread and the reply before the new ones", t.locator(".ctx .msg").count() == 2 and "Launch checklist for Thursday" in t.locator(".ctx").inner_text())
+    if slug == "telegram-like": pg.locator('[data-act="btab"][data-b="focus"]').click()
+    pg.reload()
+    pg.locator('article[data-row="r-anna"] .open-btn').click()
+    ok("one click on the row opens the conversation at the first new message", pg.locator(".conv .newline").count() == 1 and pg.locator(".conv .newline").is_visible() and pg.locator('article[data-row="r-anna"] .row-exp').count() == 0)
+    ctx.close()
+
 def hist_unread(browser, slug, size, vp, scale):
     """History tabs carry an unread count, and unread entries a mark; opening one clears both (user, 2026-11-22)."""
     ctx = browser.new_context(viewport=vp, device_scale_factor=scale, has_touch=size == "phone")
@@ -302,6 +327,7 @@ with sync_playwright() as p:
                 run(b, slug, size, vp, scale)
                 conv_edit(b, slug, size, vp, scale)
                 hist_unread(b, slug, size, vp, scale)
+                bursts(b, slug, size, vp, scale)
                 why_and_people(b, slug, size, vp, scale)
             except Exception as e:
                 failures.append(f"{slug} @ {size}: stopped: {str(e).splitlines()[0][:300]}")

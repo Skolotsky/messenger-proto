@@ -89,7 +89,7 @@ Three variants live in the Slack-like page behind the address ending `#why=a`, `
 
 ### After the review
 
-The pages now also show what the user decided next: variant (a) as the default (D-020), Focus people for direct messages (D-021), no notification bell, with the notification list reached from the Demo controls as a stand-in for the separate app (D-022), a mark-read button on rows (D-015), and Activity first on a phone (D-019). `check.py` covers these: 403 checks.
+The pages now also show what the user decided next: variant (a) as the default (D-020), Focus people for direct messages (D-021), no notification bell, with the notification list reached from the Demo controls as a stand-in for the separate app (D-022), a mark-read button on rows (D-015), and Activity first on a phone (D-019). `check.py` covers these. A further proposal is shown and checked but not yet accepted (T-025): context above the new messages in an expanded row, a long burst read six at a time, and an arrow that opens the conversation at the first new message. 439 checks in all.
 
 ### What this does not show
 

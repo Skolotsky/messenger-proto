@@ -248,3 +248,11 @@ h1,h2,h3,p{margin:0}
 .napp .switch{border:0;margin:0;padding:0;color:#eee}
 .napp select{font:inherit;background:#222;color:#eee;border:1px solid #555;border-radius:4px;padding:2px 6px}
 .rule>.av{flex:none}
+/* context, long bursts, one-click open */
+.ctx{opacity:.62;border-left:2px solid var(--line);padding-left:10px;margin:6px 0 0}
+.ctx-l{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+.ctx-l .link{text-transform:none;letter-spacing:0}
+.more-new{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0;font-size:12.5px;color:var(--muted)}
+.row-btns{display:flex;gap:4px}
+.open-btn{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--muted);text-align:center;font-size:14px;line-height:1}
+.open-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}

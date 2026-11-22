@@ -71,7 +71,15 @@ function seed() {
     M('a-1', 'anna', 'Yesterday 18:05', 'The board deck is due Friday. Can you own the roadmap slide?'),
     M('a0', 'maya', 'Yesterday 18:09', 'Yes. Draft by Wednesday night.'),
     M('a1', 'anna', '10:36', 'Can you join the pricing call with Brightwell at 3? They want to hear the roadmap from you, not from me.', { isNew: 1 }),
-    M('a2', 'anna', '10:37', 'And did legal clear the new terms page? I don\'t want to launch without it.', { isNew: 1 })]);
+    M('a2', 'anna', '10:37', 'And did legal clear the new terms page? I don\'t want to launch without it.', { isNew: 1 }),
+    M('a3', 'anna', '10:37', 'Brightwell will ask about SSO. Jonas wants to promise the first quarter.', { isNew: 1 }),
+    M('a4', 'anna', '10:38', 'My view: we say "first half of next year" and nothing firmer.', { isNew: 1 }),
+    M('a5', 'anna', '10:38', 'They also want the XLSX export. Tomás says it slips past Thursday?', { isNew: 1 }),
+    M('a6', 'anna', '10:39', 'If it slips, I would rather tell them on the call than have them find out.', { isNew: 1 }),
+    M('a7', 'anna', '10:39', 'The deck for the call is in the shared folder. Slide 4 is yours.', { isNew: 1 }),
+    M('a8', 'anna', '10:40', 'Slide 6 has last quarter\'s numbers. Dele is refreshing them now.', { isNew: 1 }),
+    M('a9', 'anna', '10:41', 'One more thing: the board wants a launch-day summary by Friday noon.', { isNew: 1 }),
+    M('a10', 'anna', '10:41', 'Call me if 3 pm does not work. Otherwise see you there.', { isNew: 1 })]);
   C('dm-sam', 'dm', '', { with: 'sam' }, [
     M('s0', 'sam', 'Yesterday 12:20', 'Macros for the new booking flow are written. Want to skim them?'),
     M('s00', 'maya', 'Yesterday 13:02', 'Skimmed. The refund one is very clear.')]);
@@ -141,7 +149,7 @@ function seed() {
     M('d00', 'omar', 'Mon 09:40', 'I need the revenue one by Wednesday noon.')]);
   const R = (id, conv, bucket, items, by, t, reason, why, o) => Object.assign({ id, conv, bucket, items, by, t, reason, why, sec: 'new', read: false, kept: null, done: false, replies: [] }, o || {});
   const rows = [
-    R('r-anna', 'dm-anna', 'focus', ['a1', 'a2'], 'anna', '10:37', 'In Focus: direct message from Anna', 'Anna is one of your Focus people: everyone who writes to you directly is added.', { rule: 'dm' }),
+    R('r-anna', 'dm-anna', 'focus', ['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9', 'a10'], 'anna', '10:41', 'In Focus: direct message from Anna', 'Anna is one of your Focus people: everyone who writes to you directly is added.', { rule: 'dm' }),
     R('r-rc', 'th-rc', 'focus', ['rc4'], 'ship', '10:21', 'In Focus: Shipwright flagged this for you', 'A flag that names you lands in Focus and is kept for you until you press Done, reply or react. Shipwright has stopped and is waiting for you.', { kept: 'flag', rule: 'flag' }),
     R('r-inc', 'ch-incidents', 'focus', ['i1', 'i2', 'i3', 'i4', 'i5', 'i6'], 'yuki', '10:24', 'In Focus: #incidents is set to Focus', 'You set this channel\'s dial to Focus, so every new post lands here, as one row however many there are.', { drive: 'channel', chan: 1 }),
     R('r-go', 'ch-launch', 'focus', ['l3'], 'anna', '09:12', 'Flagged by Anna', 'Anna flagged this and named you. You read it at 09:20, so it is kept for you until you press Done, reply or react. Nobody else\'s answer changes that.', { sec: 'kept', kept: 'flag', read: true, rule: 'flag' }),
@@ -164,7 +172,7 @@ function seed() {
     pending: null, arrived: false, fyiSeen: false, level: '', focusOnly: false, demo: false, note: '', q: '', resort: false,
     dmAuto: true, dmPeople: ['anna', 'sam', 'marco', 'lena', 'tomas'], dmRemoved: [], dmAsk: false, off: {},
     rules: [{ id: 'flag', label: 'Flags that name you', n: 6, start: 1 }, { id: 'ch:incidents', label: 'Every new post in #incidents', n: 23, kind: 'channel', target: 'incidents' }],
-    tray: [T('r-anna', 'a2', 'focus'), T('r-check', 'c5', 'needs'), T('r-export', 't1', 'needs'), T('r-sso', 'j1', 'needs'), T('r-inc', 'i6', 'focus'), T('r-rc', 'rc4', 'focus'), Object.assign(T('r-mig', 'mig1', 'needs'), { as: 'marco', lead: 'Reacted ✅ to your message: ', at: '10:16' }), T('r-comp', 'p3', 'needs'), T('r-triage', 'u2', 'needs'), T('r-go', 'l3', 'focus')],
+    tray: [T('r-anna', 'a10', 'focus'), T('r-check', 'c5', 'needs'), T('r-export', 't1', 'needs'), T('r-sso', 'j1', 'needs'), T('r-inc', 'i6', 'focus'), T('r-rc', 'rc4', 'focus'), Object.assign(T('r-mig', 'mig1', 'needs'), { as: 'marco', lead: 'Reacted ✅ to your message: ', at: '10:16' }), T('r-comp', 'p3', 'needs'), T('r-triage', 'u2', 'needs'), T('r-go', 'l3', 'focus')],
     kept: new Set(), nid: 0
   };
 }
@@ -179,7 +187,7 @@ function conv(id) {
   return c;
 }
 const HIST = {
-  dms: [['dm-anna', 'anna', 'a2', '', 'Today 10:37'], ['dm-sam', 'sam', 's0', '', 'Yesterday'], ['dm-marco', 'marco', null, 'Freeze is at 20:00 tonight, not 18:00.', 'Yesterday'], ['dm-lena', 'lena', null, 'Sent you the v3 file for the empty states.', 'Monday'], ['dm-tomas', 'tomas', null, 'Do you have five minutes for the export question after standup?', 'Monday'], ['dm-ship', 'ship', null, 'Release notes draft for 1.9.4 is ready for your review.', 'Friday']],
+  dms: [['dm-anna', 'anna', 'a10', '', 'Today 10:41'], ['dm-sam', 'sam', 's0', '', 'Yesterday'], ['dm-marco', 'marco', null, 'Freeze is at 20:00 tonight, not 18:00.', 'Yesterday'], ['dm-lena', 'lena', null, 'Sent you the v3 file for the empty states.', 'Monday'], ['dm-tomas', 'tomas', null, 'Do you have five minutes for the export question after standup?', 'Monday'], ['dm-ship', 'ship', null, 'Release notes draft for 1.9.4 is ready for your review.', 'Friday']],
   mentions: [['ch-engineering', 'tomas', 't1', '', 'Today 10:31', '#engineering'], ['ch-sales', 'jonas', 'j1', '', 'Today 10:27', '#sales'], ['th-rc', 'ship', 'rc4', '', 'Today 10:21', '#releases'], ['ch-marketing', 'priya', 'q1', '', 'Today 10:18', '#marketing'], ['ch-launch', 'anna', 'l3', '', 'Today 09:12', '#launch'], ['th-rc', 'marco', 'rc1', '', 'Yesterday', '#releases'], ['th-metrics', 'dele', 'w1', '', 'Monday', '#data']],
   threads: [['th-check', 'priya', 'c5', '', 'Today 10:33'], ['th-rc', 'ship', 'rc4', '', 'Today 10:21'], ['th-metrics', 'ledger', 'w2', '', 'Today 10:15'], ['th-comp', 'field', 'p3', '', 'Today 10:08'], ['th-icons', 'ines', 'k4', '', 'Today 09:52'], ['th-empty', 'ines', 'e2', '', 'Yesterday']],
   reactions: [['ch-engineering', 'marco', 'mig1', 'Marco reacted ✅ to your message', 'Today 10:16', '#engineering'], ['th-beta', 'anna', 'b1', '🎉 6 · ❤️ 2 on your message', 'Yesterday', '#general'], ['ch-pricing', 'omar', null, '✅ 4 · ❌ 1 on your message: "Vote: do we keep the Team plan name?"', 'Yesterday', '#pricing'], ['ch-product', 'lena', null, '👍 Lena, Tomás on your message: "Roadmap review moves to Wednesday 10:00."', 'Monday', '#product']]
@@ -251,6 +259,16 @@ function whyBody(r, full) {
   const acts = e.off ? '' : e.acts.map(a => `<div class="why-act"><button class="btn sm" data-act="${a.act}" ${a.d}>${esc(a.label)}</button><small>${esc(a.note)}</small></div>`).join('');
   return `<div class="why-steps"><div><i>1</i><span><b>What it is</b>${esc(e.what)}</span></div><div><i>2</i><span><b>What put it in ${b}</b>${esc(e.by)}</span></div>${e.alt && !full ? `<div><i>3</i><span><b>Otherwise</b>${esc(e.alt)}</span></div>` : ''}</div>${path}${acts || done ? `<div class="why-acts"><b class="why-q">Not what you want in ${b}?</b>${acts}${done}</div>` : ''}`;
 }
+const CAP = 6; // a long burst opens in steps, and only what was shown counts as read
+const left = r => r.read ? 0 : r.items.length - (r.pos || 0);
+function ctxFor(r) { // context is what the new messages answer: the message before them in a direct conversation, or the start of the thread
+  const c = conv(r.conv); if (c.kind === 'channel' || r.kind === 'rx') return '';
+  const i = c.msgs.indexOf(r.items[0]), ids = [];
+  if (c.kind === 'thread' && i > 1) ids.push(c.msgs[0]);
+  if (i > 0) ids.push(c.msgs[i - 1]);
+  const h = ids.filter(id => !S.msgs[id].deleted).map(id => msgHTML(id, 'ctx')).join('');
+  return h ? `<div class="ctx"><span class="ctx-l">${c.kind === 'thread' ? 'In this thread' : 'Before'}${i > ids.length ? ` · <button class="link" data-act="openConv" data-c="${c.id}" data-id="${r.id}">${i - ids.length} earlier</button>` : ''}</span>${h}</div>` : '';
+}
 function rowHTML(r) {
   const c = conv(r.conv), ms = r.items.map(i => S.msgs[i]), last = ms[ms.length - 1], exp = S.exp.has(r.id);
   const k = 'row:' + last.id, L = S.lock[k] || {};
@@ -258,16 +276,16 @@ function rowHTML(r) {
   if (ms.every(m => m.deleted)) return `<article class="row gone b-${r.bucket}" data-row="${r.id}"><div class="row-main" style="height:${L.self || 64}px"><span class="tomb">${first(last.by)} deleted this message</span><small>${where} · it was here because ${first(last.by)} mentioned you</small></div></article>`;
   const title = r.title || (c.kind === 'dm' ? pn(c.with) : c.kind === 'channel' ? (r.chan ? '#' + c.name : pn(last.by)) : c.title);
   const sub = r.sub || (c.kind === 'dm' ? '' : c.kind === 'channel' ? (r.chan ? '' : '#' + c.name) : '#' + c.where);
-  const cnt = !r.read && ms.length > 1 ? `<span class="row-count">${ms.length} new</span>` : '';
+  const n = left(r), cnt = n > 1 || (n && r.pos) ? `<span class="row-count">${n} new</span>` : '';
   const marks = (ms.some(m => m.flag) ? '<span class="tag flag">⚑</span>' : '') + (ms.some(m => m.info) ? '<span class="tag info">Info</span>' : '') + (isAgent(r.by) ? '<span class="tag ag">agent</span>' : '');
   const state = r.done ? '<span class="state">Done</span>' : r.keptNow ? '<span class="state">Kept</span>' : '';
-  const badge = r.read ? '' : `<span class="row-badge">${ms.length > 1 ? ms.length : ''}</span>`;
+  const badge = r.read ? '' : `<span class="row-badge">${n > 1 ? n : ''}</span>`;
   const lockS = last.edited && L.body ? ` style="max-height:${L.body}px"` : '';
   let x = '';
   if (exp) {
     const mine = r.replies.map(i => msgHTML(i, 'exp')).join('');
     const kd = r.kept && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : r.done ? '' : `<button class="btn sm" data-act="keep" data-id="${r.id}">Keep</button>`;
-    x = `<div class="row-exp">${WHY === 'b' ? `<div class="why-inline">${whyBody(r)}</div>` : `<p class="why"><b>Why it is here.</b> ${esc(r.why)}</p>`}${r.items.map(i => msgHTML(i, 'exp')).join('')}${mine}
+    x = `<div class="row-exp">${WHY === 'b' ? `<div class="why-inline">${whyBody(r)}</div>` : `<p class="why"><b>Why it is here.</b> ${esc(r.why)}</p>`}${ctxFor(r)}${ctxFor(r) ? '<div class="newline"><span>New</span></div>' : ''}${(r.read ? r.items : r.items.slice(0, r.pos)).map(i => msgHTML(i, 'exp')).join('')}${n ? `<div class="more-new"><button class="btn sm pri" data-act="more" data-id="${r.id}">Show the next ${Math.min(n, CAP)}</button><span>${n} more new. They stay unread until you have seen them.</span></div>` : ''}${mine}
       <div class="acts"><span class="quick">${['👍', '✅', '👀', '🎉'].map(e => `<button class="rx-btn" data-act="react" data-id="${r.id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}</span>${kd}<button class="btn sm" data-act="openConv" data-c="${r.conv}" data-id="${r.id}">Open conversation</button>${dialCtl(c, r.id)}<button class="btn sm" data-act="ruleFor" data-c="${r.conv}" data-by="${r.by}">Add to Focus…</button></div>
       <form class="reply" data-form="reply" data-id="${r.id}"><input name="t" autocomplete="off" aria-label="Reply" placeholder="Reply ${c.kind === 'dm' ? 'to ' + first(c.with) : 'in ' + where}…"><button class="btn pri">Send</button></form></div>`;
   }
@@ -277,7 +295,7 @@ function rowHTML(r) {
         <div class="row-reason"><span class="why-dot"></span>${WHY === 'a' ? `<button class="why-btn" data-act="why" data-id="${r.id}" aria-expanded="${S.whyOpen === r.id}">${esc(r.reason)} ${ic('chev')}</button>` : esc(r.reason)}${r.note ? ` · <em>${r.note}</em>` : ''}${WHY === 'c' ? `<button class="why-btn c" data-act="whySheet" data-id="${r.id}">Why? Change…</button>` : ''}</div>
         <div class="row-preview" data-k="${k}"${lockS}><b>${last.by === ME ? 'You' : first(last.by)}:</b> ${rich(last.text)}</div>
         ${r.kind !== 'rx' && last.rx.length ? rxHTML(last) : ''}</div>
-      <div class="row-side">${state}${badge}${!r.read ? `<button class="mark-read" data-act="read" data-id="${r.id}" aria-label="Mark read without opening" title="Mark read without opening">✓</button>` : ''}${r.sec === 'kept' && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : ''}<span class="row-chev">${ic('chev')}</span></div></div>${WHY === 'a' && S.whyOpen === r.id ? `<div class="why-pop" data-stop="1"><h3>Why this is in ${BK[r.bucket][0]}</h3>${whyBody(r)}</div>` : ''}${x}</article>`;
+      <div class="row-side">${state}${badge}<span class="row-btns">${!r.read ? `<button class="mark-read" data-act="read" data-id="${r.id}" aria-label="Mark read without opening" title="Mark read without opening">✓</button>` : ''}<button class="open-btn" data-act="openConv" data-c="${r.conv}" data-id="${r.id}" aria-label="Open the conversation" title="Open the conversation at the first new message">↗</button></span>${r.sec === 'kept' && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : ''}<span class="row-chev">${ic('chev')}</span></div></div>${WHY === 'a' && S.whyOpen === r.id ? `<div class="why-pop" data-stop="1"><h3>Why this is in ${BK[r.bucket][0]}</h3>${whyBody(r)}</div>` : ''}${x}</article>`;
 }
 const SUN = '<svg class="ill" viewBox="0 0 120 64" aria-hidden="true"><path d="M8 52h104" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M36 52a24 24 0 0 1 48 0" fill="currentColor" opacity=".18"/><path d="M60 14v8M30 26l6 6M90 26l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 60h30M62 60h38" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".4"/></svg>';
 function bucketHTML(b) {
@@ -430,7 +448,8 @@ function below(rid) { const el = document.querySelector(`[data-row="${rid}"]`); 
 function onScreen(rid) { const el = document.querySelector(`[data-row="${rid}"]`); if (!el) return false; const b = el.getBoundingClientRect(); return b.bottom > 0 && b.top < innerHeight; }
 function measured(rid, fn, what) { const a = below(rid); fn(); render(); const b = below(rid); S.note = a === null || b === null ? what + ' The row was not on screen.' : `${what} The row below moved by ${Math.abs(b - a).toFixed(1)} px.`; render(); }
 const A = {
-  toggle(d) { const r = row(d.id); if (S.exp.has(d.id)) S.exp.delete(d.id); else { S.exp.add(d.id); r.read = true; } },
+  toggle(d) { const r = row(d.id); if (S.exp.has(d.id)) S.exp.delete(d.id); else { S.exp.add(d.id); if (!r.pos) r.pos = Math.min(CAP, r.items.length); if (r.pos >= r.items.length) r.read = true; } },
+  more(d) { const r = row(d.id); r.pos = Math.min(r.pos + CAP, r.items.length); if (r.pos >= r.items.length) r.read = true; },
   openConv(d) { if (S.conv !== d.c) S.lock = Object.fromEntries(Object.entries(S.lock).filter(([k]) => !k.startsWith('conv:'))); S.conv = d.c; conv(d.c); S.menu = null; S.modal = null; S.rows.forEach(r => { if (r.conv === d.c && (!d.id || r.id === d.id || conv(d.c).kind !== 'channel')) r.read = true; }); const sr = document.getElementById('sr'); if (sr) sr.innerHTML = ''; S.q = ''; },
   closeConv() { S.conv = null; S.menu = null; },
   read(d) { row(d.id).read = true; },
@@ -516,6 +535,7 @@ document.addEventListener('click', e => {
   if (el.tagName === 'INPUT' && el.type !== 'checkbox') return;
   const skip = A[el.dataset.act](el.dataset);
   if (!skip) render();
+  if (el.dataset.act === 'openConv') { const nl = document.querySelector('.conv .newline'); if (nl) nl.scrollIntoView({ block: 'start' }); }
 });
 document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"]')) { e.preventDefault(); e.target.click(); } if (e.key === 'Escape' && (S.modal || S.menu)) { S.modal = null; S.menu = null; render(); } });
 document.addEventListener('submit', e => { e.preventDefault(); submit(e.target); });

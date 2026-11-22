@@ -415,6 +415,48 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "ten messages are one row that says so",
+  "pass": true,
+  "detail": "AL\nAnna Lindqvist\n10 new\n10:41\nIn Focus: direct message from"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "expanding shows the first six new messages after the one before them",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the four not yet shown stay unread",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "showing the rest reads the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a thread row shows the message that started the thread and the reply before the new ones",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "one click on the row opens the conversation at the first new message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "the reason line opens the explanation without reading the row",
   "pass": true,
   "detail": ""
@@ -884,6 +926,48 @@
  {
   "page": "slack-like",
   "width": "phone",
+  "check": "ten messages are one row that says so",
+  "pass": true,
+  "detail": "AL\nAnna Lindqvist\n10 new\n10:41\nIn Focus: direct message from"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "expanding shows the first six new messages after the one before them",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "the four not yet shown stay unread",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "showing the rest reads the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "a thread row shows the message that started the thread and the reply before the new ones",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "one click on the row opens the conversation at the first new message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
   "check": "the reason line opens the explanation without reading the row",
   "pass": true,
   "detail": ""
@@ -1353,6 +1437,48 @@
  {
   "page": "telegram-like",
   "width": "desktop",
+  "check": "ten messages are one row that says so",
+  "pass": true,
+  "detail": "AL\nAnna Lindqvist\n10:41\nIn Focus: direct message from Anna\nA"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "expanding shows the first six new messages after the one before them",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "the four not yet shown stay unread",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "showing the rest reads the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "a thread row shows the message that started the thread and the reply before the new ones",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "one click on the row opens the conversation at the first new message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
   "check": "the reason line opens the explanation without reading the row",
   "pass": true,
   "detail": ""
@@ -1822,6 +1948,48 @@
  {
   "page": "telegram-like",
   "width": "phone",
+  "check": "ten messages are one row that says so",
+  "pass": true,
+  "detail": "AL\nAnna Lindqvist\n10:41\nIn Focus: direct message from Anna\nA"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "expanding shows the first six new messages after the one before them",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "the four not yet shown stay unread",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "showing the rest reads the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "a thread row shows the message that started the thread and the reply before the new ones",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "one click on the row opens the conversation at the first new message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
   "check": "the reason line opens the explanation without reading the row",
   "pass": true,
   "detail": ""
@@ -2291,6 +2459,48 @@
  {
   "page": "own",
   "width": "desktop",
+  "check": "ten messages are one row that says so",
+  "pass": true,
+  "detail": "AL\nAnna Lindqvist\n10 new\n10:41\nIn Focus: direct message from"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "expanding shows the first six new messages after the one before them",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "the four not yet shown stay unread",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "showing the rest reads the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "a thread row shows the message that started the thread and the reply before the new ones",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "one click on the row opens the conversation at the first new message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
   "check": "the reason line opens the explanation without reading the row",
   "pass": true,
   "detail": ""
@@ -2756,6 +2966,48 @@
   "check": "opening an entry clears its mark and lowers the count; the entry stays",
   "pass": true,
   "detail": "7"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "ten messages are one row that says so",
+  "pass": true,
+  "detail": "AL\nAnna Lindqvist\n10 new\n10:41\nIn Focus: direct message from"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "expanding shows the first six new messages after the one before them",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "the four not yet shown stay unread",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "showing the rest reads the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "a thread row shows the message that started the thread and the reply before the new ones",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "one click on the row opens the conversation at the first new message",
+  "pass": true,
+  "detail": ""
  },
  {
   "page": "own",
