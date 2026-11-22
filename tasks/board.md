@@ -11,6 +11,7 @@ _Nothing in progress._
 
 ## Waiting on user
 
+- **T-063** `decide` D-031: corrections to the contracts after the independent re-check, with five choices for the user (`docs/visuals/D-031-contract-corrections.html`). Blocks T-045. T-044 is done; the user asked for the whole plan to be built
 - **T-034** `guardrails` Seven contracts (`docs/contracts/`) and guardrails G-003 to G-030 are written (G-027 to G-030 for growing by adding copies and databases and for one large organization, D-029 and D-030) (with the organization in every contract since D-026, and G-025, G-026 for keeping organizations apart and independent) from the accepted technical decisions; the user reviews the sentences in `docs/visuals/T-034-guardrails.html`. All product guardrails are `pending` until their tests exist. An independent verifier found four blockers and six larger gaps (delivery of notifications unprotected, a screen numbering that could not work with filtered updates, two boundaries without a contract, a guardrail whose check could pass while it was false); all answered, corrections not re-checked
 - **T-021** `decide` Nine small behaviours the E-001 model still chooses on its own (list in `experiments/E-001-feed-rules-model/README.md`, "Still open after this run"). None blocks the look-and-feel work. The notification default was confirmed by the user at about 29 a day
 
