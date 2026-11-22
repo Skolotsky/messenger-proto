@@ -258,7 +258,7 @@ func (l *lane) claimQuestion(now time.Time, far bool, limit int) (string, []any)
 		)
 		UPDATE feed.note_places p SET claimed_by = $1, claimed_until = $5
 		FROM locked WHERE p.org = locked.org RETURNING p.org`
-		args = []any{l.s.me, now, turnBudget, limit, now.Add(claimFor)}
+		args = []any{l.s.me, now, turnBudget, limit, now.Add(l.s.cfg.ClaimFor)}
 	} else {
 		sql = `WITH wanted AS (
 			SELECT d.org FROM delivery_due d
@@ -274,7 +274,7 @@ func (l *lane) claimQuestion(now time.Time, far bool, limit int) (string, []any)
 		)
 		UPDATE delivery_places p SET claimed_by = $1, claimed_until = $5
 		FROM locked WHERE p.org = locked.org AND p.receiver = $6 RETURNING p.org`
-		args = []any{l.s.me, now, turnBudget, limit, now.Add(claimFor), l.name}
+		args = []any{l.s.me, now, turnBudget, limit, now.Add(l.s.cfg.ClaimFor), l.name}
 	}
 	return sql, args
 }
@@ -307,7 +307,7 @@ func (s *Service) Questions(now time.Time) []Question {
 // order of arrival, until it has nothing left.
 func (l *lane) claimOldest(ctx context.Context, pool *pgxpool.Pool, now time.Time) ([]ids.Org, error) {
 	due, places, extra := "delivery_due", "delivery_places", " AND p.receiver = $4 AND d.receiver = $4"
-	args := []any{l.s.me, now, now.Add(claimFor), l.name}
+	args := []any{l.s.me, now, now.Add(l.s.cfg.ClaimFor), l.name}
 	if l.notes {
 		due, places, extra = "feed.note_due", "feed.note_places", ""
 		args = args[:3]

@@ -291,6 +291,13 @@ func (s *Service) restart(w http.ResponseWriter, r *http.Request, org ids.Org) {
 	}
 	now := s.cfg.Clock.Now()
 	err = pgx.BeginFunc(ctx, pool, func(tx pgx.Tx) error {
+		var known bool
+		if err := tx.QueryRow(ctx, `SELECT EXISTS (SELECT 1 FROM org_log WHERE org = $1)`, string(org)).Scan(&known); err != nil {
+			return err
+		}
+		if !known {
+			return errNoOrganization
+		}
 		if l.notes {
 			edition := in.Edition
 			if edition == nil {
@@ -322,6 +329,10 @@ func (s *Service) restart(w http.ResponseWriter, r *http.Request, org ids.Org) {
 		_, err := tx.Exec(ctx, `INSERT INTO delivery_due (receiver, org, since) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`, name, string(org), now)
 		return err
 	})
+	if errors.Is(err, errNoOrganization) {
+		refuse(w, http.StatusNotFound, "unknown organization")
+		return
+	}
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
