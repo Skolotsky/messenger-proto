@@ -268,6 +268,13 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "days are divided: yesterday's messages stand apart from today's",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "the channel has more than one thread to find",
   "pass": true,
   "detail": ""
@@ -520,6 +527,118 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "an action explains itself in a tooltip",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "so does Info",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the send hint opens the setting it describes",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the first suggestion is marked",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "arrow keys move the mark",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Enter picks the marked person and sends nothing",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Tab picks too, after narrowing by typing",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Esc closes the list and keeps the text",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Enter starts a new line and does not send",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Ctrl+Enter sends, and the message keeps its two lines",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the same holds while editing: Enter adds a line",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the edit box grows with its text and shows no scrollbar",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "so does the message box",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "and Ctrl+Enter saves the edit",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "which key sends is a setting, with Enter for a new line as the start",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "switched: Enter sends and Shift+Enter starts a new line",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "a message that fails to send stays in place and says so",
   "pass": true,
   "detail": ""
@@ -569,6 +688,20 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "in a narrow panel the tabs no longer fit",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the tab row scrolls sideways by dragging, without switching tab",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "a double click puts it back",
   "pass": true,
   "detail": ""
@@ -605,6 +738,27 @@
   "page": "slack-like",
   "width": "desktop",
   "check": "and back on",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "with the setting off the Kept heading says only Done releases",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "then a reaction does not mark a kept row done",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "and Done still does",
   "pass": true,
   "detail": ""
  },
@@ -1129,6 +1283,13 @@
  {
   "page": "slack-like",
   "width": "phone",
+  "check": "days are divided: yesterday's messages stand apart from today's",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
   "check": "the channel has more than one thread to find",
   "pass": true,
   "detail": ""
@@ -1340,6 +1501,27 @@
   "page": "slack-like",
   "width": "phone",
   "check": "and back on",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "with the setting off the Kept heading says only Done releases",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "then a reaction does not mark a kept row done",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "and Done still does",
   "pass": true,
   "detail": ""
  },
@@ -1787,6 +1969,13 @@
  {
   "page": "telegram-like",
   "width": "desktop",
+  "check": "days are divided: yesterday's messages stand apart from today's",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
   "check": "the channel has more than one thread to find",
   "pass": true,
   "detail": ""
@@ -2376,6 +2565,13 @@
   "page": "telegram-like",
   "width": "phone",
   "check": "a deleted message with replies keeps a marker and a link to its thread; no replies inline",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "days are divided: yesterday's messages stand apart from today's",
   "pass": true,
   "detail": ""
  },
@@ -2942,6 +3138,13 @@
  {
   "page": "own",
   "width": "desktop",
+  "check": "days are divided: yesterday's messages stand apart from today's",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
   "check": "the channel has more than one thread to find",
   "pass": true,
   "detail": ""
@@ -3531,6 +3734,13 @@
   "page": "own",
   "width": "phone",
   "check": "a deleted message with replies keeps a marker and a link to its thread; no replies inline",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "days are divided: yesterday's messages stand apart from today's",
   "pass": true,
   "detail": ""
  },

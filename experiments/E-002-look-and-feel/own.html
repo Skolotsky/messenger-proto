@@ -429,7 +429,8 @@ button.rx:hover{border-color:var(--accent)}
 .mp{position:absolute;left:16px;right:16px;bottom:100%;z-index:6}
 .mp-box{background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:4px;margin-bottom:4px}
 .mp-box button{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px;border-radius:6px}
-.mp-box button:hover,.mp-box button:first-child{background:var(--hover)}
+.mp-box button:hover{background:var(--hover)}
+.mp-box button.act{background:var(--accent-soft);box-shadow:inset 2px 0 0 var(--accent)}
 .mp-box small{color:var(--muted);font-size:12.5px}
 /* when things go wrong: say so in a place that moves nothing */
 .netpill{flex:none;background:var(--flag-soft);color:var(--flag);border:1px solid var(--flag);border-radius:99px;padding:3px 12px;font-size:12.5px;font-weight:600;white-space:nowrap}
@@ -468,6 +469,35 @@ body.resizing{cursor:col-resize;user-select:none}
 @media (max-width:760px){.msg-head{padding-right:42px}}
 .thread-link{white-space:nowrap;max-width:calc(100% - 46px);overflow:hidden}
 .thread-link small{overflow:hidden;text-overflow:ellipsis;min-width:0}
+/* multi-line writing */
+.cbox .reply textarea{display:block;border:0;background:none;outline:0;padding:11px 12px 6px;width:100%;resize:none;font:inherit;color:inherit;line-height:1.45;max-height:180px;overflow-y:auto}
+.edit{align-items:flex-end}
+.edit textarea{flex:1;min-width:0;border:1.5px solid var(--accent);border-radius:6px;padding:6px 9px;background:var(--panel);resize:none;font:inherit;color:inherit;line-height:1.45;max-height:180px}
+.msg-body,.row-preview{white-space:pre-wrap}
+.row-preview{white-space:normal}
+.send-hint{color:var(--muted);font-size:12px;white-space:nowrap}
+@media (max-width:760px){.send-hint{display:none}}
+.edit{position:relative}
+.edit .mp{left:0;right:0}
+.mp-box{max-height:260px;overflow-y:auto}
+/* tooltips */
+.tip{position:fixed;z-index:80;max-width:260px;background:#16181a;color:#f2f2f0;font-size:12.5px;line-height:1.35;padding:6px 9px;border-radius:6px;box-shadow:var(--shadow);pointer-events:none;opacity:0;transition:opacity .1s;left:-999px;top:0}
+.tip.on{opacity:1}
+.send-hint{cursor:pointer;border-bottom:1px dotted currentColor}
+.send-hint:hover{color:var(--text)}
+.tabs{cursor:default;user-select:none}
+.tabs.dragging,.tabs.dragging .tab{cursor:grabbing}
+/* day divider */
+.dayline{display:flex;align-items:center;gap:10px;margin:10px 0 6px;color:var(--muted);font-size:12px;font-weight:600}
+.dayline::before,.dayline::after{content:"";flex:1;height:1px;background:var(--line)}
+.dayline span{border:1px solid var(--line);border-radius:99px;padding:2px 12px;background:var(--panel)}
+/* agents: a robot on the avatar's corner instead of a text label */
+.av{position:relative}
+.av.ag{border:0;border-radius:8px;background:hsl(var(--h,200) 22% 38%);color:#fff;font-size:12px}
+.av .bot{position:absolute;right:-5px;bottom:-5px;width:18px;height:18px;border-radius:50%;background:var(--panel);color:var(--text);border:1.5px solid var(--line);display:grid;place-items:center;font-style:normal}
+.av .bot svg{width:12px;height:12px}
+.av.xs .bot{width:13px;height:13px;right:-4px;bottom:-4px;border-width:1px}.av.xs .bot svg{width:9px;height:9px}
+.av.xs.ag{border-radius:5px;font-size:9px}
 
 /* The agent's own: a calm page. The reason leads every row, and a row's size says how much attention it asks for. */
 :root{--bg:#faf8f4;--panel:#fff;--panel2:#f1eee7;--line:#e4dfd4;--hover:#f3f0e9;--accent:#1f4f46;--accent-soft:#e1ece9;--serif:ui-serif,Georgia,"Times New Roman",serif}
@@ -600,7 +630,8 @@ function av(id, cls) {
   if (id === '#') return `<span class="av ch ${cls || ''}" aria-hidden="true">#</span>`;
   const n = P[id][0].split(' ');
   const ini = isAgent(id) ? n[0].slice(0, 2) : n[0][0] + (n[1] ? n[1][0] : '');
-  return `<span class="av ${isAgent(id) ? 'ag ' : ''}${cls || ''}" style="--h:${(PID.indexOf(id) * 47) % 360}" aria-hidden="true">${ini}</span>`;
+  const bot = isAgent(id) ? `<i class="bot" data-tip="${P[id][1]}: an agent, not a person"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="9" width="14" height="10" rx="2.5"/><path d="M12 9V5.5M9.2 13.5h.01M14.8 13.5h.01"/><circle cx="12" cy="4.2" r="1.2"/></svg></i>` : ''; // an agent is marked by a small robot on the corner of its avatar
+  return `<span class="av ${isAgent(id) ? 'ag ' : ''}${cls || ''}" style="--h:${(PID.indexOf(id) * 47) % 360}">${ini}${bot}</span>`;
 }
 
 /* ---------- the seeded moment: Larkspur, two days before the 2.0 launch, Tuesday 10:42, seen as Maya ---------- */
@@ -743,7 +774,7 @@ function seed() {
   const T = (row, mid, bucket) => ({ row, mid, bucket });
   return {
     msgs, convs, rows, view: 'feed', btab: 'focus', htab: 'dms', conv: null, exp: new Set(), open: new Set(), lock: {}, menu: null, modal: null,
-    w: { side: 250, act: 500 }, pending: null, arrived: false, fyiSeen: false, level: '', focusOnly: false, demo: false, note: '', q: '', resort: false,
+    enterSends: false, autoDone: true, w: { side: 250, act: 500 }, pending: null, arrived: false, fyiSeen: false, level: '', focusOnly: false, demo: false, note: '', q: '', resort: false,
     dmAuto: true, dmPeople: ['anna', 'sam', 'marco', 'lena', 'tomas'], dmRemoved: [], dmAsk: false, off: {}, gone: [],
     rules: [{ id: 'flag', label: 'Flags that name you', n: 6, start: 1 }, { id: 'ch:incidents', label: 'Every new post in #incidents', n: 23, kind: 'channel', target: 'incidents' }],
     tray: [T('r-anna', 'a10', 'focus'), T('r-check', 'c5', 'needs'), T('r-export', 't1', 'needs'), T('r-sso', 'j1', 'needs'), T('r-inc', 'i6', 'focus'), T('r-rc', 'rc4', 'focus'), Object.assign(T('r-mig', 'mig1', 'needs'), { as: 'marco', lead: 'Reacted ✅ to your message: ', at: '10:16' }), T('r-comp', 'p3', 'needs'), T('r-triage', 'u2', 'needs'), T('r-go', 'l3', 'focus')],
@@ -785,13 +816,13 @@ const EMOJI = { // the full picker: a name on each, so the search box can find i
 function pickerHTML() {
   const pk = S.pick; if (!pk) return '';
   const m = S.msgs[pk.m], x = Math.max(8, Math.min(pk.x - 150, innerWidth - 316)), y = Math.max(8, Math.min(pk.y + 10, innerHeight - 372));
-  const secs = Object.keys(EMOJI).map(k => `<div class="pk-sec"><h4>${k}</h4><div class="pk-grid">${EMOJI[k].split(',').map(t => { const [e, n] = t.split(':'); return `<button data-act="reactMsg" data-m="${pk.m}" data-e="${e}" data-n="${n}" title="${n.split(' ')[0]}" aria-label="${n}">${e}</button>`; }).join('')}</div></div>`).join('');
+  const secs = Object.keys(EMOJI).map(k => `<div class="pk-sec"><h4>${k}</h4><div class="pk-grid">${EMOJI[k].split(',').map(t => { const [e, n] = t.split(':'); return `<button data-act="reactMsg" data-m="${pk.m}" data-e="${e}" data-n="${n}" data-tip="${n.split(' ')[0]}" aria-label="${n}">${e}</button>`; }).join('')}</div></div>`).join('');
   return `<div class="picker" role="dialog" aria-label="Choose a reaction" style="left:${x}px;top:${y}px"><div class="pk-head"><small>React to ${m.by === ME ? 'your' : first(m.by) + "'s"} message</small><input type="search" data-pick-search="1" placeholder="Search emoji" aria-label="Search emoji"></div><div class="pk-body">${secs}<p class="pk-none" hidden>No emoji by that name.</p></div></div>`;
 }
 function toggleRx(m, e) { const x = m.rx.find(y => y[0] === e); if (x) { if (x[1].includes(ME)) { x[1] = x[1].filter(y => y !== ME); if (!x[1].length) m.rx = m.rx.filter(y => y !== x); } else x[1].push(ME); } else m.rx.push([e, [ME]]); }
 function rxHTML(m) {
   if (!m.rx.length) return '';
-  return '<div class="rxs">' + m.rx.map(([e, who]) => `<button class="rx${who.includes(ME) ? ' on' : ''}" data-act="reactMsg" data-m="${m.id}" data-e="${e}" title="${who.includes(ME) ? 'Remove your reaction' : 'React with ' + e}">${e} <i>${who.length > 2 ? who.length : who.map(w => w === ME ? 'You' : first(w)).join(', ')}</i></button>`).join('') + '</div>';
+  return '<div class="rxs">' + m.rx.map(([e, who]) => `<button class="rx${who.includes(ME) ? ' on' : ''}" data-act="reactMsg" data-m="${m.id}" data-e="${e}" data-tip="${who.includes(ME) ? 'Remove your reaction' : 'React with ' + e}">${e} <i>${who.length > 2 ? who.length : who.map(w => w === ME ? 'You' : first(w)).join(', ')}</i></button>`).join('') + '</div>';
 }
 function msgHTML(id, ctx) {
   const m = S.msgs[id], k = ctx + ':' + id, L = S.lock[k] || {};
@@ -803,10 +834,10 @@ function msgHTML(id, ctx) {
     return `<div class="msg deleted" data-k="${k}"><div class="msg-self"${L.self ? ` style="height:${L.self}px"` : ''}><span class="tomb">${first(m.by)} deleted this message</span></div>${rep}</div>`;
   }
   const locked = m.edited && L.body && !S.open.has(k);
-  const tags = (isAgent(m.by) ? '<span class="tag ag">agent</span>' : '') + (m.flag ? '<span class="tag flag">⚑ Flag</span>' : '') + (m.info ? '<span class="tag info">Info</span>' : '');
+  const tags = '' + (m.flag ? '<span class="tag flag">⚑ Flag</span>' : '') + (m.info ? '<span class="tag info">Info</span>' : '');
   const ed = m.edited ? `<span class="edited">edited</span>` + (locked ? `<button class="link" data-act="openMsg" data-k="${k}">Show all</button>` : '') : '';
-  const tools = `<span class="msg-tools">${EMO.map(e => `<button class="rx-btn" data-act="reactMsg" data-m="${id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}<button class="rx-pick" data-act="pick" data-m="${id}" aria-label="More reactions" title="More reactions">${ic('smile')}</button>${m.by === ME ? `${m.flag ? `<button class="own-tool" data-act="unflag" data-m="${id}" aria-label="Remove the flag" title="Remove the flag">${ic('unflag')}</button>` : ''}<button class="own-tool" data-act="editMsg" data-mk="${k}" aria-label="Edit" title="Edit">${ic('pencil')}</button><button class="own-tool" data-act="askDel" data-mk="${k}" aria-label="Delete" title="Delete">${ic('trash')}</button>` : ''}</span>`;
-  return `<div class="msg${m.failed ? ' is-failed' : ''}${m.pending ? ' is-pending' : ''}${m.by === ME ? ' mine' : ''}${m.flag ? ' is-flag' : ''}${m.info ? ' is-info' : ''}" data-k="${k}"><div class="msg-self">${tools}${av(m.by)}<div class="msg-main"><div class="msg-head"><b>${pn(m.by)}</b>${tags}<time>${m.t}</time>${ed}</div>${S.editing === k ? `<form class="edit" data-form="edit" data-m="${id}"><input name="t" value="${esc(m.text)}" aria-label="Edit your message" autocomplete="off"><button class="btn sm pri">Save</button><button type="button" class="btn sm" data-act="cancelEdit">Cancel</button></form>` : S.delAsk === k ? `<div class="del-ask"><span>Delete this message? It disappears for everyone${replies ? '; its replies stay' : ''}. This cannot be undone.</span><button class="btn sm danger" data-act="delMsg" data-m="${id}">Delete</button><button class="btn sm" data-act="cancelEdit">Cancel</button></div>` : `<div class="msg-body${locked ? ' locked' : ''}"${locked ? ` style="max-height:${L.body}px"` : ''}>${rich(m.text)}</div>`}${m.failed ? `<div class="send-state fail">Not sent. <button class="link" data-act="retry" data-m="${id}">Try again</button> · <button class="link" data-act="discard" data-m="${id}">Discard</button></div>` : m.pending ? '<div class="send-state">Waiting for the connection. It will be sent when you are back online.</div>' : ''}${rxHTML(m)}${m.status ? `<div class="status"><span class="st-dot"></span>${m.status}</div>` : ''}</div></div>${rep}</div>`;
+  const tools = `<span class="msg-tools">${EMO.map(e => `<button class="rx-btn" data-act="reactMsg" data-m="${id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}<button class="rx-pick" data-act="pick" data-m="${id}" aria-label="More reactions" data-tip="More reactions">${ic('smile')}</button>${m.by === ME ? `${m.flag ? `<button class="own-tool" data-act="unflag" data-m="${id}" aria-label="Remove the flag" data-tip="Remove the flag">${ic('unflag')}</button>` : ''}<button class="own-tool" data-act="editMsg" data-mk="${k}" aria-label="Edit" data-tip="Edit">${ic('pencil')}</button><button class="own-tool" data-act="askDel" data-mk="${k}" aria-label="Delete" data-tip="Delete">${ic('trash')}</button>` : ''}</span>`;
+  return `<div class="msg${m.failed ? ' is-failed' : ''}${m.pending ? ' is-pending' : ''}${m.by === ME ? ' mine' : ''}${m.flag ? ' is-flag' : ''}${m.info ? ' is-info' : ''}" data-k="${k}"><div class="msg-self">${tools}${av(m.by)}<div class="msg-main"><div class="msg-head"><b>${pn(m.by)}</b>${tags}<time>${timeOf(m.t)}</time>${ed}</div>${S.editing === k ? `<form class="edit" data-form="edit" data-m="${id}"><div class="mp"></div><textarea name="t" rows="1" aria-label="Edit your message" autocomplete="off">${esc(m.text)}</textarea><button class="btn sm pri" data-tip="${S.enterSends ? 'Enter' : 'Ctrl+Enter'}">Save</button><button type="button" class="btn sm" data-act="cancelEdit" data-tip="Esc">Cancel</button></form>` : S.delAsk === k ? `<div class="del-ask"><span>Delete this message? It disappears for everyone${replies ? '; its replies stay' : ''}. This cannot be undone.</span><button class="btn sm danger" data-act="delMsg" data-m="${id}">Delete</button><button class="btn sm" data-act="cancelEdit">Cancel</button></div>` : `<div class="msg-body${locked ? ' locked' : ''}"${locked ? ` style="max-height:${L.body}px"` : ''}>${rich(m.text)}</div>`}${m.failed ? `<div class="send-state fail">Not sent. <button class="link" data-act="retry" data-m="${id}">Try again</button> · <button class="link" data-act="discard" data-m="${id}">Discard</button></div>` : m.pending ? '<div class="send-state">Waiting for the connection. It will be sent when you are back online.</div>' : ''}${rxHTML(m)}${m.status ? `<div class="status"><span class="st-dot"></span>${m.status}</div>` : ''}</div></div>${rep}</div>`;
 }
 function dialCtl(c, ctx) {
   const key = 'dial:' + c.id + ':' + ctx, open = S.menu === key;
@@ -869,7 +900,7 @@ function rowHTML(r) {
   const title = r.title || (c.kind === 'dm' ? pn(c.with) : c.kind === 'channel' ? (r.chan ? '#' + c.name : pn(last.by)) : c.title);
   const sub = r.sub || (c.kind === 'dm' ? '' : c.kind === 'channel' ? (r.chan ? '' : '#' + c.name) : '#' + c.where);
   const n = left(r), cnt = n > 1 ? `<span class="row-count">${n} new</span>` : '';
-  const marks = (ms.some(m => m.flag) ? '<span class="tag flag">⚑</span>' : '') + (ms.some(m => m.info) ? '<span class="tag info">Info</span>' : '') + (isAgent(r.by) ? '<span class="tag ag">agent</span>' : '');
+  const marks = (ms.some(m => m.flag) ? '<span class="tag flag">⚑</span>' : '') + (ms.some(m => m.info) ? '<span class="tag info">Info</span>' : '') + '';
   const state = r.replied ? '<span class="state">Replied</span>' : r.done ? '<span class="state">Done</span>' : r.keptNow ? '<span class="state">Kept</span>' : '';
   const badge = r.read ? '' : `<span class="row-badge">${n > 1 ? n : ''}</span>`;
   const lockS = last.edited && L.body ? ` style="max-height:${L.body}px"` : '';
@@ -878,7 +909,7 @@ function rowHTML(r) {
     const mine = r.replies.map(i => msgHTML(i, 'exp')).join('');
     const kd = r.kept && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : r.done ? '' : `<button class="btn sm" data-act="keep" data-id="${r.id}">Keep</button>`;
     x = `<div class="row-exp">${WHY === 'b' ? `<div class="why-inline">${whyBody(r)}</div>` : `<p class="why"><b>Why it is here.</b> ${esc(r.why)}</p>`}${ctxFor(r)}${ctxFor(r) ? '<div class="newline"><span>New</span></div>' : ''}${r.items.length > CAP && !r.all ? `<div class="more-new"><button class="btn sm" data-act="more" data-id="${r.id}">Show ${r.items.length - CAP} earlier new messages</button></div>` : ''}${(r.all ? r.items : r.items.slice(-CAP)).map(i => msgHTML(i, 'exp')).join('')}${mine}
-      <div class="acts"><span class="quick"><small>React to the latest</small>${EMO.map(e => `<button class="rx-btn" data-act="react" data-id="${r.id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}<button class="rx-btn rx-pick" data-act="pick" data-m="${last.id}" aria-label="More reactions" title="More reactions">${ic('smile')}</button></span>${kd}<button class="btn sm" data-act="openConv" data-c="${r.conv}" data-id="${r.id}">Open conversation</button>${dialCtl(c, r.id)}<button class="btn sm" data-act="ruleFor" data-c="${r.conv}" data-by="${r.by}">Add to Focus…</button></div>
+      <div class="acts"><span class="quick"><small>React to the latest</small>${EMO.map(e => `<button class="rx-btn" data-act="react" data-id="${r.id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}<button class="rx-btn rx-pick" data-act="pick" data-m="${last.id}" aria-label="More reactions" data-tip="More reactions">${ic('smile')}</button></span>${kd}<button class="btn sm" data-act="openConv" data-c="${r.conv}" data-id="${r.id}">Open conversation</button>${dialCtl(c, r.id)}<button class="btn sm" data-act="ruleFor" data-c="${r.conv}" data-by="${r.by}">Add to Focus…</button></div>
       <form class="reply" data-form="reply" data-id="${r.id}"><input name="t" autocomplete="off" aria-label="Reply" placeholder="Reply ${c.kind === 'dm' ? 'to ' + first(c.with) : 'in ' + where}…"><button class="btn pri">Send</button></form></div>`;
   }
   return `<article class="row b-${r.bucket} ${r.read ? 'read' : 'unread'}${exp ? ' expanded' : ''}${r.fresh ? ' fresh' : ''}${r.sec === 'kept' ? ' kept' : ''}${r.done ? ' done' : ''}" data-row="${r.id}">
@@ -888,15 +919,15 @@ function rowHTML(r) {
         <div class="row-reason"><span class="why-dot"></span>${WHY === 'a' ? `<button class="why-btn" data-act="why" data-id="${r.id}" aria-expanded="${S.whyOpen === r.id}">${esc(r.reason)} ${ic('chev')}</button>` : esc(r.reason)}${r.note ? ` · <em>${r.note}</em>` : ''}${WHY === 'c' ? `<button class="why-btn c" data-act="whySheet" data-id="${r.id}">Why? Change…</button>` : ''}</div>
         <div class="row-preview" data-k="${k}"${lockS}>${r.replies.length ? `<b>You:</b> ${rich(S.msgs[r.replies[r.replies.length - 1]].text)}` : `<b>${last.by === ME ? 'You' : first(last.by)}:</b> ${rich(last.text)}`}</div>
         ${r.kind !== 'rx' && last.rx.length ? rxHTML(last) : ''}</div>
-      <div class="row-side">${state}${badge}<span class="row-btns"><button class="rx-pick" data-act="pick" data-m="${last.id}" aria-label="React without opening" title="React to the latest message without opening">${ic('smile')}</button>${!r.read ? `<button class="mark-read" data-act="read" data-id="${r.id}" aria-label="Mark read without opening" title="Mark read without opening">${ic('check')}</button>` : ''}${r.kept && !r.done ? '' : `<button class="keep-btn" data-act="keep" data-id="${r.id}" aria-label="${r.done ? 'Keep again' : 'Keep'}" title="${r.done ? 'Keep again: undo Done' : 'Keep until you press Done'}">${ic('pin')}</button>`}</span>${r.sec === 'kept' && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : ''}<span class="row-chev">${ic('chev')}</span></div></div>${WHY === 'a' && S.whyOpen === r.id ? `<div class="why-pop" data-stop="1"><h3>Why this is in ${BK[r.bucket][0]}</h3>${whyBody(r)}</div>` : ''}${x}</article>`;
+      <div class="row-side">${state}${badge}<span class="row-btns"><button class="rx-pick" data-act="pick" data-m="${last.id}" aria-label="React without opening" data-tip="React to the latest message without opening">${ic('smile')}</button>${!r.read ? `<button class="mark-read" data-act="read" data-id="${r.id}" aria-label="Mark read without opening" data-tip="Mark read without opening">${ic('check')}</button>` : ''}${r.kept && !r.done ? '' : `<button class="keep-btn" data-act="keep" data-id="${r.id}" aria-label="${r.done ? 'Keep again' : 'Keep'}" data-tip="${r.done ? 'Keep again: undo Done' : 'Keep until you press Done'}">${ic('pin')}</button>`}</span>${r.sec === 'kept' && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : ''}<span class="row-chev">${ic('chev')}</span></div></div>${WHY === 'a' && S.whyOpen === r.id ? `<div class="why-pop" data-stop="1"><h3>Why this is in ${BK[r.bucket][0]}</h3>${whyBody(r)}</div>` : ''}${x}</article>`;
 }
 const SUN = '<svg class="ill" viewBox="0 0 120 64" aria-hidden="true"><path d="M8 52h104" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M36 52a24 24 0 0 1 48 0" fill="currentColor" opacity=".18"/><path d="M60 14v8M30 26l6 6M90 26l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 60h30M62 60h38" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".4"/></svg>';
 function bucketHTML(b) {
   const rs = S.rows.filter(r => r.bucket === b), nw = rs.filter(r => r.sec !== 'kept'), kp = rs.filter(r => r.sec === 'kept');
   const n = nw.filter(r => !r.read).length;
-  const cnt = b === 'fyi' ? (n ? '<span class="bk-dot" title="Something new"></span>' : '') : `<span class="bk-count">${n}</span>`;
+  const cnt = b === 'fyi' ? (n ? '<span class="bk-dot" data-tip="Something new"></span>' : '') : `<span class="bk-count">${n}</span>`;
   let body = nw.length ? nw.map(rowHTML).join('') : `<div class="empty">${SUN}<p>${EMPTY[b]}</p></div>`;
-  if (kp.length) body += `<div class="kept-head"><b>Kept · ${kp.length}</b><small>Stays until you press Done, reply or react</small></div>` + kp.map(rowHTML).join('');
+  if (kp.length) body += `<div class="kept-head"><b>Kept · ${kp.length}</b><small>${S.autoDone ? 'Stays until you press Done, reply or react' : 'Stays until you press Done'}</small></div>` + kp.map(rowHTML).join('');
   return `<section class="bucket b-${b}" data-b="${b}"><header class="bk-head"><h2>${BK[b][0]}</h2>${cnt}<span class="bk-desc">${BK[b][1]}</span><span class="bk-acts"><button class="btn sm" data-act="markAll" data-b="${b}">Mark all read</button></span></header>${body}</section>`;
 }
 const counts = () => ({ focus: S.rows.filter(r => r.bucket === 'focus' && r.sec !== 'kept' && !r.read).length, needs: S.rows.filter(r => r.bucket === 'needs' && !r.read).length, fyi: S.rows.filter(r => r.bucket === 'fyi' && !r.read).length });
@@ -927,16 +958,18 @@ function history() {
     const body = S.htab === 'reactions' ? esc(text) + (m ? `<span class="h-quote">${rich(m.text)}</span>` : '') : `${S.htab === 'threads' ? `<b>${first(by)}:</b> ` : ''}${rich(m ? m.text : text)}`;
     const extra = S.htab === 'threads' ? `<span class="row-sub">#${c.where} · ${TDIAL[c.tdial][0]}</span>` : where ? `<span class="row-sub">${where}</span>` : '';
     const kk = cid + ':' + (mid || text);
-    return `<article class="row hrow${unread ? ' unread' : ''}"><div class="row-main" role="button" tabindex="0" data-act="openConv" data-c="${cid}">${av(by)}<div class="row-text"><div class="row-head">${unread ? '<span class="dot" title="Unread"></span>' : ''}${title ? `<span class="row-title">${esc(title)}</span>` : ''}${extra}${m && m.flag ? '<span class="tag flag">⚑</span>' : ''}${m && m.info ? '<span class="tag info">Info</span>' : ''}<span class="row-time">${when}${m && m.edited ? ' · edited' : ''}</span></div><div class="row-preview">${body}</div></div><div class="row-side"><button class="btn sm${S.kept.has(kk) ? ' on' : ''}" data-act="keepH" data-k="${esc(kk)}">${S.kept.has(kk) ? 'Kept' : 'Keep'}</button></div></div></article>`;
+    return `<article class="row hrow${unread ? ' unread' : ''}"><div class="row-main" role="button" tabindex="0" data-act="openConv" data-c="${cid}">${av(by)}<div class="row-text"><div class="row-head">${unread ? '<span class="dot" data-tip="Unread"></span>' : ''}${title ? `<span class="row-title">${esc(title)}</span>` : ''}${extra}${m && m.flag ? '<span class="tag flag">⚑</span>' : ''}${m && m.info ? '<span class="tag info">Info</span>' : ''}<span class="row-time">${when}${m && m.edited ? ' · edited' : ''}</span></div><div class="row-preview">${body}</div></div><div class="row-side"><button class="btn sm${S.kept.has(kk) ? ' on' : ''}" data-act="keepH" data-k="${esc(kk)}">${S.kept.has(kk) ? 'Kept' : 'Keep'}</button></div></div></article>`;
   }).join('');
   return `<div class="feed-wrap"><div class="feed-scroll" data-scroll="hist"><p class="hist-note">History, for finding things again. Newest first, read and unread together; a dot marks what you have not read yet. Nothing here is sorted by buckets, and nothing leaves by being read.</p>${list}</div></div>`;
 }
 function chats() {
   const dialTag = d => d === 'default' ? '' : `<span class="lvl l-${d}">${DIAL[d][0]}</span>`;
   const ch = CH.map(([n, d, u]) => { const c = S.convs['ch-' + n]; const dd = c && c.dial ? c.dial : d; const un = S.rows.some(r => r.conv === 'ch-' + n && !r.read) || (u && !S.convs['ch-' + n]); return `<button class="chat${un ? ' unread' : ''}${S.conv === 'ch-' + n ? ' on' : ''}" data-act="openConv" data-c="ch-${n}"><span class="hash">#</span><span class="chat-n">${n}</span>${dialTag(dd)}${un ? '<span class="dot"></span>' : ''}</button>`; }).join('');
-  const dm = DMS.map(p => { const un = S.rows.some(r => r.conv === 'dm-' + p && !r.read); return `<button class="chat${un ? ' unread' : ''}${S.conv === 'dm-' + p ? ' on' : ''}" data-act="openConv" data-c="dm-${p}">${av(p, 'xs')}<span class="chat-n">${pn(p)}</span>${isAgent(p) ? '<span class="tag ag">agent</span>' : ''}${un ? '<span class="dot"></span>' : ''}</button>`; }).join('');
+  const dm = DMS.map(p => { const un = S.rows.some(r => r.conv === 'dm-' + p && !r.read); return `<button class="chat${un ? ' unread' : ''}${S.conv === 'dm-' + p ? ' on' : ''}" data-act="openConv" data-c="dm-${p}">${av(p, 'xs')}<span class="chat-n">${pn(p)}</span>${un ? '<span class="dot"></span>' : ''}</button>`; }).join('');
   return `<div class="chats"><h3>Channels <small>${CH.length}</small></h3>${ch}<h3>Direct messages</h3>${dm}</div>`;
 }
+const DAYS = { Mon: 'Monday', Fri: 'Friday', Yesterday: 'Yesterday' };
+const dayOf = t => DAYS[t.split(' ')[0]] || 'Today', timeOf = t => t.replace(/^(Mon|Fri|Yesterday) /, '');
 function convView(cid, side) {
   const ctx = side ? 'thr' : 'conv';
   if (!cid) return `<div class="conv none"><div class="empty">${SUN}<p>${S.actOpen === false ? 'Choose a channel or a person on the left. Activity is closed; its count stays in the sidebar.' : 'Open a row to read the conversation here, next to the feed.'}</p></div></div>`;
@@ -944,12 +977,13 @@ function convView(cid, side) {
   const title = c.kind === 'dm' ? pn(c.with) : c.kind === 'channel' ? '#' + c.name : c.title;
   const sub = c.kind === 'dm' ? P[c.with][1] + (isAgent(c.with) ? ' · agent' : '') : c.kind === 'channel' ? `Channel · ${c.people} people` : side ? `Thread in #${c.where}` : `<button class="link to-chan" data-act="openConv" data-c="ch-${c.where}">‹ #${c.where}</button> · Thread`;
   let seenNew = false;
-  const body = c.msgs.map(id => { const m = S.msgs[id]; let d = ''; if (m.isNew && !seenNew) { seenNew = true; d = '<div class="newline"><span>New</span></div>'; } return d + msgHTML(id, ctx); }).join('');
-  const lv = l => `<button type="button" class="btn sm lv-${l}${S.level === l ? ' on' : ''}" data-act="level" data-l="${l}">${l === 'flag' ? '⚑ Flag' : 'Info'}</button>`;
+  let lastDay = null; // a line between days, so today's messages stand apart from older ones
+  const body = c.msgs.map(id => { const m = S.msgs[id], html = msgHTML(id, ctx); let d = ''; const day = dayOf(m.t); if (html && day !== lastDay) { lastDay = day; d += `<div class="dayline"><span>${day}</span></div>`; } if (m.isNew && !seenNew) { seenNew = true; d += '<div class="newline"><span>New</span></div>'; } return d + html; }).join(''); // the divider goes with the first message that is really shown, so a delete cannot move it
+  const lv = l => `<button type="button" class="btn sm lv-${l}${S.level === l ? ' on' : ''}" data-act="level" data-l="${l}" data-tip="${l === 'flag' ? 'Flag: this needs attention. It stays in the feed of whoever you mention until they deal with it.' : 'Info: for the record. It notifies nobody and never lands above For your information.'}">${l === 'flag' ? '⚑ Flag' : 'Info'}</button>`;
   const by = c.kind === 'dm' ? c.with : S.msgs[c.msgs[c.msgs.length - 1]].by;
-  return `<div class="conv k-${c.kind}${side ? ' side-thread' : ''}"><header class="conv-head">${side ? '' : `<button class="icon-btn back" data-act="closeConv" aria-label="Back to the feed">${ic('back')}</button>`}<div class="conv-title"><b>${esc(title)}</b><small>${sub}</small></div><div class="conv-acts">${dialCtl(c, ctx)}<button class="btn sm" data-act="ruleFor" data-c="${c.id}" data-by="${by}">Add to Focus…</button>${side ? '<button class="icon-btn" data-act="closeThread" aria-label="Close the thread" title="Close the thread">×</button>' : ''}</div></header>
+  return `<div class="conv k-${c.kind}${side ? ' side-thread' : ''}"><header class="conv-head">${side ? '' : `<button class="icon-btn back" data-act="closeConv" aria-label="Back to the feed">${ic('back')}</button>`}<div class="conv-title"><b>${esc(title)}</b><small>${sub}</small></div><div class="conv-acts">${dialCtl(c, ctx)}<button class="btn sm" data-act="ruleFor" data-c="${c.id}" data-by="${by}">Add to Focus…</button>${side ? '<button class="icon-btn" data-act="closeThread" aria-label="Close the thread" data-tip="Close the thread">×</button>' : ''}</div></header>
     <div class="conv-body" data-scroll="${ctx}">${body}</div>
-    <form class="composer" data-form="send" data-c="${c.id}"><div class="mp"></div><div class="cbox"><div class="reply"><input name="t" autocomplete="off" aria-label="Message" placeholder="${c.kind === 'thread' ? 'Reply in thread' : 'Message ' + esc(title)}…"></div><div class="cbar"><div class="levels">${lv('flag')}${lv('info')}<small>${S.net === 'off' ? 'You are offline. What you write is sent when the connection is back.' : S.level === 'flag' ? 'Needs attention. Stays with whoever you mention until they deal with it.' : S.level === 'info' ? 'For the record. Notifies nobody.' : ''}</small></div><button class="btn pri send" aria-label="Send">Send</button></div></div></form></div>`;
+    <form class="composer" data-form="send" data-c="${c.id}"><div class="mp"></div><div class="cbox"><div class="reply"><textarea name="t" rows="1" autocomplete="off" aria-label="Message" placeholder="${c.kind === 'thread' ? 'Reply in thread' : 'Message ' + esc(title)}…"></textarea></div><div class="cbar"><div class="levels">${lv('flag')}${lv('info')}<small>${S.net === 'off' ? 'You are offline. What you write is sent when the connection is back.' : S.level === 'flag' ? 'Needs attention. Stays with whoever you mention until they deal with it.' : S.level === 'info' ? 'For the record. Notifies nobody.' : ''}</small></div><button type="button" class="send-hint" data-act="modal" data-m="rules" data-s="writing" data-tip="Change which key sends, in settings">${S.enterSends ? 'Enter to send' : 'Ctrl+Enter to send'}</button><button class="btn pri send" aria-label="Send" data-tip="${S.enterSends ? 'Enter sends. Shift+Enter starts a new line' : 'Ctrl+Enter sends. Enter starts a new line'}">Send</button></div></div></form></div>`;
 }
 const convPane = () => convView(S.conv), threadPane = () => S.thread ? convView(S.thread, true) : '';
 function modalHTML() {
@@ -992,6 +1026,7 @@ function modalHTML() {
     const ask = S.dmAsk ? `<div class="ask"><p>New people will no longer be added. ${ppl.length} ${ppl.length === 1 ? 'person is' : 'people are'} already in Focus and stay there. Remove them too?</p><button class="btn sm pri" data-act="keepPeople">Keep them</button><button class="btn sm" data-act="rmAllPeople">Remove all ${ppl.length}</button></div>` : '';
     const feedPart = `<p class="set-q">What goes to Focus?</p><p class="sheet-note">Focus holds what matches these rules and lists, and nothing else. Changes apply the next time you open the feed.</p>
       <h3>General rules</h3>${sw('dmAuto', '', S.dmAuto, 'Direct messages from people', 'Everyone who writes to you directly is added to your Focus people. Off: nobody new is added.')}${ask}${sw('ruleToggle', 'flag', has('flag'), 'Flags that name you', 'A flag that mentions you or is sent to you directly. 6 items in the last 7 days.')}${sw('ruleToggle', 'mention', has('mention'), 'Any direct mention', 'Off: mentions land in Needs you. 23 items in the last 7 days.')}
+      <h3>Kept rows</h3>${sw('autoDone', '', S.autoDone, 'Replying or reacting marks a kept row done', 'Off: a kept or flagged row stays until you press Done yourself, whatever else you do with it.')}
       <h3>What you added to Focus</h3>${link('people', 'People', ppl.length + of('person').length, 'Whose direct messages land in Focus')}<p class="sheet-note set-thr">Threads are not listed here. A thread is put in Focus, and taken out, on the thread itself; History → Threads shows each thread's level.</p>
       <h3>Channels</h3>${link('channels', 'Channel levels', CH.filter(x => ((S.convs['ch-' + x[0]] && S.convs['ch-' + x[0]].dial) || x[1]) !== 'default').length + ' changed', 'How much of each channel reaches your feed: Focus, All activity, Default or Muted')}`;
     const back = '<button class="link set-back" data-act="setSec" data-s="feed">‹ Activity feed</button>';
@@ -1002,7 +1037,9 @@ function modalHTML() {
     const chRow = n => `<div class="rule ch-row"><span><b>#${n}</b><small>${DIAL[lvOf(n)][1]}</small></span><select data-dial="ch-${n}" aria-label="Level for #${n}">${Object.keys(DIAL).map(l => `<option value="${l}"${lvOf(n) === l ? ' selected' : ''}>${DIAL[l][0]}</option>`).join('')}</select></div>`;
     const chd = CH.map(x => x[0]).filter(n => lvOf(n) !== 'default'), dfl = CH.map(x => x[0]).filter(n => lvOf(n) === 'default');
     const chans = `${back}<p class="set-q">How much of each channel reaches your feed?</p><p class="sheet-note">Every channel has one level. You can also change it from the channel itself. A mention or a flag that names you gets through at every level.</p><div class="lv-legend">${Object.keys(DIAL).map(l => `<div><b>${DIAL[l][0]}</b><span>${DIAL[l][1]}</span></div>`).join('')}</div>${chd.length ? `<h3>Changed by you · ${chd.length}</h3>${chd.map(chRow).join('')}` : ''}<h3>At Default · ${dfl.length}</h3>${dfl.map(chRow).join('')}`;
-    const secs = { account: ['Account', acct], feed: ['Activity feed', feedPart], people: ['Focus people', people, 1], channels: ['Channel levels', chans, 1], notif: ['Notifications', notif] };
+    const eOpt = (v, t, d) => { const on = (S.enterSends ? 'send' : 'newline') === v; return `<button class="n-opt${on ? ' on' : ''}" data-act="enterMode" data-v="${v}" role="radio" aria-checked="${on}"><span class="n-radio"></span><span class="n-text"><b>${t}</b><small>${d}</small></span></button>`; };
+    const writing = `<p class="set-q">While writing or editing a message, what does Enter do?</p><div role="radiogroup" class="n-group">${eOpt('newline', 'Enter starts a new line', 'Ctrl+Enter sends the message, or saves the edit.')}${eOpt('send', 'Enter sends', 'Shift+Enter starts a new line.')}</div><p class="sheet-note">Esc leaves an edit without saving. On a phone the keyboard's Enter always starts a new line; the Send button sends.</p>`;
+    const secs = { account: ['Account', acct], writing: ['Writing messages', writing], feed: ['Activity feed', feedPart], people: ['Focus people', people, 1], channels: ['Channel levels', chans, 1], notif: ['Notifications', notif] };
     return `<div class="scrim center" data-act="closeModal"><div class="sheet settings" role="dialog" aria-modal="true" aria-label="Settings" data-stop="1"><button class="icon-btn close" data-act="closeModal" aria-label="Close">×</button><nav class="set-nav"><h2>Settings</h2>${Object.keys(secs).map(k => `<button class="set-item${secs[k][2] ? ' sub' : ''}${k === cur ? ' on' : ''}${k === 'feed' && secs[cur][2] ? ' parent' : ''}" data-act="setSec" data-s="${k}">${secs[k][0]}</button>`).join('')}</nav><div class="set-body"><h2>${secs[cur][0]}</h2>${secs[cur][1]}</div></div></div>`;
   }
   if (m.type === 'why') { const r = row(m.id); h = r ? `<h2>Why this is in ${BK[r.bucket][0]}</h2><p class="sheet-note">${esc(r.title || (conv(r.conv).kind === 'dm' ? pn(conv(r.conv).with) : conv(r.conv).title || '#' + conv(r.conv).name))} · ${r.t}. Every row is tested against the buckets from the top; the first that matches holds it.</p>${whyBody(r, true)}` : ''; }
@@ -1025,7 +1062,7 @@ const h = {
   bellOld() { const n = S.tray.filter(e => { const r = S.rows.find(x => x.id === e.row); return r && !r.read && (!S.focusOnly || e.bucket === 'focus'); }).length; return `<button class="icon-btn bell" data-act="modal" data-m="tray" aria-label="Notifications">${ic('bell')}${n ? `<span class="badge">${n}</span>` : ''}</button>`; },
   search() { return `<div class="search">${ic('search')}<input type="search" data-search="1" aria-label="Search messages" placeholder="Search messages" value="${esc(S.q)}"><div class="sr" id="sr"></div></div>`; },
   me() { const open = S.menu === 'me'; return `<div class="me"><button class="me-btn" data-act="menu" data-key="me" aria-expanded="${open}" aria-label="Your account menu">${av(ME)}<span><b>${pn(ME)}</b><small>${P[ME][1]}</small></span>${ic('chev')}</button>${open ? `<div class="pop me-pop"><button class="opt" data-act="modal" data-m="rules" data-s="account"><b>Settings</b><span>Account, activity feed, notifications, channels</span></button><button class="opt" data-act="modal" data-m="rules" data-s="feed"><b>Activity feed settings</b><span>Focus people and rules</span></button><div class="pop-f">Switch person and Sign out come with the running product.</div></div>` : ''}</div>`; },
-  rz(k) { return `<div class="rz" data-rz="${k}" role="separator" aria-orientation="vertical" title="Drag to resize. Double-click to reset"></div>`; },
+  rz(k) { return `<div class="rz" data-rz="${k}" role="separator" aria-orientation="vertical" data-tip="Drag to resize. Double-click to reset"></div>`; },
   net() { return S.net === 'off' ? '<span class="netpill" role="status">Offline · showing 10:42</span>' : ''; },
   nav(v, label, icon, extra) { return `<button class="nav${S.view === v ? ' on' : ''}" data-act="view" data-v="${v}">${ic(icon)}<span>${label}</span>${extra || ''}</button>`; }
 };
@@ -1044,7 +1081,8 @@ function seeFyi() {
   if (b && sc && b.getBoundingClientRect().top < sc.getBoundingClientRect().bottom - 60) S.fyiSeen = true;
 }
 const row = id => S.rows.find(r => r.id === id);
-function act(r) { r.read = true; if (r.kept) r.done = true; const m = S.msgs[r.items[r.items.length - 1]]; if (m.status === 'Waiting on Maya') m.status = 'Continuing'; }
+function act(r) { r.read = true; if (r.kept && S.autoDone) r.done = true; // by setting, a reply or a reaction releases a kept row, or only Done does
+  const m = S.msgs[r.items[r.items.length - 1]]; if (m.status === 'Waiting on Maya') m.status = 'Continuing'; }
 function settle() { // the person leaves the feed: read rows go, kept rows move to Kept, rule and dial changes apply
   if (S.fyiSeen) S.rows.forEach(r => { if (r.bucket === 'fyi') r.read = true; });
   S.rows = S.rows.filter(r => {
@@ -1094,7 +1132,7 @@ const A = {
   unflag(d) { S.msgs[d.m].flag = 0; },
   retry(d) { S.msgs[d.m].failed = 0; },
   discard(d) { const m = S.msgs[d.m], c = conv(m.conv); c.msgs = c.msgs.filter(x => x !== d.m); delete S.msgs[d.m]; },
-  mention(d) { const i = window._mi; i.value = i.value.replace(/@([\wÀ-ÿ]*)$/, '@' + d.n + ' '); i.closest('.composer').querySelector('.mp').innerHTML = ''; i.focus(); return true; },
+  mention(d) { const i = window._mi; i.value = i.value.replace(/@([\wÀ-ÿ]*)$/, '@' + d.n + ' '); i.closest('form').querySelector('.mp').innerHTML = ''; grow(i); i.focus(); return true; },
   netToggle() { if (S.net === 'off') { S.net = 'ok'; Object.values(S.msgs).forEach(m => { m.pending = 0; }); if (!S.arrived) A.playNew(); S.note = 'Back online. What you wrote was sent; what arrived meanwhile waits behind Show.'; } else { S.net = 'off'; S.note = 'The connection is lost. Nothing on screen moved; a notice says since when.'; } },
   lagToggle() { S.searchLag = !S.searchLag; S.note = S.searchLag ? 'The search index is behind. Search says so.' : 'Search has caught up.'; },
   failToggle() { S.failNext = !S.failNext; S.note = S.failNext ? 'The next message you send will fail.' : 'Sending works again.'; },
@@ -1115,6 +1153,8 @@ const A = {
   follow(d) { const c = conv(d.c); c.tdial = c.tdial === 'off' ? 'fyi' : 'off'; c.tset = true; S.menu = null; },
   modal(d) { S.modal = { type: d.m }; S.menu = null; if (d.m === 'tray') S.demo = false; if (d.m === 'rules') S.setSec = d.s || 'feed'; },
   setSec(d) { S.setSec = d.s; },
+  enterMode(d) { S.enterSends = d.v === 'send'; },
+  autoDone() { S.autoDone = !S.autoDone; },
   notify(d) { S.focusOnly = d.v === 'focus'; },
   actToggle() { if (S.actOpen === false) { S.actOpen = true; S.view = 'feed'; } else { if (S.view === 'feed') settle(); S.actOpen = false; } S.menu = null; },
   ruleFor(d) { S.modal = { type: 'rule', conv: d.c, by: d.by }; S.menu = null; },
@@ -1165,7 +1205,7 @@ const A = {
     S.note = 'Three arrived. Nothing in the list moved; they wait behind "3 new".';
   },
   leave() { settle(); S.note = 'You left and came back: read rows are in History, kept rows are under Kept, rule and dial changes are applied.'; },
-  reset() { const t = S.demo, w = S.w; S = seed(); S.demo = t; S.w = w; },
+  reset() { const t = S.demo, w = S.w, es = S.enterSends, ad = S.autoDone; S = seed(); S.demo = t; S.w = w; S.enterSends = es; S.autoDone = ad; },
   theme(d) { if (d.t === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = d.t; }
 };
 function submit(f) {
@@ -1205,6 +1245,12 @@ const swEnd = () => {
   render();
 };
 document.addEventListener('pointerup', swEnd); document.addEventListener('pointercancel', swEnd);
+/* a row of tabs that does not fit scrolls sideways: by dragging it, or with the wheel */
+let td = null;
+document.addEventListener('pointerdown', e => { const t = e.target.closest('.tabs'); if (t && e.pointerType !== 'touch' && t.scrollWidth > t.clientWidth) td = { t, x: e.clientX, s0: t.scrollLeft, moved: false }; });
+document.addEventListener('pointermove', e => { if (!td) return; const dx = e.clientX - td.x; if (Math.abs(dx) > 5) td.moved = true; if (td.moved) { td.t.scrollLeft = td.s0 - dx; td.t.classList.add('dragging'); } });
+document.addEventListener('pointerup', () => { if (!td) return; if (td.moved) { swallow = true; setTimeout(() => { swallow = false; }, 60); } td.t.classList.remove('dragging'); td = null; });
+document.addEventListener('wheel', e => { const t = e.target.closest && e.target.closest('.tabs'); if (t && t.scrollWidth > t.clientWidth && Math.abs(e.deltaY) > Math.abs(e.deltaX)) t.scrollLeft += e.deltaY; }, { passive: true });
 /* panels are resized by dragging the line between them; a double click puts the line back */
 let rz = null;
 document.addEventListener('pointerdown', e => { const hnd = e.target.closest('.rz'); if (!hnd) return; e.preventDefault(); rz = { k: hnd.dataset.rz, x: e.clientX, w0: S.w[hnd.dataset.rz] }; document.body.classList.add('resizing'); });
@@ -1234,19 +1280,43 @@ document.addEventListener('click', e => {
   }
   if (el.dataset.act === 'pick' && S.pick && matchMedia('(hover:hover)').matches) { const pi = document.querySelector('.picker input'); if (pi) pi.focus(); }
   if (el.dataset.act === 'applyNew') { const sc = document.querySelector('.feed-scroll'); if (sc) sc.scrollTop = 0; } // you asked for them: go to where they are
-  if (an === 'editMsg') { const ei = document.querySelector('.edit input'); if (ei) { ei.focus(); ei.setSelectionRange(ei.value.length, ei.value.length); } }
-  if (an === 'openConv' && matchMedia('(hover:hover)').matches) { const ci = document.querySelector('.composer input'); if (ci) ci.focus({ preventScroll: true }); } // ready to answer
+  if (an === 'editMsg') { const ei = document.querySelector('.edit textarea'); if (ei) { grow(ei); ei.focus(); ei.setSelectionRange(ei.value.length, ei.value.length); } }
+  if (an === 'openConv' && matchMedia('(hover:hover)').matches) { const ci = document.querySelector('.composer textarea'); if (ci) ci.focus({ preventScroll: true }); } // ready to answer
   if (an === 'openConv') { const nl = document.querySelector('.conv .newline'); if (nl) nl.scrollIntoView({ block: 'start' }); }
+});
+const grow = el => { el.style.height = 'auto'; const h = el.scrollHeight + (el.offsetHeight - el.clientHeight); el.style.height = Math.min(h, 180) + 'px'; el.style.overflowY = h > 180 ? 'auto' : 'hidden'; }; // the box is as tall as its text, borders included; it scrolls only past its limit
+document.addEventListener('keydown', e => { // Enter and Ctrl+Enter in the message box and in an edit, by the person's setting
+  const ta = e.target.matches && e.target.matches('textarea[name="t"]') ? e.target : null; if (!ta) return;
+  const box = ta.closest('form').querySelector('.mp-box'); // while a mention is being typed, the keys belong to the list of suggestions
+  if (box) {
+    const bs = [...box.querySelectorAll('button')], i = Math.max(0, bs.findIndex(b => b.classList.contains('act')));
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); bs[i].classList.remove('act'); const nx = bs[(i + (e.key === 'ArrowDown' ? 1 : bs.length - 1)) % bs.length]; nx.classList.add('act'); nx.scrollIntoView({ block: 'nearest' }); return; }
+    if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); window._mi = ta; bs[i].click(); return; }
+    if (e.key === 'Escape') { e.preventDefault(); box.parentNode.innerHTML = ''; return; }
+  }
+  if (e.key === 'Escape' && ta.closest('.edit')) { e.preventDefault(); S.editing = null; render(); return; }
+  if (e.key !== 'Enter' || e.isComposing) return;
+  const mod = e.ctrlKey || e.metaKey, sends = S.enterSends ? !e.shiftKey && !mod || mod : mod;
+  if (sends) { e.preventDefault(); submit(ta.closest('form')); }
 });
 document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"]')) { e.preventDefault(); e.target.click(); } if (e.key === 'Escape' && (S.modal || S.menu || S.pick)) { S.modal = null; S.menu = null; S.pick = null; render(); } });
 document.addEventListener('change', e => { if (e.target.dataset.dial) { setLevel(conv(e.target.dataset.dial), e.target.value); render(); } });
 document.addEventListener('submit', e => { e.preventDefault(); submit(e.target); });
 document.addEventListener('input', e => {
+  if (e.target.matches('textarea[name="t"]')) grow(e.target);
   if (e.target.dataset.search) search(e.target.value);
-  if (e.target.closest('.composer') && e.target.name === 't') { window._mi = e.target; const mp = e.target.closest('.composer').querySelector('.mp'), mm = e.target.value.match(/@([\wÀ-ÿ]*)$/); mp.innerHTML = mm ? `<div class="mp-box">${[...PID.filter(x => x !== ME && pn(x).toLowerCase().includes(mm[1].toLowerCase())).slice(0, 6).map(x => `<button type="button" data-act="mention" data-n="${first(x)}">${av(x, 'xs')}<b>${pn(x)}</b><small>${P[x][1]}</small></button>`), 'channel'.startsWith(mm[1].toLowerCase()) ? '<button type="button" data-act="mention" data-n="channel"><span class="hash">@</span><b>channel</b><small>Everyone here. Not a mention of anyone in particular.</small></button>' : ''].join('')}</div>` : ''; }
+  if (e.target.matches('textarea[name="t"]')) { window._mi = e.target; const mp = e.target.closest('form').querySelector('.mp'), mm = e.target.value.match(/@([\wÀ-ÿ]*)$/); mp.innerHTML = mm ? `<div class="mp-box">${[...PID.filter(x => x !== ME && pn(x).toLowerCase().includes(mm[1].toLowerCase())).slice(0, 6).map(x => `<button type="button" data-act="mention" data-n="${first(x)}">${av(x, 'xs')}<b>${pn(x)}</b><small>${P[x][1]}</small></button>`), 'channel'.startsWith(mm[1].toLowerCase()) ? '<button type="button" data-act="mention" data-n="channel"><span class="hash">@</span><b>channel</b><small>Everyone here. Not a mention of anyone in particular.</small></button>' : ''].join('')}</div>` : ''; const fb = mp.querySelector('button'); if (fb) fb.classList.add('act'); }
   if (e.target.dataset.pickSearch) { const q = e.target.value.trim().toLowerCase(); let any = false; document.querySelectorAll('.pk-sec').forEach(sec => { let n = 0; sec.querySelectorAll('button').forEach(b => { const hit = !q || b.dataset.n.includes(q); b.hidden = !hit; if (hit) n++; }); sec.hidden = !n; any = any || n > 0; }); document.querySelector('.pk-none').hidden = any; }
 });
 document.addEventListener('scroll', seeFyi, true);
+let tipT = null;
+const tipEl = () => document.getElementById('tip') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'tip', className: 'tip' }));
+document.addEventListener('mouseover', e => {
+  const h = e.target.closest && e.target.closest('[data-tip]'); clearTimeout(tipT); const t = tipEl();
+  if (!h || !h.dataset.tip) { t.classList.remove('on'); return; }
+  tipT = setTimeout(() => { if (!document.contains(h)) return; t.textContent = h.dataset.tip; t.classList.add('on'); const b = h.getBoundingClientRect(), w = t.offsetWidth, ht = t.offsetHeight; t.style.left = Math.max(6, Math.min(innerWidth - w - 6, b.left + b.width / 2 - w / 2)) + 'px'; t.style.top = (b.top - ht - 8 < 4 ? b.bottom + 8 : b.top - ht - 8) + 'px'; }, 350);
+});
+document.addEventListener('pointerdown', () => { clearTimeout(tipT); tipEl().classList.remove('on'); });
 window.E002 = { state: () => S };
 render();
 })();

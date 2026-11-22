@@ -421,7 +421,8 @@ button.rx:hover{border-color:var(--accent)}
 .mp{position:absolute;left:16px;right:16px;bottom:100%;z-index:6}
 .mp-box{background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:4px;margin-bottom:4px}
 .mp-box button{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px;border-radius:6px}
-.mp-box button:hover,.mp-box button:first-child{background:var(--hover)}
+.mp-box button:hover{background:var(--hover)}
+.mp-box button.act{background:var(--accent-soft);box-shadow:inset 2px 0 0 var(--accent)}
 .mp-box small{color:var(--muted);font-size:12.5px}
 /* when things go wrong: say so in a place that moves nothing */
 .netpill{flex:none;background:var(--flag-soft);color:var(--flag);border:1px solid var(--flag);border-radius:99px;padding:3px 12px;font-size:12.5px;font-weight:600;white-space:nowrap}
@@ -460,3 +461,32 @@ body.resizing{cursor:col-resize;user-select:none}
 @media (max-width:760px){.msg-head{padding-right:42px}}
 .thread-link{white-space:nowrap;max-width:calc(100% - 46px);overflow:hidden}
 .thread-link small{overflow:hidden;text-overflow:ellipsis;min-width:0}
+/* multi-line writing */
+.cbox .reply textarea{display:block;border:0;background:none;outline:0;padding:11px 12px 6px;width:100%;resize:none;font:inherit;color:inherit;line-height:1.45;max-height:180px;overflow-y:auto}
+.edit{align-items:flex-end}
+.edit textarea{flex:1;min-width:0;border:1.5px solid var(--accent);border-radius:6px;padding:6px 9px;background:var(--panel);resize:none;font:inherit;color:inherit;line-height:1.45;max-height:180px}
+.msg-body,.row-preview{white-space:pre-wrap}
+.row-preview{white-space:normal}
+.send-hint{color:var(--muted);font-size:12px;white-space:nowrap}
+@media (max-width:760px){.send-hint{display:none}}
+.edit{position:relative}
+.edit .mp{left:0;right:0}
+.mp-box{max-height:260px;overflow-y:auto}
+/* tooltips */
+.tip{position:fixed;z-index:80;max-width:260px;background:#16181a;color:#f2f2f0;font-size:12.5px;line-height:1.35;padding:6px 9px;border-radius:6px;box-shadow:var(--shadow);pointer-events:none;opacity:0;transition:opacity .1s;left:-999px;top:0}
+.tip.on{opacity:1}
+.send-hint{cursor:pointer;border-bottom:1px dotted currentColor}
+.send-hint:hover{color:var(--text)}
+.tabs{cursor:default;user-select:none}
+.tabs.dragging,.tabs.dragging .tab{cursor:grabbing}
+/* day divider */
+.dayline{display:flex;align-items:center;gap:10px;margin:10px 0 6px;color:var(--muted);font-size:12px;font-weight:600}
+.dayline::before,.dayline::after{content:"";flex:1;height:1px;background:var(--line)}
+.dayline span{border:1px solid var(--line);border-radius:99px;padding:2px 12px;background:var(--panel)}
+/* agents: a robot on the avatar's corner instead of a text label */
+.av{position:relative}
+.av.ag{border:0;border-radius:8px;background:hsl(var(--h,200) 22% 38%);color:#fff;font-size:12px}
+.av .bot{position:absolute;right:-5px;bottom:-5px;width:18px;height:18px;border-radius:50%;background:var(--panel);color:var(--text);border:1.5px solid var(--line);display:grid;place-items:center;font-style:normal}
+.av .bot svg{width:12px;height:12px}
+.av.xs .bot{width:13px;height:13px;right:-4px;bottom:-4px;border-width:1px}.av.xs .bot svg{width:9px;height:9px}
+.av.xs.ag{border-radius:5px;font-size:9px}

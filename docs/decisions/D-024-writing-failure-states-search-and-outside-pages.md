@@ -54,6 +54,16 @@ The results say how many messages were found, mark the match, show "edited" wher
 - **Control panel (D-010):** start, pause and reset; the pace; what happened; what comes next, with "Play now"; each situation on demand; and for the search index, the notification sender and the feed a switch between Running, Slow and Off with how much is waiting.
 - **Notification app (D-022):** what the sender delivered to a chosen person, each entry in the current state of its message, read when the row was read anywhere.
 
+### Added by the user, 2026-11-22 (after acceptance; the decision is unchanged)
+
+- **Enter and Ctrl+Enter.** "During editing I would like to use enter for new line and ctrl+enter for send (and configurable in settings of course)." Messages are multi-line. By default Enter starts a new line and Ctrl+Enter sends or saves; a setting, "Writing messages", switches to Enter sends with Shift+Enter for a new line. The agent's reading: it holds for the message box and for editing alike. The hint beside Send names the key and opens that setting ("this should be clickable then and lead to the settings").
+- **The mention suggestions are driven from the keyboard** while typing: arrows move, Enter or Tab picks, Esc closes.
+- **Every action has a tooltip** saying what it means, Flag and Info first of all.
+- **A box that holds text is as tall as its text** and shows no scrollbar until it reaches its limit (reported by the user as a bug in the edit box).
+- **A row of tabs that does not fit scrolls sideways by dragging.**
+- **A line between days in a conversation**, "so I can visually distinguish today's messages from older ones".
+- **An agent is marked by a robot on the corner of its avatar**, not by a text label. This is the visible agent mark D-002 asks for, in another form.
+
 ## Consequences
 
 - Easier: every part of the brief now has a designed surface, and the reliability story can be shown by one person with three windows: the product, the control panel, the notification app.

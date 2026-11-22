@@ -61,6 +61,8 @@ As listed under "Decided"; where the agent had built something else first, the r
 24. **Panels can be resized** by dragging the line between them. "It's basics."
 25. **One settings button on Activity.** "Rules and feed settings open the same screen. A bit strange, let's leave just settings button."
 
+26. **A setting decides whether a reply or a reaction marks a kept row done.** "There should be a setting which lets you mark these done only by explicit done, so reaction or reply wouldn't do that." On, as D-003 and D-011 have it: replying or reacting releases a kept or flagged row. Off: only Done does. It sits with the general rules of the Activity feed settings; on is the start.
+
 ### Still the agent's proposal, shown in the mock-up, awaiting the user's word
 
 - Lapsed with point 21: context above the new messages in an opened row, and how a long burst is shown there. The conversation shows the whole exchange with a "New" line at the first new message.
