@@ -364,8 +364,8 @@ func (s *Service) Rebuild(ctx context.Context, org ids.Org, receiver string, rul
 	path := "/orgs/" + string(org)
 	client := s.recv[receiver]
 	var body any
-	if receiver == "feed" {
-		body = map[string]bool{"rules_changed": rulesChanged}
+	if receiver == "feed" && rulesChanged {
+		body = contract.WipeRequest{RulesChanged: &rulesChanged}
 	}
 	wipe := path + "/control/wipe"
 	if fault("wipe_all") {

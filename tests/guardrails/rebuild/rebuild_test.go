@@ -1,7 +1,6 @@
 // Package rebuild holds G-020: each receiver can be rebuilt for one organization
 // and then equals what it held, and Reset gives the same starting state under a
-// new organization, touching no other. The parts are the real ones except the
-// feed, which is a stand-in answering its contract until T-052 lands.
+// new organization, touching no other. Every part is the real one.
 package rebuild
 
 import (
@@ -22,13 +21,13 @@ import (
 	"contexia/internal/delivery"
 	"contexia/internal/demo"
 	"contexia/internal/democontent"
+	feedservice "contexia/internal/feed/service"
 	"contexia/internal/shared/clock"
 	"contexia/internal/shared/contract"
 	"contexia/internal/shared/migrate"
 	"contexia/internal/shared/orgdb"
 	"contexia/internal/standins"
 	sqlfiles "contexia/migrations"
-	"contexia/tests/guardrails/rebuild/feedstandin"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -41,7 +40,6 @@ const rebuildLimit = 2 * time.Minute // G-020
 type system struct {
 	admin                     *pgxpool.Pool
 	content                   *democontent.Content
-	feed                      *feedstandin.Feed
 	demo                      *demo.Service
 	conv, ops, search, sender string
 	feedURL                   string
@@ -112,21 +110,21 @@ func newSystem(t *testing.T, limit time.Duration) *system {
 		}
 		return orgdb.Single{Pool: p}
 	}
-	convDB, _, searchDB, senderDB, demoDB := login("conversations"), login("feed"), login("search"), login("sender"), login("demo")
+	convDB, feedDB, searchDB, senderDB, demoDB := login("conversations"), login("feed"), login("search"), login("sender"), login("demo")
 	deliveryDB := login("delivery")
 
 	content, err := democontent.Load(os.DirFS("../../../demo/content"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	s := &system{admin: admin, content: content, feed: feedstandin.New()}
+	s := &system{admin: admin, content: content}
 	store := &conversations.Store{Dir: convDB, Clock: clock.Real{}}
 	mux := http.NewServeMux()
 	store.Routes(mux)
 	s.conv = serve(t, mux)
 	s.search = serve(t, standins.NewSearch(standins.Options{Dir: searchDB, Clock: clock.Real{}}).Routes())
 	s.sender = serve(t, standins.NewSender(standins.Options{Dir: senderDB, Clock: clock.Real{}}).Routes())
-	s.feedURL = serve(t, s.feed.Routes())
+	s.feedURL = serve(t, feedservice.New(feedservice.Options{Dir: feedDB, Clock: clock.Real{}}).Routes())
 	d := delivery.New(delivery.Config{DB: delivery.OneDatabase{Single: deliveryDB}, Clock: clock.Real{},
 		Search: s.search, Feed: s.feedURL, Sender: s.sender, Conversations: s.conv, Seed: 59})
 	s.ops = serve(t, d.Routes())
@@ -261,8 +259,21 @@ func (s *system) rows(t *testing.T, receiver, org string) map[string]string {
 	out := map[string]string{}
 	switch receiver {
 	case "feed":
-		for n, k := range s.feed.Applied(org) {
-			out[fmt.Sprint(n)] = k
+		rows, err := s.admin.Query(bg, `SELECT 'row/' || person || '/' || row_key, body::text FROM feed.feed_rows WHERE org = $1
+			UNION ALL SELECT 'reader/' || person, counts::text FROM feed.feed_readers WHERE org = $1`, org)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer rows.Close()
+		for rows.Next() {
+			var k, v string
+			if err := rows.Scan(&k, &v); err != nil {
+				t.Fatal(err)
+			}
+			out[k] = v
+		}
+		if err := rows.Err(); err != nil {
+			t.Fatal(err)
 		}
 		return out
 	case "search":
@@ -339,8 +350,10 @@ func (s *system) startingState(t *testing.T, org string) map[string]string {
 	if err := rows.Err(); err != nil {
 		t.Fatal(err)
 	}
-	for k, v := range s.rows(t, "search", org) {
-		out["search/"+k] = strings.ReplaceAll(v, org, "<org>")
+	for _, receiver := range []string{"search", "feed"} {
+		for k, v := range s.rows(t, receiver, org) {
+			out[receiver+"/"+k] = strings.ReplaceAll(v, org, "<org>")
+		}
 	}
 	return out
 }
@@ -391,14 +404,14 @@ func checkLevelBeforeCurrent(t *testing.T, s *system) error {
 	if err != nil {
 		return err
 	}
-	s.feed.SetOff(true)
+	s.setFeedMode(t, "off")
 	if _, err := s.demo.Reset(bg); err == nil {
 		return fmt.Errorf("Reset answered while the feed could not be level")
 	}
 	if cur := s.currentOrg(t); cur != first.Org {
 		return fmt.Errorf("current moved to %s before the feed was level", cur)
 	}
-	s.feed.SetOff(false)
+	s.setFeedMode(t, "running")
 	second, err := s.demo.Reset(bg)
 	if err != nil {
 		return err
@@ -407,6 +420,30 @@ func checkLevelBeforeCurrent(t *testing.T, s *system) error {
 		return fmt.Errorf("Reset stayed on %s", first.Org)
 	}
 	return nil
+}
+
+func (s *system) setFeedMode(t *testing.T, mode string) {
+	t.Helper()
+	if c := s.post(t, s.feedURL+"/control/mode", contract.ModeBody{Mode: contract.Mode(mode)}, nil); c != 200 {
+		t.Fatalf("feed mode: %d", c)
+	}
+}
+
+// settled leaves out what the activity of an active run legitimately changes in
+// the feed: the rows of the channel it writes in and the readers' counts. The idle
+// run compares everything.
+func (s *system) settled(receiver string, active bool, rows map[string]string) map[string]string {
+	if !active || receiver != "feed" {
+		return rows
+	}
+	channel := "#" + s.content.Org.Channels[0].Name
+	out := map[string]string{}
+	for k, v := range rows {
+		if !strings.HasPrefix(k, "reader/") && !strings.Contains(k, channel) {
+			out[k] = v
+		}
+	}
+	return out
 }
 
 func (s *system) currentOrg(t *testing.T) string {
@@ -443,7 +480,7 @@ func checkRebuild(t *testing.T, s *system, active bool) error {
 	s.waitLevel(t, other)
 
 	for i, receiver := range []string{"search", "sender", "feed"} {
-		reference, untouched := s.rows(t, receiver, cur.Org), s.rows(t, receiver, other)
+		reference, untouched := s.settled(receiver, active, s.rows(t, receiver, cur.Org)), s.settled(receiver, active, s.rows(t, receiver, other))
 		if len(reference) == 0 || len(untouched) == 0 {
 			return fmt.Errorf("%s holds nothing to compare (%d, %d)", receiver, len(reference), len(untouched))
 		}
@@ -518,5 +555,35 @@ func TestCleanupLeavesTheCurrentAndRemovesRetired(t *testing.T) {
 	var kept int
 	if err := s.admin.QueryRow(bg, `SELECT count(*) FROM conversations.change_log WHERE org = $1`, second.Org).Scan(&kept); err != nil || kept == 0 {
 		t.Fatalf("the current organization lost its log: %d, %v", kept, err)
+	}
+}
+
+// TestOnlyARuleChangeMarksTheRebuildAsHistory: an ordinary rebuild keeps "never
+// lost"; one after a rule change tells the feed, which lists what it refinds as history.
+func TestOnlyARuleChangeMarksTheRebuildAsHistory(t *testing.T) {
+	s := newSystem(t, 0)
+	cur, err := s.demo.Reset(bg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	history := func() int64 {
+		var n int64
+		if err := s.admin.QueryRow(bg, `SELECT history_through FROM feed.feed_state WHERE org = $1`, cur.Org).Scan(&n); err != nil {
+			t.Fatal(err)
+		}
+		return n
+	}
+	before := history()
+	if err := s.demo.Rebuild(bg, contractOrg(cur.Org), "feed", false); err != nil {
+		t.Fatal(err)
+	}
+	if got := history(); got != before {
+		t.Fatalf("an ordinary rebuild moved the history mark from %d to %d", before, got)
+	}
+	if err := s.demo.Rebuild(bg, contractOrg(cur.Org), "feed", true); err != nil {
+		t.Fatal(err)
+	}
+	if got := history(); got <= before {
+		t.Fatalf("a rebuild after a rule change left the history mark at %d", got)
 	}
 }
