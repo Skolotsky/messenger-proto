@@ -243,6 +243,9 @@ h1,h2,h3,p{margin:0}
 @media (max-width:760px){.why-pop{left:12px;width:calc(100% - 24px)}.why-path li{flex-direction:column;gap:0}}
 .sw-in{border:0;margin:0;padding:0;font-size:13px}
 .sw-link{margin-left:auto}
+.mark-read{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--muted);text-align:center;font-size:14px;line-height:1}
+.mark-read:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+@media (hover:hover) and (min-width:761px){.mark-read{opacity:0}.row-main:hover .mark-read,.mark-read:focus-visible{opacity:1}}
 
 /* Telegram-like: one list, round avatars, big targets, folders for buckets, bubbles. Own colours. */
 :root{--accent:#6a4fd0;--accent-soft:#ebe6fb;--r:14px;--wall:#eeebe4}
@@ -600,7 +603,7 @@ function rowHTML(r) {
         <div class="row-reason"><span class="why-dot"></span>${WHY === 'a' ? `<button class="why-btn" data-act="why" data-id="${r.id}" aria-expanded="${S.whyOpen === r.id}">${esc(r.reason)} ${ic('chev')}</button>` : esc(r.reason)}${r.note ? ` · <em>${r.note}</em>` : ''}${WHY === 'c' ? `<button class="why-btn c" data-act="whySheet" data-id="${r.id}">Why? Change…</button>` : ''}</div>
         <div class="row-preview" data-k="${k}"${lockS}><b>${last.by === ME ? 'You' : first(last.by)}:</b> ${rich(last.text)}</div>
         ${r.kind !== 'rx' && last.rx.length ? rxHTML(last) : ''}</div>
-      <div class="row-side">${state}${badge}${r.sec === 'kept' && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : ''}<span class="row-chev">${ic('chev')}</span></div></div>${WHY === 'a' && S.whyOpen === r.id ? `<div class="why-pop" data-stop="1"><h3>Why this is in ${BK[r.bucket][0]}</h3>${whyBody(r)}</div>` : ''}${x}</article>`;
+      <div class="row-side">${state}${badge}${!r.read ? `<button class="mark-read" data-act="read" data-id="${r.id}" aria-label="Mark read without opening" title="Mark read without opening">✓</button>` : ''}${r.sec === 'kept' && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : ''}<span class="row-chev">${ic('chev')}</span></div></div>${WHY === 'a' && S.whyOpen === r.id ? `<div class="why-pop" data-stop="1"><h3>Why this is in ${BK[r.bucket][0]}</h3>${whyBody(r)}</div>` : ''}${x}</article>`;
 }
 const SUN = '<svg class="ill" viewBox="0 0 120 64" aria-hidden="true"><path d="M8 52h104" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M36 52a24 24 0 0 1 48 0" fill="currentColor" opacity=".18"/><path d="M60 14v8M30 26l6 6M90 26l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 60h30M62 60h38" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".4"/></svg>';
 function bucketHTML(b) {
@@ -752,6 +755,7 @@ const A = {
   toggle(d) { const r = row(d.id); if (S.exp.has(d.id)) S.exp.delete(d.id); else { S.exp.add(d.id); r.read = true; } },
   openConv(d) { if (S.conv !== d.c) S.lock = Object.fromEntries(Object.entries(S.lock).filter(([k]) => !k.startsWith('conv:'))); S.conv = d.c; conv(d.c); S.menu = null; S.modal = null; S.rows.forEach(r => { if (r.conv === d.c && (!d.id || r.id === d.id || conv(d.c).kind !== 'channel')) r.read = true; }); const sr = document.getElementById('sr'); if (sr) sr.innerHTML = ''; S.q = ''; },
   closeConv() { S.conv = null; S.menu = null; },
+  read(d) { row(d.id).read = true; },
   keep(d) { const r = row(d.id); r.kept = r.kept || 'you'; r.read = true; r.keptNow = true; },
   done(d) { const r = row(d.id); r.done = true; r.read = true; },
   react(d) { const r = row(d.id), m = S.msgs[r.items[r.items.length - 1]]; const e = m.rx.find(x => x[0] === d.e); if (e) { if (e[1].includes(ME)) { e[1] = e[1].filter(x => x !== ME); if (!e[1].length) m.rx = m.rx.filter(x => x !== e); } else e[1].push(ME); } else m.rx.push([d.e, [ME]]); act(r); },

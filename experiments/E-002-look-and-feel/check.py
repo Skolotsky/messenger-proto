@@ -54,6 +54,12 @@ def run(browser, slug, size, vp, scale):
     ok("Focus has a Kept section with two rows", pg.locator(".kept-head").inner_text().startswith("Kept · 2") and pg.locator(".bucket.b-focus .row.kept").count() == 2)
     no_overflow("feed")
 
+    # mark one row read without opening it (user, 2026-11-22)
+    bucket("needs"); pg.locator('[data-row="r-triage"] .row-main').hover()
+    click('[data-row="r-triage"] .mark-read')
+    r = pg.locator('[data-row="r-triage"]')
+    ok("a row can be marked read without opening it", "read" in r.get_attribute("class").split() and "expanded" not in r.get_attribute("class") and pg.locator(".has-conv").count() == 0)
+    bucket("focus")
     # 2. one row per conversation, expanded in place; reply and react from the row
     ok("#incidents is one row for six posts", "6 new" in pg.locator('[data-row="r-inc"]').inner_text() or pg.locator('[data-row="r-inc"] .row-badge').inner_text() == "6")
     click('[data-row="r-inc"] .row-main')

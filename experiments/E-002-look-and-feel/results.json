@@ -44,6 +44,13 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "a row can be marked read without opening it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "#incidents is one row for six posts",
   "pass": true,
   "detail": ""
@@ -443,6 +450,13 @@
  {
   "page": "slack-like",
   "width": "phone",
+  "check": "a row can be marked read without opening it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
   "check": "#incidents is one row for six posts",
   "pass": true,
   "detail": ""
@@ -835,6 +849,13 @@
  {
   "page": "telegram-like",
   "width": "desktop",
+  "check": "a row can be marked read without opening it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
   "check": "#incidents is one row for six posts",
   "pass": true,
   "detail": ""
@@ -1227,6 +1248,13 @@
  {
   "page": "telegram-like",
   "width": "phone",
+  "check": "a row can be marked read without opening it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
   "check": "#incidents is one row for six posts",
   "pass": true,
   "detail": ""
@@ -1619,6 +1647,13 @@
  {
   "page": "own",
   "width": "desktop",
+  "check": "a row can be marked read without opening it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
   "check": "#incidents is one row for six posts",
   "pass": true,
   "detail": ""
@@ -2005,6 +2040,13 @@
   "page": "own",
   "width": "phone",
   "check": "no sideways scroll: feed",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "a row can be marked read without opening it",
   "pass": true,
   "detail": ""
  },

@@ -55,6 +55,10 @@ Accepted by the user on 2026-11-22 ("let's do as you say"): **C.**
 
 Unchanged from D-003: in For your information, viewing the bucket is enough.
 
+### Added by the user, 2026-11-22 (after acceptance; the rules above are unchanged)
+
+"Currently click on the item in feed opens it and marks it read. I'd like to have an easy way to mark it read without opening." Each unread row in the feed has a **mark read** control that reads it without expanding it or opening its conversation. It is "Mark all read" (D-003) for one row and moves the read position like any other read (rule 2). A row that a flag keeps for you is read but stays kept (D-011).
+
 ## Consequences
 
 - Easier: the feed, the unread marks on channels (D-009) and notifications cannot disagree, because they read the same position.

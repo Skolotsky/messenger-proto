@@ -235,3 +235,6 @@ h1,h2,h3,p{margin:0}
 @media (max-width:760px){.why-pop{left:12px;width:calc(100% - 24px)}.why-path li{flex-direction:column;gap:0}}
 .sw-in{border:0;margin:0;padding:0;font-size:13px}
 .sw-link{margin-left:auto}
+.mark-read{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--muted);text-align:center;font-size:14px;line-height:1}
+.mark-read:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+@media (hover:hover) and (min-width:761px){.mark-read{opacity:0}.row-main:hover .mark-read,.mark-read:focus-visible{opacity:1}}
