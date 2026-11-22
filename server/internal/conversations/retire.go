@@ -32,6 +32,7 @@ var ownTables = []string{
 	"reactions", "conversation_people", "messages", "conversations", "people",
 	"reader_reads", "reader_kept", "reader_dials", "reader_focus_rules", "reader_focus_people",
 	"reader_settings", "reader_preferences", "watching", "action_answers", "seed_sessions",
+	"agent_events", "agent_heads", "agent_subscriptions", "agent_chains", "agent_replies", "agent_status", "agent_org_due",
 	"change_log", "org_log",
 }
 
@@ -84,11 +85,19 @@ func (s *Store) door(next http.HandlerFunc) http.HandlerFunc {
 // every save either committed before it or is refused after it.
 func (s *Store) Retire(ctx context.Context, org ids.Org) error {
 	now := s.Clock.Now().UTC()
-	return orgdb.InOrg(ctx, s.Dir, org, func(tx pgx.Tx) error {
+	err := orgdb.InOrg(ctx, s.Dir, org, func(tx pgx.Tx) error {
 		_, err := tx.Exec(ctx, `UPDATE org_log SET retired_at = coalesce(retired_at, $2), tick_due_at = NULL WHERE org = $1`,
 			string(org), now)
 		return err
 	})
+	if err == nil {
+		s.forgetOrgReplies(org) // what was in progress is dropped (D-033)
+		if s.OnSaved != nil {
+			s.OnSaved(org, 0, 0) // its open screens are told at once
+		}
+	}
+	s.agents.wake(org) // a waiting agent hears it is gone now, not after its wait
+	return err
 }
 
 // DeleteOrg removes every row of a retired organization from Conversations'

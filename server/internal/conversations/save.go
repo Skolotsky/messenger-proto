@@ -30,6 +30,14 @@ var ErrUnknownOrg = errors.New("unknown organization")
 type Store struct {
 	Dir   orgdb.Directory
 	Clock clock.Clock
+
+	agents agentDoor // the agent door's memory (T-054)
+	// OnSaved is told, after a save committed, which numbers it wrote. It only
+	// wakes the log's reader: the update itself is read back from the log (T-053).
+	OnSaved func(org ids.Org, first, last int64)
+	// Outside sends a message outside the numbering (a reply's piece, an agent's
+	// status) to the open screens of a conversation, or of everybody for "".
+	Outside func(org ids.Org, conversation string, message any)
 }
 
 // Step is one saving transaction: it holds the organization's log row, so
@@ -42,14 +50,18 @@ type Step struct {
 	headAt  *time.Time
 	at      time.Time
 	wrote   bool
+	first   int64
 	nonTick bool
 	noTick  bool
+
+	agentBecauseOf *int64 // the agent's event this post answers (T-054)
 }
 
 // Save runs fn as one step of the organization's log. An error from fn rolls
 // back everything it wrote.
 func (s *Store) Save(ctx context.Context, org ids.Org, fn func(*Step) error) error {
-	return orgdb.InOrg(ctx, s.Dir, org, func(tx pgx.Tx) error {
+	var first, last int64
+	err := orgdb.InOrg(ctx, s.Dir, org, func(tx pgx.Tx) error {
 		step, err := s.open(ctx, tx, org)
 		if err != nil {
 			return err
@@ -57,8 +69,19 @@ func (s *Store) Save(ctx context.Context, org ids.Org, fn func(*Step) error) err
 		if err := fn(step); err != nil {
 			return err
 		}
+		first, last = step.first, step.head
+		if !step.wrote {
+			first, last = 0, 0
+		}
 		return step.finish()
 	})
+	if err == nil {
+		s.agents.wake(org) // an agent waiting for events asks again
+		if first > 0 && s.OnSaved != nil {
+			s.OnSaved(org, first, last) // only wakes the log's reader (T-053)
+		}
+	}
+	return err
 }
 
 func (s *Store) open(ctx context.Context, tx pgx.Tx, org ids.Org) (*Step, error) {
@@ -142,7 +165,13 @@ func (s *Step) Append(change any) (int64, error) {
 	if err := s.project(change, number); err != nil {
 		return 0, err
 	}
+	if err := s.tellAgents(change); err != nil {
+		return 0, fmt.Errorf("tell agents: %w", err)
+	}
 	s.head = number
+	if !s.wrote {
+		s.first = number
+	}
 	s.wrote = true
 	if kind != "tick" {
 		s.nonTick = true
@@ -163,8 +192,11 @@ func (s *Step) finish() error {
 			t := s.at.Add(tickAfter)
 			due = &t
 		}
-		_, err = s.Tx.Exec(s.ctx, `UPDATE org_log SET head = $2, head_at = $3, last_change_at = $3, tick_due_at = $4 WHERE org = $1`,
-			string(s.org), s.head, s.at, due)
+		// A tick already due stays due: ticks are timed from the previous tick, so
+		// a busy organization still gets them (D-034).
+		_, err = s.Tx.Exec(s.ctx, `UPDATE org_log SET head = $2, head_at = $3, last_change_at = $3,
+			tick_due_at = CASE WHEN $4::timestamptz IS NULL THEN NULL WHEN $5 THEN $4 ELSE coalesce(tick_due_at, $4) END WHERE org = $1`,
+			string(s.org), s.head, s.at, due, tickFromNewest)
 	} else {
 		_, err = s.Tx.Exec(s.ctx, `UPDATE org_log SET head = $2, head_at = $3 WHERE org = $1`, string(s.org), s.head, s.at)
 	}

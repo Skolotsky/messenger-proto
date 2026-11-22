@@ -118,7 +118,10 @@ func loadPeople(ctx context.Context, tx pgx.Tx, org ids.Org, where string, args 
 		}
 		out = append(out, p)
 	}
-	return out, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return out, withAgentStatus(ctx, tx, org, out)
 }
 
 // People is the operators' list of everyone in the organization.
@@ -230,11 +233,10 @@ func loadConversations(ctx context.Context, tx pgx.Tx, org ids.Org, person strin
 // screen applies an update only if its "after" equals the number it holds: the
 // person's own read and preference, anyone's joining or profile line, and what
 // happens in their conversations. Other reader facts travel on the feed stream.
-func lastNumberFor(ctx context.Context, tx pgx.Tx, org ids.Org, person string, mine []string) (int64, error) {
-	var number int64
-	err := tx.QueryRow(ctx, `
-		SELECT number FROM change_log
-		WHERE org = $1 AND kind <> 'tick' AND (
+// concernsPerson is that rule as SQL, with $2 the person and $3 their
+// conversations. The live connection's replay uses it as it stands, and its
+// filter for new entries is held equal to it by TestLiveFilterMatchesTheLoad.
+const concernsPerson = `kind <> 'tick' AND (
 		  CASE
 		    WHEN kind IN ('reader.read', 'reader.preference') THEN body->>'person' = $2
 		    WHEN kind = 'reader.profile_line' THEN true
@@ -243,7 +245,11 @@ func lastNumberFor(ctx context.Context, tx pgx.Tx, org ids.Org, person string, m
 		    WHEN kind IN ('channel.created', 'direct.created') THEN body->'people' ? $2
 		    WHEN kind LIKE 'message.%' THEN body->'message'->>'conversation' = ANY($3)
 		    ELSE body->>'conversation' = ANY($3)
-		  END)
+		  END)`
+
+func lastNumberFor(ctx context.Context, tx pgx.Tx, org ids.Org, person string, mine []string) (int64, error) {
+	var number int64
+	err := tx.QueryRow(ctx, `SELECT number FROM change_log WHERE org = $1 AND `+concernsPerson+`
 		ORDER BY number DESC LIMIT 1`, string(org), person, mine).Scan(&number)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return 0, nil
@@ -325,7 +331,10 @@ func (s *Store) Messages(ctx context.Context, org ids.Org, q MessagesQuery) (con
 				}
 			}
 		}
-		out.Messages, err = withSummaries(ctx, tx, org, page, q.As, channelAt)
+		if out.Messages, err = withSummaries(ctx, tx, org, page, q.As, channelAt); err != nil {
+			return err
+		}
+		out.InProgress, err = s.agentInProgress(ctx, tx, org, q.Conversation, q.Thread)
 		return err
 	})
 	return out, err
