@@ -8,16 +8,16 @@ A delivery worker reading the feed's own numbered log calls the notification sen
 
 ## 2. Events
 
-Every call is made for one team (D-026). The team is in the address (`/teams/acme/…`) and in every item sent, and all numbers count within that team. Nothing of another team is ever sent or accepted.
+Every call is made for one organization (D-026). The organization is in the address (`/orgs/acme/…`) and in every item sent, and all numbers count within that organization. Nothing of another organization is ever sent or accepted.
 
 ```json
 POST /notes
-{ "team": "acme", "number": 1286, "previous": 1285, "edition": "feed-7c1", "at": "2026-11-22T10:14:03.120Z", "kind": "due",
+{ "org": "acme", "number": 1286, "previous": 1285, "edition": "feed-7c1", "at": "2026-11-22T10:14:03.120Z", "kind": "due",
   "name": "marco / #launch / 4812", "person": "marco", "bucket": "needs_you",
   "why": "Anna mentioned you in #launch", "text": "@Marco can you sign off the pricing page?" }
-{ "team": "acme", "number": 1301, "previous": 1300, "edition": "feed-7c1", "at": "…", "kind": "changed",   "name": "marco / #launch / 4812", "text": "…new text…" }
-{ "team": "acme", "number": 1317, "previous": 1316, "edition": "feed-7c1", "at": "…", "kind": "withdrawn", "name": "marco / #launch / 4812", "because": "read" }
-{ "team": "acme", "number": 1318, "previous": 1317, "edition": "feed-7c1", "at": "…", "kind": "tick" }
+{ "org": "acme", "number": 1301, "previous": 1300, "edition": "feed-7c1", "at": "…", "kind": "changed",   "name": "marco / #launch / 4812", "text": "…new text…" }
+{ "org": "acme", "number": 1317, "previous": 1316, "edition": "feed-7c1", "at": "…", "kind": "withdrawn", "name": "marco / #launch / 4812", "because": "read" }
+{ "org": "acme", "number": 1318, "previous": 1317, "edition": "feed-7c1", "at": "…", "kind": "tick" }
 
 answers: 200 taken · 200 already had it · 409 { "i_am_at": 1285 } · anything else, or 3 s of silence: down
 ```

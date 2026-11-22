@@ -8,7 +8,7 @@ Conversations' live connection sends; an open screen receives. One connection pe
 
 ## 2. Events
 
-Every call is made for one team (D-026). The team is in the address (`/teams/acme/…`) and in every item sent, and all numbers count within that team. Nothing of another team is ever sent or accepted.
+Every call is made for one organization (D-026). The organization is in the address (`/orgs/acme/…`) and in every item sent, and all numbers count within that organization. Nothing of another organization is ever sent or accepted.
 
 Updates for what the screen shows, in two streams: `conversations` (messages, reactions, thread summaries, unread marks; numbered by the change log) and `feed` (the person's rows and counts; numbered by the feed's own log, with the feed's edition). A screen is sent only what concerns it, so the numbers it sees have gaps. Each update therefore also says which number was sent to this screen before it (`after`). Text of a reply being written arrives as pieces outside the numbering.
 

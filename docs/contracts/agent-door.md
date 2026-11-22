@@ -8,11 +8,11 @@ An agent (scripted, a team's own, or a coding agent through a small connector) c
 
 ## 2. Operations
 
-Every call is made for one team (D-026). The team is in the address (`/teams/acme/…`) and in every item sent, and all numbers count within that team. Nothing of another team is ever sent or accepted.
+Every call is made for one organization (D-026). The organization is in the address (`/orgs/acme/…`) and in every item sent, and all numbers count within that organization. Nothing of another organization is ever sent or accepted.
 
 ```json
 GET  /agents/release-agent/events?after=311&wait=25
-→ [ { "team": "acme", "number": 312, "kind": "mentioned", "agent_chain": 0,
+→ [ { "org": "acme", "number": 312, "kind": "mentioned", "agent_chain": 0,
       "message": { "id": "msg_7Q2", "version": 1, "conversation": "#launch", "author": "anna", "text": "…" } } ]
 
 POST /agents/release-agent/messages          { "id": "a-91", "thread": "msg_7Q2", "text": "On it.", "level": "info", "because_of": 312 }

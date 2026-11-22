@@ -8,7 +8,7 @@ The web app (a person's screen), and the scripted team acting as people, call Co
 
 ## 2. Operations
 
-Every call is made for one team (D-026). The team is in the address (`/teams/acme/…`) and in every item sent, and all numbers count within that team. Nothing of another team is ever sent or accepted.
+Every call is made for one organization (D-026). The organization is in the address (`/orgs/acme/…`) and in every item sent, and all numbers count within that organization. Nothing of another organization is ever sent or accepted.
 
 Every action is one call carrying an ID the caller chose. Conversations saves it as a fact and writes it to the change log in the same step.
 

@@ -8,7 +8,7 @@ Conversations' door for people (and its live connection) calls the activity feed
 
 ## 2. Operations
 
-Every call is made for one team (D-026). The team is in the address (`/teams/acme/…`) and in every item sent, and all numbers count within that team. Nothing of another team is ever sent or accepted.
+Every call is made for one organization (D-026). The organization is in the address (`/orgs/acme/…`) and in every item sent, and all numbers count within that organization. Nothing of another organization is ever sent or accepted.
 
 All are questions; none changes anything.
 

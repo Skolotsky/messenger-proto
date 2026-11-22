@@ -35,7 +35,7 @@ Save to "a worker has fetched it", woken by NOTIFY, 400 changes at 50 a second: 
 
 ### Second part, added the same day: many teams in one database (feeds D-026)
 
-`test_teams.py`: 8 teams, two writers each; each team's changes numbered by its own one-row counter.
+`test_teams.py`: 8 teams, two writers each; each team's changes numbered by its own one-row counter. In the product's terms a "team" in this test is an organization, the tenant of D-026.
 
 | | One log for everybody | A log per team |
 |---|---|---|

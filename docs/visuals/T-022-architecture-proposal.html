@@ -166,8 +166,8 @@ details > .stack { gap: 10px; }
 
 <div class="ask">
   <div class="label">Where it stands</div>
-  <p><strong>All technical decisions are taken.</strong> You decided the shape, the database and the live connection (D-005), Go for the server (D-025), who owns what a reader did (D-017), who decides a notification (D-018), and that the architecture is ready for many teams (D-026, section 11). On your delegation I decided the delivery promise (D-006), the numbers (D-007) and the agent door (D-008). Any of them can be overturned.</p>
-  <p class="note">One open point from D-026: should the product show a second team (a switcher), or does the second team exist only for the tests?</p>
+  <p><strong>All technical decisions are taken.</strong> You decided the shape, the database and the live connection (D-005), Go for the server (D-025), who owns what a reader did (D-017), who decides a notification (D-018), and that the architecture is ready for many organizations (D-026, section 11). On your delegation I decided the delivery promise (D-006), the numbers (D-007) and the agent door (D-008). Any of them can be overturned.</p>
+  <p class="note">An organization is the tenant; the seeded team lives inside one. There is no organization switcher in this scope: the second organization exists only for the tests.</p>
 </div>
 
 <section>
@@ -660,11 +660,11 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
 </section>
 
 <section id="d026">
-  <h2>11 · D-026: ready for many teams, and how it scales</h2>
-  <p><span class="chip ok">Decided</span> You asked for the architecture to be ready for many teams in one installation, and scalable because of it. The rule that delivers both: <strong>teams are completely independent of each other</strong>. The team is part of every key and every contract, each team has its own numbered log, and the database itself keeps teams apart.</p>
+  <h2>11 · D-026: ready for many organizations (multi-tenant), and how it scales</h2>
+  <p><span class="chip ok">Decided</span> You asked for the architecture to be ready for many organizations in one installation, and scalable because of it. The rule that delivers both: <strong>organizations are completely independent of each other</strong>. The organization is part of every key and every contract, each organization has its own numbered log, and the database itself keeps organizations apart.</p>
   <figure class="diagram">
     <div class="scroll">
-      <svg viewBox="0 0 900 330" role="img" aria-label="Each team has its own numbered change log in Conversations. Delivery workers keep a place per receiver and team and take the teams in turn. Each receiver keeps each team's data apart.">
+      <svg viewBox="0 0 900 330" role="img" aria-label="Each organization has its own numbered change log in Conversations. Delivery workers keep a place per receiver and organization and take the organizations in turn. Each receiver keeps each organization's data apart.">
         <defs>
           <marker id="arrow26" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
@@ -672,16 +672,16 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
         </defs>
         <rect class="box" x="20" y="16" width="330" height="298" rx="8"/>
         <text class="t" x="36" y="40">Conversations</text>
-        <text class="t2" x="36" y="58">a session acts for one team and sees no other</text>
+        <text class="t2" x="36" y="58">a session acts for one organization and sees no other</text>
         <rect class="box-ok" x="36" y="74" width="298" height="64" rx="6"/>
-        <text class="t" x="50" y="98">Team A · its own log</text>
+        <text class="t" x="50" y="98">Organization A · its own log</text>
         <text class="t2" x="50" y="118">changes 1, 2, 3 … one writer at a time</text>
         <rect class="box-ok" x="36" y="152" width="298" height="64" rx="6"/>
-        <text class="t" x="50" y="176">Team B · its own log</text>
+        <text class="t" x="50" y="176">Organization B · its own log</text>
         <text class="t2" x="50" y="196">a slow save here delays nobody else</text>
         <rect class="box-ok" x="36" y="230" width="298" height="64" rx="6"/>
-        <text class="t" x="50" y="254">Team C · its own log</text>
-        <text class="t2" x="50" y="274">no order is needed between teams</text>
+        <text class="t" x="50" y="254">Organization C · its own log</text>
+        <text class="t2" x="50" y="274">no order is needed between organizations</text>
 
         <line class="edge" x1="334" y1="106" x2="430" y2="150" marker-end="url(#arrow26)"/>
         <line class="edge" x1="334" y1="184" x2="430" y2="165" marker-end="url(#arrow26)"/>
@@ -689,9 +689,9 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
 
         <rect class="box-agent" x="430" y="110" width="200" height="110" rx="6"/>
         <text class="t" x="530" y="136" text-anchor="middle">Delivery workers</text>
-        <text class="t2" x="530" y="156" text-anchor="middle">a place per receiver and team;</text>
-        <text class="t2" x="530" y="171" text-anchor="middle">teams are taken in turn, so one</text>
-        <text class="t2" x="530" y="186" text-anchor="middle">team's backlog starves no other</text>
+        <text class="t2" x="530" y="156" text-anchor="middle">a place per receiver and organization;</text>
+        <text class="t2" x="530" y="171" text-anchor="middle">organizations are taken in turn, so one</text>
+        <text class="t2" x="530" y="186" text-anchor="middle">organization's backlog starves no other</text>
 
         <line class="edge" x1="630" y1="140" x2="700" y2="76" marker-end="url(#arrow26)"/>
         <line class="edge" x1="630" y1="165" x2="700" y2="165" marker-end="url(#arrow26)"/>
@@ -699,35 +699,35 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
 
         <rect class="box" x="700" y="46" width="180" height="60" rx="6"/>
         <text class="t" x="790" y="70" text-anchor="middle">Search index</text>
-        <text class="t2" x="790" y="88" text-anchor="middle">a query stays in one team</text>
+        <text class="t2" x="790" y="88" text-anchor="middle">a query stays in one organization</text>
         <rect class="box-ok" x="700" y="135" width="180" height="60" rx="6"/>
         <text class="t" x="790" y="159" text-anchor="middle">Activity feed</text>
-        <text class="t2" x="790" y="177" text-anchor="middle">rebuilt and fenced per team</text>
+        <text class="t2" x="790" y="177" text-anchor="middle">rebuilt and fenced per organization</text>
         <rect class="box" x="700" y="224" width="180" height="60" rx="6"/>
         <text class="t" x="790" y="248" text-anchor="middle">Notification sender</text>
-        <text class="t2" x="790" y="266" text-anchor="middle">fed by the feed, per team</text>
+        <text class="t2" x="790" y="266" text-anchor="middle">fed by the feed, per organization</text>
       </svg>
     </div>
-    <figcaption>Nothing crosses from one team to another, so every part can later be split by team without changing what it does.</figcaption>
+    <figcaption>Nothing crosses from one organization to another, so every part can later be split by organization without changing what it does.</figcaption>
   </figure>
   <div class="table-wrap">
     <table>
       <thead><tr><th>How it grows</th><th>What is done</th><th>State</th></tr></thead>
       <tbody>
-        <tr><td><strong>More teams, one machine</strong></td><td>Nothing. A team is data: its own log, its own rows, its own places.</td><td><span class="chip ok">in the design from the start</span></td></tr>
-        <tr><td><strong>More load than one copy of a program carries</strong></td><td>Several copies of Conversations, of the workers and of the feed, each taking a share of the teams.</td><td><span class="chip">ready for, not built</span></td></tr>
-        <tr><td><strong>More data than one database carries</strong></td><td>Teams are spread over several databases. Possible because no question ever spans two teams.</td><td><span class="chip">ready for, not built</span></td></tr>
-        <tr><td><strong>So many teams that assigning and balancing them is the work</strong></td><td>A message broker takes over the layer between the logs and the receivers.</td><td><span class="chip">later, if needed</span></td></tr>
-        <tr><td><strong>One very large team</strong></td><td>Not helped by any of this: it still has one log and one feed. Its log would be split by channel.</td><td><span class="chip risk">a known limit</span></td></tr>
+        <tr><td><strong>More organizations, one machine</strong></td><td>Nothing. An organization is data: its own log, its own rows, its own places.</td><td><span class="chip ok">in the design from the start</span></td></tr>
+        <tr><td><strong>More load than one copy of a program carries</strong></td><td>Several copies of Conversations, of the workers and of the feed, each taking a share of the organizations.</td><td><span class="chip">ready for, not built</span></td></tr>
+        <tr><td><strong>More data than one database carries</strong></td><td>Organizations are spread over several databases. Possible because no question ever spans two organizations.</td><td><span class="chip">ready for, not built</span></td></tr>
+        <tr><td><strong>So many organizations that assigning and balancing them is the work</strong></td><td>A message broker takes over the layer between the logs and the receivers.</td><td><span class="chip">later, if needed</span></td></tr>
+        <tr><td><strong>One very large organization</strong></td><td>Not helped by any of this: it still has one log and one feed. Its log would be split by channel.</td><td><span class="chip risk">a known limit</span></td></tr>
       </tbody>
     </table>
   </div>
   <div class="split">
-    <div class="panel"><div class="label">Tried on PostgreSQL (E-004, second part)</div><p>Eight teams, two writers each. One team keeps every save open for 300 ms. With one log for everybody, a save in the <em>other</em> teams took up to <strong>2.6 s</strong>; with a log per team, at most <strong>34 ms</strong>. Nothing was stepped over (0 of 3,200). A log per team buys independence, not more speed from one database: both forms saved about 850 to 1,030 changes a second.</p></div>
-    <div class="panel"><div class="label">What a failure now touches</div><p>A receiver that is down is down for every team. Everything else is per team: a change that is parked, a fence, a feed that stops after five fences, a rebuild, a reset.</p></div>
-    <div class="panel"><div class="label">Not built</div><p>Creating or administering teams, sign-in, limits per team, one identity across teams, several copies of a program actually running. The first version runs the seeded team; a second small team exists so the tests can prove separation.</p></div>
+    <div class="panel"><div class="label">Tried on PostgreSQL (E-004, second part)</div><p>Eight organizations, two writers each (the test code calls them teams). One organization keeps every save open for 300 ms. With one log for everybody, a save in the <em>other</em> organizations took up to <strong>2.6 s</strong>; with a log per organization, at most <strong>34 ms</strong>. Nothing was stepped over (0 of 3,200). A log per organization buys independence, not more speed from one database: both forms saved about 850 to 1,030 changes a second.</p></div>
+    <div class="panel"><div class="label">What a failure now touches</div><p>A receiver that is down is down for every organization. Everything else is per organization: a change that is parked, a fence, a feed that stops after five fences, a rebuild, a reset.</p></div>
+    <div class="panel"><div class="label">Not built</div><p>Creating or administering organizations, sign-in, limits per organization, one identity across organizations, several copies of a program actually running. The first version runs one organization with the seeded team in it, and has no organization switcher; a second small organization exists only so the tests can prove separation.</p></div>
   </div>
-  <p class="note">Two guardrails come with it: nothing of one team is ever shown to or changed by another (enforced by the database itself, G-025), and what happens in one team does not delay another (G-026). The diagrams and examples earlier on this page show one team.</p>
+  <p class="note">Two guardrails come with it: nothing of one organization is ever shown to or changed by another (enforced by the database itself, G-025), and what happens in one organization does not delay another (G-026). The diagrams and examples earlier on this page show one organization.</p>
 </section>
 
 <section id="small">
@@ -777,7 +777,7 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
         <tr><td><strong>The log is kept forever and a rebuild replays all of it</strong></td><td>Rebuild time grows with history.</td><td>Two weeks of a 36-member team is small. E-003 replayed 2,400 changes in under two seconds with a subset of the rules.</td><td>At the seeded team's size: 80 s on the test build with a subset of the rules. The product's own figure comes with the build.</td></tr>
         <tr><td><strong>The screen's catch-up is our own</strong></td><td>A fault there shows as a stale or wrong screen after a dropped connection.</td><td>Numbered updates, a "too far behind: reload" answer, a test that cuts the connection mid-burst.</td><td>Not tried yet.</td></tr>
         <tr><td><strong>The rule against agents setting each other off is ours</strong></td><td>Too strict: agents cannot cooperate. Too loose: a loop floods a channel.</td><td>A cap of three agents in a row and 20 messages a minute, both settings.</td><td>No vendor documents a rule to copy. Needs watching in use.</td></tr>
-        <tr><td><strong>Many teams share one copy of each part and one database</strong> (D-026)</td><td>If the database is lost, every team's data is. A receiver that is down is down for every team.</td><td>Teams are independent, so parts and databases can later be split by team. One team's burst, slow save or fence does not touch another.</td><td>Several copies and several databases are not built. One very large team is not helped by splitting by team.</td></tr>
+        <tr><td><strong>Many organizations share one copy of each part and one database</strong> (D-026)</td><td>If the database is lost, every organization's data is. A receiver that is down is down for every organization.</td><td>Organizations are independent, so parts and databases can later be split by organization. One organization's burst, slow save or fence does not touch another.</td><td>Several copies and several databases are not built. One very large organization is not helped by splitting by organization.</td></tr>
       </tbody>
     </table>
   </div>

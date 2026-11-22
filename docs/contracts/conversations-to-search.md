@@ -8,17 +8,17 @@ The search delivery worker (ours) calls the search index (a stand-in behind a re
 
 ## 2. Events
 
-Every call is made for one team (D-026). The team is in the address (`/teams/acme/…`) and in every item sent, and all numbers count within that team. Nothing of another team is ever sent or accepted.
+Every call is made for one organization (D-026). The organization is in the address (`/orgs/acme/…`) and in every item sent, and all numbers count within that organization. Nothing of another organization is ever sent or accepted.
 
 Finished messages only: created, changed, deleted. A change carries the whole current message and its version; a delete carries which message and its version.
 
 ```json
 POST /changes
-{ "team": "acme", "number": 4830, "kind": "message.changed",
+{ "org": "acme", "number": 4830, "kind": "message.changed",
   "message": { "id": "msg_7Q2", "version": 2, "conversation": "#launch", "author": "anna",
                "text": "@Marco @Lena can you sign off the pricing page?", "mentions": ["marco", "lena"],
                "level": null, "reactions": [] } }
-{ "team": "acme", "number": 4855, "kind": "message.deleted", "message": { "id": "msg_7Q2", "version": 3 } }
+{ "org": "acme", "number": 4855, "kind": "message.deleted", "message": { "id": "msg_7Q2", "version": 3 } }
 
 answers: 200 applied · 200 already had it · 422 I refuse this one · anything else, or 3 s of silence: down
 ```
@@ -33,7 +33,7 @@ answers: 200 applied · 200 already had it · 422 I refuse this one · anything 
 ## 4. Failure behaviour
 
 - Down (no answer in 3 s, a connection error, a server error): the worker waits and tries again after 1, 2, 4 … up to 60 s, each pause varied at random so retries do not arrive in step, without limit, and skips nothing.
-- "I refuse this one" three times: the change is parked for that team, shown in the control panel with the reason and "try again", and the worker moves on. Three different changes refused in a row count as down.
+- "I refuse this one" three times: the change is parked for that organization, shown in the control panel with the reason and "try again", and the worker moves on. Three different changes refused in a row count as down.
 - While the index is unreachable a person sees "Search is unavailable right now. Your messages are safe."; while it is more than 10 s behind, results carry "the last N minutes may be missing".
 - Wiped: the worker's place is set back to the start and the index refills.
 

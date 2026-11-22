@@ -8,17 +8,17 @@ The feed delivery worker (ours) calls the activity feed. The feed never calls Co
 
 ## 2. Events
 
-Every call is made for one team (D-026). The team is in the address (`/teams/acme/…`) and in every item sent, and all numbers count within that team. Nothing of another team is ever sent or accepted.
+Every call is made for one organization (D-026). The organization is in the address (`/orgs/acme/…`) and in every item sent, and all numbers count within that organization. Nothing of another organization is ever sent or accepted.
 
 Every change, in log order: messages (created, changed, deleted; finished ones only), what readers did (read, watching, keep, done, dial, focus rule, focus person, focus only), and clock ticks. Each carries its number, the number before it, and the log's timestamp.
 
 ```json
 POST /changes
-{ "team": "acme", "number": 4812, "previous": 4811, "at": "2026-11-22T10:14:03.120Z", "kind": "message.created",
+{ "org": "acme", "number": 4812, "previous": 4811, "at": "2026-11-22T10:14:03.120Z", "kind": "message.created",
   "message": { "id": "msg_7Q2", "version": 1, "conversation": "#launch", "thread": null, "author": "anna",
                "text": "@Marco can you sign off the pricing page?", "mentions": ["marco"], "level": null, "reactions": [] } }
-{ "team": "acme", "number": 4813, "previous": 4812, "at": "…", "kind": "reader.read", "person": "marco", "conversation": "#launch", "up_to": 4812 }
-{ "team": "acme", "number": 4814, "previous": 4813, "at": "…", "kind": "tick" }
+{ "org": "acme", "number": 4813, "previous": 4812, "at": "…", "kind": "reader.read", "person": "marco", "conversation": "#launch", "up_to": 4812 }
+{ "org": "acme", "number": 4814, "previous": 4813, "at": "…", "kind": "tick" }
 
 POST /changes/batch   { "changes": [ …up to 100 of the above, in order… ] }      for a backlog
 
@@ -37,9 +37,9 @@ Applying a batch stops at the first change that is not answered 200, and answers
 ## 4. Failure behaviour
 
 - Out of sequence, or asked while idle: the feed answers with its place and the worker continues from there.
-- The worker keeps a place per team and takes the teams in turn, so one team's backlog does not delay another's.
+- The worker keeps a place per organization and takes the organizations in turn, so one organization's backlog does not delay another's.
 - Down: the worker waits and retries without limit. A person sees the rows the feed had, with "Catching up"; conversations, unread marks on channels and search are unaffected; notifications wait with the feed.
-- A change the feed cannot apply: it is set aside and a fence goes up around the one conversation, or the one reader, it touches. Later changes inside the fence are set aside too; those rows are marked "may be out of date" and nothing new notifies from them. Everything outside stays exact. More than five fences in one team: the feed stops for that team only. Repair: fix the fault, rebuild that team's feed.
+- A change the feed cannot apply: it is set aside and a fence goes up around the one conversation, or the one reader, it touches. Later changes inside the fence are set aside too; those rows are marked "may be out of date" and nothing new notifies from them. Everything outside stays exact. More than five fences in one organization: the feed stops for that organization only. Repair: fix the fault, rebuild that organization's feed.
 
 ## 5. Evolution
 

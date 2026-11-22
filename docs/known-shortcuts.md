@@ -10,9 +10,9 @@ Every place the design knowingly cuts a corner, with what the full answer would 
 | Acting on behalf of a person through the coding-agent connector (D-002) | Verification only; off unless switched on | Does not exist in a real deployment |
 | Agents may read every channel (D-008, proposed) | No access model yet | Reading rights granted per agent |
 | One database server with an area per part (D-005, proposed) | Independence is kept by rule and a check, not by hardware | A store per service |
-| Ready for many teams, but none of the management is built: no creating or administering teams, no limits per team, one identity per team (D-026) | The first version runs one seeded team; a second exists for the tests | Team administration, limits, one identity across teams |
-| One copy of each program and one database serve all teams (D-026) | Teams are independent, so this is a matter of spreading them | Several copies each taking a share of the teams; teams spread over several databases; a broker when balancing them becomes the work |
-| One very large team still has one log and one feed | Teams of 30 | Split a team's log by channel; work large channels out when the feed is read |
+| Ready for many organizations, but none of the management is built: no creating or administering organizations, no limits per organization, one identity per organization (D-026) | The first version runs one seeded team; a second exists for the tests | Team administration, limits, one identity across organizations |
+| One copy of each program and one database serve all organizations (D-026) | Organizations are independent, so this is a matter of spreading them | Several copies each taking a share of the organizations; organizations spread over several databases; a broker when balancing them becomes the work |
+| One very large organization still has one log and one feed | Organizations of 30 people | Split an organization's log by channel; work large channels out when the feed is read |
 | Log numbers handed out one at a time (D-005, proposed) | About 1.5 messages a second at a hundred times our size | Split the log by conversation, or read the database's replication log |
 | The change log is never trimmed | Two weeks of a 36-member team is small | Keep a window, rebuild from snapshots |
 | After a fenced change is fixed, the whole feed is rebuilt, not only the fenced part | Seconds at this size, and exact | Rebuild one conversation or one reader in place |
