@@ -19,7 +19,7 @@ POST /notes
 { "org": "acme", "number": 1317, "previous": 1316, "edition": 7, "at": "…", "kind": "withdrawn", "name": "acme / marco / #launch:msg_7Q2 / 4812", "because": "read" }
 { "org": "acme", "number": 1318, "previous": 1317, "edition": 7, "at": "…", "kind": "clock" }
 
-answers: 200 taken · 200 already had it · 409 { "i_am_at": 1285, "edition": 7 } · 409 { "stale_reset": 3 } · 422 I refuse this one · anything else, or 3 s of silence: down (for every organization)
+answers: 200 taken · 200 already had it · 409 { "i_am_at": 1285, "edition": 7 } · 422 I refuse this one · anything else, or 3 s of silence: down (for every organization)
 ```
 
 A name is the organization, the person, the row and the number of the change that caused it; a thread's row is written `#launch:msg_7Q2`. A row that moves up into Focus while unread gets a second "due" with its own name (D-012). The "Focus only" switch is applied by the feed before it writes "due".
@@ -37,9 +37,9 @@ A name is the organization, the person, the row and the number of the change tha
 
 - Sender down: notes wait in order; the same waiting and retrying as every other delivery.
 - Feed down: no notes are written, so notifications wait until it is back.
-- Sender wiped: the list of names already sent survives, each with when it was sent and its "delayed" mark (D-031, D-032), as a real provider's delivery history would. The sender answers with its place and is refilled from the start of the feed's log; a name on the list is not sent again, and one that was never sent goes out, marked "delayed" if more than 10 minutes late. Reset restores the list from its saved copy.
+- Sender wiped: the list of names already sent survives, each with when it was sent and its "delayed" mark (D-031, D-032), as a real provider's delivery history would. The sender answers with its place and is refilled from the start of the feed's log; a name on the list is not sent again, and one that was never sent goes out, marked "delayed" if more than 10 minutes late.
 - "I refuse this one" three times: the note is parked, shown, and can be sent again. That organization's notes stop there until it is retried, because a later clock note must never let a notification past a withdrawal that is parked (D-032). Other organizations carry on.
-- Seeded history writes no "due" (D-032). A rebuild made because the rules changed lists what fell due before the rebuild as history, without sending it; an ordinary rebuild keeps "never lost".
+- Seeded history writes no "due" (D-032): the feed writes no notes for anything before the log's `seed.sealed` entry (D-033). A rebuild made because the rules changed lists what fell due before the rebuild as history, without sending it; an ordinary rebuild keeps "never lost".
 - With a real push provider "sent once" cannot be promised across a crash between handing over and noting it; the rule there is "rather twice than never", passing the name as the provider's duplicate key where it takes one.
 
 ## 5. Evolution

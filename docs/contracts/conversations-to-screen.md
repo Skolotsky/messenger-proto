@@ -13,7 +13,7 @@ Every call is made for one organization (D-026). It is in the address of every c
 A connection is opened at `/orgs/acme/live` for one person of one organization. Everything of one organization (every call of its screens, their connections, its agents) is served by one copy of Conversations, chosen from the organization in the address (D-029); if that changes, the connection is closed and the screen reconnects and resumes by number. Updates for what the screen shows, in two streams: `conversations` (messages, reactions, thread summaries, unread marks; numbered by the change log) and `feed` (the person's rows and counts; numbered by the feed's row log, with the feed's edition). One number is one update: whatever a change means for this screen travels together as a list of `parts`. A screen is sent only what concerns it, so the numbers it sees have gaps. Each update therefore also says which number was sent to this screen before it (`after`). Text of a reply being written arrives as pieces outside the numbering.
 
 ```json
-screen → { "resume": { "reset": 2, "conversations": 4855, "feed": 97, "feed_edition": 7 } }      feed and feed_edition are null if the feed was unavailable at load
+screen → { "resume": { "conversations": 4855, "feed": 97, "feed_edition": 7 } }      feed and feed_edition are null if the feed was unavailable at load
 screen → { "watching": { "conversation": "#launch", "thread": null, "open": true } }      "open": false when it stops
 server → { "stream": "conversations", "number": 4859, "after": 4855, "parts": [
             { "kind": "message.changed", "message": { "id": "msg_7Q2", "version": 2, "text": "…" } },
@@ -23,7 +23,7 @@ server → { "stream": "feed", "number": 103, "after": 97, "edition": 7, "parts"
             { "kind": "row.changed", "row": { "conversation": "#launch", "thread": "msg_7Q2", "bucket": "needs_you", "unread": true, "why": "Anna mentioned you" } } ] }
 server → { "last_sent": { "conversations": 4859, "feed": 103, "feed_edition": 7 } }       every 5 s
 server → { "too_far_behind": "feed" }                                   the screen loads that view fresh
-server → { "reset": 3 }                                                 the organization was Reset: the screen loads everything fresh
+server → { "organization_gone": true }                                  then the connection closes: the screen goes back to the entry address and loads the current organization (D-033)
 server → { "piece": { "message": "msg_9A1", "at": 120, "text": "ready. " } }
 server → { "agent_status": { "agent": "release-agent", "state": "waiting", "on": "marco" } }     outside the numbering; the latest counts, and a fresh load has it on the person
 ```

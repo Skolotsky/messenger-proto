@@ -29,7 +29,7 @@ Every action is one call carrying an ID the caller chose. Conversations saves it
 | profile line | the person's own line under their name (D-023, point 29). No receiver acts on it |
 | preference | a setting that only changes the person's own screens, such as which key sends a message (D-024). It follows the person to every screen; no receiver acts on it |
 
-Questions, which change nothing. The first full load (`start` for the `conversations` stream, `feed` for the `feed` stream) answers with `number`, the last number of that stream for this person, read together with the content, plus the reset number and, for the feed, the edition. Only that load sets the screen's position. Later views never move it: the screen keeps applying updates, by message version. If the feed is unavailable, `feed` answers with a notice and no number, and the screen loads it when it returns.
+Questions, which change nothing. The first full load (`start` for the `conversations` stream, `feed` for the `feed` stream) answers with `number`, the last number of that stream for this person, read together with the content and, for the feed, the edition. Only that load sets the screen's position. Later views never move it: the screen keeps applying updates, by message version. If the feed is unavailable, `feed` answers with a notice and no number, and the screen loads it when it returns.
 
 | Question | Answers with |
 |---|---|
@@ -72,6 +72,7 @@ GET /orgs/acme/people/marco/preview?change=<the change as URL-encoded JSON>
 
 ## 4. Failure behaviour
 
+- `410 { "organization_gone": true }`: the organization was retired (D-033). The screen goes back to the entry address and loads the current organization.
 - No answer, or a server error: the action waits. A new message stays in its place marked as waiting; an edit or a reaction shows as waiting on its message. Waiting actions are sent in the order they were made, each with its ID, when the connection is back (D-024; T-038, point 26).
 - A refusal is final: the screen says so in place and offers Discard; "Try again" is offered only where trying again can help (no answer, server error).
 - Conversations unreachable: the screen says "Reconnecting" and keeps what it shows.

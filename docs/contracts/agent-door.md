@@ -12,7 +12,7 @@ Every call is made for one organization (D-026). It is in the address of every c
 
 ```json
 GET  /orgs/acme/agents/release-agent/events?after=311&wait=25
-→ { "reset": 2, "continue_from": null, "events": [ { "org": "acme", "reset": 2, "number": 312, "kind": "mentioned", "agent_chain": 0,
+→ { "continue_from": null, "events": [ { "org": "acme", "number": 312, "kind": "mentioned", "agent_chain": 0,
       "message": { "id": "msg_7Q2", "version": 1, "conversation": "#launch", "author": "anna", "text": "…" } } ] }
 
 POST /orgs/acme/agents/release-agent/messages          { "id": "a-91", "conversation": "#launch", "thread": "msg_7Q2", "text": "On it.", "level": "info", "because_of": 312 }
@@ -27,14 +27,14 @@ POST /orgs/acme/agents/release-agent/reactions         { "id": "a-93", "message"
 PUT  /orgs/acme/agents/release-agent/subscriptions/%23launch      everything in that channel from now on; DELETE to stop
 GET  /orgs/acme/agents/release-agent/conversations/%23launch/messages?around=4812      as the people door answers
 
-answers: 200 · 200 already had it · 409 { "have": 12 } a piece is missing · 409 closed · 429 slow down · 410 { "too_far_behind": true, "oldest": 290 }
+answers: 200 · 200 already had it · 409 { "have": 12 } a piece is missing · 409 closed · 429 slow down · 410 { "too_far_behind": true, "oldest": 290 } · 410 { "organization_gone": true } (read the body: the two 410s differ)
 ```
 
 An agent is told what addresses it: a mention, a direct message, a reply in a thread it takes part in, a reaction to its message, and the edit or delete of any of these. On request, everything in a channel it is a member of.
 
 ## 3. Guarantees
 
-- Each event carries the organization's reset number; after a Reset the agent starts again from the number it is told. A `reaction` event names who reacted, the emoji and whether it was added. Events are numbered per agent, kept 7 days, delivered in order, and may be read again; the agent ignores a number it has handled. An agent that asks for events older than 7 days is told so and from which number it can continue.
+- A `reaction` event names who reacted, the emoji and whether it was added. Events are numbered per agent, kept 7 days, delivered in order, and may be read again; the agent ignores a number it has handled. An agent that asks for events older than 7 days is told so and from which number it can continue.
 - Event kinds are named for what happened to the agent (`mentioned`, `direct_message`, `reply`, `reaction`, `changed`, `deleted`); the message inside has the same shape as everywhere else.
 - Anything an agent posts with the same ID is saved once. A piece is identified by its reply and its position, so it needs no ID of its own; a status has none either, the latest one counts.
 - Text of a reply in progress goes to open screens only. The log carries a text-free `reply.started`; search, the feed and notifications learn the text when it is finished, as one whole message.

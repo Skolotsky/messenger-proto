@@ -265,8 +265,8 @@ func seedOrg(t *testing.T, client *http.Client, base, org string) {
 	}
 	at := "2026-11-01T09:00:00.000Z"
 	batch, _ := json.Marshal(map[string]any{"changes": []map[string]any{
-		{"kind": "person.joined", "org": org, "reset": 1, "number": 1, "previous": 0, "at": at, "person": "anna", "name": "Anna", "is_agent": false},
-		{"kind": "channel.created", "org": org, "reset": 1, "number": 2, "previous": 1, "at": at, "conversation": "#load", "name": "load", "people": []string{"anna"}},
+		{"kind": "person.joined", "org": org, "number": 1, "previous": 0, "at": at, "person": "anna", "name": "Anna", "is_agent": false},
+		{"kind": "channel.created", "org": org, "number": 2, "previous": 1, "at": at, "conversation": "#load", "name": "load", "people": []string{"anna"}},
 	}})
 	if status, answer, err = post(client, base+"/seed/"+opened.Session, batch); err != nil || status != 200 {
 		t.Fatalf("seed batch: %d %s %v", status, answer, err)

@@ -33,6 +33,7 @@ Every change, in log order, with no number skipped. Each carries `org`, `number`
 | `reader.focus_only` | `person, on` |
 | `reader.release_setting` | `person, on` (D-023, point 26) |
 | `reader.preference`, `reader.profile_line` | `person`, no effect on the feed: counted and ignored |
+| `seed.sealed` | nothing. The last entry of a seed session: the feed writes no notification notes for anything up to it (D-033). Organization-wide |
 | `tick` | nothing |
 
 ```json
@@ -45,7 +46,7 @@ POST /changes
 
 POST /changes/batch   { "changes": [ …up to 100 of the above, of one organization, in order… ] }      for a backlog
 
-answers: 200 applied · 200 already had it · 200 { "applied": true, "fenced": true } taken and set aside · 409 { "i_am_at": 4811 } · 409 { "stale_reset": 3 } · 423 { "organization_stopped": "acme" } · anything else, or 3 s of silence: down (for every organization)
+answers: 200 applied · 200 already had it · 200 { "applied": true, "fenced": true } taken and set aside · 409 { "i_am_at": 4811 } · 423 { "organization_stopped": "acme" } · anything else, or 3 s of silence: down (for every organization)
 Applying a batch stops at the first change that is not answered 200, and answers with that one.
 ```
 
@@ -54,7 +55,7 @@ Applying a batch stops at the first change that is not answered 200, and answers
 - Never lost; strictly in order. The feed takes only the change whose "previous" is the last one it applied, and saves its rows, its place and its notification notes in one step, so each change counts once.
 - The feed's rows always equal what the rules give for the log up to its place. A feed rebuilt from the start of the log equals the live one.
 - The feed holds nothing original: wiping it loses nothing.
-- At this boundary nothing changes with the size of an organization: the feed takes changes strictly in order and confirms each. Inside, it may then work on different conversations of one organization side by side (D-030). It keeps the order inside a conversation (a channel with its threads, or a direct conversation), and treats an organization-wide change (a Focus rule, a Focus person or the option that fills that list, "Focus only", the release setting, a person joining, a clock tick) as a point that everything before it must have reached first. Every other change belongs to exactly one conversation. "Its place", and the `through` it reports, is the last change up to which everything has been applied.
+- At this boundary nothing changes with the size of an organization: the feed takes changes strictly in order and confirms each. Inside, it may then work on different conversations of one organization side by side (D-030). It keeps the order inside a conversation (a channel with its threads, or a direct conversation), and treats an organization-wide change (a Focus rule, a Focus person or the option that fills that list, "Focus only", the release setting, a person joining, the end of seeding, a clock tick) as a point that everything before it must have reached first. Every other change belongs to exactly one conversation. "Its place", and the `through` it reports, is the last change up to which everything has been applied.
 - When healthy, a change is reflected within 2 seconds, 19 times in 20.
 - Timestamps never decrease within an organization's log. After an organization's last change, its log gets a clock tick about 1 second after the newest entry, until a tick is stamped at least 6 seconds after the last change that was not a tick (D-031). Housekeeping looks for ticks that are due every 0.5 seconds, through an index holding only organizations inside that window, so idle organizations cost nothing. So anything is known to be more than 5 seconds old within about 6.5 seconds of happening, whatever arrived in between.
 - The feed's rows, its place, its own log of notification notes and that log's edition are all per organization. One organization's feed can be rebuilt without touching another's.
