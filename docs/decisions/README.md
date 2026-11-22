@@ -8,10 +8,11 @@ Line format: `- **D-nnn** [status] The decision as a statement, and what it comm
 
 ## Product: what we build and for whom
 
-- **D-001** [open] Scope and audience: who evaluates the prototype, how it is shown, and which surfaces exist (channels, threads, direct messages, switching person). Evidence: R-002. Absorbs T-002
+- **D-001** [proposed] The product hypothesis the early access programme tests (recommended: the feed is the short list of what is waiting on you). Sets the scope of every other product decision → [record](D-001-product-hypothesis.md)
 - **D-002** [open] The role of AI agents: whether they are full participants, how status and streamed replies appear, what agent activity reaches the feed, scripted or real model. Evidence: R-002
 - **D-003** [open] What the activity feed contains and how it is cleared: item types, grouping, read state, triage action. Evidence: R-002
 - **D-004** [open] What an edit or a delete does to feed items and notifications that already exist. Evidence: R-002
+- **D-009** [open] Which surfaces the PoC includes (channels, threads, direct messages, switching person) and how busy the seeded team is. Depends on D-001
 
 ## System shape: components, boundaries, stack
 
