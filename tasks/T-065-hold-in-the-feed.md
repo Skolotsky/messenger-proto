@@ -1,7 +1,7 @@
 # T-065: The hold moves into the feed; scope and claims narrowed
 
 - Traces to: D-034, D-012, D-018, G-010, G-011, G-014, G-027, G-029
-- Not started: waits for T-064 to merge. Comes before T-052.
+- Started 2026-11-22 beside T-064's last delivery fix (the user: "eliminate bottlenecks when you can"). Its delivery part follows that merge. Comes before T-052.
 
 ## Outcome
 
