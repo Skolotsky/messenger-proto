@@ -14,9 +14,9 @@ Every operation and event of the eight contracts has a schema and a checked exam
 - [x] An example that breaks its schema fails `./scripts/check`. Check: plant one.
 - [x] Changing a schema without regenerating the TypeScript types fails `./scripts/check`. Check: plant one.
 - [x] Go types accept every example and round-trip it without losing a field. Check: Go test over `contracts/examples/`.
-- [ ] The log writer produces a valid log for one or two organizations from a seed, the same each time. Check: every entry validates against the schema; same seed, same bytes.
-- [ ] The mock door serves the people door and the live connection from fixtures. Check: its answers validate against the schemas.
-- [ ] The harness starts and stops parts, repeats, loses and delays deliveries, moves the clock, and runs two organizations with the same names and numbers. Check: its own tests against a recording receiver.
+- [x] The log writer produces a valid log for one or two organizations from a seed, the same each time. Check: every entry validates against the schema; same seed, same bytes.
+- [x] The mock door serves the people door and the live connection from fixtures. Check: its answers validate against the schemas.
+- [x] The harness starts and stops parts, repeats, loses and delays deliveries, moves the clock, and runs two organizations with the same names and numbers. Check: its own tests against a recording receiver.
 
 ## Verification plan
 
@@ -40,3 +40,7 @@ Every operation and event of the eight contracts has a schema and a checked exam
 Schemas (2026-11-22, after the review): 205 types, 181 examples, 54 operations. `./scripts/check` validates every example, refuses each example with a required field removed or an unknown field added, round-trips each through its Go type, and compares the generated TypeScript.
 
 Seen failing, each planted in a throwaway clone: an example breaking its schema; a bad timestamp; a schema changed without regenerating; a type without an example; a Go type losing a field (`unknown field "connection"`, on the rerun described in the log).
+
+Tools (2026-11-22): the log writer's 3,000 entries each validate against the schema, chain by number and time, use every change kind, repeat byte for byte from a seed, and match across two organizations except for the name. The mock door's answers and live updates validate against the schemas; it was run and called from the host (`./scripts/mock-door`). Log writer and mock door tests passed 25 runs in a row. `./scripts/verify` passes.
+
+Not verified yet: the fixes from the schema review have not been re-checked independently. The mock door sorts rows by a deliberately plain rule, not the product's.

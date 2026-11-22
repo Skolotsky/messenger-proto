@@ -10,3 +10,11 @@ require (
 	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
 )
+
+require (
+	contexia v0.0.0
+	github.com/coder/websocket v1.8.13
+	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
+)
+
+replace contexia => ../server
