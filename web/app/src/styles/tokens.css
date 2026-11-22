@@ -1,0 +1,32 @@
+/* The agreed tokens, carried over from the prototype (E-002, core.css and slack-like.css). */
+:root {
+  --bg: #fff; --panel: #fff; --panel2: #f5f5f3; --text: #1c1d1f; --muted: #62666d; --line: #e3e3df; --hover: #f1f1ee;
+  --accent: #0f6e64; --on-accent: #fff; --accent-soft: #e2f1ef;
+  --focus: #a85b00; --needs: #2257c5; --fyi: #6b7078; --flag: #b3261e; --flag-soft: #fbe9e7; --info: #5b6470; --info-soft: #eceef1;
+  --unread: #1c1d1f; --shadow: 0 6px 24px rgba(0, 0, 0, .14);
+  --font: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Liberation Sans", system-ui, sans-serif;
+  --r: 8px;
+  /* the sidebar stays dark in both themes (D-023, point 30) */
+  --side: #1d2b2a; --side-text: #cfdcda; --side-hover: #2a3d3b;
+  /* menus opened from the dark sidebar follow the page theme */
+  --m-panel: #fff; --m-panel2: #f5f5f3; --m-text: #1c1d1f; --m-muted: #62666d; --m-line: #e3e3df; --m-hover: #f1f1ee;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17181a; --panel: #1d1f22; --panel2: #24262a; --text: #e9e9e6; --muted: #a0a4ab; --line: #33363b; --hover: #2a2d31;
+    --accent: #4fc3b3; --on-accent: #06201c; --accent-soft: #1d3532;
+    --focus: #f0a94a; --needs: #8fb0ff; --fyi: #9aa0a8; --flag: #ff8a80; --flag-soft: #3a2321; --info: #aab2bd; --info-soft: #2b2f35;
+    --unread: #fff; --shadow: 0 6px 24px rgba(0, 0, 0, .5);
+    --m-panel: #1d1f22; --m-panel2: #24262a; --m-text: #e9e9e6; --m-muted: #a0a4ab; --m-line: #33363b; --m-hover: #2a2d31;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #17181a; --panel: #1d1f22; --panel2: #24262a; --text: #e9e9e6; --muted: #a0a4ab; --line: #33363b; --hover: #2a2d31;
+  --accent: #4fc3b3; --on-accent: #06201c; --accent-soft: #1d3532;
+  --focus: #f0a94a; --needs: #8fb0ff; --fyi: #9aa0a8; --flag: #ff8a80; --flag-soft: #3a2321; --info: #aab2bd; --info-soft: #2b2f35;
+  --unread: #fff; --shadow: 0 6px 24px rgba(0, 0, 0, .5);
+  --m-panel: #1d1f22; --m-panel2: #24262a; --m-text: #e9e9e6; --m-muted: #a0a4ab; --m-line: #33363b; --m-hover: #2a2d31;
+  color-scheme: dark;
+}

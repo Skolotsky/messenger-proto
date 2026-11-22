@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Build the web app and run its browser tests against the real mock door, all in Docker.
+# Usage: web/app/scripts/browser-tests [playwright arguments]
+# The three containers share one network namespace, so the app is on localhost: a service
+# worker needs a secure origin, and nothing is published on the host.
+# CONTEXIA_SHOTS=<folder under tests/browser> also writes the review screenshots there.
+set -euo pipefail
+root="$(cd "$(dirname "$0")/../../.." && pwd)"
+cd "$root"
+name="contexia-web-test-$$"
+image=mcr.microsoft.com/playwright:v1.49.1-noble
+user="$(id -u):$(id -g)"
+
+cleanup() { docker rm -f "$name-web" "$name-door" >/dev/null 2>&1 || true; }
+trap cleanup EXIT
+
+[ -d web/app/node_modules ] || TOOL_DIR=web/app ./scripts/tool npm ci --no-audit --no-fund
+[ -d tests/browser/node_modules ] || TOOL_DIR=tests/browser ./scripts/tool npm ci --no-audit --no-fund
+TOOL_DIR=web/app ./scripts/tool npm run build
+
+mkdir -p .cache/go
+docker run -d --name "$name-door" -u "$user" -v "$root":/repo -w /repo/tests \
+  -e HOME=/tmp -e CGO_ENABLED=0 -e GOPATH=/repo/.cache/go/path -e GOCACHE=/repo/.cache/go/build -e GOFLAGS=-modcacherw \
+  golang:1.24-alpine go run ./harness/cmd/mockdoor >/dev/null
+docker run -d --name "$name-web" --network "container:$name-door" -u "$user" -v "$root":/repo -w /repo/web/app \
+  -e HOME=/tmp node:22-alpine npm run preview >/dev/null
+
+wait_for() { # what, container, url: polls until it answers, for at most three minutes
+  for _ in $(seq 1 900); do
+    if docker exec "$2" wget -q -O /dev/null "$3" 2>/dev/null; then return 0; fi
+    if [ "$(docker inspect -f '{{.State.Running}}' "$2")" != true ]; then break; fi
+    sleep 0.2
+  done
+  echo "$1 did not start. Its log:" >&2
+  docker logs --tail 30 "$2" >&2
+  exit 1
+}
+wait_for "The mock door" "$name-door" http://127.0.0.1:8090/alive
+wait_for "The web app" "$name-web" http://127.0.0.1:4173/
+
+docker run --rm --network "container:$name-door" --ipc=host -u "$user" -v "$root":/repo -w /repo/tests/browser \
+  -e HOME=/tmp -e CI=1 -e "CONTEXIA_SHOTS=${CONTEXIA_SHOTS:-}" "$image" npx playwright test "$@"
