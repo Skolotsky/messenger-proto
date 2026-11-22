@@ -32,9 +32,6 @@ type Stream string
 // NoteNow is one of the values the contract lists.
 type NoteNow string
 
-// WithdrawReason is one of the values the contract lists.
-type WithdrawReason string
-
 // RuleType is one of the values the contract lists.
 type RuleType string
 
@@ -1677,8 +1674,8 @@ type SearchRefusal struct {
 	Wipe    int64  `json:"wipe"`
 }
 
-// NoteDue is the contract type of the same name.
-type NoteDue struct {
+// NoteSend is the contract type of the same name.
+type NoteSend struct {
 	Kind     string `json:"kind"`
 	Org      string `json:"org"`
 	Number   int64  `json:"number"`
@@ -1691,40 +1688,23 @@ type NoteDue struct {
 	Bucket   Bucket `json:"bucket"`
 	Why      string `json:"why"`
 	Text     string `json:"text"`
+	DueAt    string `json:"due_at"`
+	History  *bool  `json:"history,omitempty"`
+	Skip     *bool  `json:"skip,omitempty"`
 }
 
-// NoteChanged is the contract type of the same name.
-type NoteChanged struct {
-	Kind     string `json:"kind"`
-	Org      string `json:"org"`
-	Number   int64  `json:"number"`
-	Previous int64  `json:"previous"`
-	Edition  int64  `json:"edition"`
-	At       string `json:"at"`
-	Name     string `json:"name"`
-	Text     string `json:"text"`
-}
-
-// NoteWithdrawn is the contract type of the same name.
-type NoteWithdrawn struct {
-	Kind     string         `json:"kind"`
-	Org      string         `json:"org"`
-	Number   int64          `json:"number"`
-	Previous int64          `json:"previous"`
-	Edition  int64          `json:"edition"`
-	At       string         `json:"at"`
-	Name     string         `json:"name"`
-	Because  WithdrawReason `json:"because"`
-}
-
-// NoteClock is the contract type of the same name.
-type NoteClock struct {
-	Kind     string `json:"kind"`
-	Org      string `json:"org"`
-	Number   int64  `json:"number"`
-	Previous int64  `json:"previous"`
-	Edition  int64  `json:"edition"`
-	At       string `json:"at"`
+// NoteUpdate is the contract type of the same name.
+type NoteUpdate struct {
+	Kind     string   `json:"kind"`
+	Org      string   `json:"org"`
+	Number   int64    `json:"number"`
+	Previous int64    `json:"previous"`
+	Edition  int64    `json:"edition"`
+	At       string   `json:"at"`
+	Name     string   `json:"name"`
+	Text     *string  `json:"text,omitempty"`
+	Now      *NoteNow `json:"now,omitempty"`
+	Skip     *bool    `json:"skip,omitempty"`
 }
 
 // Note is any one of its member types.
@@ -1740,20 +1720,12 @@ func (u *Note) UnmarshalJSON(b []byte) error {
 		return err
 	}
 	switch k.Kind {
-	case "due":
-		v, err := decode[NoteDue](b)
+	case "send":
+		v, err := decode[NoteSend](b)
 		u.Value = v
 		return err
-	case "changed":
-		v, err := decode[NoteChanged](b)
-		u.Value = v
-		return err
-	case "withdrawn":
-		v, err := decode[NoteWithdrawn](b)
-		u.Value = v
-		return err
-	case "clock":
-		v, err := decode[NoteClock](b)
+	case "update":
+		v, err := decode[NoteUpdate](b)
 		u.Value = v
 		return err
 	}
@@ -2254,10 +2226,8 @@ var Types = map[string]func([]byte) (any, error){
 	"SearchDeletedChange":         func(b []byte) (any, error) { return decode[SearchDeletedChange](b) },
 	"SearchApplied":               func(b []byte) (any, error) { return decode[SearchApplied](b) },
 	"SearchRefusal":               func(b []byte) (any, error) { return decode[SearchRefusal](b) },
-	"NoteDue":                     func(b []byte) (any, error) { return decode[NoteDue](b) },
-	"NoteChanged":                 func(b []byte) (any, error) { return decode[NoteChanged](b) },
-	"NoteWithdrawn":               func(b []byte) (any, error) { return decode[NoteWithdrawn](b) },
-	"NoteClock":                   func(b []byte) (any, error) { return decode[NoteClock](b) },
+	"NoteSend":                    func(b []byte) (any, error) { return decode[NoteSend](b) },
+	"NoteUpdate":                  func(b []byte) (any, error) { return decode[NoteUpdate](b) },
 	"NoteTaken":                   func(b []byte) (any, error) { return decode[NoteTaken](b) },
 	"NoteBehind":                  func(b []byte) (any, error) { return decode[NoteBehind](b) },
 	"NotificationEntry":           func(b []byte) (any, error) { return decode[NotificationEntry](b) },

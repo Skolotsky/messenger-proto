@@ -22,11 +22,9 @@ import (
 
 // The rules a guardrail says it must fail without (test-only build).
 const (
-	FaultNoVersion   = "search-no-version"     // G-006: apply every change
-	FaultNoSentList  = "sender-no-sent-list"   // G-010: forget which names went out
-	FaultSendNothing = "sender-sends-nothing"  // G-010
-	FaultHoldArrival = "sender-hold-arrival"   // G-011: count the hold from arrival
-	FaultAnyNoteTime = "sender-any-note-clock" // G-011: any note moves the clock
+	FaultNoVersion   = "search-no-version"    // G-006: apply every change
+	FaultNoSentList  = "sender-no-sent-list"  // G-010: forget which names went out
+	FaultSendNothing = "sender-sends-nothing" // G-010
 )
 
 // SlowBy is how long the slow mode takes to answer.

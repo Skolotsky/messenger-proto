@@ -16,13 +16,11 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-// Hold is how long a notification waits, by the notes' own clock.
-const Hold = 5 * time.Second
-
 // DelayedAfter is how late a notification may go out unmarked.
 const DelayedAfter = 10 * time.Minute
 
-// Sender is the notification sender stand-in. "Sending" is one row in
+// Sender is the notification sender stand-in. It only delivers: the feed has
+// already held and judged every note (D-034). "Sending" is one row in
 // deliveries, written in the same transaction as the place.
 type Sender struct {
 	opt   Options
@@ -38,61 +36,76 @@ func (s *Sender) Routes() http.Handler {
 	mux.HandleFunc("POST /notes", s.note)
 	mux.HandleFunc("GET /orgs/{org}/place", s.place)
 	mux.HandleFunc("GET /orgs/{org}/notifications", s.notifications)
-	controlRoutes(mux, s.modes, s.opt.Dir, s.wipeOrg, "notifications", "deliveries", "state")
+	controlRoutes(mux, s.modes, s.opt.Dir, s.wipeOrg, "notifications", "deliveries", "updates_waiting", "state")
 	return mux
 }
 
 type wireNote struct {
-	Kind     string `json:"kind"`
-	Org      string `json:"org"`
-	Number   int64  `json:"number"`
-	Previous int64  `json:"previous"`
-	Edition  int64  `json:"edition"`
-	At       string `json:"at"`
-	Name     string `json:"name"`
-	Person   string `json:"person"`
-	Why      string `json:"why"`
-	Text     string `json:"text"`
-	Because  string `json:"because"`
+	Kind     string  `json:"kind"`
+	Org      string  `json:"org"`
+	Number   int64   `json:"number"`
+	Previous int64   `json:"previous"`
+	Edition  int64   `json:"edition"`
+	At       string  `json:"at"`
+	Name     string  `json:"name"`
+	Person   string  `json:"person"`
+	Why      string  `json:"why"`
+	Text     *string `json:"text"`
+	Now      *string `json:"now"`
+	DueAt    string  `json:"due_at"`
+	History  bool    `json:"history"`
+	Skip     bool    `json:"skip"`
 }
 
-func (n wireNote) problem() (time.Time, string) {
+func (n wireNote) text() string {
+	if n.Text == nil {
+		return ""
+	}
+	return *n.Text
+}
+
+// problem says what is wrong with a note. A note being stepped over needs only
+// its numbers: it may be the very note that cannot be read.
+func (n wireNote) problem() (at, due time.Time, why string) {
+	if n.Number < 1 || n.Previous < 0 || n.Edition < 0 {
+		return at, due, "a note needs a number, a previous number and an edition"
+	}
+	if n.Skip {
+		return at, due, ""
+	}
 	at, err := time.Parse(time.RFC3339Nano, n.At)
 	if err != nil {
-		return at, "a note needs a time"
+		return at, due, "a note needs a time"
 	}
-	if n.Number < 1 || n.Previous < 0 || n.Edition < 0 {
-		return at, "a note needs a number, a previous number and an edition"
-	}
-	if strings.ContainsRune(n.Text, 0) || strings.ContainsRune(n.Why, 0) {
-		return at, "text holds a NUL character"
+	if strings.ContainsRune(n.text(), 0) || strings.ContainsRune(n.Why, 0) {
+		return at, due, "text holds a NUL character"
 	}
 	switch n.Kind {
-	case "clock":
-		return at, ""
-	case "due":
-		if n.Person == "" {
-			return at, "a due note needs a person"
+	case "send":
+		if n.Person == "" || n.Text == nil {
+			return at, due, "a send note needs a person and a text"
 		}
-	case "changed":
-	case "withdrawn":
-		switch n.Because {
-		case "read", "deleted", "fenced", "rule_changed":
-		default:
-			return at, "unknown reason for withdrawing"
+		if due, err = time.Parse(time.RFC3339Nano, n.DueAt); err != nil {
+			return at, due, "a send note needs the time it became due"
+		}
+	case "update":
+		if n.Text == nil && n.Now == nil {
+			return at, due, "an update needs a text or what is now true"
+		}
+		if n.Now != nil && *n.Now != "read" && *n.Now != "deleted" {
+			return at, due, "unknown value for now"
 		}
 	default:
-		return at, "unknown kind"
+		return at, due, "unknown kind"
 	}
 	if !strings.HasPrefix(n.Name, n.Org+" / ") {
-		return at, "a name begins with its organization"
+		return at, due, "a name begins with its organization"
 	}
-	return at, ""
+	return at, due, ""
 }
 
 type senderState struct {
 	edition, place int64
-	clock          *time.Time
 }
 
 func lockSenderState(ctx context.Context, tx pgx.Tx, org ids.Org) (senderState, error) {
@@ -100,7 +113,7 @@ func lockSenderState(ctx context.Context, tx pgx.Tx, org ids.Org) (senderState, 
 	var st senderState
 	err := tx.QueryRow(ctx, `INSERT INTO state (org) VALUES ($1)
 		ON CONFLICT (org) DO UPDATE SET org = EXCLUDED.org
-		RETURNING edition, place, clock`, string(org)).Scan(&st.edition, &st.place, &st.clock)
+		RETURNING edition, place`, string(org)).Scan(&st.edition, &st.place)
 	return st, err
 }
 
@@ -108,8 +121,8 @@ func lockSenderState(ctx context.Context, tx pgx.Tx, org ids.Org) (senderState, 
 // row it answers the start: the first edition, place 0.
 func findSenderState(ctx context.Context, tx pgx.Tx, org ids.Org) (senderState, bool, error) {
 	st := senderState{edition: 1}
-	err := tx.QueryRow(ctx, "SELECT edition, place, clock FROM state WHERE org = $1 FOR UPDATE", string(org)).
-		Scan(&st.edition, &st.place, &st.clock)
+	err := tx.QueryRow(ctx, "SELECT edition, place FROM state WHERE org = $1 FOR UPDATE", string(org)).
+		Scan(&st.edition, &st.place)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return senderState{edition: 1}, false, nil
 	}
@@ -117,8 +130,7 @@ func findSenderState(ctx context.Context, tx pgx.Tx, org ids.Org) (senderState, 
 }
 
 func saveSenderState(ctx context.Context, tx pgx.Tx, org ids.Org, st senderState) error {
-	_, err := tx.Exec(ctx, "UPDATE state SET edition = $2, place = $3, clock = $4 WHERE org = $1",
-		string(org), st.edition, st.place, st.clock)
+	_, err := tx.Exec(ctx, "UPDATE state SET edition = $2, place = $3 WHERE org = $1", string(org), st.edition, st.place)
 	return err
 }
 
@@ -137,7 +149,7 @@ func (s *Sender) note(w http.ResponseWriter, r *http.Request) {
 		refuse(w, http.StatusUnprocessableEntity, "not a valid note")
 		return
 	}
-	at, why := n.problem()
+	at, due, why := n.problem()
 	if why != "" {
 		refuse(w, http.StatusUnprocessableEntity, why)
 		return
@@ -155,29 +167,43 @@ func (s *Sender) note(w http.ResponseWriter, r *http.Request) {
 			return nil
 		}
 		if n.Edition > st.edition {
-			// A new edition: start again; the replay recreates what was held, by name.
-			st.edition, st.place, st.clock = n.Edition, 0, nil
-			if _, err := tx.Exec(ctx, "DELETE FROM notifications WHERE org = $1 AND state = 'held'", string(org)); err != nil {
+			// A new edition: start again. The names sent stay; updates still
+			// waiting for a send are written again by the replay.
+			st.edition, st.place = n.Edition, 0
+			if _, err := tx.Exec(ctx, "DELETE FROM updates_waiting WHERE org = $1", string(org)); err != nil {
 				return err
 			}
 		}
+		already := true
 		switch {
-		case n.Number <= st.place:
-			already := true
+		case n.Skip && n.Number <= st.place:
 			status, answer = http.StatusOK, contract.NoteTaken{Taken: true, Already: &already}
-		case n.Previous != st.place:
+		case n.Number > st.place && n.Previous != st.place:
 			status, answer = http.StatusConflict, contract.NoteBehind{IAmAt: st.place, Edition: st.edition}
+		case n.Skip: // parked by the worker: step over it, unapplied, until it is tried again
+			st.place = n.Number
+			status, answer = http.StatusOK, contract.NoteTaken{Taken: true}
 		default:
+			if n.Number <= st.place { // a repeat, or a parked note tried again
+				seen, err := s.seen(ctx, tx, org, n)
+				if err != nil {
+					return err
+				}
+				if seen {
+					status, answer = http.StatusOK, contract.NoteTaken{Taken: true, Already: &already}
+					break
+				}
+			}
 			if s.opt.Refuse != nil {
 				if no := s.opt.Refuse(n.Org, n.Number); no != "" {
 					status, answer = http.StatusUnprocessableEntity, contract.Refusal{Refused: no}
 					break
 				}
 			}
-			if err := s.apply(ctx, tx, org, n, at, &st); err != nil {
+			if err := s.apply(ctx, tx, org, n, at, due); err != nil {
 				return err
 			}
-			st.place = n.Number
+			st.place = max(st.place, n.Number)
 			status, answer = http.StatusOK, contract.NoteTaken{Taken: true}
 		}
 		return saveSenderState(ctx, tx, org, st)
@@ -189,135 +215,133 @@ func (s *Sender) note(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, status, answer)
 }
 
-func (s *Sender) apply(ctx context.Context, tx pgx.Tx, org ids.Org, n wireNote, at time.Time, st *senderState) error {
-	now := s.opt.Clock.Now()
-	switch n.Kind {
-	case "due":
-		onConflict := " WHERE notifications.state <> 'sent'"
+// seen says whether a note at or behind the place has already had its effect.
+func (s *Sender) seen(ctx context.Context, tx pgx.Tx, org ids.Org, n wireNote) (bool, error) {
+	if n.Kind == "send" {
 		if fault(FaultNoSentList) {
-			onConflict = ""
+			return false, nil
 		}
-		if _, err := tx.Exec(ctx, `INSERT INTO notifications (org, name, person, state, due_at, arrived_at, why, body)
-			VALUES ($1, $2, $3, 'held', $4, $5, $6, $7)
-			ON CONFLICT (org, name) DO UPDATE SET state = 'held', due_at = EXCLUDED.due_at, arrived_at = EXCLUDED.arrived_at,
-				sent_at = NULL, why = EXCLUDED.why, body = EXCLUDED.body, now = NULL`+onConflict,
-			string(org), n.Name, n.Person, at, now, n.Why, n.Text); err != nil {
-			return err
+		var one int
+		err := tx.QueryRow(ctx, "SELECT 1 FROM notifications WHERE org = $1 AND name = $2", string(org), n.Name).Scan(&one)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return false, nil
 		}
-	case "changed":
-		if _, err := tx.Exec(ctx, "UPDATE notifications SET body = $3 WHERE org = $1 AND name = $2 AND now IS DISTINCT FROM 'deleted'",
-			string(org), n.Name, n.Text); err != nil {
-			return err
-		}
-	case "withdrawn":
-		if err := s.withdraw(ctx, tx, org, n, at, now); err != nil {
-			return err
-		}
-	case "clock":
-		if st.clock == nil || at.After(*st.clock) {
-			st.clock = &at
-		}
-		if !fault(FaultHoldArrival) {
-			if err := s.sendHeld(ctx, tx, org, *st.clock, now); err != nil {
-				return err
-			}
-		}
+		return err == nil, err
 	}
-	if fault(FaultAnyNoteTime) {
-		if st.clock == nil || at.After(*st.clock) {
-			st.clock = &at
-		}
-		if err := s.sendHeld(ctx, tx, org, *st.clock, now); err != nil {
-			return err
-		}
+	var textNumber int64
+	var now *string
+	err := tx.QueryRow(ctx, `SELECT text_number, now FROM notifications WHERE org = $1 AND name = $2
+		UNION ALL SELECT text_number, now FROM updates_waiting WHERE org = $1 AND name = $2 LIMIT 1`, string(org), n.Name).Scan(&textNumber, &now)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return false, nil
 	}
-	if fault(FaultHoldArrival) {
-		return s.sendWhere(ctx, tx, org, "arrived_at <= $2", now.Add(-Hold), now)
+	if err != nil {
+		return false, err
 	}
-	return nil
+	textDone := n.Text == nil || textNumber >= n.Number || (now != nil && *now == "deleted")
+	nowDone := n.Now == nil || (now != nil && (*now == "deleted" || *now == *n.Now))
+	return textDone && nowDone, nil
 }
 
-// withdraw takes back a held notification. One whose hold had already ended by
-// the log's own clock was not withdrawn in time: it goes out, showing the truth.
-// A withdrawal because the rules changed lists it as history, never sent.
-func (s *Sender) withdraw(ctx context.Context, tx pgx.Tx, org ids.Org, n wireNote, at, now time.Time) error {
-	var state string
-	var due time.Time
-	err := tx.QueryRow(ctx, "SELECT state, due_at FROM notifications WHERE org = $1 AND name = $2", string(org), n.Name).Scan(&state, &due)
+func (s *Sender) apply(ctx context.Context, tx pgx.Tx, org ids.Org, n wireNote, at, due time.Time) error {
+	if n.Kind == "update" {
+		return s.update(ctx, tx, org, n)
+	}
+	return s.send(ctx, tx, org, n, at, due)
+}
+
+// send hands a notification over, once per name. A name listed as history is
+// never handed over, whatever arrives for it later (D-032, D-034).
+func (s *Sender) send(ctx context.Context, tx pgx.Tx, org ids.Org, n wireNote, at, due time.Time) error {
+	now := s.opt.Clock.Now()
+	state, sentAt, delayed := "sent", now, false
+	if n.History {
+		state, sentAt = "history", due
+	} else {
+		// Late by whichever is later: this machine's hand-over, or the note's own
+		// time, so a machine clock stepped back cannot hide a late notification.
+		handed := now
+		if at.After(handed) {
+			handed = at
+		}
+		delayed = handed.Sub(due) > DelayedAfter
+	}
+	onConflict := "DO NOTHING"
+	if fault(FaultNoSentList) {
+		onConflict = "DO UPDATE SET state = EXCLUDED.state"
+	}
+	tag, err := tx.Exec(ctx, `INSERT INTO notifications (org, name, person, state, due_at, sent_at, delayed, why, body)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		ON CONFLICT (org, name) `+onConflict, string(org), n.Name, n.Person, state, due, sentAt, delayed, n.Why, n.text())
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return nil
+	}
+	if state == "sent" && !fault(FaultSendNothing) {
+		if _, err := tx.Exec(ctx, "INSERT INTO deliveries (org, name, at) VALUES ($1, $2, $3)", string(org), n.Name, now); err != nil {
+			return err
+		}
+	}
+	// An update that came before this send takes effect now.
+	var text *string
+	var textNumber int64
+	var shown *string
+	err = tx.QueryRow(ctx, "DELETE FROM updates_waiting WHERE org = $1 AND name = $2 RETURNING text, text_number, now", string(org), n.Name).
+		Scan(&text, &textNumber, &shown)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil
 	}
 	if err != nil {
 		return err
 	}
-	if n.Because == "rule_changed" {
-		if state == "held" {
-			_, err = tx.Exec(ctx, "UPDATE notifications SET state = 'history', sent_at = due_at WHERE org = $1 AND name = $2", string(org), n.Name)
-		}
+	return applyUpdate(ctx, tx, org, n.Name, text, textNumber, shown)
+}
+
+// update carries what is true now to a name on the list, or remembers it for a
+// send still to come (a parked send may be tried again after its update).
+func (s *Sender) update(ctx context.Context, tx pgx.Tx, org ids.Org, n wireNote) error {
+	var one int
+	err := tx.QueryRow(ctx, "SELECT 1 FROM notifications WHERE org = $1 AND name = $2", string(org), n.Name).Scan(&one)
+	if err == nil {
+		return applyUpdate(ctx, tx, org, n.Name, n.Text, n.Number, n.Now)
+	}
+	if !errors.Is(err, pgx.ErrNoRows) {
 		return err
 	}
-	if state == "held" {
-		if at.After(due.Add(Hold)) && n.Because != "fenced" {
-			if err := s.handOver(ctx, tx, org, n.Name, due, now); err != nil {
-				return err
-			}
-			state = "sent"
-		} else {
-			state = "withdrawn"
-		}
+	textNumber := int64(0)
+	if n.Text != nil {
+		textNumber = n.Number
 	}
-	var mark any
-	if n.Because == "read" || n.Because == "deleted" {
-		mark = n.Because
-	}
-	blank := ""
-	if n.Because == "deleted" {
-		blank = ", body = ''"
-	}
-	_, err = tx.Exec(ctx, "UPDATE notifications SET state = $3, now = COALESCE($4::text, now)"+blank+" WHERE org = $1 AND name = $2",
-		string(org), n.Name, state, mark)
+	_, err = tx.Exec(ctx, `INSERT INTO updates_waiting AS w (org, name, text, text_number, now) VALUES ($1, $2, $3, $4, $5)
+		ON CONFLICT (org, name) DO UPDATE SET
+			text = CASE WHEN EXCLUDED.text_number > w.text_number THEN EXCLUDED.text ELSE w.text END,
+			text_number = greatest(EXCLUDED.text_number, w.text_number),
+			now = CASE WHEN w.now = 'deleted' OR EXCLUDED.now IS NULL THEN w.now ELSE EXCLUDED.now END`,
+		string(org), n.Name, n.Text, textNumber, n.Now)
 	return err
 }
 
-func (s *Sender) handOver(ctx context.Context, tx pgx.Tx, org ids.Org, name string, due, now time.Time) error {
-	if fault(FaultSendNothing) {
-		return nil
-	}
-	if _, err := tx.Exec(ctx, "UPDATE notifications SET state = 'sent', sent_at = $3, delayed = $4 WHERE org = $1 AND name = $2",
-		string(org), name, now, now.Sub(due) > DelayedAfter); err != nil {
-		return err
-	}
-	_, err := tx.Exec(ctx, "INSERT INTO deliveries (org, name, at) VALUES ($1, $2, $3)", string(org), name, now)
-	return err
-}
-
-// sendHeld hands over everything whose hold ended before the clock note.
-func (s *Sender) sendHeld(ctx context.Context, tx pgx.Tx, org ids.Org, noteClock, now time.Time) error {
-	return s.sendWhere(ctx, tx, org, "due_at < $2", noteClock.Add(-Hold), now)
-}
-
-func (s *Sender) sendWhere(ctx context.Context, tx pgx.Tx, org ids.Org, cond string, limit, now time.Time) error {
-	rows, err := tx.Query(ctx, "SELECT name, due_at FROM notifications WHERE org = $1 AND state = 'held' AND "+cond+" ORDER BY due_at, name", string(org), limit)
-	if err != nil {
-		return err
-	}
-	type held struct {
-		name string
-		due  time.Time
-	}
-	list, err := pgx.CollectRows(rows, func(r pgx.CollectableRow) (held, error) {
-		var h held
-		return h, r.Scan(&h.name, &h.due)
-	})
-	if err != nil {
-		return err
-	}
-	for _, h := range list {
-		if err := s.handOver(ctx, tx, org, h.name, h.due, now); err != nil {
+// applyUpdate changes an entry. A newer text wins over an older one that was
+// tried again later, and a delete wins over everything (D-004).
+func applyUpdate(ctx context.Context, tx pgx.Tx, org ids.Org, name string, text *string, textNumber int64, now *string) error {
+	if text != nil {
+		if _, err := tx.Exec(ctx, `UPDATE notifications SET body = $3, text_number = $4
+			WHERE org = $1 AND name = $2 AND text_number < $4 AND now IS DISTINCT FROM 'deleted'`,
+			string(org), name, *text, textNumber); err != nil {
 			return err
 		}
 	}
-	return nil
+	if now == nil {
+		return nil
+	}
+	if *now == "deleted" {
+		_, err := tx.Exec(ctx, "UPDATE notifications SET now = 'deleted', body = '' WHERE org = $1 AND name = $2", string(org), name)
+		return err
+	}
+	_, err := tx.Exec(ctx, "UPDATE notifications SET now = $3 WHERE org = $1 AND name = $2 AND now IS DISTINCT FROM 'deleted'", string(org), name, *now)
+	return err
 }
 
 func (s *Sender) place(w http.ResponseWriter, r *http.Request) {
@@ -382,17 +406,18 @@ func (s *Sender) notifications(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, out)
 }
 
-// wipeOrg empties what the sender holds, except the list of what it sent.
+// wipeOrg empties what the sender holds, except its list of names: a name once
+// sent or listed as history is never handed over again.
 func (s *Sender) wipeOrg(ctx context.Context, org ids.Org) error {
 	return orgdb.InOrg(ctx, s.opt.Dir, org, func(tx pgx.Tx) error {
 		st, found, err := findSenderState(ctx, tx, org)
 		if err != nil || !found {
 			return err // nothing was ever delivered, or it was deleted: nothing to wipe
 		}
-		if _, err := tx.Exec(ctx, "DELETE FROM notifications WHERE org = $1 AND state <> 'sent'", string(org)); err != nil {
+		if _, err := tx.Exec(ctx, "DELETE FROM updates_waiting WHERE org = $1", string(org)); err != nil {
 			return err
 		}
-		st.place, st.clock = 0, nil
+		st.place = 0
 		return saveSenderState(ctx, tx, org, st)
 	})
 }
