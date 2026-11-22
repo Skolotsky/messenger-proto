@@ -1,6 +1,6 @@
 # D-009: Which surfaces the first version includes
 
-- Status: proposed
+- Status: accepted
 - Level: product
 - Date: 2026-11-22
 - Decided by: user
@@ -61,11 +61,18 @@ No second opinion was sought: cheap to reverse.
 
 ## Decision
 
-_Open._
+Accepted by the user on 2026-11-22: **B, with two additions.**
+
+- **A small-screen layout is in.** "Mobile is super important." Taken to mean the web product laid out for a phone-sized screen, not a separate app.
+- **Creating channels is in.** "Otherwise it would look strange: entity which exists but can't be created." Taken at its plainest: a name and the people to add. Private channels, renaming and archiving stay out.
+
+Both were listed under C and under "out of the first version" above; the user's choice overrides that. The rest of the out list stands: sign-in and accounts, group direct messages and ad-hoc topics, profiles, presence and typing indicators, files and formatted text, settings beyond the dials and Focus rules.
 
 ## Consequences
 
-_Filled in when accepted._
+- Easier: every promise in D-001 and every system in the brief has a visible surface. The product can be shown on a phone, where a feed of "what needs you" is most natural.
+- Harder: every surface has to work at two widths, and "nothing jumps" has to hold on the narrow one, where an expander or a deleted-message marker takes a larger share of the screen. Channel membership can now change while the product runs, so "everyone in the channel" for a flag is not a fixed list.
+- Committed to: the surfaces in B, creating channels, and a layout that works on a phone-sized screen from the first user-facing task on (which makes T-004, a browser the agent can drive, more pressing).
 
 ## Follow-ups
 

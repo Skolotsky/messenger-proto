@@ -2,6 +2,7 @@
 
 Finished work, newest first. One line each: what is now true and how it was verified. Commits carry the task ID, so `git log --grep T-nnn` finds the change.
 
+- 2026-11-22 · **T-009** `decide` D-009 is accepted: the first version is the feed plus what makes it observable, with creating channels and a phone-sized layout added by the user. Verified: accepted by the user in conversation; record and index updated; `./scripts/check` passes.
 - 2026-11-22 · **T-007** `decide` D-001 is accepted: the product hypothesis is the three-bucket feed (Focus, Needs you, For your information) with dials, Flag and Info. Verified: accepted by the user in conversation; record and index updated; `./scripts/check` passes.
 - 2026-11-22 · **T-002** `research` The context is known: built for small to mid-size startup teams with mixed roles and heavy AI use, as a PoC to launch an early access programme. Verified: stated by the user; recorded in D-001.
 - 2026-11-22 · **T-005** `research` We know how Slack, Teams, Discord, Zulip and others handle the feed, delivery to downstream systems and AI agents, and which eight decisions follow (R-002, visual `R-002-decision-landscape.html`). Verified: eight key claims re-fetched by a second agent, seven held and one was corrected; the rest rests on the research agents' reading; the visual was not looked at rendered (no browser, T-004).
