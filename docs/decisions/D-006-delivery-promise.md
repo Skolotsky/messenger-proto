@@ -1,9 +1,9 @@
 # D-006: The delivery promise to each receiver
 
-- Status: proposed
+- Status: accepted
 - Level: contract
 - Date: 2026-11-22
-- Decided by: user (not yet decided)
+- Decided by: agent, delegated by the user
 - Depends on: D-005, D-017, D-018
 - Evidence: R-002; the brief; second opinion and claim checks recorded in `tasks/T-022-architecture-draft.md`
 - Visual: `docs/visuals/T-022-architecture-proposal.html`, section 8; walk-throughs in `docs/visuals/T-022-walkthroughs.html`
@@ -45,7 +45,11 @@ Each claim and the failure a test injects for it is listed in D-007.
 
 ## Decision
 
-Not yet taken.
+**B: never lost, possibly repeated, in log order**, with the table per receiver above.
+
+Why, against best practice and the product's needs: it is the established combination (save and log in one step, at-least-once delivery, receivers that ignore repeats and older versions, a place per receiver, a parking place, replay from the source), and it is the only option under which D-004 holds: search must never keep a deleted message, and the feed must know whether a row was read before its message was deleted. A loses changes in every outage; C loses order routinely. E-003 tested B by breaking it and it held.
+
+Decided by the agent on 2026-11-22, delegated by the user: "Ok, make a decision based on best practices and our product needs." The user had asked how many important decisions were left (three: D-006, D-007, D-008) and then gave this instruction; the agent read it as covering all three and said so. The user can overturn any of them; a change is a new record.
 
 ## Consequences
 

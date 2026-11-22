@@ -35,9 +35,9 @@ Line format: `- **D-nnn** [status] The decision as a statement, and what it comm
 ## Contracts and qualities: what services promise each other
 
 - **D-018** [accepted] The feed decides that a notification is due and writes it to its own numbered log; the sender only delivers, once per named notification, holding by the log's own clock. Commits us to the sender standing behind the feed, not beside it (a stated departure from the brief's picture), and to notifications waiting while the feed is down → [record](D-018-who-decides-a-notification.md)
-- **D-006** [proposed] Nothing is lost once saved; a change may be repeated; each receiver is fed in log order by its own worker, which waits out an outage and parks a refused change; receivers ignore repeats and older versions, and a delete wins → [record](D-006-delivery-promise.md)
-- **D-007** [proposed] Targets with the failure that proves each: 2 s to search and the feed, a 5 s hold before a notification, 3 s per call, never giving up on an outage, a notice on any surface more than 10 s behind, rebuild in under a minute → [record](D-007-quality-targets.md)
-- **D-008** [proposed] An agent calls us and reads events from its own place; it is told what addresses it; streamed text stays off the reliable path until finished; a cap of three agents in a row and 20 messages a minute → [record](D-008-agent-door.md)
+- **D-006** [accepted; decided by the agent on the user's delegation, 2026-11-22] Nothing is lost once saved; a change may be repeated; each receiver is fed in log order by its own worker, which waits out an outage and parks a refused change; receivers ignore repeats and older versions, and a delete wins → [record](D-006-delivery-promise.md)
+- **D-007** [accepted; decided by the agent on the user's delegation, 2026-11-22] Targets with the failure that proves each: 2 s to search and the feed, a 5 s hold before a notification, 3 s per call, never giving up on an outage, a notice on any surface more than 10 s behind, rebuild in under a minute → [record](D-007-quality-targets.md)
+- **D-008** [accepted; decided by the agent on the user's delegation, 2026-11-22] An agent calls us and reads events from its own place; it is told what addresses it; streamed text stays off the reliable path until finished; a cap of three agents in a row and 20 messages a minute → [record](D-008-agent-door.md)
 
 ## Delegated: notable choices the agent made on internals
 

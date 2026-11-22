@@ -165,9 +165,9 @@ details > .stack { gap: 10px; }
 </header>
 
 <div class="ask">
-  <div class="label">Needs you</div>
-  <p><strong>D-005 is decided:</strong> parts that talk only over the network with no message broker, PostgreSQL in Docker, WebSocket with numbered updates to the screen, TypeScript on the server. <strong>D-017 and D-018 are decided:</strong> Conversations owns what a reader did; the feed decides that a notification is due. <strong>Next: what each receiver is promised (D-006, section 8).</strong> Two more decisions follow.</p>
-  <p class="note">When a message broker would become the right choice, and how it would slot in: <a href="D-005-message-broker.html">its own page</a>.</p>
+  <div class="label">Where it stands</div>
+  <p><strong>All six technical decisions are taken.</strong> You decided the shape, the database, the live connection and the language (D-005), who owns what a reader did (D-017) and who decides a notification (D-018). You then asked me to decide the remaining three by best practice and the product's needs: the delivery promise (D-006), the numbers (D-007) and the agent door (D-008). Each is the recommended option in its section; any of them can be overturned.</p>
+  <p class="note">Two figures in D-007 are the ones a person will feel, should you want to change them: the 5-second hold before a notification, and the 10 seconds after which a surface says it is behind.</p>
 </div>
 
 <section>
@@ -537,7 +537,7 @@ server → screen   { "conversations": 4856, "kind": "message.changed", … }
       <dl><dt>Upside</dt><dd>Trivial.</dd><dt>Risk</dt><dd>Every outage loses changes for good. Search shows deleted messages forever.</dd><dt>Undo</dt><dd>Cheap.</dd></dl>
     </div>
     <div class="option pick">
-      <header><h3>B. Never lost, possibly repeated, in order</h3><span class="chip ok">Recommended</span></header>
+      <header><h3>B. Never lost, possibly repeated, in order</h3><span class="chip ok">Decided</span></header>
       <p>A worker per receiver reads the log from its own place, in order. Outage: wait and resume, without limit. A refused change: park it, move on. Receivers ignore repeats and older versions.</p>
       <dl><dt>Upside</dt><dd>A promise that can be stated in one sentence and proven by breaking things.</dd><dt>Risk</dt><dd>One change the receiver chokes on could stall it; hence the parking place. Telling "down" from "refuses this one" has to be exact.</dd><dt>Undo</dt><dd>Expensive: every receiver is built on it.</dd></dl>
     </div>
@@ -582,7 +582,7 @@ answers:  200 applied · 200 already had it · 422 I refuse this one (→ parked
 
 <section id="d007">
   <h2>9 · D-007: the numbers, and the failure that proves each</h2>
-  <p>Proposed targets on one local machine with the seeded team. Every claim is paired with the fault a test injects; a claim without one is not made.</p>
+  <p><span class="chip ok">Decided</span> Targets on one local machine with the seeded team. Every claim is paired with the fault a test injects; a claim without one is not made.</p>
   <div class="table-wrap">
     <table>
       <thead><tr><th>Promise</th><th>Proposed number</th><th>The failure a test injects</th></tr></thead>
@@ -627,7 +627,7 @@ answers:  200 applied · 200 already had it · 422 I refuse this one (→ parked
       <dl><dt>Upside</dt><dd>The best-known form.</dd><dt>Risk</dt><dd>An agent on a developer's machine has no address we can reach. A coding agent joining for verification (D-002) could not use it.</dd><dt>Undo</dt><dd>Moderate.</dd></dl>
     </div>
     <div class="option pick">
-      <header><h3>B. The agent calls us and reads from its own place</h3><span class="chip ok">Recommended</span></header>
+      <header><h3>B. The agent calls us and reads from its own place</h3><span class="chip ok">Decided</span></header>
       <p>The agent asks "what is there for me after event 311?" and waits for the answer. Slack offers the same as Socket Mode.</p>
       <dl><dt>Upside</dt><dd>Works from anywhere. An agent that was away simply reads on. It is the same numbered catch-up the screens use.</dd><dt>Risk</dt><dd>An agent hears only when it asks; a slow one holds events in store. We keep 7 days and say so.</dd><dt>Undo</dt><dd>Cheap: A can be added beside it.</dd></dl>
     </div>

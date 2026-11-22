@@ -1,9 +1,9 @@
 # D-007: Quality targets, and the failure that proves each
 
-- Status: proposed
+- Status: accepted
 - Level: quality
 - Date: 2026-11-22
-- Decided by: user (not yet decided)
+- Decided by: agent, delegated by the user
 - Depends on: D-005, D-006
 - Evidence: R-002; the brief; second opinion and claim checks recorded in `tasks/T-022-architecture-draft.md`
 - Visual: `docs/visuals/T-022-architecture-proposal.html`, section 9; walk-throughs in `docs/visuals/T-022-walkthroughs.html`
@@ -54,7 +54,11 @@ The table as proposed. Reset in the control panel restores a saved copy of each 
 
 ## Decision
 
-Not yet taken.
+**The table as proposed**, with the rebuild target at two minutes and Reset from a saved copy.
+
+Why: each number is either the established figure (3 s per call, Slack's rule; retry with growing pauses and never giving up on an outage, because our receivers are ours to keep consistent) or was measured with a wide margin in E-003 to E-005 (2 s freshness against 7 to 12 ms measured; rebuild 80 s). The hold stays at 5 s: long enough for a typo fix or a quick delete, short enough that a demonstration does not look stuck. These are settings; the two a person will feel are the 5 s hold and the 10 s after which a surface says it is behind.
+
+Decided by the agent on 2026-11-22, delegated by the user: "Ok, make a decision based on best practices and our product needs." The user had asked how many important decisions were left (three: D-006, D-007, D-008) and then gave this instruction; the agent read it as covering all three and said so. The user can overturn any of them; a change is a new record.
 
 ## Consequences
 

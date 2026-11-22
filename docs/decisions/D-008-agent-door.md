@@ -1,9 +1,9 @@
 # D-008: The contract for agents as receivers and senders
 
-- Status: proposed
+- Status: accepted
 - Level: contract
 - Date: 2026-11-22
-- Decided by: user (not yet decided)
+- Decided by: agent, delegated by the user
 - Depends on: D-002, D-005, D-006
 - Evidence: R-002; the brief; second opinion and claim checks recorded in `tasks/T-022-architecture-draft.md`
 - Visual: `docs/visuals/T-022-architecture-proposal.html`, section 10; walk-throughs in `docs/visuals/T-022-walkthroughs.html`
@@ -41,7 +41,11 @@ Second opinion: chose B; noted that through MCP nothing is pushed, so "reads fro
 
 ## Decision
 
-Not yet taken.
+**B: the agent calls us and reads from its own place**, with the rules listed under the recommendation.
+
+Why: the first version's agents are scripted and a coding agent must be able to join from a developer's machine (D-002), which only B allows; it is an established form (Slack's Socket Mode); and E-003 showed scripted agents missing nothing and never posting twice through it. The cap of three agents in a row and 20 messages a minute are our own figures, since no vendor documents a rule; they are settings.
+
+Decided by the agent on 2026-11-22, delegated by the user: "Ok, make a decision based on best practices and our product needs." The user had asked how many important decisions were left (three: D-006, D-007, D-008) and then gave this instruction; the agent read it as covering all three and said so. The user can overturn any of them; a change is a new record.
 
 ## Consequences
 
