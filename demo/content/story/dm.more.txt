@@ -1,0 +1,66 @@
+=== early anna marco
+marco: Do you have a view on the second on-call rotation? I'd rather not ask Felix and Bram to do it all through December too.
+anna: Let's talk about hiring in January. In the meantime make sure they take the days back.
+
+=== early maya sam
+maya: What's the single thing you would change about the beta if you could?
+sam: Stop people getting logged out. Everything else they forgive.
+
+=== early jonas maya
+jonas: Can I tell Kilbrennan the audit trail is coming? It's their one hesitation.
+maya: Say 2.0.1, and do not say a date. I'd rather we surprise them.
+
+=== mid lena maya
+lena: You were right about the mascot.
+maya: I know. I'm sorry for your loss.
+
+=== mid marco maya
+maya: How are you doing? You've been in every thread this week.
+marco: I'm fine. Tired. I'll take the Friday after launch off and I won't feel guilty about it.
+maya: Good. I will personally lock your laptop.
+
+=== mid maya tomas
+maya: Is the CSV export going to handle a clinic with five years of data?
+tomas: I tested it with eleven. It takes about 40 seconds and it streams, so nothing falls over.
+maya: You are my favourite person this week.
+
+=== mid dele maya
+maya: Could you check if the waiting list numbers hold if we leave out the three biggest clinics?
+dele: They do. It drops from 46 to 41 percent. Still the same story.
+
+=== mid maya priya
+priya: I want to put the number of pilot clinics on the page. Is 48 safe to say?
+maya: Yes. All 48 are real and all of them have used it this month.
+
+=== late maya priya
+maya: Can you send me the final launch email one more time? I want to read it on my phone like a clinic manager would.
+priya: Sent. Be gentle.
+maya: It's good. One thing, the button says "Learn more", and I think it should say "See what's new".
+
+=== late marco maya
+maya: Anything you are worried about that you haven't told me?
+marco: The reminder batch at 07:00 on Thursday is the first big thing to run on the new code. I'll be up for it.
+
+=== late lena maya
+lena: Do you think people will notice how much better the spacing is?
+maya: No, but they will feel it, and that's the job.
+
+=== mid greta sam
+greta: Would it be okay if I took on the launch notes doc? I like that sort of thing.
+sam: Please. That's a weight off.
+
+=== late ruth sofia
+sofia: Do you want to do the pilot check-in calls together on Friday?
+ruth: Yes, I'll bring coffee and the list.
+
+=== mid kofi yuki
+yuki: Is the push notification change in the next build, or the one after?
+kofi: Next one. Do your worst.
+
+=== late felix marco
+felix: Rollback rehearsed twice. Takes four minutes, and I can do it with my eyes closed, though I would rather not.
+marco: Thanks. Eyes open on Thursday please.
+
+=== late nadia tomas
+tomas: Thanks for catching the "this and following" bug last week. That would have been ugly on launch day.
+nadia: You'd have done the same. Coffee is still owed though.

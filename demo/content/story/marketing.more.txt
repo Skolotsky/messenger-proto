@@ -1,0 +1,46 @@
+=== early
+ewan: Competitor comparison page: yes or no? Sales keeps asking.
+> priya: No named comparisons. We say what we do and let them compare.
+> jonas: I can live with that, as long as I get a private sheet for calls.
+> priya: You will have it by Friday.
+
+=== early
+zoe: Style note for all launch copy: we write "appointment", not "booking", unless it is the patient doing it online. I know it is a small thing.
+> ewan: It is a small thing that I have got wrong four times already. Fixing.
+
+=== early
+priya: Customer story draft for Wexhollow is with them for approval. They changed one word and it was better.
+> ewan: Which word?
+> priya: We said "reduced no-shows". She said "stopped losing Mondays".
+> ewan: Oh, that's so much better.
+
+=== mid
+ewan: The email subject line test: "Your front desk, two hours lighter" got 44 percent opens against 29 for "Introducing Larkmere 2.0".
+> priya: Never put the version number in a subject line again, noted.
+
+=== mid
+lena: For the launch page, can we show one real clinic's week instead of the fake one? With names blurred, of course.
+> priya: Would Marrowgate agree?
+> jonas: I can ask. They like being asked.
+> jonas: They said yes. {+🎉 lena,priya}
+
+=== mid
+priya: Budget check: we have about €4,000 left for launch. I would put it on two trade newsletters and nothing else.
+> anna: Agreed. No billboards, Ewan.
+> ewan: It was one suggestion, one time.
+
+=== mid
+ewan: I scheduled the teaser for 08:00 by mistake and it went out an hour early. {delete}
+
+=== mid
+zoe: The help centre article titles are now questions people actually type. "How do I move a series of appointments?" instead of "Recurring appointment management".
+> priya: Search traffic should thank you for that.
+
+=== late
+ewan: Webinar is at 86 sign-ups, and the slides are down to eleven. Ruth is doing the live demo with a real clinic's setup.
+> lena: Do you want me to look over the slides?
+> ewan: Please, they are currently very blue.
+
+=== d15
+priya: T-minus two days. Everything is scheduled, double-checked and in one calendar. If you need me on Wednesday I will be the person walking in circles.
+> anna: You have done a wonderful job on this. Go for a walk in a straight line. {+❤️ priya,ewan,zoe}

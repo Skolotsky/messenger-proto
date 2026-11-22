@@ -1,0 +1,175 @@
+# Direct conversations: the header names the two people.
+
+=== early anna maya
+anna: The board deck is due on the 13th. Can you own the roadmap slide?
+maya: Yes. Draft by Wednesday night.
+anna: Keep it to one slide. Last time the roadmap had a sequel.
+
+=== d8 anna maya
+anna: Honest question. Are we going to make the 19th?
+maya: Yes. What I am less sure of is whether we make it without someone burning out. Marco's team is carrying a lot.
+anna: What would help?
+maya: Taking XLSX out of the release so they stop pretending it fits.
+anna: Do it. I will back you if anyone complains.
+
+=== late anna maya
+anna: Thank you for holding this together. I know it has not been a quiet month.
+maya: Ask me again on Friday.
+
+=== early marco maya
+marco: Freeze is Monday the 16th at 18:00. I told the team, but say it again in your update so it sticks.
+maya: Noted. I will tell marketing too, they think it is the 17th.
+
+=== mid marco maya
+marco: Do you have ten minutes? I want to talk about Arjun before his review.
+maya: After lunch?
+marco: Perfect.
+
+=== late marco maya
+marco: If the rehearsal goes badly on Wednesday I will want to move the go/no-go to 07:00 on Thursday. Warn Anna?
+maya: I will warn her. I don't think you will need it.
+
+=== early lena maya
+lena: Sent you the v3 file for the empty states.
+maya: Much better. One comment on the mascot.
+lena: You are going to say we should not have a mascot.
+maya: I am going to say we should not have a mascot.
+
+=== mid lena maya
+lena: Can I show you the new navigation before the crit? I would like one person to be mean to it first.
+maya: I can be mean at 16:00.
+
+=== early maya tomas
+tomas: Do you have five minutes for the export question after standup?
+maya: Yes.
+
+=== d8 maya tomas
+tomas: If we drop XLSX from 2.0, I can have CSV done and properly tested by Friday. If we keep it I can only promise one of those words.
+maya: Which word?
+tomas: Done.
+maya: Dropping it.
+
+=== early maya sam
+sam: Can I steal you for the support readiness review on Friday? It would help if the team heard the plan from you.
+maya: Yes, put it in my calendar.
+
+=== mid maya sam
+sam: The part-time staff permission thing is now our number one ticket. I know it is not on the 2.0 list.
+maya: How bad on a scale of "annoying" to "they will leave"?
+sam: Annoying, trending towards a strongly worded email.
+maya: Let me see what Marco can do for 2.0.1.
+
+=== late maya sam
+sam: We are as ready as we will be. Greta made a playlist for the launch shift, so if I seem odd on Thursday, that's why.
+maya: Thank you for everything you've done on this.
+
+=== d9 jonas maya
+jonas: Fennimoor asked again about XLSX. Can you call them or should I?
+maya: I'll call. It's my decision, so it should be my phone call.
+jonas: Appreciated.
+
+=== late jonas maya
+jonas: Call went well, by the way. They were more annoyed about the logo change than about the export.
+maya: I will take it.
+
+=== early maya priya
+priya: Do you have a sentence for "what is new in 2.0" that a normal person would say?
+maya: "Your calendar now fills its own gaps."
+priya: Oh, that is annoyingly good.
+
+=== mid maya priya
+priya: Launch email draft is in your inbox. I need a yes or a no by tomorrow, no maybes.
+maya: Yes, with one change to the second paragraph. Comment is in the doc.
+
+=== mid dele maya
+dele: Do you want the no-show numbers before the board meeting or after?
+maya: Before. I would rather be asked hard questions with the data open.
+
+=== late dele maya
+dele: Dashboard is ready for Thursday. I put the number you care about at the top.
+maya: Which one do you think that is?
+dele: Waiting list activations.
+maya: You know me too well.
+
+=== mid maya ship
+ship: Release notes draft for 2.0.0-rc.3 is ready for your review.
+maya: Approved. Fix the sentence about reminders first, it promises too much.
+ship: Updated. The sentence now says reminders are retried for up to an hour.
+
+=== early maya triage
+triage: Weekly summary: 212 tickets, 71 percent answered by macro, median first response 14 minutes.
+maya: Thanks.
+
+=== mid maya triage
+triage: Weekly summary: 263 tickets, 66 percent answered by macro, median first response 19 minutes. The rise comes from beta clinics.
+maya: Is the part-time staff question still the largest group?
+triage: Yes, 38 tickets this week, up from 21.
+
+=== early anna marco
+anna: How is the team holding up, really?
+marco: Tired but in a good way. Ask me again after the freeze.
+
+=== mid anna marco
+marco: Kofi has been doing weekends. I've asked him to stop. If you see him online on Saturday, please send him home.
+anna: Will do. Thanks for watching out for him.
+
+=== early jonas owen
+owen: Can you look at my Dunmarrow proposal before I send it?
+jonas: Sure. Lose the third page, nobody reads a third page.
+
+=== d8 jonas owen
+jonas: Nice work on Kilbrennan. You did most of the slog on that one.
+owen: Thanks. I will remember you said that at bonus time.
+
+=== early greta sam
+greta: Can I swap my Thursday shift with Mateo? Dentist. An actual one, not a customer.
+sam: Fine, just update the rota.
+
+=== mid greta sam
+sam: You handled the Penhallow call really well today, by the way.
+greta: Thanks. I may have needed to hear that.
+
+=== mid ines lena
+ines: The spacing token for the day view is 6 but your file says 8. Which of you is lying?
+lena: The file. It is 6. I will fix it.
+
+=== early kofi yuki
+kofi: Does QA still have the Android 11 device?
+yuki: Yes. Desk by the window, charger is the one with tape on it.
+
+=== mid felix marco
+felix: Do you want me on the migration rehearsal in person or is being on the call enough?
+marco: In person, if you can stand it. There will be pizza.
+
+=== mid omar paula
+omar: Do we have a budget line for the launch lunch or is this coming from general office?
+paula: General office. I kept it under 400.
+omar: You are my favourite colleague.
+
+=== early priya zoe
+priya: Can you take a pass on the launch email before Ewan sends it to Anna?
+zoe: Yes. Is the word "seamless" in it?
+priya: Twice.
+zoe: Sending you a bill.
+
+=== mid ruth sofia
+ruth: Can you take the Orrinvale walkthrough on Thursday? I have Kilbrennan at the same time.
+sofia: Sure. Anything I should know?
+ruth: The office manager is great, but needs to feel heard first.
+
+=== mid bram felix
+bram: I can take the launch weekend on call. You did the last one.
+felix: You are a good person.
+bram: I am a person with a dog who wakes me at six anyway.
+
+=== mid marco ship
+ship: Migration dry run for rc.5 finished. Longest lock was 180 ms. No action needed.
+marco: Thanks. Keep posting these in the channel, not here.
+
+=== early sam triage
+triage: Three tickets from Penhallow in one hour, all about reminders. Grouping them and passing them to you.
+sam: Thanks, I will call them.
+
+=== mid nadia tomas
+nadia: Do you have time to review the reminder table migration? It's small.
+tomas: Send it. I'll look before lunch.

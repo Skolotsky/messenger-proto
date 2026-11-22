@@ -1,0 +1,43 @@
+=== early
+felix: Calendar reads were slow for about six minutes at 09:12. A long report query was holding up the replica. Killed it, and I am adding a statement timeout for reporting users. {+🙏 marco,sam}
+> sam: Two clinics called. I told them it was resolved.
+> felix: Thanks. Short write-up later today.
+
+=== early
+bram: Reminder batch started 20 minutes late this morning because the worker was stuck on one malformed phone number. Nothing was lost, everything went out by 08:40.
+> nadia: That is the validation I keep meaning to add. Doing it now.
+> marco: Please also make one bad row unable to stop the whole batch.
+> nadia: Yes. Parking it instead of retrying forever.
+
+=== early
+sam: Is anyone else seeing logins fail for Wexhollow? They have three people locked out right now.
+> arjun: Looking.
+> arjun: Their SSO certificate expired this morning. It is on their side, but I can tell you exactly what to send them.
+> sam: Please do, you are a hero. {edit: Please do. That is the second clinic this month, can we warn people 30 days before it expires?}
+> arjun: Good idea, filing it.
+
+=== mid
+felix: Heads up, the SMS provider is reporting delays in one region. Our reminders are queuing and will retry. No action needed unless it goes past an hour.
+> greta: Should I tell clinics?
+> felix: Only if they ask. I will update here in 30 minutes.
+> felix: Provider is back. Queue drained in nine minutes, no reminders lost. {+👍 greta,sam,nadia}
+
+=== mid
+nadia: The backfill slowed replication to about eight seconds behind for a while. I lowered the batch size and it has recovered.
+> felix: Thanks for catching it before I did.
+
+=== mid
+tomas: Between 14:02 and 14:09 a deploy made the waiting list return an empty page for about 30 clinics. Rolled back. Root cause is a missing default on the new column.
+> marco: How did it get past staging?
+> tomas: Staging had the column already from an earlier migration. I will add a check that runs migrations from a clean copy.
+> marco: Thanks. No blame, just fix the gap.
+> sam: No tickets came in about it, for what it is worth.
+
+=== mid
+bram: Disk alert on the export node is real this time. Old export files were never cleaned up. Cleared 80 GB and set a seven-day expiry.
+> arjun: I wrote that job. Sorry, and thank you.
+
+=== late
+felix: Short blip on the API gateway at 08:51, about 40 seconds of 502s while an instance was replaced. Looks like the health check was too eager. Tuning it today so it does not happen on Thursday.
+> marco: Thanks. Please post when it is done.
+> felix: Done, and tested by killing an instance on staging twice.

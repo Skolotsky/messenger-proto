@@ -1,0 +1,25 @@
+=== early
+greta: Getting reports that the calendar shows yesterday's appointments for a few clinics. Is that us?
+> ines: Cache header from this morning's deploy. Rolling out the fix, a refresh clears it.
+> greta: Telling them.
+
+=== mid
+arjun: The search index was 12 minutes behind for a while around 11:00 because of the bulk import. Search results for new patients were missing in that window.
+> sam: That explains the two calls I got.
+> arjun: I am going to throttle imports so they cannot starve it again.
+
+=== mid
+priya: Is the site meant to be down? {delete}
+
+=== mid
+bram: Certificates on the status page expire in six days. Renewing now rather than discovering it on launch day.
+> felix: Good catch. Please add it to the monitoring so neither of us has to remember.
+
+=== mid
+hana: Mobile logins were failing for about four minutes after the auth deploy. The old tokens were rejected before the new key had propagated.
+> marco: Order of operations for next time: publish the key first, then switch signing.
+> hana: Written into the runbook.
+
+=== late
+felix: The failover test is done. We pulled the primary on staging during a simulated Monday. Writes resumed in 27 seconds, and no saved booking was lost.
+> marco: That is what I wanted to hear before Thursday. {+🎉 marco,tomas,bram}

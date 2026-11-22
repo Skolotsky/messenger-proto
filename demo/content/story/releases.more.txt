@@ -1,0 +1,17 @@
+=== early
+sam: When a build says it fixed something a customer reported, could it mention the ticket number? I would love to be able to tell them.
+> marco: Good idea. Deployer can pull it from the commit message if we write it there.
+> tomas: Starting today.
+
+=== mid
+yuki: Holding rc.3 for a moment, please. I want to check one thing on the waiting list. {delete}
+
+=== mid
+maya: What's the difference between rc.4 and rc.5, in words a person would use?
+> marco: rc.5 stops the print view losing a page and fixes the reminder that went out twice after a move.
+> maya: Thanks, that goes in the notes.
+
+=== late
+priya: Is the build on staging the one we will launch with, or could it still change?
+> marco: Only if we find something that blocks a clinic. Otherwise this is it.
+> priya: Okay, I am going to use it for the last screenshots then.

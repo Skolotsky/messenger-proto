@@ -1,0 +1,16 @@
+=== early
+omar: Cloud bill for October came in 11 percent over. Mostly the staging database, which someone sized for a very optimistic future.
+> felix: That was me. Scaling it down tonight.
+
+=== mid
+paula: Launch day lunch is ordered for 34 people.
+> anna: Thank you. Make it 36, two contractors are in.
+
+=== mid
+omar: Contract renewal for the SMS provider is due in December. Felix, are we happy with them, or should I shop around?
+> felix: Happy enough, but the outage last week makes me want a second provider as a fallback.
+> omar: I will get a quote.
+
+=== late
+paula: New laptop for Noor arrives Wednesday. If anyone has a spare monitor stand, she has been using a stack of old manuals.
+> marco: There is one under my desk. Take it.

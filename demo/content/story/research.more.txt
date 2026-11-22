@@ -1,0 +1,26 @@
+=== early
+ruth: Can I join the Dunmarrow interview? They know me, and I think they will be more honest with a familiar face in the room.
+> theo: Please do, but let me ask the questions. If you jump in to help them, we learn less.
+> ruth: Hands on my knees, I promise.
+
+=== early
+zoe: One receptionist keeps a sticky note on her monitor that says "Tues = Dr. P late". Every clinic has these. It is a whole shadow system of little facts about people.
+> lena: Could those be notes on the day itself?
+> maya: That is a very good 2.1 idea. Write it up.
+
+=== mid
+noor: Cross-checked the survey against actual usage. People who say they "use reports weekly" open them about once a month. I would trust the logs over the survey.
+> dele: Always.
+
+=== mid
+theo: Recruiting for the post-launch study. I want three clinics that upgraded on day one and three that held off, so we hear from both.
+> ruth: I can get you the second group. They are the ones who call me.
+
+=== mid
+lena: Reading the transcripts, the word that keeps coming up is "trust". Not speed, not features. "I don't trust it yet" is what stops people switching off paper.
+> maya: That reframes the whole onboarding for me. {+💯 lena,zoe}
+
+=== late
+dele: What should we measure in the post-launch study that we can't get from the product data?
+> theo: Whether they stopped printing. You can't see that from here.
+> dele: Fair. Good one.

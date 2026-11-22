@@ -1,0 +1,39 @@
+=== early
+camila: The month view renders 42 cells and each of them subscribes to the whole appointment store. That would explain the fan noise.
+> ines: Selectors per cell?
+> camila: Yes. Trying it this afternoon.
+> camila: From 310 ms per update to 14. {+🎉 ines,marco}
+
+=== early
+ines: Who wrote the comment "do not touch, it works and nobody knows why" in the drag code?
+> marco: That was me in 2023. I stand by it.
+> ines: I am touching it.
+
+=== early
+zoe: Can the strings in the app live in one file, so I can edit copy without asking anyone?
+> ines: They mostly do. There are about 60 stragglers.
+> camila: I will sweep them up this week. {edit: I will sweep them up this week. After that Zoe can change any label without a pull request from us.}
+
+=== mid
+theo: The sidebar collapses at 1100 px, but at exactly 1100 it does both. Try it, it's a little bit magical.
+> ines: Off-by-one in the media query. Fixed, and I am sorry you saw that.
+
+=== mid
+yuki: Frontend folks: the undo toast disappears after 3 seconds, which is too quick when you have a patient at the desk.
+> ines: 8 seconds, and it stays while you hover it.
+> yuki: Perfect.
+
+=== mid
+camila: We are finally off the old router. 2,000 lines deleted. If a link is broken, tell me, but please do it nicely. {+🚀 ines,marco,theo}
+
+=== mid
+lena: The focus ring on the appointment card is clipped by the column when it is on the far right. Tiny, but it's the kind of thing keyboard users hit all day.
+> ines: Good catch. Fixed with an inset ring.
+
+=== d15
+ines: The freeze list for frontend is down to two small things, both in review.
+> marco: Thank you. Remember to go home.
+
+=== late
+camila: Ran the whole app with the network throttled to clinic Wi-Fi. Everything works, the calendar takes 2.1 s on a cold start. I would like that lower, but it is not a launch problem.
+> marco: Agreed. Put it on the list for after.

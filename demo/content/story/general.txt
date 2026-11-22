@@ -1,0 +1,32 @@
+=== early
+anna: Good morning everyone. All-hands on Friday at 16:00 as usual. Short one this time: what is left before launch, and then drinks. {+🎉 paula,hana,priya,owen}
+
+=== early
+paula: Welcome to Mateo's first anniversary at Larkmere today. Cake at 15:00 in the kitchen, and yes it is the lemon one. {+🎉 sam,greta,sofia,anna,marco}
+> mateo: You remembered the lemon one.
+> greta: You mentioned it roughly every week for a year.
+
+=== early
+paula: The heating on the second floor is being looked at on Wednesday morning. Bring a jumper, or come sit with sales, who run hot.
+> owen: We do not run hot, we are passionate.
+
+=== early
+omar: Expense reports for October are due by Friday. If yours is still a pile of receipts in your bag, this is your sign.
+> kofi: How did you know about the bag?
+
+=== d11
+anna: All-hands recap for those who missed it: launch is on track, Kilbrennan signed, and we are hiring two more people in support after the new year. Slides are in the shared drive. {+👏 sam,greta,mateo}
+
+=== mid
+paula: Office closes at 15:00 on Friday for the fire safety inspection. Please take your laptops with you.
+
+=== mid
+hana: Is anyone going to the frontend meetup on Thursday? I have a spare ticket.
+> camila: Me, if that spare ticket is for me.
+> hana: It is now.
+
+=== late
+paula: Thursday logistics: breakfast from 08:30, launch call at 09:00 in the big room, lunch at 12:30. If you are remote, the link is in the calendar invite. {+🙏 anna,priya,sam}
+
+=== late
+anna: One ask for launch week: be kind to each other. Everyone is tired and everything feels urgent, and most of it can wait ten minutes. {+❤️ maya,paula,lena,sam,greta,hana,marco}

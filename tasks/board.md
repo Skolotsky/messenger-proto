@@ -8,7 +8,6 @@ Work in flight. Order inside a section is priority. Finished work moves to `done
 
 - **T-047** `implement` Wave 1 · Delivery workers (G-012, G-014, G-023, G-026, G-029). Needs T-045
 - **T-050** `implement` Wave 1 · Web app: the frame, the look, a conversation, against the mock door. Needs T-045
-- **T-051** `implement` Wave 1 · The seeded organization as data, with D-010's situations. Needs T-045
 
 
 ## Waiting on user

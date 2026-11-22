@@ -1,0 +1,48 @@
+=== early
+leila: Test data question: are we allowed to use real clinic names in staging, or should everything be fake?
+> yuki: Always fake. I generate them. Yes, I know "Dr. Testington" is on four of your screenshots.
+
+=== early
+yuki: New rule of thumb for bug reports: steps, what you expected, what happened, which build. If it's missing one of those I will send it back with love.
+> camila: With love is doing a lot in that sentence.
+
+=== early
+hana: Is there a way to run the mobile smoke test without a physical device?
+> leila: The emulator job in CI does most of it. Push notifications are the one thing that needs a real phone.
+
+=== early
+leila: Found a fun one: if you book an appointment at 23:45 for 30 minutes it ends on the next day and disappears from the day list.
+> tomas: Do clinics open at midnight?
+> leila: Vets do.
+> tomas: Fair enough, fixing it.
+
+=== mid
+yuki: Coverage of the recurring flows is at 94 percent of the cases we wrote. The remaining ones need the clock change, so I am faking the clock on staging tonight.
+> marco: Please tell people. Last time that happened half the team thought it was Sunday.
+> yuki: Posting it in #engineering now.
+
+=== mid
+camila: Does QA want the visual regression screenshots on every PR or only on the release branch?
+> leila: Every PR, but only for the calendar and the waiting list. Otherwise we will drown.
+
+=== mid
+leila: Retested the reminder fix with 20 forced restarts: zero duplicates, zero missing. I also tried it during a deploy, because I do not trust anyone.
+> tomas: That is why we like you. {+😂 leila,yuki,marco}
+
+=== mid
+kofi: The waiting list test on Android fails only on the device with the small screen, because the button is below the fold.
+> leila: So it's a real bug, not a test problem.
+> kofi: Yes, unfortunately. Moving the button.
+
+=== mid
+yuki: rc.4 has one blocker: printing the day list with more than 40 appointments loses the last page. Everything else is green. {edit: rc.4 has one blocker: printing the day list with more than 40 appointments loses the last page. Inès has a fix. Everything else is green.}
+> ines: Fix is merged, should be in the next build.
+
+=== d15
+leila: Overnight run on rc.6: 248 cases, 248 passed, including the replay of last Monday's traffic.
+> yuki: I am going to frame this.
+> marco: Print it out. We can look at it during the rollback we won't need.
+
+=== late
+yuki: QA sign-off for 2.0 is written. It lists what we tested, what we did not, and the three known issues with their workarounds. Marco and Maya have it.
+> marco: Thank you. That list is exactly what I wanted to read.

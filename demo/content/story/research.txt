@@ -1,0 +1,22 @@
+=== early
+dele: Interview notes from the six pilot clinics are in the shared folder.
+> lena: Reading them before the empty-state work.
+> maya: The note on double bookings is worth a ticket.
+
+=== early
+theo: For the next round of sessions, can we recruit at least one clinic that has never used scheduling software? All of ours are switching from something.
+> ruth: Dunmarrow were on paper until last month. I can ask them.
+
+=== mid
+noor: Survey is back: 124 responses from 61 clinics. The top request is not a feature, it is "tell us when something changes".
+> zoe: So release notes that are written for receptionists.
+> maya: That is cheap and I want it for 2.0.
+
+=== mid
+zoe: Asked five receptionists what they would call the button that offers a free slot to the next person. Five different answers, and none of them was what we had.
+> lena: What was the closest?
+> zoe: "Offer it". I think that is just right.
+
+=== late
+theo: Summary of the waiting list sessions is in the folder. Short version: people get it the moment they see one real example, and not before. So the empty state matters more than the feature page.
+> maya: That fits what we did. Thanks for closing the loop.

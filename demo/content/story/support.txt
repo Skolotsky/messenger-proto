@@ -1,0 +1,65 @@
+=== early
+sam: Reminder for everyone on the queue: if a clinic is angry, phone them. Writing a longer email has never once made it better.
+> greta: Learned that one the hard way in my first month.
+
+=== early
+greta: Tallowbrook can't see their Friday. Calendar shows empty, but the appointments exist. Anyone seen this before?
+> mateo: Is their browser zoomed? We had this last month with someone at 150 percent.
+> greta: It was the browser scale. I am never going to stop being amazed. {+😂 mateo,sam}
+
+=== early
+mateo: A lovely one from Wexhollow Dental: "your reminders cut our no-shows by a third, please thank whoever built them." Forwarding to engineering. {+❤️ sam,greta,tomas,maya}
+> tomas: Printing this and putting it on the wall.
+
+=== early
+sam: We are getting asked about the 2.0 price by people who have heard rumours. The line for now is: "Your current plan stays as it is, we will tell you about any change well in advance."
+> jonas: That is accurate.
+> ruth: I will use the same words with the pilots.
+
+=== early
+greta: Is there a way to see who changed an appointment? Hethersett had a dispute between two receptionists.
+> tomas: Not in the app yet. I can look it up in the logs if it is serious.
+> greta: It is serious to them.
+> tomas: Send me the appointment ID. {edit: Send me the appointment ID and the day. The audit trail is coming in 2.0.1, so this should be the last time it needs me.}
+
+=== early
+mateo: Macro request: "How do I add a part-time staff member?" I have typed this answer eleven times this week.
+> sam: Added. Also flagged it to Maya as a product problem.
+
+=== mid
+sam: Ticket count is up 18 percent this week, nearly all from clinics in the beta. That is expected, but I am moving Sofia onto the queue for the afternoons.
+> sofia: Fine by me. It helps to hear what the pilots are hitting anyway.
+
+=== mid
+greta: Penhallow says reminders went out at the wrong hour after the clock change. Is this the bug we fixed or a new one?
+> tomas: Which day? If it is before the 4th it is the old one.
+> greta: It was the 2nd.
+> tomas: Old one. Tell them it is fixed and I am sorry.
+
+=== mid
+mateo: Someone at Cobbleford asked if we can bring back the old green colour. I said I would pass it on. Consider it passed on.
+> sam: Thank you for your service.
+
+=== mid
+yuki: Support folks, if you see a report that a waiting list offer went to the wrong patient, I want it right away, whatever the time. It is the one bug I would stop the release for.
+> sam: Understood. It goes to the top of the queue and to you directly.
+
+=== mid
+sofia: Orrinvale's office manager is overwhelmed by the change to the navigation in the beta. I offered a 20-minute walk-through. Could be worth doing this for all the bigger accounts before launch.
+> ruth: Yes. I can split the list with you.
+> sam: Please do, that will save us a lot of tickets on launch day.
+
+=== mid
+marco: For support: the reminder retry fix is in the next build. If a clinic reports a missing reminder after Tuesday, send it to us, it should no longer happen silently.
+> sam: Good to know. I will update the macro.
+
+=== d14
+sam: Launch day notes doc is open. If you hear the same question twice, it goes in there, and Zoe and I will turn the top ones into articles the same day.
+> greta: Already added two from today.
+
+=== late
+mateo: Marrowgate called to say the new week view is "actually quite nice". Coming from them, that is a standing ovation. {+🎉 sam,greta,ruth}
+
+=== late
+greta: Quiet morning so far. I do not trust it.
+> sam: Never say that out loud on a Tuesday.

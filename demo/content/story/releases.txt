@@ -1,0 +1,21 @@
+=== early
+marco: Process note for this channel: Deployer posts every build here. If it stops and asks for something, whoever it names answers. Nobody else needs to do anything.
+
+=== early
+yuki: 1.9.4 is verified on all three browsers.
+> marco: Shipping it at 16:00.
+> ship: 1.9.4 is live. No errors in the first 500 sessions.
+
+=== mid
+yuki: QA is ready for the first release candidate as soon as Deployer posts it.
+> kofi: Ping me for anything on Android 12.
+> ines: And me for the older tablets.
+
+=== mid
+priya: Non-engineer question: when it says "on staging", can I show that to a customer yet?
+> marco: Not yet. Staging is where we try to break it. I will say here when something is safe to show.
+> priya: Understood, thanks. {+👍 marco}
+
+=== late
+marco: From here on, nothing goes to production without Yuki's go. Deployer is set to stop and ask.
+> yuki: I accept this terrifying responsibility.

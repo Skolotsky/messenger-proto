@@ -1,0 +1,107 @@
+=== early
+nadia: Does anyone remember why the reminder worker has its own copy of the phone number formatter?
+> tomas: Historical accident. It was written the week before the shared one existed.
+> nadia: Can I delete it?
+> tomas: With joy.
+
+=== early
+camila: PSA: if you run the frontend tests with the old node version you get a wall of warnings that look like failures. They are not. Upgrade anyway.
+> ines: I lost half an hour to this yesterday. {+😅 ines,hana}
+
+=== early
+arjun: Is the staging SMS gateway actually sending real texts? I just got a reminder for a dentist appointment that does not exist.
+> felix: It should be going to the sink.
+> arjun: It did not go to the sink.
+> felix: Oh no. Checking the config right now.
+> felix: Fixed. It was only your number, because you are in the test fixture from 2024. {+😂 arjun,nadia,tomas,bram}
+
+=== early
+hana: I am rewriting the offline banner on the tablet layout. Today it says "No connection" and then does nothing. It should say what still works.
+> lena: Yes. "You can still see today's appointments. Changes will save when you are back online."
+> hana: Stealing that word for word.
+
+=== early
+bram: Rotated the database credentials for staging. If something of yours suddenly can't connect, grab the new ones from the vault.
+> arjun: Done, thanks for the warning.
+
+=== early
+tomas: Note to self and to everyone: "appointment.status" has seven values and two of them mean cancelled. I would like us not to add an eighth.
+> marco: Write down which two and why, please, while you still remember. {edit: Write down which two and why, please, while you still remember. It belongs in the data model doc.}
+> tomas: Done. One is cancelled by the clinic, the other by the patient, and reports treat them differently.
+
+=== early
+ines: The date picker now works with a keyboard from start to finish. Arrow keys, page up for months, escape to close. {+🎉 camila,lena,yuki}
+> yuki: Tested it with a screen reader as well, it announces the day properly.
+
+=== early
+felix: Someone left a debug log on in the booking service and it is writing 4 GB a day. Not naming names. {delete}
+
+=== early
+felix: The booking service is writing 4 GB of debug logs a day. Turning it off in config, no redeploy needed.
+> tomas: That was me, sorry. Forgot to take it out after the conflict work.
+> felix: Happens. Fixed now.
+
+=== mid
+marco: One thing I would like us to do better after launch is write down the reasons for technical choices at the time, not six months later when someone asks.
+> nadia: A short decision note in the repo?
+> marco: Exactly that. Ten lines, no ceremony.
+
+=== mid
+arjun: The import wizard chokes on files with Windows line endings. Fix is one line, but the test is the interesting part because our fixtures all came from one laptop.
+> leila: I have a folder of horrible real-world CSVs if you want them.
+> arjun: I want them very much.
+
+=== mid
+kofi: Tablet layout question: when the sidebar is open the week view has about 620 px. Do we squash it or auto-collapse the sidebar?
+> ines: Auto-collapse. That is what we do on the web at that width.
+> kofi: Consistent, good.
+
+=== mid
+nadia: Reminder backfill finished at 04:12. 1.2 million rows, peak replication lag 3 seconds, nothing paged anybody. {+🎉 felix,marco,arjun}
+
+=== mid
+camila: We have 14 places that format a phone number. I counted. I would like to go and lie down.
+> tomas: After the freeze we make it one.
+> camila: Filing it with the title "fourteen".
+
+=== mid
+felix: Reminder that the primary gets a minor version upgrade on Sunday at 06:00, expected downtime under a minute. Support has been told.
+> bram: I will be up, the dog sees to that.
+
+=== mid
+tomas: Can someone with fresh eyes look at the "this and following" query? I have been staring at it long enough that it has started to look correct.
+> nadia: Sending me that is a threat, but fine.
+> nadia: Found it. It includes the appointment before the split when the times are equal.
+> tomas: I owe you a coffee. {edit: I owe you a coffee, and a test case with exactly that shape.}
+
+=== mid
+yuki: Please stop merging on Friday afternoons without telling QA. I found out about two changes from the build log.
+> marco: Fair. From now on anything merged after 15:00 on a Friday gets posted here.
+
+=== mid
+ines: Does the calendar need to support 15-minute slots on the phone view, or just on desktop?
+> lena: Both. Dentists book 15 minutes all the time.
+> ines: Then I need a different gesture for short appointments. Give me a day.
+
+=== mid
+hana: Crash reports are down 60 percent since the token fix. The remaining ones are nearly all one old device model.
+> kofi: Fine by me to leave that device alone until after launch.
+
+=== late
+arjun: Rate limit on the public booking page is on: 60 per minute per address, with a friendly message. A real clinic would need to try quite hard to hit it.
+> felix: Good. I will keep an eye on the logs Thursday in case a clinic's shared network trips it.
+
+=== late
+nadia: I would like one person besides me to know how the reminder dedupe works before launch. Thirty minutes today?
+> arjun: Me. After lunch.
+
+=== late
+camila: Last known visual bug in the waiting list: the count badge overlaps the icon at 200 percent browser scale. Fixing it now, because of course someone will do that.
+> lena: Someone at Marrowgate definitely will.
+
+=== late
+bram: Launch day dashboards are on the big screen in the corner. If you walk past and something is red, please tell a human rather than assuming we know.
+> marco: Good rule. Applies to all of us.
+
+=== late
+tomas: I ran the Monday-morning replay against the release branch. No conflicts, no lost saves, median save 42 ms. {+🚀 marco,nadia,yuki}

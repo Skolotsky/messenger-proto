@@ -1,0 +1,46 @@
+=== early
+owen: How firm is the 15 percent cap on discounts? Cobbleford wants 20 for a two-year term.
+> jonas: Firm, unless Anna agrees. Offer the extra implementation help instead, it costs us less.
+> owen: Good idea, trying that.
+> owen: They took it.
+
+=== early
+sofia: Which is better for a renewal conversation, starting with usage numbers or starting with what they asked for last year?
+> ruth: What they asked for. Then show you did it. The numbers are the proof, not the opener.
+
+=== early
+jonas: Who wants to sit in on a discovery call on Wednesday? It is a six-location dental group, good practice for anyone who has not heard one.
+> sofia: Me, please.
+> priya: Can I listen in too? I never get to hear how they actually describe the problem.
+> jonas: Both welcome. Mute and take notes.
+
+=== mid
+priya: From the discovery call: she never once said "scheduling". She said "the phone" about twelve times. Our whole page is about calendars and her problem is the phone.
+> jonas: That is the most useful thing anyone has said this month.
+> anna: Put it in the launch messaging.
+
+=== mid
+owen: Dunmarrow's trial is going well. 11 practitioners, all using it daily, and they have stopped keeping the paper diary as of Monday.
+> jonas: That is the moment. Send the proposal this week.
+
+=== mid
+omar: Can sales please stop promising invoices per location "from next month"? It is January, and I would like to keep being able to look people in the eye.
+> jonas: Understood. January it is. I will tell the team.
+> owen: That was probably me. Sorry, Omar. {edit: That was probably me. Sorry, Omar. I have corrected it with the two clinics I said it to.}
+
+=== mid
+sofia: A clinic asked for a reference from someone their size. Who is happy to take a call?
+> ruth: Quillfield's owner has offered before.
+> sofia: Perfect, I will ask her first.
+
+=== late
+jonas: Numbers for the month so far: 9 new clinics, 2 lost, and Kilbrennan on top. Best November we have had by some distance. {+🎉 anna,owen,omar,ruth}
+
+=== late
+owen: Do we have a line for "why should I switch right now, just before your big release"?
+> jonas: "You get the new version on day one, with us doing the move."
+> owen: That is better than what I was saying.
+
+=== late
+ruth: Dunmarrow signed. 11 practitioners, 12 months, starting in December. Owen, that was patient work. {+🎉 jonas,owen,anna,sofia}
+> owen: Thanks. It helped that the product did the convincing.

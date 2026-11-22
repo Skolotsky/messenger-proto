@@ -1,0 +1,22 @@
+=== early
+tomas: Migration 0412 adds the location index. Dry run took 41 seconds on a copy of prod.
+> marco: Run it before the freeze.
+
+=== early
+arjun: Who owns the rate limit on the public booking page? Someone hit it with a script last night, 900 requests a minute.
+> felix: Nobody, so now it is you.
+> arjun: Fair.
+
+=== mid
+nadia: Reminder dedupe table is live. A worker restart in the middle of a batch no longer sends anything twice, tested by killing it 20 times.
+> marco: That is the kind of sentence I like reading. {+🎉 tomas,arjun,felix}
+
+=== mid
+tomas: Can someone sanity-check my reasoning on the clock change? We store UTC plus the clinic's zone, and expand recurring slots in local time.
+> arjun: Yes, that is the right way round.
+> nadia: Only remember the hour that happens twice in October.
+> tomas: I handled it. The first one wins.
+
+=== late
+bram: Connection pool settings for launch are in the config repo. Nothing exotic, just more headroom on the primary for the morning peak.
+> felix: Looks right.

@@ -1,0 +1,98 @@
+=== early
+marco: Week plan: backend finishes recurring appointments, frontend picks up the waiting list, mobile is in bug-fix mode. If you are about to start something that is not on that list, talk to me first.
+> nadia: The audit trail for edits is not on the list. Is that deliberate?
+> marco: It is in 2.0.1. Sorry, I should have said.
+
+=== early
+tomas: Anyone object to splitting the appointments table's notes column into its own table? It is 60 percent of the row size and nobody queries it in the calendar.
+> arjun: No objection, but do it after the freeze. It is the kind of change that looks harmless.
+> tomas: Fair. Filed for December.
+
+=== early
+nadia: Found out why the reminder worker sometimes sends twice: it marks the job done after sending, and a restart in between replays it. Writing a fix that remembers what it already sent.
+> marco: Good catch. Does it need a migration?
+> nadia: One small table.
+> felix: Please make it so that a restart during a deploy is boring. {+😂 nadia,arjun}
+
+=== early
+felix: The staging database got upgraded to match production last night. If your local fixtures suddenly complain about collations, that is why.
+> camila: So that is what broke my tests this morning.
+> felix: Sorry. Pull main, I added a note to the setup doc.
+
+=== early
+arjun: Proposal: every background job gets a maximum run time, and exceeding it is an alert, not a silent hang. We had one export job running for nine hours last week.
+> bram: Yes please. I was the one who found it.
+> marco: Agreed, make it a default in the job runner so nobody can forget.
+
+=== early
+ines: Small thing: can we stop importing the entire date library for one format call? It is 40 kB of the calendar bundle.
+> camila: I will take it. There is a tiny formatter in utils already. {+🙌 ines}
+
+=== early
+kofi: Reminder that anything needing a mobile store review has to be ready by the 12th. Store review times are not something I can negotiate with.
+> hana: We have two builds in the queue already, the last one is the notification permission fix.
+
+=== early
+marco: Code review etiquette, again, gently: if you are blocked waiting on a review for more than half a day, say so in here. I would rather be nagged than find out at standup. {+👍 tomas,nadia,camila}
+
+=== early
+bram: I moved the nightly backups to 02:30 so they stop overlapping with the reminder batch. Nothing should change for anyone, but if something looks odd around 03:00, it is me.
+
+=== mid
+marco: Freeze is Monday 18:00. Please look at your open PRs today and decide which ones are actually going to make it. Closing one is a perfectly good outcome.
+> tomas: Closed two of mine.
+> arjun: One left, it is the reminder retry.
+> ines: Three, all small.
+
+=== mid
+tomas: The booking conflict check now holds under concurrent saves. I ran it with 200 parallel writers against one slot and exactly one booking won every time. {+🎉 marco,nadia,felix,yuki}
+> yuki: Can I have that script for the regression suite?
+> tomas: It is in tools/race-booking.
+
+=== mid
+felix: Load test result for the Monday peak: we hold 3x the real traffic with p95 under 400 ms. Past that the connection pool is the limit, which is where I expected it.
+> marco: What would you change before launch?
+> felix: Nothing. After launch, a pooler in front of the primary.
+
+=== mid
+camila: The calendar re-renders the whole week on every drag frame. Fixing it took the drag from 18 fps to a smooth 60 on the clinic-grade laptops we keep for testing.
+> lena: I can feel the difference. It used to feel like dragging a sofa.
+
+=== mid
+nadia: Heads up: the new reminder table needs a backfill, about 1.2 million rows. It runs in small batches and pauses when the primary is busy. Expect it to take most of tonight.
+> felix: I will watch it. Ping me if you see replication lag go past a few seconds.
+
+=== mid
+hana: Mobile logout bug: the token refresh raced with app start. Only happens if the app was killed for more than 12 hours, which is why nobody on the team ever saw it.
+> kofi: That explains the angry reviews from the people who only open it on Mondays.
+
+=== mid
+arjun: Reminder retries are merged. Backoff is 1, 2, 4 minutes up to an hour, and a message that keeps failing lands in the parked list where support can see it. {+👍 marco,nadia,felix}
+> maya: Support can see it where?
+> arjun: In the admin screen, under Reminders. Sam asked for it.
+
+=== mid
+leila: The flaky calendar test on the slower browser is not flaky. It finds a real bug about one run in ten when a drag ends exactly on a day boundary.
+> ines: Oh no.
+> ines: Oh that is a good one. Fix is two lines. {+😂 leila,camila}
+
+=== mid
+marco: Who is on call over the launch weekend? I have Felix Thursday and Friday. I need a second name for Saturday and Sunday.
+> bram: I will take it. Felix owes me one anyway.
+> felix: I do.
+
+=== d15
+marco: We are frozen. From now on the only things going into the release branch are fixes for the list in #launch, and each one needs a second pair of eyes. {+👍 tomas,ines,arjun,nadia,kofi}
+
+=== d15
+tomas: Found a slow query in the waiting list view: it was scanning every appointment for the location. An index on status and slot time takes it from 900 ms to 6.
+> marco: Is that going into the release or waiting?
+> tomas: It is a safe additive index. I would like it in. Yuki?
+> yuki: Yes, if it is built concurrently.
+
+=== late
+ines: Last call on UI bugs for 2.0. After tomorrow noon they go to 2.0.1 unless a clinic cannot work without the fix.
+
+=== late
+felix: Added a runbook for launch day: how to roll back, who to call, what to check first. It is short on purpose. Please read it even if you think you will not need it.
+> bram: Read it. One thing, the rollback command needs the release tag, I added an example.

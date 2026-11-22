@@ -1,0 +1,20 @@
+=== early
+ruth: Orrinvale renewed for 12 months, 9 locations.
+> jonas: That is our biggest account now.
+> anna: Well done, both of you.
+
+=== early
+sam: Cobbleford asked for an invoice per location.
+> omar: Possible from January. I will write to them.
+
+=== mid
+sofia: Walkthroughs booked with the seven largest accounts before launch. Four done, nobody has asked to go back to the old navigation so far.
+> ruth: Penhallow nearly did, then they found the waiting list.
+
+=== mid
+ruth: Tallowbrook's second location goes live on the 1st. They want the same setup copied across rather than configuring it all again.
+> sam: We can do that by hand for now. I will note it as a feature request.
+
+=== late
+sofia: Sent the "what changes on Thursday" note to all pilot clinics. Three replies so far, all some version of "thanks for telling us".
+> ruth: That is the reaction you want.

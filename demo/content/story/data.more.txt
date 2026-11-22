@@ -1,0 +1,39 @@
+=== early
+anna: Could I get one chart that shows whether clinics stay? Not a table. I want to be able to read it in a board meeting without my glasses.
+> dele: Retention by signup month, one line per cohort. You will have it Thursday.
+> anna: Bless you.
+
+=== early
+noor: The funnel from trial to paid has a strange dip for clinics that sign up on a Friday. Before anyone gets excited, I think it is just that nobody follows up until Monday.
+> jonas: That is not nothing. Owen and I can make Friday signups a Monday-morning call.
+> noor: Then we will find out if the dip goes away.
+
+=== early
+dele: Moving the reporting queries off the primary this week. If a dashboard looks a few minutes stale, that is the replica and it is on purpose.
+> marco: Thank you. This is the thing that bit Felix last week.
+
+=== mid
+omar: Revenue per location is up 6 percent since August. Is that real, or is it the two clinics that merged?
+> dele: About half of it is the merge. The honest number is closer to 3.
+> omar: Thank you for saying that before I put it on a slide.
+
+=== mid
+maya: What share of cancelled slots gets rebooked within a day, with and without the waiting list?
+> noor: With: 46 percent. Without: 11. I would not quote the first number outside the company yet, the sample is small.
+> maya: Understood. Internal only.
+
+=== mid
+noor: Fixed the timezone bug in the weekly report. Everything was off by one day for clinics east of us, which nobody noticed because it only moved the bars slightly.
+> dele: Those are the worst kind. Thank you. {+🙏 dele,omar}
+
+=== mid
+jonas: How many clinics are on the old plan and renew in the next 90 days? Trying to plan the conversations.
+> dele: 38. I am sending you the list sorted by renewal date.
+
+=== late
+dele: I checked the launch dashboard against the raw tables by hand. Sign-ups, activations and reminders all match to the row.
+> noor: Same result on my side. We are good.
+
+=== late
+anna: What will you be looking at first on Thursday morning?
+> dele: Whether reminders went out at 07:00. Everything else can wait until that is true.
