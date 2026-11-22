@@ -27,6 +27,7 @@ func (s *Store) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /orgs/{org}/seed/{session}/seal", s.handleSeedSeal)
 	mux.HandleFunc("POST /orgs/{org}/retire", s.handleRetire)
 	mux.HandleFunc("DELETE /orgs/{org}", s.handleDelete)
+	s.agentRoutes(mux)
 }
 
 func send(w http.ResponseWriter, status int, v any) {

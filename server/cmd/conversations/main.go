@@ -13,6 +13,8 @@ import (
 	"contexia/internal/shared/orgdb"
 	"contexia/internal/shared/part"
 	"contexia/migrations"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
@@ -29,5 +31,6 @@ func main() {
 	store := &conversations.Store{Dir: db, Clock: clock.Default()}
 	mux := http.NewServeMux()
 	store.Routes(mux)
+	go store.RunAgentHousekeeping(ctx, []*pgxpool.Pool{db.Pool})
 	part.Serve("conversations", mux)
 }

@@ -118,7 +118,10 @@ func loadPeople(ctx context.Context, tx pgx.Tx, org ids.Org, where string, args 
 		}
 		out = append(out, p)
 	}
-	return out, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return out, withAgentStatus(ctx, tx, org, out)
 }
 
 // People is the operators' list of everyone in the organization.
@@ -325,7 +328,10 @@ func (s *Store) Messages(ctx context.Context, org ids.Org, q MessagesQuery) (con
 				}
 			}
 		}
-		out.Messages, err = withSummaries(ctx, tx, org, page, q.As, channelAt)
+		if out.Messages, err = withSummaries(ctx, tx, org, page, q.As, channelAt); err != nil {
+			return err
+		}
+		out.InProgress, err = s.agentInProgress(ctx, tx, org, q.Conversation, q.Thread)
 		return err
 	})
 	return out, err

@@ -30,6 +30,8 @@ var ErrUnknownOrg = errors.New("unknown organization")
 type Store struct {
 	Dir   orgdb.Directory
 	Clock clock.Clock
+
+	agents agentDoor // the agent door's memory (T-054)
 }
 
 // Step is one saving transaction: it holds the organization's log row, so
@@ -44,12 +46,14 @@ type Step struct {
 	wrote   bool
 	nonTick bool
 	noTick  bool
+
+	agentBecauseOf *int64 // the agent's event this post answers (T-054)
 }
 
 // Save runs fn as one step of the organization's log. An error from fn rolls
 // back everything it wrote.
 func (s *Store) Save(ctx context.Context, org ids.Org, fn func(*Step) error) error {
-	return orgdb.InOrg(ctx, s.Dir, org, func(tx pgx.Tx) error {
+	err := orgdb.InOrg(ctx, s.Dir, org, func(tx pgx.Tx) error {
 		step, err := s.open(ctx, tx, org)
 		if err != nil {
 			return err
@@ -59,6 +63,10 @@ func (s *Store) Save(ctx context.Context, org ids.Org, fn func(*Step) error) err
 		}
 		return step.finish()
 	})
+	if err == nil {
+		s.agents.wake(org) // an agent waiting for events asks again
+	}
+	return err
 }
 
 func (s *Store) open(ctx context.Context, tx pgx.Tx, org ids.Org) (*Step, error) {
@@ -141,6 +149,9 @@ func (s *Step) Append(change any) (int64, error) {
 	}
 	if err := s.project(change, number); err != nil {
 		return 0, err
+	}
+	if err := s.tellAgents(change); err != nil {
+		return 0, fmt.Errorf("tell agents: %w", err)
 	}
 	s.head = number
 	s.wrote = true
