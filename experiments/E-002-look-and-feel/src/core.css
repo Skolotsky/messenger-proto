@@ -256,3 +256,11 @@ h1,h2,h3,p{margin:0}
 .row-btns{display:flex;gap:4px}
 .open-btn{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--muted);text-align:center;font-size:14px;line-height:1}
 .open-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+/* row actions: one small joined toolbar, drawn icons */
+.row-btns{gap:0;border:1px solid var(--line);border-radius:8px;background:var(--panel);overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.row-btns .mark-read,.row-btns .open-btn{width:32px;height:28px;border:0;border-radius:0;background:none;color:var(--muted);display:grid;place-items:center;opacity:1}
+.row-btns .mark-read{border-right:1px solid var(--line)}
+.row-btns .ic{width:17px;height:17px}
+.row-btns button:hover{background:var(--accent-soft);color:var(--accent)}
+@media (hover:hover) and (min-width:761px){.row-btns{opacity:0;transition:opacity .12s}.row-main:hover .row-btns,.row-btns:focus-within,.row.expanded .row-btns{opacity:1}}
+@media (max-width:760px){.row-btns .mark-read,.row-btns .open-btn{width:38px;height:34px}}
