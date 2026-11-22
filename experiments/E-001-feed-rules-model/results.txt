@@ -1,0 +1,319 @@
+ok   A person sends you a direct message
+       -> Focus/new   [D-001 starting rules]
+ok   An agent sends you a direct message, no flag
+       -> Needs you   [R04]
+ok   Someone mentions you in a channel
+       -> Needs you   [D-001 starting rules]
+ok   Someone mentions the whole channel
+       -> FYI   [D-001 starting rules]
+ok   Ordinary channel traffic not addressed to you
+       -> nothing   [D-001]
+ok   A courtesy mention marked Info
+       -> FYI   [D-001 Info]
+ok   A person flags a message that mentions you
+       -> Focus/new   [D-001 flags]
+ok   …you read it: it stays, because reading does not close a flag
+       -> Focus/waiting   [D-003 + R17]
+ok   …you reply: the flag closes and the row leaves
+       -> Earlier   [D-003]
+ok   A flag names two people; the other one reacts: still open for you
+       -> Focus/new   [D-001 each responds for themselves]
+ok   …and closed for them
+       -> {'you'}   [D-001]
+ok   An agent flags a message that names nobody: channel members get it in Needs you
+       -> Needs you   [D-001 flags]
+ok   …a person outside the channel gets nothing
+       -> nothing   [D-001 + R22]
+ok   …someone answers: it leaves the feed of a person who had not read it
+       -> nothing   [D-003]
+ok   …and moves to Earlier for one who had
+       -> Earlier   [D-003]
+ok   A flag with only a whole-channel mention is treated as naming nobody
+       -> Needs you   [R03]
+ok   A flag that names nobody, read, never answered: it cannot leave
+       -> Needs you   [D-003 as written (see findings)]
+ok   A flag in a direct conversation is for the other person
+       -> Focus/new   [D-001 flags]
+ok   …any later message from you there answers it
+       -> Earlier   [R10]
+ok   An agent's reply is still streaming in
+       -> nothing   [D-001]
+ok   An agent posts a finished progress update (Info) in your thread
+       -> FYI   [D-001 Info]
+ok   The streamed reply finishes: a result in your thread
+       -> Needs you   [D-001 thread dial]
+ok   The agent stops for your approval and flags you
+       -> Focus/new   [D-001 flags]
+ok   …the whole thread is one row, sitting in the highest bucket any of its items earns
+       -> 1   [D-001 one row per conversation]
+ok   …you react to approve: the flag closes; the unread result keeps the row in Needs you
+       -> Needs you   [D-003 (observation: a row can move down a bucket)]
+ok   Your Info reply does not answer a flag
+       -> {'you'}   [R08]
+ok   A reply in a thread you started
+       -> Needs you   [D-001 thread dial]
+ok   A reply in someone else's thread you are not part of
+       -> nothing   [D-001 thread dial: Off]
+ok   …after you click Follow
+       -> FYI   [D-001 Follow]
+ok   A reply in your own thread after you turned it off
+       -> nothing   [D-001 Off]
+ok   …a reply there that mentions you still arrives
+       -> Needs you   [D-001 names you gets through]
+ok   …and the thread stays off
+       -> off   [D-001]
+ok   …you reply in it: the thread is back at Needs you
+       -> needs   [D-001]
+ok   A reply under a message that mentioned you
+       -> FYI   [D-001 thread dial: mentioned]
+ok   A reply in a thread you put in Focus
+       -> Focus/new   [D-001 thread in Focus]
+ok   …an Info reply there still lands no higher than FYI
+       -> 1   [D-001 Info]
+ok   #incidents at focus: a burst of six posts
+       -> Focus/new   [D-001 channel dial]
+ok   #incidents at focus: the burst is one row
+       -> 1   [D-001 one row per conversation]
+ok   #incidents at focus: a reply in a thread you are not part of
+       -> nothing   [D-001 channel in Focus]
+ok   #incidents at focus: a post that mentions you
+       -> Focus/new   [D-001 names you gets through]
+ok   #incidents at all: a burst of six posts
+       -> FYI   [D-001 channel dial]
+ok   #incidents at all: the burst is one row
+       -> 1   [D-001 one row per conversation]
+ok   #incidents at all: a reply in a thread you are not part of
+       -> nothing   [D-001 channel in Focus]
+ok   #incidents at all: a post that mentions you
+       -> Needs you   [D-001 names you gets through]
+ok   #incidents at default: a burst of six posts
+       -> nothing   [D-001 channel dial]
+ok   #incidents at default: a reply in a thread you are not part of
+       -> nothing   [D-001 channel in Focus]
+ok   #incidents at default: a post that mentions you
+       -> Needs you   [D-001 names you gets through]
+ok   #incidents at muted: a burst of six posts
+       -> nothing   [D-001 channel dial]
+ok   #incidents at muted: a reply in a thread you are not part of
+       -> nothing   [D-001 channel in Focus]
+ok   #incidents at muted: a post that mentions you
+       -> Needs you   [D-001 names you gets through]
+ok   Channel in Focus: a reply in your own thread there
+       -> Focus/new   [D-001 'everything addressed to you there']
+ok   …but you set that thread to For your information yourself: the thread wins
+       -> 1   [D-001 thread dial wins]
+ok   Muted channel: a reply in your own thread there
+       -> nothing   [D-001 Muted: only what names you (N01, see findings)]
+ok   Muted channel: a reply in a thread you followed by hand
+       -> FYI   [D-001 thread dial wins]
+ok   Muted channel: an Info message that mentions you
+       -> FYI   [R06]
+ok   Channel in Focus: an Info post there
+       -> FYI   [D-001 Info wins over Focus]
+ok   An edit adds a mention of you
+       -> Needs you   [D-004]
+ok   …a second edit removes it before you read it: no trace
+       -> nothing   [D-004 never seen]
+ok   An edit removes your mention after you read it: marker in Earlier
+       -> Earlier (marker)   [D-004 read earlier]
+ok   A text-only edit of a row you read does not make it unread
+       -> Earlier   [D-004]
+ok   A message that mentioned you is deleted before you saw it
+       -> nothing   [D-004 never seen]
+ok   …deleted while its row is on your screen: a marker in the same space
+       -> Earlier (marker)   [D-004 on screen]
+ok   …and the list on screen has not changed
+       -> {3: [], 2: [('th', 5)], 1: []}   [D-003 list does not move]
+ok   …after you move on it is gone
+       -> nothing   [D-004]
+ok   You keep a row
+       -> Focus/kept   [D-003 Keep]
+ok   …its message is deleted: the marker stays in Focus
+       -> Focus/kept (marker)   [D-004 kept]
+ok   …until you mark it done
+       -> Earlier (marker)   [D-004]
+ok   A flag for you is withdrawn before you read it
+       -> nothing   [D-004 decision: never seen, no marker]
+ok   A flag for you is withdrawn after you read it: the marker stays in Focus until done
+       -> Focus/waiting (marker)   [D-004 flagged]
+ok   A deleted message with replies leaves a marker in the conversation
+       -> 1   [D-004]
+ok   An edit removes Info from a message that mentions you: it moves up, quietly
+       -> Needs you   [D-004 current truth]
+ok   Three people react to your message: one grouped row
+       -> ('FYI', '3 reacted to your message')   [D-001 grouped reactions]
+ok   …one reaction is taken back: the count follows
+       -> 2 reacted to your message   [D-004]
+ok   …the last one goes before you saw the row: no trace
+       -> nothing   [D-004]
+ok   While the feed is open, a new mention does not change what is on screen
+       -> {3: [], 2: [('th', 1)], 1: []}   [D-003]
+ok   …it is announced as '1 new'
+       -> 1   [D-003]
+ok   A row you read is in Earlier on your next visit
+       -> Earlier   [D-003]
+ok   …and returns when something new happens in that conversation
+       -> FYI   [D-003 (the thread dial is 'mentioned', so FYI)]
+ok   You keep a row that came from another bucket: it lives in Focus
+       -> Focus/kept   [D-003]
+ok   …replying to it releases it
+       -> Earlier   [D-003]
+ok   With the suggested rule 'any direct mention' added
+       -> Focus/new   [D-001 suggested rule]
+ok   Before saving a rule for a person, the product can say how many items it would have pulled in
+       -> 5   [D-001 count before saving + R05]
+ok   A flag is withdrawn but the message still mentions you, after you read it: the row stays in Focus until done
+       -> Focus/waiting   [R24]
+ok   …and leaves when you mark it done
+       -> Earlier   [D-004]
+ok   Channel in Focus: a mention of you inside a thread you are not part of
+       -> Focus/new   [D-001 'everything addressed to you there']
+ok   Channel in Focus: a flag for everyone is answered by someone else; the post itself still belongs in Focus
+       -> Focus/new   [D-001 channel in Focus brings every new top-level message]
+ok   An answered flag for everyone gets a typo fix: it does not come back
+       -> nothing   [D-004 text-only edit]
+ok   You keep a channel row, then reply to a post in it: the row is released
+       -> Earlier   [D-003 reply releases a kept row]
+ok   You delete the message that started a thread; a later reply still reaches you
+       -> Needs you   [R27]
+ok   Muted channel, a thread you turned off, then you reply in it: the next reply arrives
+       -> Needs you   [D-001 replying sets it back to Needs you; the thread dial wins]
+ok   Someone reacts to a flag for everyone: it closes for everyone
+       -> False   [R29 (see findings)]
+ok   Channel at All activity: a post that mentions you
+       -> Needs you   [R26 (the record's wording is ambiguous, see findings)]
+
+92 of 92 cases behave as the decisions say
+invented behaviours exercised by the scenarios: R03, R04, R06, R07, R08, R10, R15, R22, R24, R26, R27, R29
+
+== base: the accepted rules
+   13466 messages, 35% by agents, 22365 events, invariant violations: 0
+   rows waiting when a person opens the feed (mean / p90 / max):
+     Focus, new                 0.5 /   2 /  10
+     Focus, waiting on you      0.7 /   1 /  17
+     Focus, kept                1.0 /   2 /   5
+     Needs you                  5.5 /  14 /  29
+     For your information       3.0 /   7 /  14
+   new rows per person per day: Focus 4.4 (from agents 0.2), Needs you 15.5 (from agents 2.0), FYI 17.8 (from agents 2.9); one single list: 37.7
+   Needs you at a visit, mean, as the run goes on: days 1-2: 3.3, days 5-6: 5.8, days 9-10: 7.2
+   open flags that name a person, never answered: 18
+   open flags that name nobody, never answered: 19
+   rows stuck in Needs you: read, flag for everyone still open (per person, mean): 4.4
+   kept rows (per person, mean): 1.1
+   markers left in conversations: 7
+
+== mentions start in Focus
+   13368 messages, 34% by agents, 22194 events, invariant violations: 0
+   rows waiting when a person opens the feed (mean / p90 / max):
+     Focus, new                 1.1 /   3 /  16
+     Focus, waiting on you      0.7 /   2 /  15
+     Focus, kept                0.9 /   2 /   6
+     Needs you                  5.2 /  14 /  25
+     For your information       2.8 /   6 /  14
+   new rows per person per day: Focus 7.1 (from agents 0.6), Needs you 13.4 (from agents 1.9), FYI 17.4 (from agents 2.9); one single list: 37.8
+   Needs you at a visit, mean, as the run goes on: days 1-2: 3.0, days 5-6: 5.1, days 9-10: 6.8
+   open flags that name a person, never answered: 21
+   open flags that name nobody, never answered: 17
+   rows stuck in Needs you: read, flag for everyone still open (per person, mean): 4.3
+   kept rows (per person, mean): 1.3
+   markers left in conversations: 4
+
+== agents do not use Info
+   13403 messages, 35% by agents, 22261 events, invariant violations: 0
+   rows waiting when a person opens the feed (mean / p90 / max):
+     Focus, new                 0.5 /   2 /  10
+     Focus, waiting on you      0.7 /   2 /  14
+     Focus, kept                0.9 /   2 /   6
+     Needs you                  5.3 /  13 /  28
+     For your information       2.6 /   6 /  15
+   new rows per person per day: Focus 4.8 (from agents 0.4), Needs you 18.6 (from agents 4.7), FYI 14.9 (from agents 0.0); one single list: 38.3
+   Needs you at a visit, mean, as the run goes on: days 1-2: 3.5, days 5-6: 5.2, days 9-10: 6.9
+   open flags that name a person, never answered: 21
+   open flags that name nobody, never answered: 17
+   rows stuck in Needs you: read, flag for everyone still open (per person, mean): 3.7
+   kept rows (per person, mean): 1.1
+   markers left in conversations: 4
+
+== a flag that names nobody leaves once read
+   13336 messages, 34% by agents, 22159 events, invariant violations: 0
+   rows waiting when a person opens the feed (mean / p90 / max):
+     Focus, new                 0.5 /   2 /  13
+     Focus, waiting on you      0.4 /   1 /   3
+     Focus, kept                0.8 /   2 /   4
+     Needs you                  3.2 /   7 /  18
+     For your information       2.8 /   7 /  15
+   new rows per person per day: Focus 4.3 (from agents 0.2), Needs you 16.0 (from agents 2.2), FYI 17.4 (from agents 2.9); one single list: 37.7
+   Needs you at a visit, mean, as the run goes on: days 1-2: 2.9, days 5-6: 3.1, days 9-10: 3.3
+   open flags that name a person, never answered: 21
+   open flags that name nobody, never answered: 17
+   rows stuck in Needs you: read, flag for everyone still open (per person, mean): 0
+   kept rows (per person, mean): 1.1
+   markers left in conversations: 4
+
+== half the traffic
+   6785 messages, 35% by agents, 12163 events, invariant violations: 0
+   rows waiting when a person opens the feed (mean / p90 / max):
+     Focus, new                 0.3 /   1 /   6
+     Focus, waiting on you      0.2 /   1 /   5
+     Focus, kept                0.4 /   1 /   4
+     Needs you                  2.2 /   5 /  12
+     For your information       1.7 /   4 /  13
+   new rows per person per day: Focus 2.2 (from agents 0.1), Needs you 8.0 (from agents 0.8), FYI 9.7 (from agents 1.4); one single list: 19.7
+   Needs you at a visit, mean, as the run goes on: days 1-2: 1.6, days 5-6: 2.2, days 9-10: 3.0
+   open flags that name a person, never answered: 11
+   open flags that name nobody, never answered: 5
+   rows stuck in Needs you: read, flag for everyone still open (per person, mean): 1.3
+   kept rows (per person, mean): 0.5
+   markers left in conversations: 0
+
+== double the traffic
+   26794 messages, 35% by agents, 42792 events, invariant violations: 0
+   rows waiting when a person opens the feed (mean / p90 / max):
+     Focus, new                 1.0 /   2 /  21
+     Focus, waiting on you      1.4 /   3 /  33
+     Focus, kept                1.8 /   4 /   9
+     Needs you                 10.0 /  24 /  55
+     For your information       5.2 /  11 /  26
+   new rows per person per day: Focus 8.4 (from agents 0.4), Needs you 30.3 (from agents 4.0), FYI 33.2 (from agents 6.2); one single list: 71.8
+   Needs you at a visit, mean, as the run goes on: days 1-2: 6.3, days 5-6: 10.1, days 9-10: 13.5
+   open flags that name a person, never answered: 48
+   open flags that name nobody, never answered: 30
+   rows stuck in Needs you: read, flag for everyone still open (per person, mean): 7.6
+   kept rows (per person, mean): 2.3
+   markers left in conversations: 12
+
+== personas, base rules: new rows per day, and Focus rows at a visit (mean / max)
+   Product manager (default viewer)   Focus   3.0  Needs you  16.4  FYI  23.9  single list  43.3   Focus new at a visit 0.3 / 2
+   Founder                            Focus   3.8  Needs you  13.9  FYI  15.6  single list  33.3   Focus new at a visit 0.4 / 2
+   Engineer                           Focus   3.6  Needs you  15.9  FYI  14.8  single list  34.3   Focus new at a visit 0.5 / 2
+   Support, on call                   Focus  17.5  Needs you  10.0  FYI  17.6  single list  45.1   Focus new at a visit 2.7 / 10
+
+== why items land in Needs you, base rules (items, not rows)
+   Reply in a thread you started              3354  43%
+   Reply in a thread you only replied in      2808  36%
+   Mentioned you                              1189  15%
+   Flag that names nobody                      526  7%
+
+== behaviours the model had to invent, and how often each came up in the base run
+   R22 x 42420  A person who is not a member of a channel gets nothing from it except what names them
+   R17 x   560  A read, still-open flag sits in its own 'Waiting on you' section of Focus (D-003 names only New and Kept)
+   R07 x   248  Any reply in the thread by the flagged person answers the flag, not only a reply to that exact message
+   R18 x   172  Reactions to your message follow the thread: none when the thread is Off or the channel Muted
+   R16 x   160  New activity on a kept row shows inside the Kept section; it does not move the row back to New
+   R26 x    91  At All activity, what is addressed to you lands as at Default (the record's wording can also be read as 'in Focus')
+   R27 x    42  Deleting your own message does not remove you from its thread: later replies still reach you
+   R10 x    10  In a direct conversation, any later message from the flagged person answers the flag
+   R29 x     9  A reaction from anyone answers a flag that named nobody, for everyone
+   R13 x     4  An edit that lowers a message you have not read moves it down quietly
+   R33 x     1  An edit that turns a flag for named people into one that names nobody opens it for everyone
+   N01 x   306  Stated by D-001, worth confirming: a muted channel silences replies in threads you started or replied in there
+
+== how much the base numbers move with the random seed (five other seeds)
+   new Focus rows per person per day:       4.3 to 4.6
+   one single list, rows per person per day: 36.9 to 38.5
+   Focus, new, at a visit (mean):            0.5 to 0.6
+   Needs you at a visit (mean):              4.3 to 5.8
+   Needs you at a visit (p90):               10 to 16
+   rows stuck in Needs you per person:       2.5 to 4.8
+   Focus 'waiting on you' at a visit (max):  10 to 22
+   invariant violations:                     0 to 0

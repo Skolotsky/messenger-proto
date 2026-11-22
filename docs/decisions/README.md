@@ -14,6 +14,9 @@ Line format: `- **D-nnn** [status] The decision as a statement, and what it comm
 - **D-004** [accepted] A deleted message leaves no trace in a conversation unless something depends on it (replies). In the feed, something taken back leaves a marker only where the person had already seen it, and one that stays for flagged or kept rows. An edit that adds a mention or flag reaches the person as new → [record](D-004-edits-and-deletes.md)
 - **D-009** [accepted] The first version is the feed plus what makes it observable: direct messages, a search box, a notification tray, a Focus rules list, unread marks, creating channels, and a layout that works on a phone-sized screen, delivered as an installable web app (PWA). Commits us to two widths for every surface; the access model, sign-in, group messages, ad-hoc topics, profiles, files and formatted text stay out → [record](D-009-first-version-surfaces.md)
 - **D-010** [accepted] The seeded team is large: about 30 people, 6 agents and 20 channels, with a core cast carrying hand-written situations and the rest as background. A separate control panel starts, stops and resets the demonstration and shows what happened and what comes next → [record](D-010-seeded-team.md)
+- **D-011** [open] How a flag nobody answers leaves the feed. E-001 found it never does (recommended: one that names nobody leaves once read; one that names you can be marked Done by you). Evidence: E-001
+- **D-012** [open] What sends a notification: which buckets, and what the sender's Info and the dials change. Only "Info sends none" is decided. Needed before D-006 and D-007. Evidence: E-001
+- **D-013** [open] Confirm the behaviours E-001 had to assume: a muted channel and your own threads, where a read open flag sits, what All activity does with addressed items, whether dial changes re-sort the feed, whether a reaction closes a flag for everyone, and the smaller list. Evidence: E-001
 
 ## System shape: components, boundaries, stack
 

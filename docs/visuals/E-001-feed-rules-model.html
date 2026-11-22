@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E-001 Feed rules model</title>
+<style>
+/* Layout: one reading column. Diagrams, tables and code may run wider inside their own scroll box. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --sunken: #eceef2; --line: #d8dce4;
+  --ink: #17202b; --ink-2: #445063; --ink-3: #5f6b7d;
+  --agent: #2351c9; --agent-soft: #e5ecfc; /* the agent's work, links */
+  --you: #a64b08; --you-soft: #fcebd9;     /* where the user's attention is needed */
+  --ok: #1b7548; --ok-soft: #e1f3e8;       /* recommended, holds, verified */
+  --risk: #b3261e; --risk-soft: #fbe8e6;   /* risk, broken, not verified */
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Cascadia Code", "Cascadia Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+    --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+    --agent: #86a8ff; --agent-soft: #1b2a4c;
+    --you: #f2a766; --you-soft: #3b2814;
+    --ok: #62cf99; --ok-soft: #14301f;
+    --risk: #ff8f85; --risk-soft: #3d1815;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+  --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+  --agent: #86a8ff; --agent-soft: #1b2a4c;
+  --you: #f2a766; --you-soft: #3b2814;
+  --ok: #62cf99; --ok-soft: #14301f;
+  --risk: #ff8f85; --risk-soft: #3d1815;
+  color-scheme: dark;
+}
+
+/* Base */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--font); }
+.page {
+  max-width: 880px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 34px;
+}
+section, .stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+h1 { font: 650 27px/1.2 var(--display); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h2 { font: 650 18.5px/1.3 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 650 14.5px/1.35 var(--font); margin: 0; }
+p { margin: 0; max-width: 68ch; }
+ul, ol { margin: 0; padding-left: 1.25em; display: flex; flex-direction: column; gap: 5px; max-width: 68ch; }
+a { color: var(--agent); }
+strong { font-weight: 650; }
+code { font: 0.88em var(--mono); background: var(--sunken); border: 1px solid var(--line); border-radius: 4px; padding: 0.08em 0.36em; overflow-wrap: anywhere; }
+:focus-visible { outline: 2px solid var(--agent); outline-offset: 2px; }
+.label { font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.note { color: var(--ink-3); font-size: 13.5px; }
+
+/* Header */
+.top { display: flex; flex-direction: column; gap: 8px; }
+.lede { font-size: 16.5px; color: var(--ink-2); max-width: 62ch; }
+
+/* Needs you: the one thing the user has to decide or answer */
+.ask { background: var(--you-soft); border: 1px solid color-mix(in srgb, var(--you) 40%, transparent); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.ask .label { color: var(--you); }
+
+/* Chips */
+.chip { display: inline-flex; align-items: center; font: 600 12px/1 var(--font); padding: 4px 9px; border-radius: 999px; background: var(--sunken); color: var(--ink-2); white-space: nowrap; }
+.chip.you { background: var(--you-soft); color: var(--you); }
+.chip.agent { background: var(--agent-soft); color: var(--agent); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.risk { background: var(--risk-soft); color: var(--risk); }
+
+/* Panels side by side */
+.split { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.panel.you .label { color: var(--you); }
+.panel.agent .label { color: var(--agent); }
+.files { list-style: none; padding: 0; gap: 7px; }
+.files li { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.files span { color: var(--ink-2); font-size: 13.5px; }
+
+/* Lanes: who does what, phase by phase. Children in order: three .head cells, then .phase, .you, .agent per row */
+.lanes { display: grid; grid-template-columns: minmax(128px, 0.75fr) 1.25fr 1.5fr; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.lanes > * { padding: 12px 14px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin: -1px 0 0 -1px; min-width: 0; }
+.lanes > .head { background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.lanes > .head.you { color: var(--you); background: var(--sunken); }
+.lanes > .head.agent { color: var(--agent); }
+.lanes > .phase { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.lanes > .phase strong { font: 650 15px/1.3 var(--display); }
+.lanes > .phase .say { color: var(--ink-2); font-size: 13.5px; }
+.lanes > .you { background: color-mix(in srgb, var(--you-soft) 60%, var(--surface)); }
+.lanes > .you.idle { background: var(--surface); color: var(--ink-3); }
+@media (max-width: 600px) {
+  .lanes { grid-template-columns: 1fr 1.2fr; }
+  .lanes > .head.first { display: none; }
+  .lanes > .phase { grid-column: 1 / -1; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--sunken); padding-block: 8px; }
+}
+
+/* Options: a choice, side by side */
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.option { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.option.pick { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+.option header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.option dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; font-size: 14px; }
+.option dt { font-weight: 650; color: var(--ink-3); }
+.option dd { margin: 0; min-width: 0; }
+.brief { border: 1px dashed var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+/* Steps: what happens, in order */
+.steps { list-style: none; padding: 0; gap: 0; counter-reset: step; max-width: none; }
+.steps > li { counter-increment: step; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding-bottom: 16px; position: relative; }
+.steps > li::before { content: counter(step); width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; font: 600 13px var(--mono); color: var(--ink-2); position: relative; z-index: 1; }
+.steps > li:not(:last-child)::after { content: ""; position: absolute; left: 13.5px; top: 28px; bottom: 0; width: 1px; background: var(--line); }
+.steps > li:last-child { padding-bottom: 0; }
+.steps .body { display: flex; flex-direction: column; gap: 5px; padding-top: 3px; min-width: 0; }
+
+/* Figures: diagrams and snippets */
+figure { margin: 0; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+figcaption { font-size: 13px; color: var(--ink-3); max-width: 68ch; }
+.diagram .scroll { overflow-x: auto; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; }
+.diagram svg { display: block; min-width: 680px; width: 100%; height: auto; color: var(--ink-3); font-family: var(--font); }
+.diagram .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
+.diagram .box-you { fill: var(--you-soft); stroke: var(--you); stroke-width: 1.25; }
+.diagram .box-agent { fill: var(--agent-soft); stroke: var(--agent); stroke-width: 1.25; }
+.diagram .box-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.25; }
+.diagram .box-risk { fill: var(--risk-soft); stroke: var(--risk); stroke-width: 1.25; }
+.diagram .t { fill: var(--ink); font-size: 13px; font-weight: 650; }
+.diagram .t2 { fill: var(--ink-2); font-size: 11px; }
+.diagram .edge { stroke: currentColor; stroke-width: 1.5; fill: none; }
+.diagram .edge-label { fill: var(--ink-2); font-size: 11px; }
+.snippet pre { margin: 0; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; overflow-x: auto; font: 13px/1.5 var(--mono); }
+.snippet pre code { background: none; border: 0; padding: 0; font: inherit; overflow-wrap: normal; }
+.snippet mark { background: var(--you-soft); color: inherit; border-radius: 3px; padding: 0 2px; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+thead th { border-top: 0; background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Depth on demand */
+details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 0 16px; }
+details > summary { cursor: pointer; padding: 11px 0; font-weight: 650; }
+details[open] { padding-bottom: 14px; }
+details > .stack { gap: 10px; }
+
+/* Footer */
+.foot { border-top: 1px solid var(--line); padding-top: 14px; color: var(--ink-3); font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body>
+<main class="page">
+<header class="top">
+  <div class="label">Experiment · E-001 · 2026-11-22</div>
+  <h1>The feed rules hold together, with one hole and a short list to confirm</h1>
+  <p class="lede">I wrote the accepted rules as a runnable model, played 92 situations through it, and ran ten working days of a 30-person, 6-agent team. Nothing the decisions promise broke. One thing can never leave the feed.</p>
+</header>
+
+<div class="ask">
+  <div class="label">Needs you</div>
+  <p><strong>Seven points need your call before we build, starting with the hole:</strong> a flag nobody answers stays in the feed for good. My recommendation for each is in the table below.</p>
+</div>
+
+<section>
+  <h2>The verdict</h2>
+  <div class="split">
+    <div class="panel">
+      <div class="label">Holds</div>
+      <ul>
+        <li><span class="chip ok">92 of 92</span> scripted situations behave as the decisions say.</li>
+        <li><span class="chip ok">0 broken</span> promises in about 150,000 simulated events: one item in one place, Info never above For your information, what names you always arrives, no marker for something never seen.</li>
+        <li>Focus stays short: about one row in nine of what a single list would hold.</li>
+      </ul>
+    </div>
+    <div class="panel you">
+      <div class="label">Does not hold</div>
+      <ul>
+        <li><span class="chip risk">A hole</span> A flag nobody answers never leaves.</li>
+        <li><span class="chip you">6 to confirm</span> Cases the decisions leave open or state in a way that surprises.</li>
+        <li><span class="chip you">Not decided</span> What sends a notification.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>The hole: a flag nobody answers</h2>
+  <p>We gave a flagged row one way out, the flag closing. In the simulated team 19 flags that named nobody and 18 that named a person were never answered in ten days. They stay.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Needs you rows a person meets on opening the feed</th><th>Days 1-2</th><th>Days 5-6</th><th>Days 9-10</th></tr></thead>
+      <tbody>
+        <tr><td>Rules as accepted</td><td class="num">3.3</td><td class="num">5.8</td><td class="num"><span class="chip risk">7.2 and growing</span></td></tr>
+        <tr><td>One change: a flag that names nobody leaves once read</td><td class="num">2.9</td><td class="num">3.1</td><td class="num"><span class="chip ok">3.3, flat</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">The same happens in Focus for flags that name you and that you will not answer: one person reached 17 rows under “waiting on you”. Today a person has no way to say “not mine”.</p>
+</section>
+
+<section>
+  <h2>Does Focus stay short?</h2>
+  <p>Per person, with the starting rules. The traffic is assumed, so read the proportions, not the absolute numbers.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th></th><th>Focus</th><th>Needs you</th><th>For your information</th><th>One single list</th></tr></thead>
+      <tbody>
+        <tr><td>New rows a day</td><td class="num"><strong>4.4</strong></td><td class="num">15.5</td><td class="num">17.8</td><td class="num">37.7</td></tr>
+        <tr><td>…of which caused by agents</td><td class="num">0.2</td><td class="num">2.0</td><td class="num">2.9</td><td></td></tr>
+        <tr><td>New rows waiting when you open the feed</td><td class="num">0.5</td><td class="num">5.5</td><td class="num">3.0</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ul>
+    <li><strong>Agents write a third of the messages and cause 0.2 of the 4.4 Focus rows a day.</strong> Without Info, agent items in Needs you rise from about 1,100 to 4,700 over the run.</li>
+    <li><strong>The on-call person with two channels in Focus</strong> gets 17.5 Focus rows a day but meets 2.7 at a visit, because a burst of 15 alerts is one row.</li>
+    <li><strong>Your first idea, mentions starting in Focus,</strong> would give 7.1 Focus rows a day instead of 4.4. Not a flood either way.</li>
+    <li><strong>Needs you is the long bucket, not Focus.</strong> 79% of its items are thread replies, and 36% come from threads the person only replied in once. At double the traffic a person meets 10 rows on average and 24 on a bad visit.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>What needs your call</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>The question</th><th>How often it came up</th><th>My recommendation</th></tr></thead>
+      <tbody>
+        <tr><td><strong>1</strong> <span class="chip risk">Hole</span></td><td>How does a flag nobody answers leave the feed?</td><td>37 flags in ten days; the backlog only grows</td><td>A flag that names nobody leaves once you read it and stays open on the message. A flag that names you can be marked Done by you, and the sender sees that.</td></tr>
+        <tr><td><strong>2</strong></td><td>Should muting a channel silence replies in threads you started or replied in there? The decision as written says yes.</td><td>306 times</td><td>No: they still reach you. Missing an answer to your own question is worse than one extra row, and Unfollow is one click.</td></tr>
+        <tr><td><strong>3</strong></td><td>Where does a flag sit once you read it but have not answered? We named only “New” and “Kept” in Focus, and the count shows unread only.</td><td>560 times</td><td>A third section, “Waiting on you”, between New and Kept, with its own count.</td></tr>
+        <tr><td><strong>4</strong></td><td>At “All activity”, where do items addressed to you land? The record's sentence reads two ways.</td><td>91 times</td><td>As at Default. All activity only adds the channel's other posts to For your information.</td></tr>
+        <tr><td><strong>5</strong></td><td>When you change a dial or add a Focus rule, do rows already in the feed move?</td><td>Every change</td><td>Unread rows re-sort the next time you open the feed. Read ones stay.</td></tr>
+        <tr><td><strong>6</strong></td><td>Does one person's reaction close a flag for everyone?</td><td>9 times</td><td>No. A reaction answers only for the person reacting. A flag for everyone closes on a reply.</td></tr>
+        <tr><td><strong>7</strong></td><td>What sends a notification? Only “Info sends none” is decided.</td><td>Not modelled</td><td>A decision of its own, next: it is needed before the delivery guarantees.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<details>
+  <summary>Smaller behaviours I assumed; object to any you disagree with</summary>
+  <div class="stack">
+    <ul>
+      <li>Any reply in the thread by the flagged person answers the flag, not only a reply to that exact message. An Info reply does not answer it. An agent's reply does.</li>
+      <li>In a direct conversation, any later message from the flagged person answers the flag.</li>
+      <li>A flag with only a whole-channel mention counts as naming nobody. A flag that mentions only an agent reaches no person.</li>
+      <li>A direct message from an agent lands in Needs you, since the Focus starting rule says “from people”.</li>
+      <li>A Focus rule for a person lifts what already reaches you from them. It does not pull in their other messages.</li>
+      <li>If you remove a starting Focus rule, those items land in Needs you.</li>
+      <li>New activity on a kept row shows inside the Kept section.</li>
+      <li>Reactions to your message follow the thread: none when the thread is Off or the channel Muted.</li>
+      <li>Deleting your own message does not remove you from its thread.</li>
+      <li>A flag withdrawn from a message that still mentions you: if you had read it, the row stays in Focus until Done, marked “flag withdrawn”.</li>
+      <li>Replying in a thread you set to For your information by hand leaves it there.</li>
+      <li>A whole-channel mention inside a thread reply reaches nobody extra.</li>
+      <li>Reading a conversation in the channel itself marks its feed row read. Mark all read leaves open flags and kept rows.</li>
+      <li>Not modelled and not decided: where the sender of a flag sees who has answered, and how they withdraw it. I would put both on the message itself.</li>
+    </ul>
+    <p class="note">Each has a code (R03 to R33) in the experiment, with how often it came up.</p>
+  </div>
+</details>
+
+<details>
+  <summary>How far to trust this</summary>
+  <div class="stack">
+    <p><span class="chip ok">Checked independently</span> A second agent, given only the decision records and the code, probed the model with its own scripts. It found six places where my model contradicted the decisions, eleven behaviours it had decided silently, and two skews in the simulation. All were corrected before these numbers were taken.</p>
+    <p><span class="chip risk">Not verified</span> The corrections were not checked by a second independent pass. The traffic rates are assumptions: agents wrote 35% of messages here, below the 50% reported for Slack. People in the simulation read and reply at fixed odds. Text rules judged by a model are not in it. It says nothing about performance or delivery.</p>
+    <p class="note">One command reruns it: <code>./experiments/E-001-feed-rules-model/run.sh</code></p>
+  </div>
+</details>
+
+<footer class="foot">
+  <span>Belongs to E-001 · Tests D-001, D-003, D-004 · Feeds D-011, D-012, D-013</span>
+  <span>Method, raw results and limits: <code>experiments/E-001-feed-rules-model/README.md</code></span>
+</footer>
+
+</main>
+</body>
+</html>

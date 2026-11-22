@@ -2,15 +2,15 @@
 
 Work in flight. Order inside a section is priority. Finished work moves to `done.md`. Rules: CLAUDE.md, section "Tasks".
 
-**Where we are:** Accepted so far (2026-11-22): D-001, the three-bucket feed with dials, Flag and Info; D-009, the feed plus what makes it observable, as a PWA, with creating channels; D-002, scripted people and agents, and a coding agent can join as either for verification; D-010, a large seeded team (about 30 people, 6 agents) with a control panel for the demonstration. D-003, reading is enough for a row to leave, with Keep and Done. D-004, what edits and deletes leave behind. All product decisions prepared so far are accepted. In progress: E-001, a model of the feed rules to find gaps before going further. Order set by the user: product decisions first; technical ones (D-005 to D-008) wait until the product scope is final and the experiments are agreed. Text rules judged by a model are in scope but built last, after an experiment.
+**Where we are:** Accepted so far (2026-11-22): D-001, the three-bucket feed with dials, Flag and Info; D-009, the feed plus what makes it observable, as a PWA, with creating channels; D-002, scripted people and agents, and a coding agent can join as either for verification; D-010, a large seeded team (about 30 people, 6 agents) with a control panel for the demonstration. D-003, reading is enough for a row to leave, with Keep and Done. D-004, what edits and deletes leave behind. All product decisions prepared so far are accepted. E-001 modelled them and ran a simulated team: the rules hold together, with one hole (a flag nobody answers never leaves) and a short list to confirm, now waiting on the user as D-011 to D-013. After those, the product scope is complete. Order set by the user: product decisions first; technical ones (D-005 to D-008) wait until the product scope is final and the experiments are agreed. Text rules judged by a model are in scope but built last, after an experiment.
 
 ## Now
 
-- **T-014** `experiment` E-001: build an executable model of the accepted feed rules (D-001, D-003, D-004), play the seeded-team situations and a simulated busy team through it, and report gaps and contradictions. Asked by the user on 2026-11-22 before leaving for a while. Done when: findings filed in `experiments/E-001-feed-rules-model/`, gaps listed for decision
+_Nothing in progress._
 
 ## Waiting on user
 
-_Nothing._
+- **T-015** `decide` The seven points E-001 raised, starting with D-011 (a flag nobody answers never leaves the feed). Recommendations per point: `docs/visuals/E-001-feed-rules-model.html`
 
 ## Next
 
