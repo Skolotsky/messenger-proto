@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./scripts/check *)"
+    ],
+    "ask": [
+      "Edit(/docs/brief.md)",
+      "Bash(git push *)"
+    ]
+  }
+}

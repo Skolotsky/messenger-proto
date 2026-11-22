@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# Single entry point for "is the repo healthy?".
+# Used by the agent, the git pre-commit hook and, later, CI.
+# Add new checks as sections at the bottom: lint, types, tests, guardrail tests.
+set -uo pipefail
+cd "$(dirname "$0")/.." || exit 2
+
+failures=0
+section() { printf '\n%s\n' "$1"; }
+pass() { printf '  ok    %s\n' "$1"; }
+fail() { printf '  FAIL  %s\n' "$1"; failures=$((failures + 1)); }
+
+# ---------------------------------------------------------------------------
+section "Project context (what every session relies on)"
+
+for f in CLAUDE.md docs/brief.md tasks/board.md tasks/done.md docs/decisions/README.md docs/guardrails.md; do
+  if [ -s "$f" ]; then pass "$f present"; else fail "$f is missing or empty"; fi
+done
+
+# A task lives in exactly one place: the board or the done log.
+dupes=$(cat tasks/board.md tasks/done.md 2>/dev/null | grep -oE '\*\*T-[0-9]+\*\*' | sort | uniq -d | tr -d '*' | tr '\n' ' ')
+if [ -z "$dupes" ]; then pass "task IDs are unique across board and done log"; else fail "task listed more than once: $dupes"; fi
+
+# Task detail files are reachable from the board or the done log.
+orphans=0
+for f in tasks/T-*.md; do
+  [ -e "$f" ] || continue
+  id=$(basename "$f" | grep -oE '^T-[0-9]+')
+  if ! grep -qF "**$id**" tasks/board.md tasks/done.md; then fail "$f has no line on the board or in the done log"; orphans=1; fi
+done
+[ "$orphans" -eq 0 ] && pass "every task file is listed on the board or in the done log"
+
+# Every decision record is in the index, so no decision is invisible to a new session.
+unindexed=0
+for f in docs/decisions/D-*.md; do
+  [ -e "$f" ] || continue
+  id=$(basename "$f" | grep -oE '^D-[0-9]+')
+  if ! grep -qF "**$id**" docs/decisions/README.md; then fail "$id has a record but no line in docs/decisions/README.md"; unindexed=1; fi
+done
+[ "$unindexed" -eq 0 ] && pass "every decision record is indexed"
+
+# Every guardrail names its enforcement and has a known status.
+bad_rows=$(awk -F'|' '
+  /^\| *G-[0-9]+/ {
+    id=$2; enforced=$6; status=$7
+    gsub(/^ +| +$/, "", id); gsub(/^ +| +$/, "", enforced); gsub(/^ +| +$/, "", status)
+    if (status != "enforced" && status != "pending") print id " (status \"" status "\")"
+    else if (status == "enforced" && enforced == "") print id " (enforced, but no check named)"
+  }' docs/guardrails.md | tr '\n' ' ')
+if [ -z "$bad_rows" ]; then pass "every guardrail has a status and a named check"; else fail "guardrail rows need attention: $bad_rows"; fi
+
+# ---------------------------------------------------------------------------
+section "Agent tooling"
+
+if [ -f .claude/settings.json ]; then
+  if python3 -m json.tool .claude/settings.json >/dev/null 2>&1; then pass ".claude/settings.json is valid JSON"; else fail ".claude/settings.json is not valid JSON (this silently disables every setting in it)"; fi
+fi
+
+broken=0
+for f in .claude/skills/*/SKILL.md .claude/agents/*.md; do
+  [ -e "$f" ] || continue
+  if [ "$(head -n 1 "$f")" != "---" ] || ! grep -qE '^description: .+' "$f"; then fail "$f needs frontmatter with a description"; broken=1; fi
+done
+[ "$broken" -eq 0 ] && pass "skills and agents have frontmatter"
+
+# Visuals must open anywhere: no external scripts or stylesheets.
+external=$(grep -lE '<script[^>]+src=|<link[^>]+rel="?stylesheet' docs/visuals/*.html 2>/dev/null | tr '\n' ' ')
+if [ -z "$external" ]; then pass "visuals are self-contained"; else fail "visuals load external scripts or stylesheets: $external"; fi
+
+# ---------------------------------------------------------------------------
+# Product checks (lint, types, tests, guardrail tests) are added here once the
+# stack is chosen. Each one calls pass or fail like the checks above.
+
+printf '\n'
+if [ "$failures" -eq 0 ]; then
+  echo "check: all passed"
+else
+  echo "check: $failures failed"
+  exit 1
+fi

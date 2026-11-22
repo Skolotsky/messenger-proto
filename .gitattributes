@@ -1,0 +1,6 @@
+# Keep line endings stable between WSL and Windows tools.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary

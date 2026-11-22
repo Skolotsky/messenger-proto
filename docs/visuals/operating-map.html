@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contexia Operating Map</title>
+<style>
+/* Layout: one reading column. Diagrams, tables and code may run wider inside their own scroll box. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --sunken: #eceef2; --line: #d8dce4;
+  --ink: #17202b; --ink-2: #445063; --ink-3: #5f6b7d;
+  --agent: #2351c9; --agent-soft: #e5ecfc; /* the agent's work, links */
+  --you: #a64b08; --you-soft: #fcebd9;     /* where the user's attention is needed */
+  --ok: #1b7548; --ok-soft: #e1f3e8;       /* recommended, holds, verified */
+  --risk: #b3261e; --risk-soft: #fbe8e6;   /* risk, broken, not verified */
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Cascadia Code", "Cascadia Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+    --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+    --agent: #86a8ff; --agent-soft: #1b2a4c;
+    --you: #f2a766; --you-soft: #3b2814;
+    --ok: #62cf99; --ok-soft: #14301f;
+    --risk: #ff8f85; --risk-soft: #3d1815;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+  --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+  --agent: #86a8ff; --agent-soft: #1b2a4c;
+  --you: #f2a766; --you-soft: #3b2814;
+  --ok: #62cf99; --ok-soft: #14301f;
+  --risk: #ff8f85; --risk-soft: #3d1815;
+  color-scheme: dark;
+}
+
+/* Base */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--font); }
+.page {
+  max-width: 880px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 34px;
+}
+section, .stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+h1 { font: 650 27px/1.2 var(--display); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h2 { font: 650 18.5px/1.3 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 650 14.5px/1.35 var(--font); margin: 0; }
+p { margin: 0; max-width: 68ch; }
+ul, ol { margin: 0; padding-left: 1.25em; display: flex; flex-direction: column; gap: 5px; max-width: 68ch; }
+a { color: var(--agent); }
+strong { font-weight: 650; }
+code { font: 0.88em var(--mono); background: var(--sunken); border: 1px solid var(--line); border-radius: 4px; padding: 0.08em 0.36em; overflow-wrap: anywhere; }
+:focus-visible { outline: 2px solid var(--agent); outline-offset: 2px; }
+.label { font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.note { color: var(--ink-3); font-size: 13.5px; }
+
+/* Header */
+.top { display: flex; flex-direction: column; gap: 8px; }
+.lede { font-size: 16.5px; color: var(--ink-2); max-width: 62ch; }
+
+/* Needs you: the one thing the user has to decide or answer */
+.ask { background: var(--you-soft); border: 1px solid color-mix(in srgb, var(--you) 40%, transparent); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.ask .label { color: var(--you); }
+
+/* Chips */
+.chip { display: inline-flex; align-items: center; font: 600 12px/1 var(--font); padding: 4px 9px; border-radius: 999px; background: var(--sunken); color: var(--ink-2); white-space: nowrap; }
+.chip.you { background: var(--you-soft); color: var(--you); }
+.chip.agent { background: var(--agent-soft); color: var(--agent); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.risk { background: var(--risk-soft); color: var(--risk); }
+
+/* Panels side by side */
+.split { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.panel.you .label { color: var(--you); }
+.panel.agent .label { color: var(--agent); }
+.files { list-style: none; padding: 0; gap: 7px; }
+.files li { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.files span { color: var(--ink-2); font-size: 13.5px; }
+
+/* Lanes: who does what, phase by phase. Children in order: three .head cells, then .phase, .you, .agent per row */
+.lanes { display: grid; grid-template-columns: minmax(128px, 0.75fr) 1.25fr 1.5fr; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.lanes > * { padding: 12px 14px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin: -1px 0 0 -1px; min-width: 0; }
+.lanes > .head { background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.lanes > .head.you { color: var(--you); background: var(--sunken); }
+.lanes > .head.agent { color: var(--agent); }
+.lanes > .phase { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.lanes > .phase strong { font: 650 15px/1.3 var(--display); }
+.lanes > .phase .say { color: var(--ink-2); font-size: 13.5px; }
+.lanes > .you { background: color-mix(in srgb, var(--you-soft) 60%, var(--surface)); }
+.lanes > .you.idle { background: var(--surface); color: var(--ink-3); }
+@media (max-width: 600px) {
+  .lanes { grid-template-columns: 1fr 1.2fr; }
+  .lanes > .head.first { display: none; }
+  .lanes > .phase { grid-column: 1 / -1; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--sunken); padding-block: 8px; }
+}
+
+/* Options: a choice, side by side */
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.option { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.option.pick { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+.option header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.option dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; font-size: 14px; }
+.option dt { font-weight: 650; color: var(--ink-3); }
+.option dd { margin: 0; min-width: 0; }
+.brief { border: 1px dashed var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+/* Steps: what happens, in order */
+.steps { list-style: none; padding: 0; gap: 0; counter-reset: step; max-width: none; }
+.steps > li { counter-increment: step; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding-bottom: 16px; position: relative; }
+.steps > li::before { content: counter(step); width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; font: 600 13px var(--mono); color: var(--ink-2); position: relative; z-index: 1; }
+.steps > li:not(:last-child)::after { content: ""; position: absolute; left: 13.5px; top: 28px; bottom: 0; width: 1px; background: var(--line); }
+.steps > li:last-child { padding-bottom: 0; }
+.steps .body { display: flex; flex-direction: column; gap: 5px; padding-top: 3px; min-width: 0; }
+
+/* Figures: diagrams and snippets */
+figure { margin: 0; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+figcaption { font-size: 13px; color: var(--ink-3); max-width: 68ch; }
+.diagram .scroll { overflow-x: auto; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; }
+.diagram svg { display: block; min-width: 560px; width: 100%; height: auto; color: var(--ink-3); font-family: var(--font); }
+.diagram .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
+.diagram .box-you { fill: var(--you-soft); stroke: var(--you); stroke-width: 1.25; }
+.diagram .box-agent { fill: var(--agent-soft); stroke: var(--agent); stroke-width: 1.25; }
+.diagram .box-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.25; }
+.diagram .box-risk { fill: var(--risk-soft); stroke: var(--risk); stroke-width: 1.25; }
+.diagram .t { fill: var(--ink); font-size: 13px; font-weight: 650; }
+.diagram .t2 { fill: var(--ink-2); font-size: 11px; }
+.diagram .edge { stroke: currentColor; stroke-width: 1.5; fill: none; }
+.diagram .edge-label { fill: var(--ink-2); font-size: 11px; }
+.snippet pre { margin: 0; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; overflow-x: auto; font: 13px/1.5 var(--mono); }
+.snippet pre code { background: none; border: 0; padding: 0; font: inherit; overflow-wrap: normal; }
+.snippet mark { background: var(--you-soft); color: inherit; border-radius: 3px; padding: 0 2px; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+thead th { border-top: 0; background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Depth on demand */
+details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 0 16px; }
+details > summary { cursor: pointer; padding: 11px 0; font-weight: 650; }
+details[open] { padding-bottom: 14px; }
+details > .stack { gap: 10px; }
+
+/* Footer */
+.foot { border-top: 1px solid var(--line); padding-top: 14px; color: var(--ink-3); font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body>
+<main class="page">
+<header class="top">
+  <div class="label">How we work · snapshot 2026-11-22</div>
+  <h1>How we work on Contexia</h1>
+  <p class="lede">You steer product and technical decisions. The agent researches, builds, verifies and keeps the project's memory. This page shows where your attention is needed and what runs without it.</p>
+</header>
+
+<section>
+  <h2>The flow, and where it needs you</h2>
+  <p>Seven phases, matching how you already work. There are no commands to learn: you say what you want in your own words and the agent picks the procedure. A shaded cell under "You" means the phase waits for you. Everywhere else you get a short summary you are free to ignore.</p>
+  <div class="lanes">
+    <div class="head first">Phase · you might say</div><div class="head you">You</div><div class="head agent">Agent</div>
+
+    <div class="phase"><strong>Research</strong><span class="say">“Look into how others handle this”</span></div>
+    <div class="you">Name the question, or approve one the agent proposes.</div>
+    <div class="agent">Reads primary sources, separates established practice from opinion, files a one-page note with sources.</div>
+
+    <div class="phase"><strong>Experiment</strong><span class="say">“Try it and measure”</span></div>
+    <div class="you idle">Nothing, unless the result is a surprise.</div>
+    <div class="agent">Runs a small throwaway spike to settle one uncertain question, and records what would have changed our mind.</div>
+
+    <div class="phase"><strong>Visual</strong><span class="say">“Show me how this works”</span></div>
+    <div class="you">Read one page for about two minutes.</div>
+    <div class="agent">Draws the system, the flow or the options, so the choice is visible without reading code.</div>
+
+    <div class="phase"><strong>Decide</strong><span class="say">“What are my options?”</span></div>
+    <div class="you"><strong>Make the call.</strong> One topic at a time, high level first.</div>
+    <div class="agent">Prepares the brief: why now, options, risks, best practice, recommendation. Records your choice and your reasoning.</div>
+
+    <div class="phase"><strong>Guardrails</strong><span class="say">“How do we keep this true?”</span></div>
+    <div class="you">Review the list. You should recognise your decisions in it.</div>
+    <div class="agent">Turns each decision into a contract or a check that fails when it is broken, before anything is built.</div>
+
+    <div class="phase"><strong>Implement</strong><span class="say">“Build the next task”</span></div>
+    <div class="you idle">Nothing. You hear the plan in a few lines, then the result with its evidence.</div>
+    <div class="agent">Builds one task to agreed acceptance criteria, then proves it on the running system.</div>
+
+    <div class="phase"><strong>Validate</strong><span class="say">“Check that it really works”</span></div>
+    <div class="you">Read the verdict and choose what to fix first.</div>
+    <div class="agent">A second agent with fresh eyes checks the work against the brief, the contracts and the guardrails. Findings become tasks.</div>
+  </div>
+  <p class="note">It is a loop: a validation finding or a surprising experiment sends work back to an earlier phase. Ask “where are we?” at any moment to get the current status.</p>
+</section>
+
+<section>
+  <h2>Who decides what</h2>
+  <div class="split">
+    <div class="panel you">
+      <div class="label">You decide</div>
+      <ul>
+        <li>Product behaviour: what a person sees and can do</li>
+        <li>System shape: the main parts, their boundaries, the stack</li>
+        <li>Contracts: what each service promises the others</li>
+        <li>Qualities: how reliable, how fast, what is guaranteed</li>
+        <li>Anything expensive to reverse</li>
+      </ul>
+    </div>
+    <div class="panel agent">
+      <div class="label">Agent decides</div>
+      <ul>
+        <li>Code structure, naming, file layout</li>
+        <li>Libraries and patterns inside a component</li>
+        <li>How tests are written</li>
+        <li>The order of small steps inside a task</li>
+      </ul>
+      <p class="note">Notable choices are listed for you in one line each. You can overrule any of them.</p>
+    </div>
+  </div>
+  <p>What you say is treated as direction. When a direction and the goal pull apart, the agent says so and proposes an alternative before acting.</p>
+</section>
+
+<section>
+  <h2>What a decision request looks like</h2>
+  <p>Always one topic, always the same five parts. This is a real one: the first decision the agent needs from you.</p>
+  <div class="brief">
+    <div class="label">Example · how commits happen</div>
+    <p><strong>Why now.</strong> The repository is initialised and nothing is committed yet. Once work starts, something will be finished and verified many times a day.</p>
+    <div class="options">
+      <div class="option pick">
+        <header><h3>A. The agent commits at verified checkpoints</h3><span class="chip ok">Recommended</span></header>
+        <dl>
+          <dt>Upside</dt><dd>Every verified step is a restore point. You are not interrupted about code you do not review.</dd>
+          <dt>Risk</dt><dd>A commit lands without your eyes on it. Limited by the check that must pass first, and nothing is pushed without asking.</dd>
+          <dt>Undo</dt><dd>Cheap. Change the rule at any time.</dd>
+        </dl>
+      </div>
+      <div class="option">
+        <header><h3>B. The agent asks before every commit</h3></header>
+        <dl>
+          <dt>Upside</dt><dd>You see every checkpoint as it happens.</dd>
+          <dt>Risk</dt><dd>Many small interruptions, and work stalls whenever you are away.</dd>
+          <dt>Undo</dt><dd>Cheap.</dd>
+        </dl>
+      </div>
+    </div>
+    <p><strong>Best practice.</strong> Agent-driven projects commit small and often, so any step can be rolled back, and people review outcomes instead of individual commits.</p>
+    <p><strong>Recommendation.</strong> A, directly on <code>main</code>, with every push still asking first.</p>
+  </div>
+</section>
+
+<section>
+  <h2>How a task moves, and why a "done" can be trusted</h2>
+  <figure class="diagram">
+    <div class="scroll">
+      <svg viewBox="0 0 680 176" role="img" aria-label="A task moves from Backlog to Next to Now to Done. From Now it can pause in Waiting on you until you answer.">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <rect class="box" x="8" y="14" width="128" height="56" rx="6"/>
+        <text class="t" x="72" y="38" text-anchor="middle">Backlog</text>
+        <text class="t2" x="72" y="56" text-anchor="middle">all known work</text>
+        <line class="edge" x1="136" y1="42" x2="182" y2="42" marker-end="url(#arrow)"/>
+
+        <rect class="box" x="184" y="14" width="128" height="56" rx="6"/>
+        <text class="t" x="248" y="38" text-anchor="middle">Next</text>
+        <text class="t2" x="248" y="56" text-anchor="middle">the next few</text>
+        <line class="edge" x1="312" y1="42" x2="358" y2="42" marker-end="url(#arrow)"/>
+
+        <rect class="box-agent" x="360" y="14" width="128" height="56" rx="6"/>
+        <text class="t" x="424" y="38" text-anchor="middle">Now</text>
+        <text class="t2" x="424" y="56" text-anchor="middle">one at a time</text>
+        <line class="edge" x1="488" y1="42" x2="534" y2="42" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="511" y="32" text-anchor="middle">verified</text>
+
+        <rect class="box-ok" x="536" y="14" width="128" height="56" rx="6"/>
+        <text class="t" x="600" y="38" text-anchor="middle">Done</text>
+        <text class="t2" x="600" y="56" text-anchor="middle">with evidence</text>
+
+        <line class="edge" x1="404" y1="70" x2="404" y2="110" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="396" y="95" text-anchor="end">blocked</text>
+        <line class="edge" x1="444" y1="112" x2="444" y2="72" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="452" y="95">answered</text>
+
+        <rect class="box-you" x="360" y="112" width="128" height="52" rx="6"/>
+        <text class="t" x="424" y="134" text-anchor="middle">Waiting on you</text>
+        <text class="t2" x="424" y="152" text-anchor="middle">shown first in status</text>
+      </svg>
+    </div>
+    <figcaption>A task reaches Done only when it is verified. Anything that needs your call is parked where you can see it, not guessed at.</figcaption>
+  </figure>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>What protects a "done"</th><th>What it prevents</th></tr></thead>
+      <tbody>
+        <tr><td>Acceptance criteria are agreed before building</td><td>Success declared against a moving target</td></tr>
+        <tr><td>Tests sit at service boundaries and inject the failure</td><td>Reliability that only works on a good day</td></tr>
+        <tr><td>A separate verifier agent checks significant work</td><td>The builder grading its own work</td></tr>
+        <tr><td>Rules live in tooling: <code>./scripts/check</code> runs on every commit, and the brief cannot be edited without your approval</td><td>Rules that depend on the agent remembering them</td></tr>
+        <tr><td>Every report says what was verified, what was not, and what was skipped</td><td>Silent gaps</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Where the project's memory lives</h2>
+  <p>Nothing important lives only in a chat. A new session starts from these files, so you never have to repeat yourself.</p>
+  <div class="split">
+    <div class="panel">
+      <div class="label">Loaded into every session</div>
+      <ul class="files">
+        <li><code>CLAUDE.md</code><span>The working agreement and the rules on this page</span></li>
+        <li><code>tasks/board.md</code><span>Work in flight, and what is waiting on you</span></li>
+        <li><code>docs/decisions/README.md</code><span>Every decision in one line</span></li>
+        <li><code>docs/guardrails.md</code><span>What must stay true, and the check that holds it</span></li>
+      </ul>
+      <p class="note">Kept short on purpose. A crowded context makes an agent worse, not better.</p>
+    </div>
+    <div class="panel">
+      <div class="label">Opened when needed</div>
+      <ul class="files">
+        <li><code>docs/brief.md</code><span>The goal, word for word</span></li>
+        <li><code>docs/research/ · experiments/</code><span>The evidence behind decisions</span></li>
+        <li><code>docs/decisions/D-nnn</code><span>The full reasoning for each decision</span></li>
+        <li><code>docs/contracts/</code><span>What services promise each other</span></li>
+        <li><code>docs/visuals/</code><span>Pages like this one</span></li>
+        <li><code>tasks/T-nnn · tasks/done.md</code><span>Acceptance criteria, evidence, history</span></li>
+      </ul>
+    </div>
+  </div>
+  <p class="note">Everything traces: a task points to its decision, a decision to its evidence, a guardrail to its decision and its check.</p>
+</section>
+
+<details>
+  <summary>Defaults chosen for you, all changeable</summary>
+  <div class="stack">
+    <ul>
+      <li>The agent does not ask before routine steps: reading, running checks and tests, editing files inside the current task, updating the board.</li>
+      <li>One board file instead of a tracker tool: fewer moving parts for a prototype.</li>
+      <li>Decisions are permanent records. A change of mind adds a new record that replaces the old one, so the history of why stays readable.</li>
+      <li>Visuals are plain HTML files in the repository. Nothing is published anywhere.</li>
+      <li>IDs keep things traceable: <code>T</code> tasks, <code>D</code> decisions, <code>G</code> guardrails, <code>R</code> research notes, <code>E</code> experiments.</li>
+      <li>Commit messages carry the task ID, so the history can be searched by task.</li>
+    </ul>
+  </div>
+</details>
+
+<footer class="foot">
+  <span>Source of truth: <code>CLAUDE.md</code>. This page is a snapshot and is redrawn when the way of working changes.</span>
+  <span>Practices behind this setup: <code>docs/research/R-001-agentic-development-practices.md</code></span>
+</footer>
+</main>
+</body>
+</html>

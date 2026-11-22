@@ -1,0 +1,31 @@
+# OS and editors
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Claude Code: personal overrides and worktrees stay local
+.claude/settings.local.json
+.claude/worktrees/
+CLAUDE.local.md
+
+# Dependencies and build output (extend once the stack is chosen)
+node_modules/
+dist/
+build/
+coverage/
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Logs and scratch
+*.log
+tmp/

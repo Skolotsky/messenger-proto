@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# Every commit must pass the project check (guardrail G-002).
+# Skipping it with --no-verify needs the user's explicit OK.
+exec "$(git rev-parse --show-toplevel)/scripts/check"
