@@ -601,6 +601,7 @@ body.resizing{cursor:col-resize;user-select:none}
 .top:has(.netpill) .newpill small,.top:has(.newpill) .np-x{display:none}
 @media (max-width:760px){.msg-head{padding-right:76px}.msg.mine .msg-head{padding-right:140px}}
 .row.gone .row-main{position:relative}
+@media (max-width:760px){.row-side .state:has(~ [data-act="done"]){display:none}}
 
 /* Telegram-like: one list, round avatars, big targets, folders for buckets, bubbles. Own colours. */
 :root{--accent:#6a4fd0;--accent-soft:#ebe6fb;--r:14px;--wall:#eeebe4}
@@ -924,7 +925,7 @@ function msgHTML(id, ctx) {
   const locked = m.edited && L.body && !S.open.has(k);
   const tags = '' + (m.flag ? '<span class="tag flag">⚑ Flag</span>' : '') + (m.info ? '<span class="tag info">Info</span>' : '');
   const ed = m.edited ? `<span class="edited">edited</span>` + (locked ? `<button class="link" data-act="openMsg" data-k="${k}">Show all</button>` : '') : '';
-  const tools = `<span class="msg-tools">${EMO.map(e => `<button class="rx-btn" data-act="reactMsg" data-m="${id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}<button class="rx-pick" data-act="pick" data-m="${id}" aria-label="More reactions" data-tip="More reactions">${ic('smile')}</button>${ctx !== 'thr' && !inThread && conv(m.conv).kind === 'channel' ? `<button class="own-tool" data-act="openThread" data-m="${id}" aria-label="Reply in thread" data-tip="Reply in thread">${ic('chat')}</button>` : ''}${m.by === ME ? `${m.flag ? `<button class="own-tool" data-act="unflag" data-m="${id}" aria-label="Remove the flag" data-tip="Remove the flag">${ic('unflag')}</button>` : ''}<button class="own-tool" data-act="editMsg" data-mk="${k}" aria-label="Edit" data-tip="Edit">${ic('pencil')}</button><button class="own-tool" data-act="askDel" data-mk="${k}" aria-label="Delete" data-tip="Delete">${ic('trash')}</button>` : ''}</span>`;
+  const tools = `<span class="msg-tools">${EMO.map(e => `<button class="rx-btn" data-act="reactMsg" data-m="${id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}<button class="rx-pick" data-act="pick" data-m="${id}" aria-label="More reactions" data-tip="More reactions">${ic('smile')}</button>${ctx === 'conv' && S.conv && conv(S.conv).kind === 'channel' ? `<button class="own-tool" data-act="openThread" data-m="${id}" aria-label="Reply in thread" data-tip="Reply in thread">${ic('chat')}</button>` : ''}${m.by === ME ? `${m.flag ? `<button class="own-tool" data-act="unflag" data-m="${id}" aria-label="Remove the flag" data-tip="Remove the flag">${ic('unflag')}</button>` : ''}<button class="own-tool" data-act="editMsg" data-mk="${k}" aria-label="Edit" data-tip="Edit">${ic('pencil')}</button><button class="own-tool" data-act="askDel" data-mk="${k}" aria-label="Delete" data-tip="Delete">${ic('trash')}</button>` : ''}</span>`;
   return `<div class="msg${m.streaming ? ' is-streaming' : ''}${m.failed ? ' is-failed' : ''}${m.pending ? ' is-pending' : ''}${m.by === ME ? ' mine' : ''}${m.flag ? ' is-flag' : ''}${m.info ? ' is-info' : ''}" data-k="${k}"><div class="msg-self">${tools}${av(m.by)}<div class="msg-main"><div class="msg-head"><b>${pn(m.by)}</b>${tags}<time>${timeOf(m.t)}</time>${ed}</div>${S.editing === k ? `<form class="edit" data-form="edit" data-m="${id}"><div class="mp"></div><textarea name="t" rows="1" aria-label="Edit your message" autocomplete="off">${esc(m.text)}</textarea><button class="btn sm pri" data-tip="${S.enterSends ? 'Enter' : 'Ctrl+Enter'}">Save</button><button type="button" class="btn sm" data-act="cancelEdit" data-tip="Esc">Cancel</button></form>` : S.delAsk === k ? `<div class="del-ask"><span>Delete this message? It disappears for everyone${replies ? '; its replies stay' : ''}. This cannot be undone.</span><button class="btn sm danger" data-act="delMsg" data-m="${id}">Delete</button><button class="btn sm" data-act="cancelEdit">Cancel</button></div>` : `<div class="msg-body${locked ? ' locked' : ''}"${locked ? ` style="max-height:${L.body}px"` : ''}>${rich(m.text)}</div>`}${m.failed ? `<div class="send-state fail">Not sent. <button class="link" data-act="retry" data-m="${id}">Try again</button> · <button class="link" data-act="discard" data-m="${id}">Discard</button></div>` : m.pending ? '<div class="send-state">Waiting for the connection. It will be sent when you are back online.</div>' : ''}${rxHTML(m)}${m.streaming ? '<div class="send-state">Still being written. It reaches feeds and notifications only when it is finished.</div>' : ''}${m.status ? `<div class="status${m.streaming ? ' live' : ''}"><span class="st-dot"></span>${m.status}</div>` : ''}</div></div>${rep}</div>`;
 }
 function dialCtl(c, ctx) {
@@ -951,10 +952,10 @@ function explain(r) {
     const x = rule('flag'); what = `${pn(r.by)} flagged this message and named you.`; by = x ? 'Your rule "Flags that name you"' : `${first(r.by)} flagged it for you`; alt = 'Without the rule it would be in Needs you, as a direct mention.';
     if (x) acts.push({ label: 'Stop putting flags in Focus', act: 'rmRuleId', d: `data-id="flag" data-rid="${r.id}" data-to="Needs you"`, note: `Removes the rule. ${x.n} items in the last 7 days would have gone to Needs you instead.` });
   } else if (r.rule === 'dm') { // Focus people: one entry per person who wrote to you directly (D-021)
-    const p = c.with; what = `A direct message from ${pn(p)}, a person.`; const inF = S.dmPeople.includes(p); by = inF ? `${first(p)} is one of your Focus people${S.dmAuto ? ', added the first time they wrote to you' : ''}` : `${first(p)} is not one of your Focus people`; alt = inF ? 'A direct message from someone who is not one of them lands in Needs you.' : 'Add them back under Focus people and their direct messages land in Focus.';
+    const p = c.with; what = `A direct message from ${pn(p)}, a person.`; const inF = S.dmPeople.includes(p); const here = r.bucket === 'focus'; by = here === inF ? (inF ? `${first(p)} is one of your Focus people${S.dmAuto ? ', added the first time they wrote to you' : ''}` : `${first(p)} is not one of your Focus people`) : `${first(p)} ${here ? 'was' : 'was not'} one of your Focus people when this arrived`; alt = here !== inF ? `It moves to ${inF ? 'Focus' : 'Needs you'} the next time you open the feed.` : inF ? 'A direct message from someone who is not one of them lands in Needs you.' : 'Add them back under Focus people and their direct messages land in Focus.';
     if (S.dmPeople.includes(p)) acts.push({ label: `Remove ${first(p)} from Focus`, act: 'rmPerson', d: `data-p="${p}" data-rid="${r.id}"`, note: `Only ${first(p)}; everyone else stays. ${RCOUNT[p] || 5} items in the last 7 days would have gone to Needs you instead.` });
   } else if (r.drive === 'channel') {
-    what = `${r.items.length} new posts in #${c.name}. None of them names you.`; by = `#${c.name} is set to ${DIAL[c.dial][0]}`; alt = c.dial === 'default' ? '' : 'At Default they would not be in your feed at all.';
+    what = `${r.items.length} new posts in #${c.name}. None of them names you.`; const lv = r.bucket === 'focus' ? 'focus' : 'all'; by = c.dial === lv ? `#${c.name} is set to ${DIAL[lv][0]}` : `#${c.name} was set to ${DIAL[lv][0]} when this arrived`; alt = c.dial !== lv ? 'It moves the next time you open the feed.' : 'At Default they would not be in your feed at all.';
     if (c.dial !== 'all') acts.push({ label: `Set #${c.name} to All activity`, act: 'dialFrom', d: `data-c="${c.id}" data-l="all" data-rid="${r.id}" data-to="For your information"`, note: `${CVOL[c.name] || 20} posts in the last 7 days would have gone to For your information.` });
     if (c.dial !== 'default') acts.push({ label: `Set #${c.name} to Default`, act: 'dialFrom', d: `data-c="${c.id}" data-l="default" data-rid="${r.id}" data-to="nowhere in your feed"`, note: 'Only what names you, and your own threads, would reach you from it.' });
   }
@@ -982,7 +983,7 @@ function rowHTML(r) {
   const badge = r.read ? '' : `<span class="row-badge">${n > 1 ? n : ''}</span>`;
   const lockS = last.edited && L.body ? ` style="max-height:${L.body}px"` : '';
   return `<article class="row b-${r.bucket} ${r.read ? 'read' : 'unread'}${state || (r.kept && !r.done) ? ' has-side' : ''}${r.fresh ? ' fresh' : ''}${r.sec === 'kept' ? ' kept' : ''}${r.done ? ' done' : ''}" data-row="${r.id}">
-    <div class="sw-under" aria-hidden="true"><span class="sw-l">${ic('check')} ${r.sec === 'kept' ? 'Done' : 'Mark read'}</span><span class="sw-k">${r.kept && !r.done ? 'Kept' : r.done ? 'Keep again' : 'Keep'} ${ic('pin')}</span></div>
+    <div class="sw-under" aria-hidden="true"><span class="sw-l">${ic('check')} ${r.kept && !r.done ? 'Done' : 'Mark read'}</span><span class="sw-k">${r.kept && !r.done ? 'Kept' : r.done ? 'Keep again' : 'Keep'} ${ic('pin')}</span></div>
     <div class="row-main" role="button" tabindex="0" data-act="toggle" data-id="${r.id}">${av(r.chan ? '#' : r.kind === 'rx' ? r.by : last.by)}
       <div class="row-text"><div class="row-head"><span class="row-title">${esc(title)}</span>${sub ? `<span class="row-sub">${sub}</span>` : ''}${marks}${cnt}<span class="row-time">${r.t}${last.edited ? ' · edited' : ''}</span></div>
         <div class="row-reason"><span class="why-dot"></span><button class="why-btn" data-tip="Why is this here?" data-act="why" data-id="${r.id}" aria-expanded="${S.whyOpen === r.id}">${esc(r.reason)} ${ic('chev')}</button>${r.note ? ` · <em>${r.note}</em>` : ''}</div>
@@ -1021,6 +1022,7 @@ const hUnread = e => !!e[2] && !S.msgs[e[2]].deleted && S.rows.some(r => !r.read
 function histTabs(short) { // each tab counts its unread entries; the count is quiet, so the feed's badge stays the one that calls
   return Object.keys(HT).map(t => { const n = HIST[t].filter(hUnread).length; return `<button class="tab${S.view === 'history' && S.htab === t ? ' on' : ''}" data-act="htab" data-t="${t}" data-tip="History of your ${HT[t].toLowerCase()}. Nothing leaves it by being read." aria-label="${HT[t]}${n ? ', ' + n + ' unread' : ''}">${short && t === 'dms' ? 'DMs' : HT[t]}${n ? `<span class="h-count">${n}</span>` : ''}</button>`; }).join('');
 }
+const isKept = k => { const m = S.msgs[k.slice(k.indexOf(':') + 1)]; return m ? S.rows.some(r => r.items.includes(m.id) && r.kept && !r.done) : S.kept.has(k); };
 function history() {
   const list = HIST[S.htab].filter(e => !e[2] || !S.msgs[e[2]].deleted).map(e => {
     const [cid, by, mid, text, when, where] = e, c = conv(cid), m = mid && S.msgs[mid];
@@ -1029,7 +1031,7 @@ function history() {
     const body = S.htab === 'reactions' ? esc(text) + (m ? `<span class="h-quote">${rich(m.text)}</span>` : '') : `${S.htab === 'threads' ? `<b>${first(by)}:</b> ` : ''}${rich(m ? m.text : text)}`;
     const extra = S.htab === 'threads' ? `<span class="row-sub">#${c.where} · ${TDIAL[c.tdial][0]}</span>` : where ? `<span class="row-sub">${where}</span>` : '';
     const kk = cid + ':' + (mid || text);
-    return `<article class="row hrow${unread ? ' unread' : ''}"><div class="row-main" role="button" tabindex="0" data-act="openConv" data-c="${cid}">${av(by)}<div class="row-text"><div class="row-head">${unread ? '<span class="dot" data-tip="Unread"></span>' : ''}${title ? `<span class="row-title">${esc(title)}</span>` : ''}${extra}${m && m.flag ? '<span class="tag flag">⚑</span>' : ''}${m && m.info ? '<span class="tag info">Info</span>' : ''}<span class="row-time">${when}${m && m.edited ? ' · edited' : ''}</span></div><div class="row-preview">${body}</div></div><div class="row-side"><button class="btn sm${S.kept.has(kk) ? ' on' : ''}" data-act="keepH" data-k="${esc(kk)}">${S.kept.has(kk) ? 'Kept' : 'Keep'}</button></div></div></article>`;
+    return `<article class="row hrow${unread ? ' unread' : ''}"><div class="row-main" role="button" tabindex="0" data-act="openConv" data-c="${cid}">${av(by)}<div class="row-text"><div class="row-head">${unread ? '<span class="dot" data-tip="Unread"></span>' : ''}${title ? `<span class="row-title">${esc(title)}</span>` : ''}${extra}${m && m.flag ? '<span class="tag flag">⚑</span>' : ''}${m && m.info ? '<span class="tag info">Info</span>' : ''}<span class="row-time">${when}${m && m.edited ? ' · edited' : ''}</span></div><div class="row-preview">${body}</div></div><div class="row-side"><button class="btn sm${isKept(kk) ? ' on' : ''}" data-act="keepH" data-k="${esc(kk)}">${isKept(kk) ? 'Kept' : 'Keep'}</button></div></div></article>`;
   }).join('');
   return `<div class="feed-wrap"><div class="feed-scroll" data-scroll="hist"><p class="hist-note">History, for finding things again. Newest first, read and unread together; a dot marks what you have not read yet. Nothing here is sorted by buckets, and nothing leaves by being read.</p>${list}</div></div>`;
 }
@@ -1215,6 +1217,8 @@ function below(rid) { const el = document.querySelector(`[data-row="${rid}"]`); 
 function onScreen(rid) { const el = document.querySelector(`[data-row="${rid}"]`); if (!el) return false; const b = el.getBoundingClientRect(); return b.bottom > 0 && b.top < innerHeight; }
 function measured(rid, fn, what) { const a = below(rid); fn(); render(); const b = below(rid); S.note = a === null || b === null ? what + ' The row was not on screen.' : `${what} The row below moved by ${Math.abs(b - a).toFixed(1)} px.`; render(); }
 function setLevel(c, v) { c.dial = v; const id = 'ch:' + c.name; S.rules = S.rules.filter(r => r.id !== id); S.gone = S.gone.filter(r => r.id !== id); if (v === 'focus') S.rules.push({ id, label: `Every new post in #${c.name}`, n: CVOL[c.name] || 20, kind: 'channel', target: c.name }); }
+const undoSnap = id => { const r = row(id); return { row: r, snap: { bucket: r.bucket, reason: r.reason, read: r.read, sec: r.sec } }; };
+const dropUndo = test => Object.keys(S.undo).forEach(k => { if (test(S.undo[k])) { delete S.undo[k]; delete S.off[k]; } }); // the same setting was changed elsewhere: this Undo no longer means anything
 const A = {
   openConv(d) { S.back = null; S.thread = null; if (S.conv !== d.c) S.lock = Object.fromEntries(Object.entries(S.lock).filter(([k]) => !k.startsWith('conv:'))); S.conv = d.c; conv(d.c); S.menu = null; S.modal = null; S.rows.forEach(r => { if (r.conv === d.c && (!d.id || r.id === d.id || conv(d.c).kind !== 'channel')) r.read = true; }); const sr = document.getElementById('sr'); if (sr) sr.innerHTML = ''; S.q = ''; },
   openThread(d) { // a thread opens as its own conversation, in place of the channel, with a way back
@@ -1249,7 +1253,7 @@ const A = {
   meSub() { S.meSub = !S.meSub; },
   viewAs(d) { S.viewAs = d.p === ME ? null : d.p; S.modal = null; S.menu = null; },
   backToMe() { S.viewAs = null; },
-  setDial(d) { setLevel(conv(d.c), d.l); S.menu = null; S.note = 'Dial changed. Unread rows are re-sorted the next time the feed is opened.'; },
+  setDial(d) { dropUndo(u => u.c === d.c); setLevel(conv(d.c), d.l); S.menu = null; S.note = 'Dial changed. Unread rows are re-sorted the next time the feed is opened.'; },
   setT(d) { const c = conv(d.c); c.tdial = d.l; c.tset = true; S.menu = null; },
   follow(d) { const c = conv(d.c); c.tdial = c.tdial === 'off' ? 'fyi' : 'off'; c.tset = true; S.menu = null; },
   modal(d) { S.modal = { type: d.m, p: d.p }; S.menu = null; if (d.m === 'tray') S.demo = false; if (d.m === 'rules') S.setSec = d.s || 'feed'; },
@@ -1276,28 +1280,28 @@ const A = {
   notify(d) { S.focusOnly = d.v === 'focus'; },
   actToggle() { if (S.actOpen === false) { S.actOpen = true; S.view = 'feed'; } else { if (S.view === 'feed') settle(); S.actOpen = false; } S.menu = null; },
   ruleFor(d) { S.modal = { type: 'rule', conv: d.c, by: d.by }; S.menu = null; },
-  addRule(d) { if (d.kind === 'thread') { const c = conv(d.target); c.tdial = 'focus'; c.tset = true; return; }
+  addRule(d) { dropUndo(u => u.rule && u.rule.id === d.id); if (d.kind === 'thread') { const c = conv(d.target); c.tdial = 'focus'; c.tset = true; return; }
     S.rules.push({ id: d.id, label: d.label, n: +d.n, kind: d.kind || undefined, target: d.target || undefined, start: d.start ? 1 : 0 }); S.gone = S.gone.filter(x => x.id !== d.id); if (d.kind === 'channel') { const c = conv('ch-' + d.target); if (c) c.dial = 'focus'; } },
   rmRule(d) { const r = S.rules.splice(+d.i, 1)[0]; S.gone.push(r); if (r.kind === 'channel') { const c = conv('ch-' + r.target); if (c) c.dial = 'default'; } },
   closeModal() { S.modal = null; },
   why(d) { S.whyOpen = S.whyOpen === d.id ? null : d.id; },
-  ruleToggle(d) { const DEF = { flag: ['Flags that name you', 6, 1], mention: ['Any direct mention', 23, 0] }; if (S.rules.some(r => r.id === d.id)) S.rules = S.rules.filter(r => r.id !== d.id); else S.rules.push({ id: d.id, label: DEF[d.id][0], n: DEF[d.id][1], start: DEF[d.id][2] }); },
-  undoChange(d) { const u = S.undo[d.rid]; if (u.rule) { S.rules.push(u.rule); S.gone = S.gone.filter(x => x.id !== u.rule.id); } if (u.dial) setLevel(conv(u.c), u.dial); delete S.undo[d.rid]; delete S.off[d.rid]; },
-  rmRuleId(d) { const was = S.rules.find(x => x.id === d.id); if (d.rid && was) S.undo[d.rid] = { rule: was }; S.gone.push(...S.rules.filter(x => x.id === d.id)); S.rules.filter(x => x.id === d.id && x.kind === 'channel').forEach(x => { const c = conv('ch-' + x.target); if (c) c.dial = 'default'; }); S.rules = S.rules.filter(x => x.id !== d.id); if (d.rid) S.off[d.rid] = d.to; },
+  ruleToggle(d) { dropUndo(u => u.rule && u.rule.id === d.id); const DEF = { flag: ['Flags that name you', 6, 1], mention: ['Any direct mention', 23, 0] }; if (S.rules.some(r => r.id === d.id)) S.rules = S.rules.filter(r => r.id !== d.id); else S.rules.push({ id: d.id, label: DEF[d.id][0], n: DEF[d.id][1], start: DEF[d.id][2] }); },
+  undoChange(d) { const u = S.undo[d.rid]; if (u.rule && !S.rules.some(x => x.id === u.rule.id)) { S.rules.push(u.rule); S.gone = S.gone.filter(x => x.id !== u.rule.id); } if (u.dial) setLevel(conv(u.c), u.dial); Object.assign(u.row, u.snap); if (!S.rows.includes(u.row)) S.rows.push(u.row); delete S.undo[d.rid]; delete S.off[d.rid]; },
+  rmRuleId(d) { const was = S.rules.find(x => x.id === d.id); if (d.rid && was) S.undo[d.rid] = { rule: was, ...undoSnap(d.rid) }; S.gone.push(...S.rules.filter(x => x.id === d.id)); S.rules.filter(x => x.id === d.id && x.kind === 'channel').forEach(x => { const c = conv('ch-' + x.target); if (c) c.dial = 'default'; }); S.rules = S.rules.filter(x => x.id !== d.id); if (d.rid) S.off[d.rid] = d.to; },
   rmPerson(d) { S.dmPeople = S.dmPeople.filter(x => x !== d.p); if (!S.dmRemoved.includes(d.p)) S.dmRemoved.push(d.p); if (d.rid) S.off[d.rid] = { p: d.p, msg: `${first(d.p)} is removed from Focus. Direct messages from ${first(d.p)} land in Needs you, starting the next time you open the feed.` }; },
   undoPerson(d) { Object.keys(S.off).forEach(k => { if (S.off[k] && S.off[k].p === d.p) delete S.off[k]; }); if (!S.dmPeople.includes(d.p)) S.dmPeople.push(d.p); S.dmRemoved = S.dmRemoved.filter(x => x !== d.p); delete S.off[d.rid]; },
   dmAuto() { S.dmAuto = !S.dmAuto; S.dmAsk = !S.dmAuto && S.dmPeople.length > 0; },
   keepPeople() { S.dmAsk = false; },
   rmAllPeople() { S.dmRemoved.push(...S.dmPeople.filter(x => !S.dmRemoved.includes(x))); S.dmPeople = []; S.dmAsk = false; },
-  dialFrom(d) { S.undo[d.rid] = { c: d.c, dial: conv(d.c).dial }; setLevel(conv(d.c), d.l); S.off[d.rid] = d.to; },
+  dialFrom(d) { S.undo[d.rid] = { c: d.c, dial: conv(d.c).dial, ...undoSnap(d.rid) }; setLevel(conv(d.c), d.l); S.off[d.rid] = d.to; },
   focusOnly() { S.focusOnly = !S.focusOnly; },
   openMsg(d) { S.open.add(d.k); },
   keepH(d) {
-    const mid = d.k.slice(d.k.indexOf(':') + 1), m = S.msgs[mid], on = S.kept.has(d.k);
+    const mid = d.k.slice(d.k.indexOf(':') + 1), m = S.msgs[mid], on = isKept(d.k);
     if (on) S.kept.delete(d.k); else S.kept.add(d.k);
     if (!m) return;
     const r = S.rows.find(x => x.items.includes(mid));
-    if (on) { if (r && r.kept === 'you') { if (r.fromHistory) S.rows = S.rows.filter(x => x !== r); else { r.kept = null; r.keptNow = false; } } return; }
+    if (on) { if (r && r.kept === 'you') { if (r.fromHistory) S.rows = S.rows.filter(x => x !== r); else { r.kept = null; r.keptNow = false; r.sec = 'new'; } } return; }
     if (r) A.keep({ id: r.id }); else S.rows.push({ id: 'r-h-' + mid, conv: d.k.slice(0, d.k.indexOf(':')), bucket: 'focus', sec: 'kept', items: [mid], by: m.by, t: m.t.replace(/^.* /, ''), reason: 'Kept by you', why: 'You kept this from History.', read: true, kept: 'you', done: false, replies: [], fromHistory: 1 });
   },
   level(d) { S.levels[d.fc] = S.levels[d.fc] === d.l ? '' : d.l; },
@@ -1364,7 +1368,7 @@ document.addEventListener('pointermove', e => {
 const swEnd = () => {
   if (!sw) return; const w = sw; sw = null; if (!w.on) return;
   swallow = true; setTimeout(() => { swallow = false; }, 60); const r = row(w.id); // eat only the click this drag itself produces
-  if (r && w.dx > 70) { if (r.sec === 'kept') r.done = true; r.read = true; }        // to the right: read (Done on a kept row)
+  if (r && w.dx > 70) { if (r.kept) r.done = true; r.read = true; }        // to the right: read (Done on a kept row)
   else if (r && w.dx < -70) A.keep({ id: r.id }); // to the left: keep
   render();
 };
@@ -1422,11 +1426,11 @@ document.addEventListener('keydown', e => { // Enter and Ctrl+Enter in the messa
 document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"]')) { e.preventDefault(); e.target.click(); } if (e.key === 'Escape' && (S.modal || S.menu || S.pick)) { S.modal = null; S.menu = null; S.pick = null; render(); } });
 const ncName = v => v.trim().toLowerCase().replace(/[\s_]+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').replace(/^-|-$/g, '');
 function ncCheck(i) { const n = ncName(i.value), taken = CH.some(x => x[0] === n), pv = document.getElementById('nc-prev'), go = document.getElementById('nc-go'); pv.innerHTML = !n ? 'Lower-case letters, digits and hyphens. Spaces become hyphens.' : taken ? `<b class="err">#${n} already exists.</b> Choose another name, or open it from the list.` : `It will be called <b>#${n}</b>.`; go.disabled = !n || taken; }
-document.addEventListener('change', e => { if (e.target.dataset.dial) { setLevel(conv(e.target.dataset.dial), e.target.value); render(); } });
+document.addEventListener('change', e => { if (e.target.dataset.dial) { dropUndo(u => u.c === e.target.dataset.dial); setLevel(conv(e.target.dataset.dial), e.target.value); render(); } });
 document.addEventListener('submit', e => { e.preventDefault(); submit(e.target); });
 document.addEventListener('input', e => {
   if (e.target.dataset.mytitle) S.myTitle = e.target.value;
-  if (e.target.dataset.myname && e.target.value.trim()) P[ME][0] = e.target.value.trim();
+  if (e.target.dataset.myname && e.target.value.trim()) P[ME][0] = e.target.value.replace(/[<>&"]/g, '').trim() || P[ME][0];
   if (e.target.dataset.newch) ncCheck(e.target);
   if (e.target.matches('textarea[name="t"]')) grow(e.target);
   if (e.target.dataset.search) search(e.target.value);

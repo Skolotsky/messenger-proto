@@ -752,6 +752,19 @@ def verifier_round(browser, slug, size, vp, scale):
     demo("netToggle"); pg.locator('.pane [data-act="retry"]').click()
     ok("B6 Try again while offline shows it waiting", "Waiting for the connection" in pg.locator(".pane .msg.is-pending").inner_text())
     demo("netToggle"); ok("and it answers the row only once it is really sent", st("S.rows.find(r => r.id === 'r-anna').done"))
+    pg.goto(U); open_c("ch-general")
+    ok("every channel message can start a thread", pg.locator('.pane [data-k="conv:b1"] [data-act="openThread"]').count() >= 1)
+    pg.goto(U); pg.locator('.top [data-m="rules"]').first.click() if size == "desktop" else pg.locator('.bottom [data-m="rules"]').click()
+    pg.locator('.settings .set-nav [data-s="account"]').click(); pg.locator('.settings [data-myname]').fill('<img src=x onerror="window.__x=1">Z'); pg.locator('.settings [data-act="closeModal"]').click()
+    ok("a name is plain text and runs nothing", pg.evaluate("window.__x === undefined") and pg.locator(".me img").count() == 0)
+    pg.goto(U); pg.evaluate("""() => { const c = (a, o) => { const b = document.createElement('button'); b.dataset.act = a; Object.assign(b.dataset, o); b.hidden = true; document.body.appendChild(b); b.click(); b.remove(); };
+      c('dialFrom', { c: 'ch-incidents', l: 'all', rid: 'r-inc', to: 'For your information' }); c('leave', {}); c('undoChange', { rid: 'r-inc' }); c('leave', {}); }""")
+    ok("Undo after the row has moved brings it back to Focus", st("(S.rows.find(r => r.id === 'r-inc') || {}).bucket") == "focus")
+    pg.goto(U); pg.evaluate("""() => { const c = (a, o) => { const b = document.createElement('button'); b.dataset.act = a; Object.assign(b.dataset, o); b.hidden = true; document.body.appendChild(b); b.click(); b.remove(); };
+      c('rmRuleId', { id: 'flag', rid: 'r-rc', to: 'Needs you' }); c('ruleToggle', { id: 'flag' }); }""")
+    ok("an Undo goes away once the same rule was changed in settings", st("Object.keys(S.undo).length") == 0 and st("S.rules.filter(r => r.id === 'flag').length") == 1)
+    pg.goto(U); pg.evaluate("() => { const c = (a, o) => { const b = document.createElement('button'); b.dataset.act = a; Object.assign(b.dataset, o); b.hidden = true; document.body.appendChild(b); b.click(); b.remove(); }; c('dialFrom', { c: 'ch-incidents', l: 'all', rid: 'r-inc', to: 'For your information' }); c('why', { id: 'r-inc' }); }")
+    ok("while a change waits, the panel still gives the true cause", "was set to Focus when this arrived" in pg.locator(".why-pop").inner_text())
     pg.goto(U); open_c("ch-launch")
     if size == "desktop":
         demo("netToggle"); h = pg.locator(".top h1").bounding_box(); n_ = pg.locator(".netpill").bounding_box(); ok("the offline notice does not cover the title", h["x"] + h["width"] <= n_["x"] + .5, (h, n_)); demo("netToggle")

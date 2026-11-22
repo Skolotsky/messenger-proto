@@ -573,3 +573,4 @@ body.resizing{cursor:col-resize;user-select:none}
 .top:has(.netpill) .newpill small,.top:has(.newpill) .np-x{display:none}
 @media (max-width:760px){.msg-head{padding-right:76px}.msg.mine .msg-head{padding-right:140px}}
 .row.gone .row-main{position:relative}
+@media (max-width:760px){.row-side .state:has(~ [data-act="done"]){display:none}}

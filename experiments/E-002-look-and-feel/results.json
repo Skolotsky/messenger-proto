@@ -555,6 +555,41 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "every channel message can start a thread",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a name is plain text and runs nothing",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Undo after the row has moved brings it back to Focus",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "an Undo goes away once the same rule was changed in settings",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "while a change waits, the panel still gives the true cause",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "the offline notice does not cover the title",
   "pass": true,
   "detail": "({'x': 266, 'y': 20.953125, 'width': 203.15625, 'height': 26.09375}, {'x': 479.15625, 'y': 20.9375, 'width': 162.84375, 'height': 26.125})"
@@ -1774,6 +1809,41 @@
   "page": "slack-like",
   "width": "phone",
   "check": "and it answers the row only once it is really sent",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "every channel message can start a thread",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "a name is plain text and runs nothing",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "Undo after the row has moved brings it back to Focus",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "an Undo goes away once the same rule was changed in settings",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "while a change waits, the panel still gives the true cause",
   "pass": true,
   "detail": ""
  },
