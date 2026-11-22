@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seven walk-throughs</title>
+<style>
+/* Layout: one reading column. Diagrams, tables and code may run wider inside their own scroll box. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --sunken: #eceef2; --line: #d8dce4;
+  --ink: #17202b; --ink-2: #445063; --ink-3: #5f6b7d;
+  --agent: #2351c9; --agent-soft: #e5ecfc; /* the agent's work, links */
+  --you: #a64b08; --you-soft: #fcebd9;     /* where the user's attention is needed */
+  --ok: #1b7548; --ok-soft: #e1f3e8;       /* recommended, holds, verified */
+  --risk: #b3261e; --risk-soft: #fbe8e6;   /* risk, broken, not verified */
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Cascadia Code", "Cascadia Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+    --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+    --agent: #86a8ff; --agent-soft: #1b2a4c;
+    --you: #f2a766; --you-soft: #3b2814;
+    --ok: #62cf99; --ok-soft: #14301f;
+    --risk: #ff8f85; --risk-soft: #3d1815;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+  --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+  --agent: #86a8ff; --agent-soft: #1b2a4c;
+  --you: #f2a766; --you-soft: #3b2814;
+  --ok: #62cf99; --ok-soft: #14301f;
+  --risk: #ff8f85; --risk-soft: #3d1815;
+  color-scheme: dark;
+}
+
+/* Base */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--font); }
+.page {
+  max-width: 880px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 34px;
+}
+section, .stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+h1 { font: 650 27px/1.2 var(--display); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h2 { font: 650 18.5px/1.3 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 650 14.5px/1.35 var(--font); margin: 0; }
+p { margin: 0; max-width: 68ch; }
+ul, ol { margin: 0; padding-left: 1.25em; display: flex; flex-direction: column; gap: 5px; max-width: 68ch; }
+a { color: var(--agent); }
+strong { font-weight: 650; }
+code { font: 0.88em var(--mono); background: var(--sunken); border: 1px solid var(--line); border-radius: 4px; padding: 0.08em 0.36em; overflow-wrap: anywhere; }
+:focus-visible { outline: 2px solid var(--agent); outline-offset: 2px; }
+.label { font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.note { color: var(--ink-3); font-size: 13.5px; }
+
+/* Header */
+.top { display: flex; flex-direction: column; gap: 8px; }
+.lede { font-size: 16.5px; color: var(--ink-2); max-width: 62ch; }
+
+/* Needs you: the one thing the user has to decide or answer */
+.ask { background: var(--you-soft); border: 1px solid color-mix(in srgb, var(--you) 40%, transparent); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.ask .label { color: var(--you); }
+
+/* Chips */
+.chip { display: inline-flex; align-items: center; font: 600 12px/1 var(--font); padding: 4px 9px; border-radius: 999px; background: var(--sunken); color: var(--ink-2); white-space: nowrap; }
+.chip.you { background: var(--you-soft); color: var(--you); }
+.chip.agent { background: var(--agent-soft); color: var(--agent); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.risk { background: var(--risk-soft); color: var(--risk); }
+
+/* Panels side by side */
+.split { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.panel.you .label { color: var(--you); }
+.panel.agent .label { color: var(--agent); }
+.files { list-style: none; padding: 0; gap: 7px; }
+.files li { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.files span { color: var(--ink-2); font-size: 13.5px; }
+
+/* Lanes: who does what, phase by phase. Children in order: three .head cells, then .phase, .you, .agent per row */
+.lanes { display: grid; grid-template-columns: minmax(128px, 0.75fr) 1.25fr 1.5fr; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.lanes > * { padding: 12px 14px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin: -1px 0 0 -1px; min-width: 0; }
+.lanes > .head { background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.lanes > .head.you { color: var(--you); background: var(--sunken); }
+.lanes > .head.agent { color: var(--agent); }
+.lanes > .phase { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.lanes > .phase strong { font: 650 15px/1.3 var(--display); }
+.lanes > .phase .say { color: var(--ink-2); font-size: 13.5px; }
+.lanes > .you { background: color-mix(in srgb, var(--you-soft) 60%, var(--surface)); }
+.lanes > .you.idle { background: var(--surface); color: var(--ink-3); }
+@media (max-width: 600px) {
+  .lanes { grid-template-columns: 1fr 1.2fr; }
+  .lanes > .head.first { display: none; }
+  .lanes > .phase { grid-column: 1 / -1; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--sunken); padding-block: 8px; }
+}
+
+/* Options: a choice, side by side */
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.option { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.option.pick { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+.option header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.option dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; font-size: 14px; }
+.option dt { font-weight: 650; color: var(--ink-3); }
+.option dd { margin: 0; min-width: 0; }
+.brief { border: 1px dashed var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+/* Steps: what happens, in order */
+.steps { list-style: none; padding: 0; gap: 0; counter-reset: step; max-width: none; }
+.steps > li { counter-increment: step; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding-bottom: 16px; position: relative; }
+.steps > li::before { content: counter(step); width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; font: 600 13px var(--mono); color: var(--ink-2); position: relative; z-index: 1; }
+.steps > li:not(:last-child)::after { content: ""; position: absolute; left: 13.5px; top: 28px; bottom: 0; width: 1px; background: var(--line); }
+.steps > li:last-child { padding-bottom: 0; }
+.steps .body { display: flex; flex-direction: column; gap: 5px; padding-top: 3px; min-width: 0; }
+
+/* Figures: diagrams and snippets */
+figure { margin: 0; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+figcaption { font-size: 13px; color: var(--ink-3); max-width: 68ch; }
+.diagram .scroll { overflow-x: auto; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; }
+.diagram svg { display: block; min-width: 680px; width: 100%; height: auto; color: var(--ink-3); font-family: var(--font); }
+.diagram .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
+.diagram .box-you { fill: var(--you-soft); stroke: var(--you); stroke-width: 1.25; }
+.diagram .box-agent { fill: var(--agent-soft); stroke: var(--agent); stroke-width: 1.25; }
+.diagram .box-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.25; }
+.diagram .box-risk { fill: var(--risk-soft); stroke: var(--risk); stroke-width: 1.25; }
+.diagram .t { fill: var(--ink); font-size: 13px; font-weight: 650; }
+.diagram .t2 { fill: var(--ink-2); font-size: 11px; }
+.diagram .edge { stroke: currentColor; stroke-width: 1.5; fill: none; }
+.diagram .edge-label { fill: var(--ink-2); font-size: 11px; }
+.snippet pre { margin: 0; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; overflow-x: auto; font: 13px/1.5 var(--mono); }
+.snippet pre code { background: none; border: 0; padding: 0; font: inherit; overflow-wrap: normal; }
+.snippet mark { background: var(--you-soft); color: inherit; border-radius: 3px; padding: 0 2px; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+thead th { border-top: 0; background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Depth on demand */
+details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 0 16px; }
+details > summary { cursor: pointer; padding: 11px 0; font-weight: 650; }
+details[open] { padding-bottom: 14px; }
+details > .stack { gap: 10px; }
+
+/* Footer */
+.foot { border-top: 1px solid var(--line); padding-top: 14px; color: var(--ink-3); font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body>
+<main class="page">
+<header class="top">
+  <div class="label">Architecture draft · T-022 · 2026-11-22 · nothing here is decided yet</div>
+  <h1>Seven walk-throughs: what happens, step by step</h1>
+  <p class="lede">Each one follows a single event through the parts on the <a href="T-022-architecture-proposal.html">system map</a>, and names the failure a test will inject to prove the claim. The numbers (two seconds, five seconds, three tries) are proposals for D-007.</p>
+</header>
+
+<section>
+  <h2>The seven, and what each one shows</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Walk-through</th><th>What it shows</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><a href="#w1">A message is sent</a></td><td>One save, then search, the feed, a notification and an agent each get it on their own.</td></tr>
+        <tr><td>2</td><td><a href="#w2">Edited to add a mention, then deleted</a></td><td>The newly named person is told as if new; after the delete each reader is left with what D-004 says.</td></tr>
+        <tr><td>3</td><td><a href="#w3">A receiver is down and recovers</a></td><td>Nothing is lost, nobody else is delayed, and the affected screen says so.</td></tr>
+        <tr><td>4</td><td><a href="#w4">The same change twice, and out of order</a></td><td>A repeat changes nothing; a late edit cannot bring back a deleted message.</td></tr>
+        <tr><td>5</td><td><a href="#w5">A screen loses its connection</a></td><td>It catches up from the last number it saw and ends equal to a fresh load.</td></tr>
+        <tr><td>6</td><td><a href="#w6">A dial is changed</a></td><td>Unread rows are judged again; read rows stay; the list does not move while viewed.</td></tr>
+        <tr><td>7</td><td><a href="#w7">An agent streams a reply and stops with a flag</a></td><td>Text in progress travels a fast path and reaches no receiver; the finished message travels like any other.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="w1">
+  <h2>1 · A message is sent</h2>
+  <p>Anna posts in #launch: "@Marco can you sign off the pricing page? @Release agent hold the build until he does."</p>
+  <ol class="steps">
+    <li><div class="body"><h3>Anna's screen shows it at once</h3><p>Marked "sending", and sent with an ID the screen made up. If the answer is lost and the screen tries again, the same ID means it is saved once.</p></div></li>
+    <li><div class="body"><h3>Conversations saves the message and the log entry together</h3><p>The message is version 1; the log gets change 4812. Either both are saved or neither. Anna's screen gets "saved".</p><p class="note">Test: stop the program right after the save. After a restart the change is in the log and is delivered.</p></div></li>
+    <li><div class="body"><h3>Screens with #launch open get it live</h3><p>As numbered update 4812, within a second.</p></div></li>
+    <li><div class="body"><h3>The search worker hands it to the search index</h3><p>The whole message with its version. It can be found within about two seconds.</p></div></li>
+    <li><div class="body"><h3>The feed works out where it lands for each person</h3><p>Marco is mentioned: a row in Needs you, "Anna mentioned you in #launch". Anna gets nothing (her own message). Others get a row only if their dial for #launch says so. In the same step the feed notes in its own log: "notification due for Marco".</p></div></li>
+    <li><div class="body"><h3>The notification sender waits five seconds, then sends once</h3><p>The entry appears in Marco's tray. If Marco had #launch open in front of him, the feed already knew: his screen had reported "watching #launch", which is on the log too. Then the message is read on arrival: no row and no notification (D-015, rule 6).</p></div></li>
+    <li><div class="body"><h3>The release agent receives "you were mentioned"</h3><p>It reads events from its own place in its own stream, and confirms by number. An agent that was away reads on from where it stopped.</p></div></li>
+  </ol>
+</section>
+
+<section id="w2">
+  <h2>2 · The message is edited to add a mention, then deleted</h2>
+  <p>Marco has read the row. Anna adds "@Lena" to the message. Lena has not looked yet when Anna deletes it.</p>
+  <ol class="steps">
+    <li><div class="body"><h3>The edit is saved as version 2</h3><p>Change 4830 carries the whole new message. In #launch the text changes in place and shows "edited".</p></div></li>
+    <li><div class="body"><h3>Search replaces what it had</h3><p>Version 2 is newer than version 1. The old wording is no longer found (D-004).</p></div></li>
+    <li><div class="body"><h3>The feed compares whom the message addresses now and before</h3><p>Lena is new: she gets a row and a notification exactly as if she had been named at the start. Marco's row shows the new text and "edited"; it does not become unread again.</p></div></li>
+    <li><div class="body"><h3>The delete is saved as version 3</h3><p>Change 4855 carries only which message and its version. In #launch nothing remains, because the message had no replies; people looking at it right now keep the space until they move on.</p></div></li>
+    <li><div class="body"><h3>Search removes it and remembers "deleted at version 3"</h3><p>So a late copy of version 2 cannot bring it back.</p></div></li>
+    <li><div class="body"><h3>The feed leaves each reader what they had earned</h3><p>Marco had read it: his row keeps its place among read rows as "Anna deleted this message". Lena had not seen it: her row goes without a trace and her count drops. The feed knows which is which because reading is on the same numbered log as the delete, so "had she read it at that moment" has one answer.</p></div></li>
+    <li><div class="body"><h3>The notification follows</h3><p>If Lena's notification was still inside its five seconds, it is withdrawn and never sent. If it had gone out, it cannot be recalled; her tray entry now reads "message deleted".</p><p class="note">Test: play E-001's cases "edit adds a mention" and "delete of a row read, unread and kept" through the real parts and compare what each person is left with.</p></div></li>
+  </ol>
+</section>
+
+<section id="w3">
+  <h2>3 · A receiver is down for a while and recovers</h2>
+  <p>The search index is switched off from the control panel for ten minutes while the team keeps talking.</p>
+  <ol class="steps">
+    <li><div class="body"><h3>The search worker's call gets no answer</h3><p>It gives each call three seconds, then tries again after 1, 2, 4 seconds and so on, up to once a minute. Its place in the log does not move. Nothing is skipped and nothing is thrown away, however long the outage lasts.</p></div></li>
+    <li><div class="body"><h3>Everything else carries on</h3><p>Messages are saved and shown live. The feed and notifications have their own workers and their own places, so they are not delayed.</p><p class="note">Test: stop search during a burst and measure that the feed is as fresh as before.</p></div></li>
+    <li><div class="body"><h3>A person sees an honest search box</h3><p>If the index cannot be reached: "Search is unavailable right now. Your messages are safe." If it answers but is behind: results, with "the last 6 minutes may be missing". The control panel shows "search: 214 changes behind".</p></div></li>
+    <li><div class="body"><h3>Search comes back</h3><p>The next try succeeds. The worker delivers the backlog in log order, so an edit and a delete of the same message arrive in the order they happened.</p></div></li>
+    <li><div class="body"><h3>Within about half a minute it is level again</h3><p>The notice disappears.</p><p class="note">Test: afterwards compare the whole index with the truth. They must be equal: every current text there, no deleted message.</p></div></li>
+    <li><div class="body"><h3>A different case: the receiver answers but refuses one change</h3><p>After three tries that one change goes to the parking place, shown in the control panel with the reason and a "try again", and the worker moves on. Until it is released the receiver is shown as not level. Three different changes refused in a row count as an outage instead: the worker pauses and parks nothing more. Later changes to the same message still apply correctly because each carries the whole message and its version.</p></div></li>
+    <li><div class="body"><h3>The same outage at the notification sender</h3><p>"Due" notes wait in order. One for a message deleted or read meanwhile is followed directly by its "withdrawn", and nothing is sent. The rest arrive late, once, marked "delayed" past ten minutes. If the feed itself is down, its screen shows the rows it had with "Catching up"; conversations, unread marks on channels and search are unaffected, and notifications wait with it.</p></div></li>
+  </ol>
+</section>
+
+<section id="w4">
+  <h2>4 · The same change is delivered twice, and out of order</h2>
+  <ol class="steps">
+    <li><div class="body"><h3>Twice, at search</h3><p>The worker delivered the edit (version 2), search applied it, and the answer was lost on the way back. The worker cannot know, so it sends again. Search already has version 2, ignores the repeat and answers "fine".</p></div></li>
+    <li><div class="body"><h3>Twice, at the feed</h3><p>The feed stores the number of the last change it applied in the same step as the rows it changed, and takes only the one that follows. Change 4830 again: ignored, no second row, no second "notification due". Change 4832 before 4831: refused with "I am at 4830", and the worker sends from there. The feed is the one receiver that insists on order.</p></div></li>
+    <li><div class="body"><h3>Twice, at the notification sender</h3><p>Every notification has a fixed name made from the person, the row and the change that caused it. The sender keeps a list of names it has sent. A repeat has the same name and is not sent again. A "withdrawn" that overtakes its "due" is remembered, so the late "due" sends nothing.</p></div></li>
+    <li><div class="body"><h3>Out of order: the edit arrives after the delete</h3><p>Search knows the message was deleted at version 3. Version 2 is older, so it is ignored. The message stays deleted. A delete beats any late edit.</p></div></li>
+    <li><div class="body"><h3>Why order can break at all</h3><p>Workers deliver in log order, but a change that was parked and released later, or a rebuild running beside live delivery, arrives late. Receivers are built not to depend on the order promise alone.</p></div></li>
+    <li><div class="body"><h3>An agent that gets an event twice</h3><p>The event has the same number both times, and the contract tells agents to ignore a number they have handled. What an agent posts carries an ID too, so an agent that crashed and repeats itself does not post twice.</p><p class="note">Test: put a troublemaker in front of every receiver that repeats each delivery and shuffles nearby ones. The end state must equal an undisturbed run.</p></div></li>
+  </ol>
+</section>
+
+<section id="w5">
+  <h2>5 · A screen loses its connection and catches up</h2>
+  <p>Marco's phone is in a tunnel for two minutes.</p>
+  <ol class="steps">
+    <li><div class="body"><h3>Every update a screen gets has a number</h3><p>Marco's screen last applied 4855 from conversations and update 97 of his own feed.</p></div></li>
+    <li><div class="body"><h3>The connection drops</h3><p>A quiet "Reconnecting" line appears. What is on screen stays. A message he writes now waits as "not sent" and is retried with the same ID.</p></div></li>
+    <li><div class="body"><h3>The connection returns</h3><p>The screen tries again after 1, 2, 4 seconds and so on, and says: "I have up to 4855, and feed 97."</p></div></li>
+    <li><div class="body"><h3>It receives everything after those numbers, in order</h3><p>And applies it the way it would have live: new feed rows are announced as "3 new", not inserted; edits and deletes keep their space.</p></div></li>
+    <li><div class="body"><h3>If it was away too long, it reloads</h3><p>Past a few hundred missed updates the answer is "too far behind", and the screen loads that view fresh from the current truth.</p></div></li>
+    <li><div class="body"><h3>A connection that looks alive but lost something</h3><p>About every twenty seconds the screen is told the latest numbers. One that sees a gap asks for what it missed.</p><p class="note">Test: cut the connection for thirty seconds while the script edits, deletes and reacts. The screen must end identical to one loaded fresh.</p></div></li>
+  </ol>
+</section>
+
+<section id="w6">
+  <h2>6 · A person changes a dial and their unread rows re-sort</h2>
+  <p>After a burst of alerts, Lena sets #incidents from Default to Muted.</p>
+  <ol class="steps">
+    <li><div class="body"><h3>The dial is saved as a fact about Lena</h3><p>In Conversations, with a numbered log entry like any other change. All her screens show the new level at once.</p></div></li>
+    <li><div class="body"><h3>Only the feed is told</h3><p>Search and agents are not sent what a person sets for themselves.</p></div></li>
+    <li><div class="body"><h3>The feed judges Lena's unread rows from #incidents again</h3><p>A flag that named nobody was in Needs you: it leaves. A reply in a thread she started stays (D-013). A direct mention stays. Rows she had already read are not touched.</p></div></li>
+    <li><div class="body"><h3>Each move is written to the feed's log</h3><p>A notification still inside its five seconds for a row that left is withdrawn.</p></div></li>
+    <li><div class="body"><h3>Her screen does not rearrange under her</h3><p>If the feed is open, the changes apply the next time she opens it (D-013). The counts update straight away.</p><p class="note">Test: E-001's dial and rule cases, played through the real parts: unread rows move, read rows never do.</p></div></li>
+  </ol>
+</section>
+
+<section id="w7">
+  <h2>7 · An agent streams a reply and then stops with a flag</h2>
+  <p>The release agent answers in a thread and ends by asking Marco to approve.</p>
+  <ol class="steps">
+    <li><div class="body"><h3>The agent says "I am starting a reply"</h3><p>Conversations saves an unfinished message and logs "reply started", with no text. Screens show the agent as working. Search, the feed and notifications ignore an unfinished message: it is never indexed, never a row, never a notification (D-001).</p></div></li>
+    <li><div class="body"><h3>The text arrives piece by piece on a fast path</h3><p>Pieces go straight to screens that have the thread open. They do not go through the log, so a reply of two hundred pieces is not two hundred deliveries to every receiver.</p></div></li>
+    <li><div class="body"><h3>A lost piece does not matter</h3><p>Conversations keeps the text so far. Each piece says where in the text it belongs; a screen that notices a gap, joins late or reconnects fetches the text so far and carries on.</p></div></li>
+    <li><div class="body"><h3>The agent finishes: "Build 2.4.1 is ready. @Marco approve the release?", flagged</h3><p>Conversations saves the full text as a finished message, version 2, one entry in the log.</p></div></li>
+    <li><div class="body"><h3>From here it travels like any message</h3><p>Search indexes it. The feed sees a flag that names Marco: Focus, kept for him, "Flagged by Release agent" (D-011). A notification is due and is sent after the five seconds.</p></div></li>
+    <li><div class="body"><h3>Marco reacts ✅ from the row</h3><p>The feed releases his kept row. The agent, shown as "waiting on Marco", receives "Marco reacted ✅ to your message" through its door and continues.</p></div></li>
+    <li><div class="body"><h3>If the agent dies mid-reply</h3><p>After a minute without a piece, or ten minutes in all (the limit Slack and Teams use), Conversations closes the message as it stands, labelled "stopped", through the log.</p><p class="note">Tests: kill the scripted agent mid-reply; cut a screen's connection mid-reply. Whether a stopped reply reaches anyone's feed is a small product question, listed in the draft.</p></div></li>
+  </ol>
+</section>
+
+<footer class="foot">
+  <span>Belongs to T-022 · Rules from D-001, D-003, D-004, D-011 to D-015 · Practice from R-002</span>
+  <span>Full draft: <a href="T-022-architecture-proposal.html">the architecture proposal</a></span>
+</footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contexia architecture proposal</title>
+<style>
+/* Layout: one reading column. Diagrams, tables and code may run wider inside their own scroll box. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --sunken: #eceef2; --line: #d8dce4;
+  --ink: #17202b; --ink-2: #445063; --ink-3: #5f6b7d;
+  --agent: #2351c9; --agent-soft: #e5ecfc; /* the agent's work, links */
+  --you: #a64b08; --you-soft: #fcebd9;     /* where the user's attention is needed */
+  --ok: #1b7548; --ok-soft: #e1f3e8;       /* recommended, holds, verified */
+  --risk: #b3261e; --risk-soft: #fbe8e6;   /* risk, broken, not verified */
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Cascadia Code", "Cascadia Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+    --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+    --agent: #86a8ff; --agent-soft: #1b2a4c;
+    --you: #f2a766; --you-soft: #3b2814;
+    --ok: #62cf99; --ok-soft: #14301f;
+    --risk: #ff8f85; --risk-soft: #3d1815;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+  --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+  --agent: #86a8ff; --agent-soft: #1b2a4c;
+  --you: #f2a766; --you-soft: #3b2814;
+  --ok: #62cf99; --ok-soft: #14301f;
+  --risk: #ff8f85; --risk-soft: #3d1815;
+  color-scheme: dark;
+}
+
+/* Base */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--font); }
+.page {
+  max-width: 880px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 34px;
+}
+section, .stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+h1 { font: 650 27px/1.2 var(--display); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h2 { font: 650 18.5px/1.3 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 650 14.5px/1.35 var(--font); margin: 0; }
+p { margin: 0; max-width: 68ch; }
+ul, ol { margin: 0; padding-left: 1.25em; display: flex; flex-direction: column; gap: 5px; max-width: 68ch; }
+a { color: var(--agent); }
+strong { font-weight: 650; }
+code { font: 0.88em var(--mono); background: var(--sunken); border: 1px solid var(--line); border-radius: 4px; padding: 0.08em 0.36em; overflow-wrap: anywhere; }
+:focus-visible { outline: 2px solid var(--agent); outline-offset: 2px; }
+.label { font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.note { color: var(--ink-3); font-size: 13.5px; }
+
+/* Header */
+.top { display: flex; flex-direction: column; gap: 8px; }
+.lede { font-size: 16.5px; color: var(--ink-2); max-width: 62ch; }
+
+/* Needs you: the one thing the user has to decide or answer */
+.ask { background: var(--you-soft); border: 1px solid color-mix(in srgb, var(--you) 40%, transparent); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.ask .label { color: var(--you); }
+
+/* Chips */
+.chip { display: inline-flex; align-items: center; font: 600 12px/1 var(--font); padding: 4px 9px; border-radius: 999px; background: var(--sunken); color: var(--ink-2); white-space: nowrap; }
+.chip.you { background: var(--you-soft); color: var(--you); }
+.chip.agent { background: var(--agent-soft); color: var(--agent); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.risk { background: var(--risk-soft); color: var(--risk); }
+
+/* Panels side by side */
+.split { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.panel.you .label { color: var(--you); }
+.panel.agent .label { color: var(--agent); }
+.files { list-style: none; padding: 0; gap: 7px; }
+.files li { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.files span { color: var(--ink-2); font-size: 13.5px; }
+
+/* Lanes: who does what, phase by phase. Children in order: three .head cells, then .phase, .you, .agent per row */
+.lanes { display: grid; grid-template-columns: minmax(128px, 0.75fr) 1.25fr 1.5fr; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.lanes > * { padding: 12px 14px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin: -1px 0 0 -1px; min-width: 0; }
+.lanes > .head { background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.lanes > .head.you { color: var(--you); background: var(--sunken); }
+.lanes > .head.agent { color: var(--agent); }
+.lanes > .phase { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.lanes > .phase strong { font: 650 15px/1.3 var(--display); }
+.lanes > .phase .say { color: var(--ink-2); font-size: 13.5px; }
+.lanes > .you { background: color-mix(in srgb, var(--you-soft) 60%, var(--surface)); }
+.lanes > .you.idle { background: var(--surface); color: var(--ink-3); }
+@media (max-width: 600px) {
+  .lanes { grid-template-columns: 1fr 1.2fr; }
+  .lanes > .head.first { display: none; }
+  .lanes > .phase { grid-column: 1 / -1; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--sunken); padding-block: 8px; }
+}
+
+/* Options: a choice, side by side */
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.option { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.option.pick { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+.option header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.option dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; font-size: 14px; }
+.option dt { font-weight: 650; color: var(--ink-3); }
+.option dd { margin: 0; min-width: 0; }
+.brief { border: 1px dashed var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+/* Steps: what happens, in order */
+.steps { list-style: none; padding: 0; gap: 0; counter-reset: step; max-width: none; }
+.steps > li { counter-increment: step; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding-bottom: 16px; position: relative; }
+.steps > li::before { content: counter(step); width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; font: 600 13px var(--mono); color: var(--ink-2); position: relative; z-index: 1; }
+.steps > li:not(:last-child)::after { content: ""; position: absolute; left: 13.5px; top: 28px; bottom: 0; width: 1px; background: var(--line); }
+.steps > li:last-child { padding-bottom: 0; }
+.steps .body { display: flex; flex-direction: column; gap: 5px; padding-top: 3px; min-width: 0; }
+
+/* Figures: diagrams and snippets */
+figure { margin: 0; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+figcaption { font-size: 13px; color: var(--ink-3); max-width: 68ch; }
+.diagram .scroll { overflow-x: auto; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; }
+.diagram svg { display: block; min-width: 680px; width: 100%; height: auto; color: var(--ink-3); font-family: var(--font); }
+.diagram .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
+.diagram .box-you { fill: var(--you-soft); stroke: var(--you); stroke-width: 1.25; }
+.diagram .box-agent { fill: var(--agent-soft); stroke: var(--agent); stroke-width: 1.25; }
+.diagram .box-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.25; }
+.diagram .box-risk { fill: var(--risk-soft); stroke: var(--risk); stroke-width: 1.25; }
+.diagram .t { fill: var(--ink); font-size: 13px; font-weight: 650; }
+.diagram .t2 { fill: var(--ink-2); font-size: 11px; }
+.diagram .edge { stroke: currentColor; stroke-width: 1.5; fill: none; }
+.diagram .edge-label { fill: var(--ink-2); font-size: 11px; }
+.snippet pre { margin: 0; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; overflow-x: auto; font: 13px/1.5 var(--mono); }
+.snippet pre code { background: none; border: 0; padding: 0; font: inherit; overflow-wrap: normal; }
+.snippet mark { background: var(--you-soft); color: inherit; border-radius: 3px; padding: 0 2px; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+thead th { border-top: 0; background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Depth on demand */
+details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 0 16px; }
+details > summary { cursor: pointer; padding: 11px 0; font-weight: 650; }
+details[open] { padding-bottom: 14px; }
+details > .stack { gap: 10px; }
+
+/* Footer */
+.foot { border-top: 1px solid var(--line); padding-top: 14px; color: var(--ink-3); font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body>
+<main class="page">
+<header class="top">
+  <div class="label">Architecture proposal · T-022 · 2026-11-22 · a draft: nothing here is decided yet</div>
+  <h1>Contexia: the system on one page, and the six technical decisions behind it</h1>
+  <p class="lede">Everything a person or an agent does is saved in one place and written to a numbered log in the same step. Search, the feed and notifications are each fed from that log by their own worker, so one of them being slow or down delays only itself and loses nothing.</p>
+</header>
+
+<div class="ask">
+  <div class="label">Needs you</div>
+  <p><strong>Read the picture, then take the first decision: the shape (D-005, section 4).</strong> I recommend parts that talk only over the network and run as separate programs side by side. The other five decisions follow in order; each has a recommendation, and none is taken until you say so.</p>
+</div>
+
+<section>
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#map">The parts and what moves between them</a></li>
+    <li><a href="#ideas">Three ideas that carry the design</a></li>
+    <li><a href="#parts">What each part holds, and what a person sees when it fails</a></li>
+    <li><a href="#d005">D-005 · The shape, the database, the live connection</a></li>
+    <li><a href="#d017">D-017 · Who owns what a reader did</a></li>
+    <li><a href="#d018">D-018 · Who decides that a notification is due</a></li>
+    <li><a href="#d006">D-006 · What each receiver is promised</a></li>
+    <li><a href="#d007">D-007 · The numbers, and the failure that proves each</a></li>
+    <li><a href="#d008">D-008 · The door for agents</a></li>
+    <li><a href="#rest">Experiments, shortcuts, and what waits for the look-and-feel work</a></li>
+  </ol>
+  <p class="note">Step by step, including every failure case: <a href="T-022-walkthroughs.html">seven walk-throughs</a>.</p>
+</section>
+
+<section id="map">
+  <h2>1 · The parts and what moves between them</h2>
+  <figure class="diagram">
+    <div class="scroll">
+      <svg viewBox="0 0 900 620" role="img" aria-label="People, the scripted team and agents act through the doors of Conversations, which saves every change with a number in a log. A delivery worker per receiver carries changes to the search index and the activity feed. The feed tells the notification sender when a notification is due.">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+
+        <!-- who acts -->
+        <rect class="box-you" x="20" y="16" width="260" height="58" rx="6"/>
+        <text class="t" x="150" y="40" text-anchor="middle">People's screens</text>
+        <text class="t2" x="150" y="58" text-anchor="middle">the web app, phone and desktop width</text>
+
+        <rect class="box" x="320" y="16" width="260" height="58" rx="6"/>
+        <text class="t" x="450" y="40" text-anchor="middle">Scripted team and control panel</text>
+        <text class="t2" x="450" y="58" text-anchor="middle">plays 30 people and 6 agents; start, stop, reset</text>
+
+        <rect class="box-agent" x="620" y="16" width="260" height="58" rx="6"/>
+        <text class="t" x="750" y="40" text-anchor="middle">Agents</text>
+        <text class="t2" x="750" y="58" text-anchor="middle">scripted ones, or a coding agent</text>
+
+        <line class="edge" x1="100" y1="74" x2="100" y2="150" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="106" y="104">what a person does</text>
+        <line class="edge" x1="230" y1="150" x2="230" y2="74" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="236" y="122">live updates,</text>
+        <text class="edge-label" x="236" y="136">numbered</text>
+
+        <line class="edge" x1="400" y1="74" x2="400" y2="150" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="406" y="104">acts as people and agents,</text>
+        <text class="edge-label" x="406" y="118">through the same doors</text>
+
+        <line class="edge" x1="660" y1="150" x2="660" y2="74" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="666" y="128">events addressed to it</text>
+        <line class="edge" x1="820" y1="74" x2="820" y2="150" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="814" y="104" text-anchor="end">posts, streams, flags</text>
+
+        <!-- the core -->
+        <rect class="box" x="20" y="150" width="860" height="150" rx="8"/>
+        <text class="t" x="36" y="172">Conversations: the one place where things are saved</text>
+
+        <rect class="box" x="36" y="184" width="250" height="100" rx="6"/>
+        <text class="t" x="50" y="206">The doors</text>
+        <text class="t2" x="50" y="224">one for people (the web app uses it),</text>
+        <text class="t2" x="50" y="239">one for agents. Every action carries</text>
+        <text class="t2" x="50" y="254">an ID, so a retry cannot post twice.</text>
+        <text class="t2" x="50" y="269">Screens also read feed, search, tray here.</text>
+
+        <rect class="box" x="302" y="184" width="270" height="100" rx="6"/>
+        <text class="t" x="316" y="206">The truth</text>
+        <text class="t2" x="316" y="224">messages and reactions; each message has</text>
+        <text class="t2" x="316" y="239">a version that rises with every change.</text>
+        <text class="t2" x="316" y="254">Per person: read positions, dials, Focus</text>
+        <text class="t2" x="316" y="269">rules, Keep and Done, what they are watching.</text>
+
+        <rect class="box-ok" x="588" y="184" width="276" height="100" rx="6"/>
+        <text class="t" x="602" y="206">The change log</text>
+        <text class="t2" x="602" y="224">every change gets the next number and is</text>
+        <text class="t2" x="602" y="239">saved in the same step as the change.</text>
+        <text class="t2" x="602" y="254">Nothing is delivered that was not saved;</text>
+        <text class="t2" x="602" y="269">nothing saved is forgotten.</text>
+
+        <line class="edge" x1="572" y1="234" x2="588" y2="234" marker-end="url(#arrow)"/>
+
+        <!-- delivery -->
+        <line class="edge" x1="624" y1="300" x2="624" y2="340" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="630" y="324">changes after each worker's place</text>
+
+        <rect class="box-agent" x="20" y="340" width="640" height="56" rx="6"/>
+        <text class="t" x="36" y="363">Delivery: one worker per receiver, each with its own place in the log</text>
+        <text class="t2" x="36" y="381">a stopped receiver holds back only itself; the worker waits and resumes where it stopped</text>
+
+        <line class="edge" x1="660" y1="368" x2="690" y2="368" marker-end="url(#arrow)"/>
+        <rect class="box-risk" x="690" y="340" width="190" height="56" rx="6"/>
+        <text class="t" x="785" y="363" text-anchor="middle">Parking place</text>
+        <text class="t2" x="785" y="381" text-anchor="middle">a change a receiver refuses</text>
+
+        <!-- receivers -->
+        <line class="edge" x1="145" y1="396" x2="145" y2="450" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="151" y="426">message created, changed, deleted</text>
+        <line class="edge" x1="445" y1="396" x2="445" y2="450" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="451" y="426">every change, in log order</text>
+
+        <rect class="box" x="20" y="450" width="250" height="70" rx="6"/>
+        <text class="t" x="145" y="474" text-anchor="middle">Search index (stand-in)</text>
+        <text class="t2" x="145" y="492" text-anchor="middle">finds the current text only;</text>
+        <text class="t2" x="145" y="506" text-anchor="middle">a deleted message is gone</text>
+
+        <rect class="box-ok" x="310" y="450" width="270" height="70" rx="6"/>
+        <text class="t" x="445" y="472" text-anchor="middle">Activity feed</text>
+        <text class="t2" x="445" y="489" text-anchor="middle">a row per reader and conversation: bucket,</text>
+        <text class="t2" x="445" y="503" text-anchor="middle">reason, read, kept. Decides when to notify.</text>
+
+        <line class="edge" x1="580" y1="485" x2="630" y2="485" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="605" y="540" text-anchor="middle">notification due, changed or withdrawn</text>
+
+        <rect class="box" x="630" y="450" width="250" height="70" rx="6"/>
+        <text class="t" x="755" y="474" text-anchor="middle">Notification sender (stand-in)</text>
+        <text class="t2" x="755" y="492" text-anchor="middle">waits a few seconds, sends once,</text>
+        <text class="t2" x="755" y="506" text-anchor="middle">fills the notification tray</text>
+
+        <!-- later -->
+        <line class="edge" x1="350" y1="520" x2="350" y2="566" stroke-dasharray="4 4" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="344" y="548" text-anchor="end">asked after the row is shown</text>
+        <rect class="box" x="200" y="566" width="300" height="40" rx="6" stroke-dasharray="4 4"/>
+        <text class="t2" x="350" y="590" text-anchor="middle">Language model for text rules (built last)</text>
+      </svg>
+    </div>
+    <figcaption>Orange: where people are. Blue: agents and our own delivery machinery. Green: the two parts the guarantees rest on. Red: where a change goes when a receiver refuses it. The notification sender is fed from the feed's own numbered log by the same kind of worker.</figcaption>
+  </figure>
+</section>
+
+<section id="ideas">
+  <h2>2 · Three ideas carry the whole design</h2>
+  <div class="split">
+    <div class="panel"><div class="label">1 · Save and log in one step</div><p>A message and the note "this changed" are saved together or not at all. That closes the gap where a message is saved and nobody is told. Established practice (the transactional outbox).</p></div>
+    <div class="panel"><div class="label">2 · Deliver again rather than lose</div><p>A worker that is not sure a change arrived sends it again. Each change carries the whole current message and its version, so a receiver ignores a repeat or an older copy, and a delete beats any late edit.</p></div>
+    <div class="panel"><div class="label">3 · The feed is worked out, never typed in</div><p>The feed holds no facts of its own. It is computed from the log: messages, and what each reader did (read, dials, rules, Keep). Wipe it and it can be rebuilt to the same state.</p></div>
+  </div>
+</section>
+
+<section id="parts">
+  <h2>3 · What each part holds, and what a person sees when it is slow or down</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Part</th><th>Holds</th><th>If it is slow or down</th><th>At 100 times the size</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Conversations</strong></td><td>The only original copy of everything: messages, reactions, what each person read, set, kept and is watching, and the change log. Every other part can be emptied and refilled from it.</td><td>Screens say "Reconnecting" and keep what they show. A message typed meanwhile waits as "not sent" and is retried without posting twice.</td><td>Still one database for a long time (about 1.5 messages a second). First to change: the single numbering of the log is split by conversation.</td></tr>
+        <tr><td><strong>Delivery workers</strong></td><td>One place in the log per receiver, and the parking place.</td><td>Receivers fall behind and catch up from the saved place. The control panel shows how far behind each one is.</td><td>Read the database's own replication log instead of asking for new changes; several workers per receiver.</td></tr>
+        <tr><td><strong>Activity feed</strong></td><td>Rows per reader, its own copy of what it needs to judge them, and its own numbered log of row changes.</td><td>The feed shows the last rows it had with "Catching up". Conversations, unread marks on channels and search work as usual. Notifications wait with it.</td><td>A post in a 3,000-person channel should not write 3,000 rows: large channels are worked out when the feed is read, not when the post is written.</td></tr>
+        <tr><td><strong>Search index</strong> <span class="chip">stand-in</span></td><td>The current text of every message that is not deleted, with its version.</td><td>The search box says "Search is unavailable right now", or shows results with "the last few minutes may be missing". Messaging is unaffected.</td><td>A real search engine behind the same boundary; nothing else moves.</td></tr>
+        <tr><td><strong>Notification sender</strong> <span class="chip">stand-in</span></td><td>What it was asked to send, the list of what it sent, and the tray. All of it can be refilled from the feed's log without interrupting anyone.</td><td>Notifications arrive late, once, and not at all if the message was deleted or read before they went out. The feed is still right.</td><td>A real push or email provider behind the same boundary, with limits per person.</td></tr>
+        <tr><td><strong>Live connection</strong></td><td>Nothing lasting: it only forwards numbered updates to open screens.</td><td>A screen that lost updates asks for everything after the last number it saw, or reloads if it was away too long.</td><td>Several of them, with a way to pass updates between them.</td></tr>
+        <tr><td><strong>Agent door</strong></td><td>Each agent's place in its own stream of events.</td><td>An agent that was away reads on from its place. Agents cannot hold back people or each other.</td><td>Limits per agent, and permissions on what an agent may read.</td></tr>
+        <tr><td><strong>Scripted team and control panel</strong></td><td>The schedule of what the seeded team does, and the switches that slow down or stop a receiver.</td><td>The team goes quiet; the product keeps working.</td><td>Not part of a real product.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="d005">
+  <h2>4 · D-005: the shape, the database, the live connection</h2>
+  <p>The brief allows the search index and the notification sender to be stand-ins inside one program, and asks that their boundaries be treated as real. The question is how real we make them.</p>
+  <div class="options">
+    <div class="option">
+      <header><h3>A. One program</h3></header>
+      <p>Search, notifications and the feed are sections of the same program. "Slow" and "down" are a switch inside it.</p>
+      <dl>
+        <dt>Upside</dt><dd>The least to build and run. The brief permits it.</dd>
+        <dt>Risk</dt><dd>The boundary is a convention; a shortcut across it goes unnoticed. An outage is acted: nothing can really be stopped.</dd>
+        <dt>Undo</dt><dd>Moderate.</dd>
+      </dl>
+    </div>
+    <div class="option pick">
+      <header><h3>B. Parts that talk only over the network</h3><span class="chip ok">Recommended</span></header>
+      <p>One codebase. Conversations, the feed, the two stand-ins and the scripted team each run as their own program and reach each other only by network calls. One command starts them all.</p>
+      <dl>
+        <dt>Upside</dt><dd>A receiver can really be stopped, slowed or wiped while you watch, and the tests do exactly that.</dd>
+        <dt>Risk</dt><dd>Five programs to start and watch; slower tests. Kept in check by one start command and a status view in the control panel.</dd>
+        <dt>Undo</dt><dd>Cheap toward A or C.</dd>
+      </dl>
+    </div>
+    <div class="option">
+      <header><h3>C. B plus a message broker</h3></header>
+      <p>A dedicated product (Kafka, NATS or similar) carries the changes between Conversations and the receivers.</p>
+      <dl>
+        <dt>Upside</dt><dd>What large products run.</dd>
+        <dt>Risk</dt><dd>One more system to run and explain, and it removes none of the hard parts: changes still have to get into it safely and receivers still see repeats. At 1,500 messages a day it adds nothing we can show.</dd>
+        <dt>Undo</dt><dd>Moderate.</dd>
+      </dl>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Comes with it</th><th>Recommended</th><th>Alternative</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Where the truth is stored</strong></td><td>PostgreSQL, run in Docker. Each part has its own area and never reads another's.</td><td>SQLite files: nothing to run, but one writer at a time and no way to wake a worker the moment something is saved.</td><td>Several programs writing at once, and a save-and-log step the whole guarantee rests on. Expensive to change later.</td></tr>
+        <tr><td><strong>How updates reach a screen</strong></td><td>A lasting two-way connection (WebSocket) carrying numbered updates, with "everything after number N" after a drop.</td><td>The browser's one-way stream (server-sent events): reconnects by itself, but a browser allows six per site on a local address, so the seventh tab hangs (browser documentation, re-checked today).</td><td>You will open many tabs as different people. Cheap to change: numbering and catch-up are the same either way.</td></tr>
+        <tr><td><strong>Language</strong></td><td>Python 3.12 on the server (installed here).</td><td>The web app's toolkit is left open.</td><td>It depends on what the look-and-feel mock-ups need (T-019). Node is not installed; it could run in Docker.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <figure class="snippet">
+    <pre><code>BEGIN;
+  UPDATE messages SET text = '…', version = 2 WHERE id = 'msg_7Q2';
+  <mark>INSERT INTO change_log (number, kind, body)
+       VALUES (4830, 'message.changed', '{ the whole message, version 2 }');</mark>
+COMMIT;      -- both are saved, or neither</code></pre>
+    <figcaption>The step everything rests on. The log entry is written in the same database transaction as the change. Numbers are handed out one at a time, in the order changes become visible, so a worker reading "everything after 4829" can never step over a change that was saved a moment late.</figcaption>
+  </figure>
+  <figure class="snippet">
+    <pre><code>screen → server   { "resume": { "conversations": 4855, "feed": 97 } }
+server → screen   { "conversations": 4856, "kind": "message.changed", … }
+                  { "feed": 98, "kind": "row.added", … }
+          or      <mark>{ "too_far_behind": "feed" }</mark>      → the screen reloads that view</code></pre>
+    <figcaption>How a screen catches up after a drop. The live connection is allowed to lose things; the numbers are what make the screen right again.</figcaption>
+  </figure>
+  <p class="note">Best practice: every product in R-002 saves first, publishes each change, and lets search, notifications and the feed consume it off the typing path; at their size with a broker, at ours with a log table and a worker per receiver. An independent second opinion, given the options without my recommendation, chose the same three and asked that the separate-programs mode be the one the tests run.</p>
+</section>
+
+<section id="d017">
+  <h2>5 · D-017: who owns what a reader did</h2>
+  <p>Where a message lands depends on the reader: their Focus rules, dials, what they read, what they kept. Someone has to own those.</p>
+  <div class="options">
+    <div class="option pick">
+      <header><h3>A. Conversations owns the facts; the feed is worked out</h3><span class="chip ok">Recommended</span></header>
+      <p>Read, dial, rule, Keep and Done are saved in Conversations like a message is, and travel on the same numbered log. The feed computes rows from the log and holds nothing original.</p>
+      <dl>
+        <dt>Upside</dt><dd>D-004 asks "had the reader read it when it was deleted?". With reads and deletes in one numbered order there is exactly one answer, on every rebuild. Unread marks on channels and the feed use the same read position (D-015). The feed can be wiped and rebuilt.</dd>
+        <dt>Risk</dt><dd>What you do in the feed goes round through the log before the feed knows it (under a second). The screen shows your own action at once and does not wait.</dd>
+        <dt>Undo</dt><dd>Expensive.</dd>
+      </dl>
+    </div>
+    <div class="option">
+      <header><h3>B. The feed owns reader state</h3></header>
+      <p>The screen writes reads, dials and Keep straight to the feed. Conversations knows only messages.</p>
+      <dl>
+        <dt>Upside</dt><dd>The feed answers at once; less on the log.</dd>
+        <dt>Risk</dt><dd>The feed now holds originals: wiping it loses what people did. Read state has two homes (channels need it too). The order of "read" against "deleted" depends on which call arrived first.</dd>
+        <dt>Undo</dt><dd>Expensive.</dd>
+      </dl>
+    </div>
+  </div>
+  <p class="note">Consequences of A: the feed keeps its own copy of what it needs (messages, who took part in which thread, each reader's settings), so it never has to ask Conversations for anything. The effective level of a thread dial, the reason on a row, the counts and the four history tabs are all answered by the feed. A person's screen also reports which conversation is open in front of them; that is a fact on the log too, so "arrived while they were watching" (D-015, rule 6) is known when the message is judged and makes no row and no notification. It ends when the screen's connection drops. Later, a language model's verdict on a text rule is handed to Conversations and saved as a fact, so a rebuild does not ask the model again; if the model is slow or fails, the row stays where it is.</p>
+</section>
+
+<section id="d018">
+  <h2>6 · D-018: who decides that a notification is due</h2>
+  <p>The brief lists the notification sender beside the feed, as an independent system that receives messages. D-012 says a notification is sent when a feed row becomes unread in Focus or Needs you, once per row. So the sender needs to know something only the feed knows.</p>
+  <div class="options">
+    <div class="option pick">
+      <header><h3>A. The feed decides; the sender delivers</h3><span class="chip ok">Recommended</span></header>
+      <p>When a row becomes unread in a bucket that notifies, the feed writes "due" to its own numbered log. A worker carries it to the sender with the same promise as any other change. Later it may write "changed" or "withdrawn".</p>
+      <dl>
+        <dt>Upside</dt><dd>The rule lives in one place. The feed and the tray cannot disagree about what deserved an interruption.</dd>
+        <dt>Risk</dt><dd>The sender stands behind the feed, not beside it: while the feed is down, notifications wait. This departs from a literal reading of the brief and the proposal says so.</dd>
+        <dt>Undo</dt><dd>Moderate.</dd>
+      </dl>
+    </div>
+    <div class="option">
+      <header><h3>B. The sender gets messages and applies the rules itself</h3></header>
+      <p>Three receivers side by side, as the brief draws it.</p>
+      <dl>
+        <dt>Upside</dt><dd>The sender does not depend on the feed.</dd>
+        <dt>Risk</dt><dd>The feed's rules exist twice, need every reader's dials and read state twice, and will drift. "One per row" cannot be told from messages alone.</dd>
+        <dt>Undo</dt><dd>Moderate.</dd>
+      </dl>
+    </div>
+    <div class="option">
+      <header><h3>C. A, and deletes also go straight to the sender</h3></header>
+      <p>The sender additionally hears "message deleted" from Conversations directly.</p>
+      <dl>
+        <dt>Upside</dt><dd>A deleted message is not announced even while the feed lags.</dd>
+        <dt>Risk</dt><dd>Two sources to reconcile for a rare case; while the feed lags, the "due" is waiting behind it anyway.</dd>
+        <dt>Undo</dt><dd>Cheap.</dd>
+      </dl>
+    </div>
+  </div>
+  <figure class="snippet">
+    <pre><code>{ "name": "marco / thread_77 / 4812",      <mark>← fixed name: a repeat is never sent twice</mark>
+  "kind": "due",
+  "person": "marco",
+  "bucket": "needs_you",
+  "why":  "Anna mentioned you in #launch",
+  "text": "@Marco can you sign off the pricing page?" }
+
+{ "name": "marco / thread_77 / 4812", "kind": "withdrawn" }   ← read, deleted or re-sorted meanwhile</code></pre>
+    <figcaption>What the feed tells the sender. The sender waits five seconds before sending (D-004's "brief hold"), so a delete or a read whose "withdrawn" reaches the sender inside those five seconds produces nothing. Past that, the notification has gone and the tray entry shows the current truth. It keeps the list of names it has sent, so rebuilding the feed never sends anything again. A "withdrawn" that arrives before its "due" is remembered. A row that moves up into Focus while unread gets a second note with its own name (D-012); the personal "Focus only" switch is a fact the feed applies before writing "due".</figcaption>
+  </figure>
+  <p class="note">Best practice: Slack's 2026 notification rebuild separates deciding what deserves attention from delivering it (R-002). A is that separation.</p>
+</section>
+
+<section id="d006">
+  <h2>7 · D-006: what each receiver is promised</h2>
+  <div class="options">
+    <div class="option">
+      <header><h3>A. Send once and hope</h3></header>
+      <p>After saving, tell each receiver; if it fails, move on.</p>
+      <dl><dt>Upside</dt><dd>Trivial.</dd><dt>Risk</dt><dd>Every outage loses changes for good. Search shows deleted messages forever.</dd><dt>Undo</dt><dd>Cheap.</dd></dl>
+    </div>
+    <div class="option pick">
+      <header><h3>B. Never lost, possibly repeated, in order</h3><span class="chip ok">Recommended</span></header>
+      <p>A worker per receiver reads the log from its own place, in order. Outage: wait and resume, without limit. A refused change: park it, move on. Receivers ignore repeats and older versions.</p>
+      <dl><dt>Upside</dt><dd>A promise that can be stated in one sentence and proven by breaking things.</dd><dt>Risk</dt><dd>One change the receiver chokes on could stall it; hence the parking place. Telling "down" from "refuses this one" has to be exact.</dd><dt>Undo</dt><dd>Expensive: every receiver is built on it.</dd></dl>
+    </div>
+    <div class="option">
+      <header><h3>C. Each change on its own, a few retries, then dropped</h3></header>
+      <p>How Slack's Events API treats outside apps: three retries, no order.</p>
+      <dl><dt>Upside</dt><dd>A bad change never holds up others.</dd><dt>Risk</dt><dd>Order is lost routinely and a longer outage loses changes; needs a separate repair job.</dd><dt>Undo</dt><dd>Moderate.</dd></dl>
+    </div>
+  </div>
+  <p>"Exactly once" is not on the list: nobody can promise it across a network (R-002). The honest version is "at least once, and a repeat changes nothing".</p>
+  <figure class="snippet">
+    <pre><code>POST  search-index/changes
+{ "change": 4830,                       ← its number in the log
+  "kind": "message.changed",
+  "message": {
+    "id": "msg_7Q2",
+    <mark>"version": 2,</mark>                       ← rises with every change, reactions included
+    "conversation": "#launch", "author": "anna",
+    "text": "@Marco @Lena can you sign off the pricing page?",
+    "mentions": ["marco", "lena"], "level": null,
+    "finished": true, "reactions": [] } }
+
+{ "change": 4855, "kind": "message.deleted",
+  "message": { "id": "msg_7Q2", <mark>"version": 3</mark> } }      ← a delete carries no content
+
+answers:  200 applied · 200 already had it · 422 I refuse this one (→ parked after 3 tries)
+          anything else, or 3 s of silence: the receiver is down → wait, try again, skip nothing</code></pre>
+    <figcaption>A change carries the whole current message, not what differs. So the newest one alone is enough, a repeat is harmless, and an older version arriving late is ignored. A delete is remembered by its version and beats any edit that turns up afterwards.</figcaption>
+  </figure>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Receiver</th><th>Is sent</th><th>Loss</th><th>Repeats</th><th>Order</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Search index</strong></td><td>Finished messages: created, changed, deleted.</td><td>None once saved.</td><td>Possible; ignored by version.</td><td>In log order; not relied on. Newest version wins, delete wins.</td></tr>
+        <tr><td><strong>Activity feed</strong></td><td>Every change, including what readers did.</td><td>None.</td><td>Possible; ignored by number. The feed takes only the change that follows the last one it applied, saved in the same step as its rows; anything else it answers with "I am at N" and the worker sends from there. In effect each change counts once.</td><td>Strictly in log order, and relied on. The feed never parks: a change it cannot apply stops it, shows in the control panel, and is fixed or rebuilt.</td></tr>
+        <tr><td><strong>Notification sender</strong></td><td>Due, changed, withdrawn, from the feed's log.</td><td>None; may be late.</td><td>Possible; a name appears in the tray once, because the tray is the stand-in's own store. A real push provider cannot give that: there the rule is "rather twice than never", with the name passed along as the duplicate key where the provider takes one.</td><td>In log order. One already sent cannot be recalled; the tray shows the current truth.</td></tr>
+        <tr><td><strong>Agents</strong></td><td>Events that address them (D-008).</td><td>None while the agent returns within the kept period.</td><td>Possible; same number.</td><td>In order per agent.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="d007">
+  <h2>8 · D-007: the numbers, and the failure that proves each</h2>
+  <p>Proposed targets on one local machine with the seeded team. Every claim is paired with the fault a test injects; a claim without one is not made.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Promise</th><th>Proposed number</th><th>The failure a test injects</th></tr></thead>
+      <tbody>
+        <tr><td>A saved message is never lost on its way out.</td><td>0 lost</td><td>Stop Conversations right after a save, mid-burst. After restart every receiver gets the change.</td></tr>
+        <tr><td>No change is stepped over when many people write at once.</td><td>0 skipped</td><td>Many writers at once, with one save held open on purpose while later ones finish.</td></tr>
+        <tr><td>Other open screens show a message.</td><td>1 s</td><td>None; measured under the scripted team at fast pace.</td></tr>
+        <tr><td>Search and the feed reflect a change when healthy.</td><td>2 s, 19 times in 20</td><td>A burst at ten times the normal pace.</td></tr>
+        <tr><td>A notification is held before sending.</td><td>5 s</td><td>Delete, or read, inside the five seconds: nothing is sent.</td></tr>
+        <tr><td>A slow receiver delays nobody else.</td><td>feed stays within 2 s</td><td>Make search answer after 10 s, or stop it, during a burst.</td></tr>
+        <tr><td>A receiver that was down ends equal to the truth.</td><td>10 minutes of backlog cleared in 30 s</td><td>Stop search for 10 minutes of edits and deletes; afterwards compare the whole index with the truth.</td></tr>
+        <tr><td>How long we wait for a receiver, and retry.</td><td>3 s per call; again after 1, 2, 4 … 60 s; never give up on an outage</td><td>A receiver that accepts the connection and never answers.</td></tr>
+        <tr><td>A change the receiver refuses does not block the rest, and is not forgotten.</td><td>parked after 3 tries; shown in the control panel with "try again"; the receiver counts as not level while anything is parked</td><td>A stand-in told to refuse one delete. While parked, the check "index equals truth" must fail; after "try again" it must pass.</td></tr>
+        <tr><td>A broken receiver is not mistaken for a bad change.</td><td>3 different changes refused in a row: pause, park nothing more</td><td>A stand-in told to refuse everything.</td></tr>
+        <tr><td>The feed never skips.</td><td>a change it cannot apply stops it; the control panel says so; everything else runs</td><td>Feed the feed a change it rejects; and stop the feed outright: conversations, unread marks on channels and search keep working.</td></tr>
+        <tr><td>A retry never posts twice.</td><td>1 message</td><td>Drop the answer to a person's send and to an agent's post, so each sends again with the same ID.</td></tr>
+        <tr><td>Repeats and late arrivals change nothing.</td><td>end state identical</td><td>A troublemaker in front of each receiver that repeats every delivery and shuffles nearby ones.</td></tr>
+        <tr><td>A notification appears in the tray once, late if need be.</td><td>1</td><td>Stop the sender for five minutes; stop it between sending and confirming; rebuild the feed while it runs. One sent more than ten minutes late must carry "delayed".</td></tr>
+        <tr><td>An agent misses nothing and holds up nobody.</td><td>events kept 7 days, in order</td><td>An agent away for ten minutes; an agent that never reads. People and other agents see no delay.</td></tr>
+        <tr><td>A receiver can be rebuilt from nothing.</td><td>under 1 minute at seeded size; equal to before</td><td>Wipe the feed, then search, then the notification sender, while the team is active; compare with a copy taken before, and confirm the sender interrupted nobody while refilling its tray.</td></tr>
+        <tr><td>A screen that lost its connection ends right.</td><td>caught up 2 s after reconnecting; a silently lost update healed within 20 s; a reload past 500 missed updates</td><td>Cut the connection for 30 s during edits and deletes; swallow single updates on a live connection; keep a screen away past the limit. Each time compare with a fresh load.</td></tr>
+        <tr><td>A slow or failing model breaks nothing (built last).</td><td>the row stays where it is</td><td>A model stand-in that times out or errors.</td></tr>
+        <tr><td>A surface that is behind says so.</td><td>a notice when more than 10 s behind</td><td>Any of the outages above, looked at on the rendered page.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="split">
+    <div class="panel"><div class="label">Search down or behind</div><p>"Search is unavailable right now. Your messages are safe." or results with "the last 6 minutes may be missing".</p></div>
+    <div class="panel"><div class="label">Feed behind</div><p>The rows it had, with "Catching up". Conversations and unread marks on channels are unaffected.</p></div>
+    <div class="panel"><div class="label">Notifications delayed</div><p>They arrive late, once, and not for something deleted or read before they went out. One more than ten minutes late is marked "delayed".</p></div>
+    <div class="panel"><div class="label">Conversations unreachable</div><p>"Reconnecting". The screen keeps what it shows; a new message waits as "not sent" and cannot post twice.</p></div>
+  </div>
+  <p class="note">Rebuild is also how Reset works: the control panel empties every part, reloads the seeded truth, and the feed, search and then the notification sender refill from the logs, the sender in a quiet mode that fills the tray with the original times and interrupts nobody. So the rebuild path runs at every reset. A rebuilt feed starts a new edition of its own log; screens seeing a new edition reload, and the sender reads it from the start, protected by its list of names. The 3-second answer is Slack's rule for its own Events API (R-002); Slack gives up after three retries, we do not.</p>
+</section>
+
+<section id="d008">
+  <h2>9 · D-008: the door for agents</h2>
+  <div class="options">
+    <div class="option">
+      <header><h3>A. We call the agent</h3></header>
+      <p>The agent hosts an address; we send events to it and expect an answer in three seconds (Slack's Events API).</p>
+      <dl><dt>Upside</dt><dd>The best-known form.</dd><dt>Risk</dt><dd>An agent on a developer's machine has no address we can reach. A coding agent joining for verification (D-002) could not use it.</dd><dt>Undo</dt><dd>Moderate.</dd></dl>
+    </div>
+    <div class="option pick">
+      <header><h3>B. The agent calls us and reads from its own place</h3><span class="chip ok">Recommended</span></header>
+      <p>The agent asks "what is there for me after event 311?" and waits for the answer. Slack offers the same as Socket Mode.</p>
+      <dl><dt>Upside</dt><dd>Works from anywhere. An agent that was away simply reads on. It is the same numbered catch-up the screens use.</dd><dt>Risk</dt><dd>An agent hears only when it asks; a slow one holds events in store. We keep 7 days and say so.</dd><dt>Undo</dt><dd>Cheap: A can be added beside it.</dd></dl>
+    </div>
+  </div>
+  <figure class="snippet">
+    <pre><code>GET  agent-door/events?after=311&amp;wait=25
+→ [ { "number": 312, "kind": "mentioned",
+      "message": { "id": "msg_7Q2", "version": 1, "conversation": "#launch", "text": "…" },
+      <mark>"agent_chain": 0</mark> } ]                 ← how many agents in a row led to this
+
+POST agent-door/messages        { "id": "a-91", "thread": "…", "text": "…", "level": "info" }
+POST agent-door/replies         { "id": "a-92", "thread": "…" }               ← "I am starting a reply"
+POST agent-door/replies/a-92/pieces   { "at": 0, "text": "Build 2.4.1 " }
+POST agent-door/replies/a-92/finish   { "level": "flag", "mentions": ["marco"] }
+POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pre>
+    <figcaption>Everything an agent posts carries an ID of its own choosing, so an agent that crashes and repeats itself does not post twice.</figcaption>
+  </figure>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Question</th><th>Proposed answer</th></tr></thead>
+      <tbody>
+        <tr><td><strong>What is an agent told?</strong></td><td>What addresses it: a mention, a direct message, a reply in a thread it takes part in, a reaction to its message, and the edit or delete of any of these. It can also ask for everything in a channel it is a member of (the support agent needs that).</td></tr>
+        <tr><td><strong>What may it read?</strong></td><td>Any channel, since the first version has no access model (D-009), and only its own direct conversations. A known shortcut.</td></tr>
+        <tr><td><strong>What stops agents setting each other off?</strong></td><td>By default an agent is not told about another agent's messages unless one names it. Every message counts the agents in a row behind it; after three, an agent's message reaches no further agent until a person writes. Plus a limit of 20 messages a minute per agent (the figure Teams uses for apps). No vendor documents a rule for this (R-002), so this is ours.</td></tr>
+        <tr><td><strong>Text in progress</strong></td><td>Travels a fast path to open screens only. Search, the feed and notifications see the reply when it is finished, as one change. A reply with no new piece for a minute, or older than ten minutes, is closed as "stopped".</td></tr>
+        <tr><td><strong>A coding agent joining (D-002)</strong></td><td>A small connector (MCP) over this same door. Acting as a person uses the door the web app uses, is off unless switched on when the system starts, and shows a banner while on.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="rest">
+  <h2>10 · Experiments, shortcuts, and what waits</h2>
+  <div class="split">
+    <div class="panel agent"><div class="label">Experiments the draft needs</div>
+      <ul>
+        <li><strong>The spine.</strong> A log, one worker, one stand-in: does a change reach a receiver within two seconds, 19 times in 20, under a burst, and is no change stepped over with many writers?</li>
+        <li><strong>Rebuild.</strong> Can the feed for the seeded team (two weeks, 36 participants) be rebuilt from the log in under a minute, so Reset can use it?</li>
+        <li><strong>Text rules judged by a model</strong>, already planned for last (D-001).</li>
+      </ul>
+      <p class="note">Streamed text needs no experiment: keeping it off the log is a design choice, proven by tests.</p>
+    </div>
+    <div class="panel"><div class="label">Shortcuts taken knowingly</div>
+      <ul>
+        <li>No sign-in or permissions; a person switcher.</li>
+        <li>Search and notifications are stand-ins; the tray stands for push.</li>
+        <li>One database server, with an area per part.</li>
+        <li>Log numbers handed out one at a time; the log is never trimmed.</li>
+        <li>One copy of each part: no spare if one fails.</li>
+        <li>A rebuild replays the whole log.</li>
+        <li>Agents may read every channel.</li>
+      </ul>
+      <p class="note">Full list with the proper answer for each: <code>docs/known-shortcuts.md</code>.</p>
+    </div>
+    <div class="panel you"><div class="label">Waits for the look-and-feel work (T-019)</div>
+      <ul>
+        <li>What the web app is built with.</li>
+        <li>What exactly a feed row and a tray entry carry.</li>
+        <li>How "3 new", dimmed read rows and held space are kept on the screen.</li>
+        <li>How a screen knows its newest message is really visible (D-015, rule 6).</li>
+        <li>Wording and place of the "catching up" notices; the control panel's layout.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Also in the design, briefly</th><th>How</th></tr></thead>
+      <tbody>
+        <tr><td><strong>A kept row whose message is deleted</strong></td><td>The feed remembers for each row whether the reader kept it, a flag kept it, or both. Kept by the reader: the row stays in Focus as a marker until Done (D-004). Kept only by the flag: the delete removes the flag, so the row is released; read before, it stays among read rows as a marker; unread, it goes without a trace (D-011).</td></tr>
+        <tr><td><strong>A flag removed after the row was read</strong></td><td>The edit arrives with the whole message, now without the flag. The feed sees "kept by flag" no longer holds and moves the row to the read rows; a row the reader also kept stays.</td></tr>
+        <tr><td><strong>A reaction from someone you addressed</strong></td><td>A reaction is a change to the message and carries all its reactions. The feed checks whether the reactor was mentioned, flagged or the other side of a direct conversation: then a row in Needs you, "Marco reacted ✅ to your message", and a notification. Anyone else: the grouped row in For your information with the split by emoji. When the last reaction goes, the row is retracted like a deleted message (D-014, D-004).</td></tr>
+        <tr><td><strong>The control panel</strong></td><td>Its own program. It holds the schedule of what the scripted team will do, shows it ahead of time, plays it at a chosen pace, starts any seeded situation on demand, and acts only through the two doors. It also holds the switches on each stand-in: slow, refuse, off.</td></tr>
+        <tr><td><strong>The seeded team</strong></td><td>Two weeks of history written by a fixed script (hand-written situations, generated background), loaded into Conversations as truth with times counted back from now. The receivers fill themselves from the log. The same script every time, so Reset gives the same start.</td></tr>
+        <tr><td><strong>History tabs</strong></td><td>Answered by the feed from its own copy, so they show the current truth as of the feed's place in the log; when the feed is behind they carry the same "Catching up" line.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <details>
+    <summary>Small product questions the draft ran into</summary>
+    <div class="stack">
+      <ul>
+        <li>A read row whose message is deleted keeps a marker (D-004), but the history tabs show "the current truth" and are meant to replace the Earlier list (D-016, the agent's reading). Where does the marker live? To settle when the mock-ups are reviewed.</li>
+        <li>An agent's reply closed as "stopped": does it reach anyone's feed, and with which level?</li>
+        <li>A notification already in the tray whose row then leaves the bucket because of a dial change: what does the entry show?</li>
+        <li>A notification that would arrive more than ten minutes late: still an interruption, or only a tray entry marked "delayed"?</li>
+      </ul>
+    </div>
+  </details>
+  <details>
+    <summary>How each of the thirteen demands from the product decisions is met</summary>
+    <div class="stack">
+      <div class="table-wrap"><table>
+        <thead><tr><th>#</th><th>Demand</th><th>Where in the draft</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Three receivers plus agents, each able to fail</td><td>A worker and a place in the log per receiver; the agent door (D-005, D-006, D-008)</td></tr>
+          <tr><td>2</td><td>Every kind of change travels</td><td>Any change raises the message's version and is logged with the whole message (D-006)</td></tr>
+          <tr><td>3</td><td>The feed is state per reader</td><td>Rows per reader, worked out from the log, judged again on a dial or rule change (D-017; walk-through 6)</td></tr>
+          <tr><td>4</td><td>One read position, shared; "had they read it" at a retraction</td><td>Read positions are facts in Conversations on the same numbered log (D-017; walk-through 2)</td></tr>
+          <tr><td>5</td><td>Notifications depend on the feed</td><td>The feed decides, the sender delivers (D-018)</td></tr>
+          <tr><td>6</td><td>Kept, with two sources</td><td>Keep and Done are facts; "kept by a flag" is worked out from the message's current version, so removing the flag releases it (D-017)</td></tr>
+          <tr><td>7</td><td>The screen never jumps and survives a drop</td><td>Numbered updates and catch-up (D-005; walk-through 5). How the screen holds its place: waits for T-019</td></tr>
+          <tr><td>8</td><td>Agents through a real door</td><td>D-008; the scripted team uses the same doors</td></tr>
+          <tr><td>9</td><td>A control panel outside the product</td><td>Its own program: schedule, pace, situations on demand, reset by rebuild, switches on each stand-in (D-005, D-007)</td></tr>
+          <tr><td>10</td><td>Text rules judged by a model, last</td><td>Asked by the feed after the row is shown; verdict saved as a fact; failure leaves the row where it is (D-017)</td></tr>
+          <tr><td>11</td><td>Installable web app at two widths</td><td>Served by Conversations; toolkit waits for T-019. <span class="chip risk">not designed yet</span></td></tr>
+          <tr><td>12</td><td>A busy seeded team</td><td>Loaded as truth; receivers rebuild from the log. Speed is the second experiment</td></tr>
+          <tr><td>13</td><td>History tabs and search read the current truth</td><td>Tabs answered by the feed from its copy; search by the index through Conversations, with a notice when behind</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </details>
+</section>
+
+<footer class="foot">
+  <span>Belongs to T-022 · Evidence: the brief, D-001 to D-004, D-009 to D-016, R-002, E-001 · Second opinion and four technical claims checked by separate agents on 2026-11-22</span>
+  <span>Records: <code>docs/decisions/D-005</code> to <code>D-008</code> (proposed), D-017 and D-018 (registered) · Walk-throughs: <a href="T-022-walkthroughs.html">T-022-walkthroughs.html</a></span>
+</footer>
+</main>
+</body>
+</html>
