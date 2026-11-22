@@ -1,0 +1,76 @@
+/* The agent's own: a calm page. The reason leads every row, and a row's size says how much attention it asks for. */
+:root{--bg:#faf8f4;--panel:#fff;--panel2:#f1eee7;--line:#e4dfd4;--hover:#f3f0e9;--accent:#1f4f46;--accent-soft:#e1ece9;--serif:ui-serif,Georgia,"Times New Roman",serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161614;--panel:#1e1e1b;--panel2:#252521;--line:#35352f;--hover:#2a2a25;--accent:#8fd0c2;--accent-soft:#22332f}}
+:root[data-theme="dark"]{--bg:#161614;--panel:#1e1e1b;--panel2:#252521;--line:#35352f;--hover:#2a2a25;--accent:#8fd0c2;--accent-soft:#22332f}
+.own{grid-template-columns:76px minmax(400px,1fr) minmax(0,1fr)}
+.own:not(.has-conv){grid-template-columns:76px 1fr 0}
+.own:not(.has-conv) .pane{display:none}
+.own .rail{display:flex;flex-direction:column;align-items:stretch;gap:4px;padding:12px 6px;border-right:1px solid var(--line);background:var(--panel2)}
+.own .logo{width:36px;height:36px;border-radius:10px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:700 18px var(--serif);margin:0 auto 10px}
+.own .rail .nav{flex:none;border-radius:10px;padding:8px 2px}
+.own .rail .nav.on{background:var(--panel);color:var(--accent);font-weight:600}
+.own .rail-gap{flex:1}
+.own .main{width:100%;max-width:760px;margin:0 auto}
+.own.has-conv .main{max-width:none}
+.own .top{padding:18px 20px 8px;align-items:flex-start}
+.own .top-t{flex:1;min-width:0}
+.own .top h1{font:600 24px/1.2 var(--serif)}
+.own .sum{color:var(--muted);font-size:14px;margin-top:2px}
+.own .s-focus{color:var(--focus)}.own .s-needs{color:var(--needs)}
+.own .search-wrap{padding:0 20px 10px}
+.own .tabs{padding:0 20px}
+.own .feed-scroll{padding:0 20px 40px}
+.own .bucket{margin-top:14px}
+.own .bk-head{padding:10px 0 8px;border-bottom:0;background:var(--bg);box-shadow:0 -16px 0 var(--bg)}
+.own .bk-head h2{font:600 19px var(--serif)}
+.own .b-needs>.bk-head h2{font-size:17px}.own .b-fyi>.bk-head h2{font-size:15px}
+.own .row{border:1px solid var(--line);border-radius:12px;background:var(--panel);margin-bottom:8px;overflow:hidden}
+.own .row-main{padding:12px 14px}
+.own .row-text{display:flex;flex-direction:column}
+.own .row-reason{order:-1;font-size:12px;font-weight:600;letter-spacing:.01em;margin-bottom:3px}
+.own .b-focus .row-reason{color:var(--focus)}.own .b-needs .row-reason{color:var(--needs)}
+.own .row.b-focus{border-left:4px solid var(--focus)}
+.own .row.b-focus .row-preview{-webkit-line-clamp:3}
+.own .row-badge,.own .why-dot{display:none}
+.own .row.unread .row-title::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:1px}
+/* Needs you: lighter */
+.own .row.b-needs{border-radius:10px;margin-bottom:6px}
+.own .row.b-needs .row-main{padding:7px 14px}
+.own .row.b-needs .av{width:30px;height:30px;font-size:11px}
+.own .row.b-needs .row-preview{-webkit-line-clamp:1}
+/* For your information: a digest */
+.own .bucket.b-fyi{color:var(--muted)}
+.own .row.b-fyi{border:0;border-bottom:1px solid var(--line);border-radius:0;background:none;margin:0}
+.own .row.b-fyi .row-main{padding:7px 4px;gap:8px}
+.own .row.b-fyi .av{width:22px;height:22px;font-size:9px;border-radius:5px;margin-top:2px}
+.own .row.b-fyi .row-preview{-webkit-line-clamp:1;font-size:14px;color:var(--muted)}
+.own .row.b-fyi .row-title{font-size:14px}
+.own .row.b-fyi .rxs{display:none}
+.own .row.b-fyi:not(.expanded) .row-text{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);column-gap:8px;align-items:baseline}
+.own .row.b-fyi:not(.expanded) .row-reason{grid-column:1/-1;font-weight:400;margin-bottom:0}
+.own .row.b-fyi:not(.expanded) .row-head{grid-column:1;max-width:46vw}
+.own .row.b-fyi:not(.expanded) .row-time,.own .row.b-fyi:not(.expanded) .row-sub{display:none}
+.own .row.b-fyi:not(.expanded) .row-preview{grid-column:2}
+.own .row.b-fyi:not(.expanded) .row-preview>b:first-child{display:none}
+.own .kept-head{padding:12px 0 6px}
+.own .row.kept{border-left-style:dashed}
+.own .row-exp{padding:4px 14px 14px;background:var(--panel)}
+.own .row.gone{background:none}
+.own .hrow{border:0;border-bottom:1px solid var(--line);border-radius:0;background:none;margin:0}
+.own .hist-note{border:0;background:none;padding:10px 0}
+.own .chats{max-width:520px}
+.own .chat{border-radius:8px}
+.own .empty{border:1px dashed var(--line);border-radius:12px;margin-bottom:8px}
+.own .pane{background:var(--panel)}
+@media (max-width:760px){
+  .own{grid-template-rows:1fr auto;grid-template-columns:1fr !important}
+  .own .rail{grid-row:2;flex-direction:row;padding:0;border:0;border-top:1px solid var(--line);background:var(--panel)}
+  .own .rail .nav{flex:1;border-radius:0;padding:7px 2px}
+  .own .logo,.own .rail-gap{display:none}
+  .own .main{grid-row:1}
+  .own .top{padding:14px 14px 6px}
+  .own .top h1{font-size:21px}
+  .own .search-wrap,.own .tabs{padding-left:14px;padding-right:14px}
+  .own .feed-scroll{padding:0 14px 30px}
+  .own:not(.has-conv) .pane{display:none}
+}

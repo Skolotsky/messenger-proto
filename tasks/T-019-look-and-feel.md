@@ -57,7 +57,14 @@ The same content in all three, from the seeded team (D-010), viewed as the produ
 ## Log
 
 - 2026-11-22: task prepared. Not started.
+- 2026-11-22: picked up in a separate session. The user confirmed the browser download (Playwright image, about 920 MB); `scripts/browser` and `tools/browser/Dockerfile` set up, which settles T-004. Three pages built from one shared script, clicked through at both widths, written up. Waiting for the user's review.
 
 ## Evidence
 
-_None yet._
+- Criterion 1: `slack-like.html`, `telegram-like.html`, `own.html` in `experiments/E-002-look-and-feel/`; 53 checks per page and width cover every item of the list; all 318 pass (`results.json`).
+- Criterion 2: both widths clicked through in light; no sideways scroll at 390 px. Dark was looked at on the opening screen only.
+- Criterion 3: 84 screenshots in `screenshots/`; the agent looked at 16 of them, across all three pages, both widths and both themes.
+- Criterion 4: `README.md` in the experiment folder, with the recommendation.
+- Criterion 5: `./scripts/check` passes.
+- Nothing jumps: 0.00 px in every run; the check was seen to fail with the size lock switched off.
+- Not done: review by the user; an independent verifier.

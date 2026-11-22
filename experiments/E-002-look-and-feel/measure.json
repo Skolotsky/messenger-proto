@@ -1,0 +1,80 @@
+{
+ "slack-like desktop": {
+  "rows_on_first_screen": 5,
+  "feed_height": 708,
+  "needs_starts_at": 632,
+  "fyi_starts_at": 1303,
+  "preview_lines": 2,
+  "preview_width": 414,
+  "first_row_height": {
+   "focus": 100,
+   "needs": 100,
+   "fyi": 100
+  }
+ },
+ "slack-like phone": {
+  "rows_on_first_screen": 5,
+  "feed_height": 701,
+  "needs_starts_at": 632,
+  "fyi_starts_at": 1303,
+  "preview_lines": 2,
+  "preview_width": 310,
+  "first_row_height": {
+   "focus": 100,
+   "needs": 100,
+   "fyi": 100
+  }
+ },
+ "telegram-like desktop": {
+  "rows_on_first_screen": 5,
+  "feed_height": 584,
+  "needs_starts_at": null,
+  "fyi_starts_at": null,
+  "preview_lines": 1,
+  "preview_width": 293,
+  "first_row_height": {
+   "focus": 83,
+   "needs": null,
+   "fyi": null
+  }
+ },
+ "telegram-like phone": {
+  "rows_on_first_screen": 5,
+  "feed_height": 628,
+  "needs_starts_at": null,
+  "fyi_starts_at": null,
+  "preview_lines": 1,
+  "preview_width": 264,
+  "first_row_height": {
+   "focus": 83,
+   "needs": null,
+   "fyi": null
+  }
+ },
+ "own desktop": {
+  "rows_on_first_screen": 4,
+  "feed_height": 675,
+  "needs_starts_at": 714,
+  "fyi_starts_at": 1311,
+  "preview_lines": 2,
+  "preview_width": 631,
+  "first_row_height": {
+   "focus": 90,
+   "needs": 80,
+   "fyi": 53
+  }
+ },
+ "own phone": {
+  "rows_on_first_screen": 4,
+  "feed_height": 676,
+  "needs_starts_at": 822,
+  "fyi_starts_at": 1420,
+  "preview_lines": 3,
+  "preview_width": 273,
+  "first_row_height": {
+   "focus": 112,
+   "needs": 80,
+   "fyi": 53
+  }
+ }
+}

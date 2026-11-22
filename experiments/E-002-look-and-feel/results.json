@@ -1,0 +1,2228 @@
+[
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "focus: every row gives its reason",
+  "pass": true,
+  "detail": "['In Focus: direct message from Anna']"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "needs: every row gives its reason",
+  "pass": true,
+  "detail": "['Needs you: replies in a thread you started']"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "fyi: every row gives its reason",
+  "pass": true,
+  "detail": "['For your information: Ledger marked this Info']"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "three buckets hold rows",
+  "pass": true,
+  "detail": "{'focus': 5, 'needs': 6, 'fyi': 5}"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Focus has a Kept section with two rows",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "no sideways scroll: feed",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "#incidents is one row for six posts",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "row expands in place with its six posts",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "expanding marks the row read",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "reply from the row appears in the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "agent flag asks for approval and shows it is waiting",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "reacting from the row releases the flagged row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "flagged row is kept, with the reason",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the kept row shows the reaction on its message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Done releases it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "agent result is in Needs you",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a reaction that is an answer names the person",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a row shows who reacted to its message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Info progress update sits in For your information",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "grouped reactions show the split",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "edit to a longer text: the row below does not move",
+  "pass": true,
+  "detail": "moved 0.00px, row grew 0.00px; page says: Edited to five times the length. The row below moved by 0.0 px."
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the edited row says so",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "delete: a marker holds the space, the row below does not move",
+  "pass": true,
+  "detail": "moved 0.00px; page says: Deleted. A marker holds its place until you move on. The row below moved by 0.0 px."
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "expanded row shows the full edit",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "\"3 new\" appears and nothing in the list moves",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the new rows come in when asked",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "an emptied bucket shows an illustration and one line",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "after leaving: done rows are gone, a read flag is under Kept",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "history tab dms lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "history tab mentions lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the deleted mention is not in history; the edit shows its new text",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "history tab threads lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "history tab reactions lists entries",
+  "pass": true,
+  "detail": "4"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "no sideways scroll: history",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "deleted message with replies keeps a marker and its two replies",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "channel dial offers four levels",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "channel dial changes in one click",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "no sideways scroll: conversation",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a message can be sent flagged",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "thread shows Following",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "thread dial offers the four buckets-as-levels",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Unfollow sets the thread to Off",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "adding a Focus rule shows its count first",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the rule is in the Focus rules list",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "tray lists notifications and shows the current truth",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "\"Focus only\" narrows the tray",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "search finds a message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "search does not find the deleted message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "no script errors",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "in the conversation, an edit does not move the next message",
+  "pass": true,
+  "detail": "moved 0.00px"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the longer edit waits behind an expander",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the expander opens the full text when asked",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "in the conversation, a delete does not move the next message",
+  "pass": true,
+  "detail": "moved 0.00px"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "focus: every row gives its reason",
+  "pass": true,
+  "detail": "['In Focus: direct message from Anna']"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "needs: every row gives its reason",
+  "pass": true,
+  "detail": "['Needs you: replies in a thread you started']"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "fyi: every row gives its reason",
+  "pass": true,
+  "detail": "['For your information: Ledger marked this Info']"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "three buckets hold rows",
+  "pass": true,
+  "detail": "{'focus': 5, 'needs': 6, 'fyi': 5}"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "Focus has a Kept section with two rows",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "no sideways scroll: feed",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "#incidents is one row for six posts",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "row expands in place with its six posts",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "expanding marks the row read",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "reply from the row appears in the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "agent flag asks for approval and shows it is waiting",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "reacting from the row releases the flagged row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "flagged row is kept, with the reason",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "the kept row shows the reaction on its message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "Done releases it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "agent result is in Needs you",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "a reaction that is an answer names the person",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "a row shows who reacted to its message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "Info progress update sits in For your information",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "grouped reactions show the split",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "edit to a longer text: the row below does not move",
+  "pass": true,
+  "detail": "moved 0.00px, row grew 0.00px; page says: Edited to five times the length. The row below moved by 0.0 px."
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "the edited row says so",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "delete: a marker holds the space, the row below does not move",
+  "pass": true,
+  "detail": "moved 0.00px; page says: Deleted. A marker holds its place until you move on. The row below moved by 0.0 px."
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "expanded row shows the full edit",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "\"3 new\" appears and nothing in the list moves",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "the new rows come in when asked",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "an emptied bucket shows an illustration and one line",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "after leaving: done rows are gone, a read flag is under Kept",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "history tab dms lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "history tab mentions lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "the deleted mention is not in history; the edit shows its new text",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "history tab threads lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "history tab reactions lists entries",
+  "pass": true,
+  "detail": "4"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "no sideways scroll: history",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "deleted message with replies keeps a marker and its two replies",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "channel dial offers four levels",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "channel dial changes in one click",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "no sideways scroll: conversation",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "a message can be sent flagged",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "thread shows Following",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "thread dial offers the four buckets-as-levels",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "Unfollow sets the thread to Off",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "adding a Focus rule shows its count first",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "the rule is in the Focus rules list",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "tray lists notifications and shows the current truth",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "\"Focus only\" narrows the tray",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "search finds a message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "search does not find the deleted message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "no script errors",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "in the conversation, an edit does not move the next message",
+  "pass": true,
+  "detail": "moved 0.00px"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "the longer edit waits behind an expander",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "the expander opens the full text when asked",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "in the conversation, a delete does not move the next message",
+  "pass": true,
+  "detail": "moved 0.00px"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "focus: every row gives its reason",
+  "pass": true,
+  "detail": "['In Focus: direct message from Anna']"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "needs: every row gives its reason",
+  "pass": true,
+  "detail": "['Needs you: replies in a thread you started']"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "fyi: every row gives its reason",
+  "pass": true,
+  "detail": "['For your information: Ledger marked this Info']"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "three buckets hold rows",
+  "pass": true,
+  "detail": "{'focus': 5, 'needs': 6, 'fyi': 5}"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "Focus has a Kept section with two rows",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "no sideways scroll: feed",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "#incidents is one row for six posts",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "row expands in place with its six posts",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "expanding marks the row read",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "reply from the row appears in the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "agent flag asks for approval and shows it is waiting",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "reacting from the row releases the flagged row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "flagged row is kept, with the reason",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "the kept row shows the reaction on its message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "Done releases it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "agent result is in Needs you",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "a reaction that is an answer names the person",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "a row shows who reacted to its message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "Info progress update sits in For your information",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "grouped reactions show the split",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "edit to a longer text: the row below does not move",
+  "pass": true,
+  "detail": "moved 0.00px, row grew 0.00px; page says: Edited to five times the length. The row below moved by 0.0 px."
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "the edited row says so",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "delete: a marker holds the space, the row below does not move",
+  "pass": true,
+  "detail": "moved 0.00px; page says: Deleted. A marker holds its place until you move on. The row below moved by 0.0 px."
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "expanded row shows the full edit",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "\"3 new\" appears and nothing in the list moves",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "the new rows come in when asked",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "an emptied bucket shows an illustration and one line",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "after leaving: done rows are gone, a read flag is under Kept",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "history tab dms lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "history tab mentions lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "the deleted mention is not in history; the edit shows its new text",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "history tab threads lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "history tab reactions lists entries",
+  "pass": true,
+  "detail": "4"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "no sideways scroll: history",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "deleted message with replies keeps a marker and its two replies",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "channel dial offers four levels",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "channel dial changes in one click",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "no sideways scroll: conversation",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "a message can be sent flagged",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "thread shows Following",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "thread dial offers the four buckets-as-levels",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "Unfollow sets the thread to Off",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "adding a Focus rule shows its count first",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "the rule is in the Focus rules list",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "tray lists notifications and shows the current truth",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "\"Focus only\" narrows the tray",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "search finds a message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "search does not find the deleted message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "no script errors",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "in the conversation, an edit does not move the next message",
+  "pass": true,
+  "detail": "moved 0.00px"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "the longer edit waits behind an expander",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "the expander opens the full text when asked",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "in the conversation, a delete does not move the next message",
+  "pass": true,
+  "detail": "moved 0.00px"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "focus: every row gives its reason",
+  "pass": true,
+  "detail": "['In Focus: direct message from Anna']"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "needs: every row gives its reason",
+  "pass": true,
+  "detail": "['Needs you: replies in a thread you started']"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "fyi: every row gives its reason",
+  "pass": true,
+  "detail": "['For your information: Ledger marked this Info']"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "three buckets hold rows",
+  "pass": true,
+  "detail": "{'focus': 5, 'needs': 6, 'fyi': 5}"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "Focus has a Kept section with two rows",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "no sideways scroll: feed",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "#incidents is one row for six posts",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "row expands in place with its six posts",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "expanding marks the row read",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "reply from the row appears in the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "agent flag asks for approval and shows it is waiting",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "reacting from the row releases the flagged row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "flagged row is kept, with the reason",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "the kept row shows the reaction on its message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "Done releases it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "agent result is in Needs you",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "a reaction that is an answer names the person",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "a row shows who reacted to its message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "Info progress update sits in For your information",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "grouped reactions show the split",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "edit to a longer text: the row below does not move",
+  "pass": true,
+  "detail": "moved 0.00px, row grew 0.00px; page says: Edited to five times the length. The row below moved by 0.0 px."
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "the edited row says so",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "delete: a marker holds the space, the row below does not move",
+  "pass": true,
+  "detail": "moved 0.00px; page says: Deleted. A marker holds its place until you move on. The row below moved by 0.0 px."
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "expanded row shows the full edit",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "\"3 new\" appears and nothing in the list moves",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "the new rows come in when asked",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "an emptied bucket shows an illustration and one line",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "after leaving: done rows are gone, a read flag is under Kept",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "history tab dms lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "history tab mentions lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "the deleted mention is not in history; the edit shows its new text",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "history tab threads lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "history tab reactions lists entries",
+  "pass": true,
+  "detail": "4"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "no sideways scroll: history",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "deleted message with replies keeps a marker and its two replies",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "channel dial offers four levels",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "channel dial changes in one click",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "no sideways scroll: conversation",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "a message can be sent flagged",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "thread shows Following",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "thread dial offers the four buckets-as-levels",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "Unfollow sets the thread to Off",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "adding a Focus rule shows its count first",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "the rule is in the Focus rules list",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "tray lists notifications and shows the current truth",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "\"Focus only\" narrows the tray",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "search finds a message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "search does not find the deleted message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "no script errors",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "in the conversation, an edit does not move the next message",
+  "pass": true,
+  "detail": "moved 0.00px"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "the longer edit waits behind an expander",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "the expander opens the full text when asked",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "in the conversation, a delete does not move the next message",
+  "pass": true,
+  "detail": "moved 0.00px"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "focus: every row gives its reason",
+  "pass": true,
+  "detail": "['In Focus: direct message from Anna']"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "needs: every row gives its reason",
+  "pass": true,
+  "detail": "['Needs you: replies in a thread you started']"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "fyi: every row gives its reason",
+  "pass": true,
+  "detail": "['For your information: Ledger marked this Info']"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "three buckets hold rows",
+  "pass": true,
+  "detail": "{'focus': 5, 'needs': 6, 'fyi': 5}"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "Focus has a Kept section with two rows",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "no sideways scroll: feed",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "#incidents is one row for six posts",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "row expands in place with its six posts",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "expanding marks the row read",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "reply from the row appears in the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "agent flag asks for approval and shows it is waiting",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "reacting from the row releases the flagged row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "flagged row is kept, with the reason",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "the kept row shows the reaction on its message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "Done releases it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "agent result is in Needs you",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "a reaction that is an answer names the person",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "a row shows who reacted to its message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "Info progress update sits in For your information",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "grouped reactions show the split",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "edit to a longer text: the row below does not move",
+  "pass": true,
+  "detail": "moved 0.00px, row grew 0.00px; page says: Edited to five times the length. The row below moved by 0.0 px."
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "the edited row says so",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "delete: a marker holds the space, the row below does not move",
+  "pass": true,
+  "detail": "moved 0.00px; page says: Deleted. A marker holds its place until you move on. The row below moved by 0.0 px."
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "expanded row shows the full edit",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "\"3 new\" appears and nothing in the list moves",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "the new rows come in when asked",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "an emptied bucket shows an illustration and one line",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "after leaving: done rows are gone, a read flag is under Kept",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "history tab dms lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "history tab mentions lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "the deleted mention is not in history; the edit shows its new text",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "history tab threads lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "history tab reactions lists entries",
+  "pass": true,
+  "detail": "4"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "no sideways scroll: history",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "deleted message with replies keeps a marker and its two replies",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "channel dial offers four levels",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "channel dial changes in one click",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "no sideways scroll: conversation",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "a message can be sent flagged",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "thread shows Following",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "thread dial offers the four buckets-as-levels",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "Unfollow sets the thread to Off",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "adding a Focus rule shows its count first",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "the rule is in the Focus rules list",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "tray lists notifications and shows the current truth",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "\"Focus only\" narrows the tray",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "search finds a message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "search does not find the deleted message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "no script errors",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "in the conversation, an edit does not move the next message",
+  "pass": true,
+  "detail": "moved 0.00px"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "the longer edit waits behind an expander",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "the expander opens the full text when asked",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "in the conversation, a delete does not move the next message",
+  "pass": true,
+  "detail": "moved 0.00px"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "focus: every row gives its reason",
+  "pass": true,
+  "detail": "['In Focus: direct message from Anna']"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "needs: every row gives its reason",
+  "pass": true,
+  "detail": "['Needs you: replies in a thread you started']"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "fyi: every row gives its reason",
+  "pass": true,
+  "detail": "['For your information: Ledger marked this Info']"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "three buckets hold rows",
+  "pass": true,
+  "detail": "{'focus': 5, 'needs': 6, 'fyi': 5}"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "Focus has a Kept section with two rows",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "no sideways scroll: feed",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "#incidents is one row for six posts",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "row expands in place with its six posts",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "expanding marks the row read",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "reply from the row appears in the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "agent flag asks for approval and shows it is waiting",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "reacting from the row releases the flagged row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "flagged row is kept, with the reason",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "the kept row shows the reaction on its message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "Done releases it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "agent result is in Needs you",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "a reaction that is an answer names the person",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "a row shows who reacted to its message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "Info progress update sits in For your information",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "grouped reactions show the split",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "edit to a longer text: the row below does not move",
+  "pass": true,
+  "detail": "moved 0.00px, row grew 0.00px; page says: Edited to five times the length. The row below moved by 0.0 px."
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "the edited row says so",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "delete: a marker holds the space, the row below does not move",
+  "pass": true,
+  "detail": "moved 0.00px; page says: Deleted. A marker holds its place until you move on. The row below moved by 0.0 px."
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "expanded row shows the full edit",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "\"3 new\" appears and nothing in the list moves",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "the new rows come in when asked",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "an emptied bucket shows an illustration and one line",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "after leaving: done rows are gone, a read flag is under Kept",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "history tab dms lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "history tab mentions lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "the deleted mention is not in history; the edit shows its new text",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "history tab threads lists entries",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "history tab reactions lists entries",
+  "pass": true,
+  "detail": "4"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "no sideways scroll: history",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "deleted message with replies keeps a marker and its two replies",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "channel dial offers four levels",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "channel dial changes in one click",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "no sideways scroll: conversation",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "a message can be sent flagged",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "thread shows Following",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "thread dial offers the four buckets-as-levels",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "Unfollow sets the thread to Off",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "adding a Focus rule shows its count first",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "the rule is in the Focus rules list",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "tray lists notifications and shows the current truth",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "\"Focus only\" narrows the tray",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "search finds a message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "search does not find the deleted message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "no script errors",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "in the conversation, an edit does not move the next message",
+  "pass": true,
+  "detail": "moved 0.00px"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "the longer edit waits behind an expander",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "the expander opens the full text when asked",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "in the conversation, a delete does not move the next message",
+  "pass": true,
+  "detail": "moved 0.00px"
+ }
+]

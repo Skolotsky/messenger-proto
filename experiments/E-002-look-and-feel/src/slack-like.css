@@ -1,0 +1,35 @@
+/* Slack-like: dark sidebar, dense rows, square avatars, flat messages. Own colours, no borrowed marks. */
+:root{--accent:#0f6e64;--side:#1d2b2a;--side-text:#cfdcda;--side-hover:#2a3d3b}
+.sk{grid-template-columns:250px minmax(380px,1fr) minmax(0,1.05fr)}
+.sk .side{background:var(--side);color:var(--side-text);display:flex;flex-direction:column;min-height:0;--muted:#8fa5a2;--line:#34494699;--hover:var(--side-hover);--panel:#16211f;--text:#fff;--panel2:#2a3d3b}
+.sk .ws{padding:14px 16px 10px;display:flex;flex-direction:column;color:#fff}
+.sk .ws small{color:var(--muted);font-size:12px}
+.sk .side .search{margin:0 12px 8px;border-color:transparent;background:#16211f}
+.sk .side .sr{--panel:#fff;--text:#1c1d1f;--muted:#62666d;--line:#e3e3df;--hover:#f1f1ee;color:#1c1d1f;width:340px}
+.sk .side-item{display:flex;align-items:center;gap:8px;padding:7px 16px;color:#fff}
+.sk .side-item.on{background:var(--accent);color:#fff}
+.sk .side-item .badge{margin-left:auto}
+.sk .side-scroll{flex:1;overflow-y:auto;padding-bottom:20px}
+.sk .chat.on{background:var(--side-hover)}
+.sk .chat.unread{color:#fff}
+.sk .side .dot{background:#fff}
+.sk .top{border-bottom:0;padding-bottom:4px}
+.sk .tabs-sep{align-self:center;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:0 6px 0 14px;border-left:1px solid var(--line);margin-left:8px;flex:none}
+.sk .bk-head{background:var(--panel2);padding-top:6px;padding-bottom:6px}
+.sk .bk-head h2{font-size:12.5px;text-transform:uppercase;letter-spacing:.05em}
+.sk .row-main{padding-top:8px;padding-bottom:8px}
+.sk .row-badge{display:none}
+.sk .row.unread{box-shadow:inset 3px 0 0 var(--accent)}
+.sk .msg-self:hover{background:var(--hover)}
+@media (max-width:1100px) and (min-width:761px){.sk{grid-template-columns:220px minmax(340px,1fr) minmax(0,1fr)}}
+@media (max-width:760px){
+  .sk{grid-template-rows:1fr auto}
+  .sk .side,.sk .main{grid-row:1}
+  .sk .side{display:none}
+  .sk.v-chats .side{display:flex}
+  .sk.v-chats .main{display:none}
+  .sk .side-item{display:none}
+  .sk .side .sr{width:auto}
+  .sk .chat{min-height:42px;font-size:16px}
+  .sk .tabs-sep{padding-left:8px;margin-left:2px}
+}
