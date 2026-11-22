@@ -8,7 +8,7 @@ The search delivery worker (ours) calls the search index (a stand-in behind a re
 
 ## 2. Events
 
-Every call is made for one organization (D-026). The organization is in the address (`/orgs/acme/…`) and in every item sent, and all numbers count within that organization. Nothing of another organization is ever sent or accepted.
+Every call is made for one organization (D-026). It is in the address of every call a screen, an agent or the door makes (`/orgs/acme/…`) and in every item a worker delivers; a live connection is opened for one organization. All numbers, places and logs count within that organization. Nothing of another organization is ever sent or accepted.
 
 Finished messages only: created, changed, deleted. A change carries the whole current message and its version; a delete carries which message and its version.
 
@@ -20,7 +20,7 @@ POST /changes
                "level": null, "reactions": [] } }
 { "org": "acme", "number": 4855, "kind": "message.deleted", "message": { "id": "msg_7Q2", "version": 3 } }
 
-answers: 200 applied · 200 already had it · 422 I refuse this one · anything else, or 3 s of silence: down
+answers: 200 applied · 200 already had it · 422 I refuse this one · anything else, or 3 s of silence: down (for every organization)
 ```
 
 ## 3. Guarantees
@@ -33,9 +33,10 @@ answers: 200 applied · 200 already had it · 422 I refuse this one · anything 
 ## 4. Failure behaviour
 
 - Down (no answer in 3 s, a connection error, a server error): the worker waits and tries again after 1, 2, 4 … up to 60 s, each pause varied at random so retries do not arrive in step, without limit, and skips nothing.
-- "I refuse this one" three times: the change is parked for that organization, shown in the control panel with the reason and "try again", and the worker moves on. Three different changes refused in a row count as down.
+- "I refuse this one" three times: the change is parked for that organization, shown in the control panel with the reason and "try again", and the worker moves on. Three different changes of one organization refused in a row pause that organization only: the worker keeps its place, shows it, and carries on with the others.
 - While the index is unreachable a person sees "Search is unavailable right now. Your messages are safe."; while it is more than 10 s behind, results carry "the last N minutes may be missing".
-- Wiped: the worker's place is set back to the start and the index refills.
+- The worker keeps a place per organization and takes the organizations in turn.
+- Wiped, for one organization or for all: the place of each wiped organization is set back to the start and its entries refill.
 
 ## 5. Evolution
 

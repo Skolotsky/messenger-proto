@@ -1,6 +1,6 @@
 # D-017: Conversations owns what a reader did; the feed is worked out from it
 
-- Status: accepted
+- Status: accepted; narrowed by D-026 (the log is per organization)
 - Level: system shape
 - Date: 2026-11-22
 - Decided by: user

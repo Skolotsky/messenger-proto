@@ -8,7 +8,7 @@ The web app (a person's screen), and the scripted team acting as people, call Co
 
 ## 2. Operations
 
-Every call is made for one organization (D-026). The organization is in the address (`/orgs/acme/…`) and in every item sent, and all numbers count within that organization. Nothing of another organization is ever sent or accepted.
+Every call is made for one organization (D-026). It is in the address of every call a screen, an agent or the door makes (`/orgs/acme/…`) and in every item a worker delivers; a live connection is opened for one organization. All numbers, places and logs count within that organization. Nothing of another organization is ever sent or accepted.
 
 Every action is one call carrying an ID the caller chose. Conversations saves it as a fact and writes it to the change log in the same step.
 
@@ -27,7 +27,7 @@ Every action is one call carrying an ID the caller chose. Conversations saves it
 One question, answered through this door by the feed: "what would this change have moved in the last 7 days?" (D-020). It changes nothing.
 
 ```json
-POST /people/actions
+POST /orgs/acme/people/actions
 { "id": "act_01JD3K7Q2", "as": "anna", "kind": "send",
   "message": { "id": "msg_7Q2", "conversation": "#launch", "thread": null,
                "text": "@Marco can you sign off the pricing page?", "mentions": ["marco"], "level": null } }
@@ -37,7 +37,7 @@ POST /people/actions
 { "id": "act_01JD3KA07", "as": "marco", "kind": "watching", "conversation": "#launch" }
 → 409 { "refused": "unknown kind" }        for a kind Conversations does not know
 
-GET /people/marco/preview?change=dial&channel=%23incidents&level=muted
+GET /orgs/acme/people/marco/preview?change=dial&channel=%23incidents&level=muted
 → 200 { "last_7_days": { "would_leave_needs_you": 14, "would_stay": 3 } }   or   503 { "not_available": "the feed is catching up" }
 ```
 

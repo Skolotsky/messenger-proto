@@ -67,6 +67,7 @@ Found by the independent check of the contracts:
 - "A silently lost update healed within 20 s" needs the screen to be told the last number sent every 10 seconds, not "about every 20"; the contract says 10.
 - The log carries a clock tick every second while there is activity, which bounds the hold: a notification goes out within 8 seconds of becoming due when everything is healthy (G-010).
 - "Watching" lapses after 60 seconds without renewal (G-024), so a vanished screen cannot leave messages read on arrival.
+- Since D-026: Reset, rebuild, a parked change and a paused receiver are per organization; the clock tick is one per quiet period, 6 seconds after an organization's last change, not one a second.
 
 ## Consequences
 

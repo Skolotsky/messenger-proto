@@ -8,15 +8,15 @@ A delivery worker reading the feed's own numbered log calls the notification sen
 
 ## 2. Events
 
-Every call is made for one organization (D-026). The organization is in the address (`/orgs/acme/…`) and in every item sent, and all numbers count within that organization. Nothing of another organization is ever sent or accepted.
+Every call is made for one organization (D-026). It is in the address of every call a screen, an agent or the door makes (`/orgs/acme/…`) and in every item a worker delivers; a live connection is opened for one organization. All numbers, places and logs count within that organization. Nothing of another organization is ever sent or accepted.
 
 ```json
 POST /notes
 { "org": "acme", "number": 1286, "previous": 1285, "edition": "feed-7c1", "at": "2026-11-22T10:14:03.120Z", "kind": "due",
-  "name": "marco / #launch / 4812", "person": "marco", "bucket": "needs_you",
+  "name": "acme / marco / #launch / 4812", "person": "marco", "bucket": "needs_you",
   "why": "Anna mentioned you in #launch", "text": "@Marco can you sign off the pricing page?" }
-{ "org": "acme", "number": 1301, "previous": 1300, "edition": "feed-7c1", "at": "…", "kind": "changed",   "name": "marco / #launch / 4812", "text": "…new text…" }
-{ "org": "acme", "number": 1317, "previous": 1316, "edition": "feed-7c1", "at": "…", "kind": "withdrawn", "name": "marco / #launch / 4812", "because": "read" }
+{ "org": "acme", "number": 1301, "previous": 1300, "edition": "feed-7c1", "at": "…", "kind": "changed",   "name": "acme / marco / #launch / 4812", "text": "…new text…" }
+{ "org": "acme", "number": 1317, "previous": 1316, "edition": "feed-7c1", "at": "…", "kind": "withdrawn", "name": "acme / marco / #launch / 4812", "because": "read" }
 { "org": "acme", "number": 1318, "previous": 1317, "edition": "feed-7c1", "at": "…", "kind": "tick" }
 
 answers: 200 taken · 200 already had it · 409 { "i_am_at": 1285 } · anything else, or 3 s of silence: down
@@ -27,10 +27,11 @@ A row that moves up into Focus while unread gets a second "due" with its own nam
 ## 3. Guarantees
 
 - The sender never judges: it sends what is due and nothing else.
-- A name is sent once, also after restarts and after the feed is rebuilt (a new edition of its log).
-- A notification is held for 5 seconds, measured by the timestamps in the notes, not by any machine's clock: it is sent only once a note stamped later than "due plus 5 s" has arrived. So nothing is sent for something read or deleted within the hold, however late the feed or the sender are.
+- A name begins with the organization, so two organizations can never produce the same one. A name is sent once, also after restarts and after the feed is rebuilt (a new edition of that organization's log).
+- The sender keeps a place per organization.
+- A notification is held for 5 seconds, measured by the timestamps in the notes, not by any machine's clock: it is sent only once a note of the same organization stamped later than "due plus 5 s" has arrived. The feed passes the clock on while that organization has a notification on hold. So nothing is sent for something read or deleted within the hold, however late the feed or the sender are.
 - One already sent cannot be recalled; its entry then shows the current truth ("message deleted", read, the new text).
-- Every notification that is due and not withdrawn within its hold is sent. When everything is healthy it goes out within 8 seconds of becoming due (5 s hold, a clock tick every second, delivery). Never lost; may be late. One sent more than 10 minutes late is marked "delayed".
+- Every notification that is due and not withdrawn within its hold is sent. When everything is healthy it goes out within 8 seconds of becoming due (5 s hold, then the next change or the clock tick at 6 s, then delivery). Never lost; may be late. One sent more than 10 minutes late is marked "delayed".
 
 ## 4. Failure behaviour
 

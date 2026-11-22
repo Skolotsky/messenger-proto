@@ -5,7 +5,7 @@
 - Date: 2026-11-22
 - Decided by: user (the direction); the scope below is the agent's reading, open to objection
 - Depends on: D-005, D-006, D-017, D-018, D-025
-- Narrows: D-005 (one change log becomes one per organization), D-006 and G-009 (a fence limit, a parked change and a stopped feed are per organization)
+- Narrows: D-005 and D-017 ("the one log" becomes one log per organization), D-007 (Reset and a paused receiver are per organization), D-006 and G-009 (a fence limit, a parked change and a stopped feed are per organization)
 - Evidence: E-004, second part (a numbered log per organization on PostgreSQL; the test code calls them teams)
 - Visual: `docs/visuals/T-022-architecture-proposal.html`, section "D-026"
 
@@ -45,7 +45,7 @@ Accepted by the user on 2026-11-22, as the direction: **B.** The scope, as the a
 4. **The feed is worked out per organization**, and is rebuilt, fenced and reset per organization. Clock ticks are written per organization while that organization is active.
 5. **Every contract is scoped by organization**: the organization is in the address and in every change, note, update and event; all numbers count within the organization.
 6. **A person and an agent belong to one organization.** One identity across several organizations is not part of this.
-7. **How it scales, which is why organizations are kept independent:** several copies of each program can each take a share of the organizations; organizations can be spread over several databases; a message broker becomes worth it when assigning and balancing organizations is itself the work (`docs/visuals/D-005-message-broker.html`). What this does not give: one very large organization still has one log and one feed.
+7. **How it scales, which is why organizations are kept independent.** What is in place: every key, log, place and contract is per organization, and no question spans two. What that makes possible later, each needing a design of its own that is not done here: several copies of a program each taking a share of the organizations (needs each organization assigned to exactly one copy, because open connections, text of replies in progress and agents' limits live in a copy's memory); organizations spread over several databases (needs a directory saying which database holds which organization). A message broker is the standard way to get that assignment and balancing (`docs/visuals/D-005-message-broker.html`). What this does not give: one very large organization still has one log and one feed, and all organizations on one database share its capacity, about 850 to 1,030 saves a second in the test.
 8. **Not built:** creating or administering organizations in the product, sign-in, limits per organization, several copies of a program actually running, more than one database. The first version runs one organization with the seeded team in it and has no organization switcher (the user, 2026-11-22); a second small organization exists only so that the tests can prove separation.
 
 Evidence (E-004, second part, PostgreSQL 17, 8 organizations, two writers each): a follower per organization missed 0 of 3,200 changes. With one organization keeping every save open for 300 ms, saves in the other organizations took up to 2.6 s (19 in 20 within 317 ms) with one log for everybody, and up to 34 ms (19 in 20 within 24 ms) with a log per organization. Flat out, both forms saved about 850 to 1,030 changes a second: a log per organization buys independence, not more speed from one database.
@@ -59,4 +59,5 @@ Evidence (E-004, second part, PostgreSQL 17, 8 organizations, two writers each):
 ## Follow-ups
 
 - Contracts updated (the organization in every address and payload); guardrails G-025 (nothing crosses organizations) and G-026 (one organization cannot delay another) added; G-005, G-009, G-014 and G-020 read "per organization".
+- Corrected after an independent check (2026-11-22): a receiver now has an answer for "this organization is stopped" that differs from "down"; refusals pause one organization only; a notification's name begins with the organization; the hold, the feed's own log and every place are stated per organization; clock ticks became one tick per quiet period (a tick a second per active organization would by itself use up the database at about a thousand active organizations); the scaling claims in point 7 say what further design they need. The sparser tick is not tried: E-003 used a tick every 0.1 s.
 - Settled by the user on 2026-11-22: the product has no organization switcher in this scope; the second organization exists only for the tests.

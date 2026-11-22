@@ -1,6 +1,6 @@
 # D-005: System shape and stack
 
-- Status: accepted; superseded in part (the server language: D-025)
+- Status: accepted; superseded in part (the server language: D-025); narrowed by D-026 (one change log per organization)
 - Level: system shape
 - Date: 2026-11-22
 - Decided by: user

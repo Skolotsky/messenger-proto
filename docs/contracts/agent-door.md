@@ -8,18 +8,18 @@ An agent (scripted, a team's own, or a coding agent through a small connector) c
 
 ## 2. Operations
 
-Every call is made for one organization (D-026). The organization is in the address (`/orgs/acme/…`) and in every item sent, and all numbers count within that organization. Nothing of another organization is ever sent or accepted.
+Every call is made for one organization (D-026). It is in the address of every call a screen, an agent or the door makes (`/orgs/acme/…`) and in every item a worker delivers; a live connection is opened for one organization. All numbers, places and logs count within that organization. Nothing of another organization is ever sent or accepted.
 
 ```json
-GET  /agents/release-agent/events?after=311&wait=25
+GET  /orgs/acme/agents/release-agent/events?after=311&wait=25
 → [ { "org": "acme", "number": 312, "kind": "mentioned", "agent_chain": 0,
       "message": { "id": "msg_7Q2", "version": 1, "conversation": "#launch", "author": "anna", "text": "…" } } ]
 
-POST /agents/release-agent/messages          { "id": "a-91", "thread": "msg_7Q2", "text": "On it.", "level": "info", "because_of": 312 }
-POST /agents/release-agent/replies           { "id": "a-92", "thread": "msg_7Q2", "because_of": 312 }        "I am starting a reply"
-POST /agents/release-agent/replies/a-92/pieces  { "at": 0, "text": "Build 2.4.1 " }
-POST /agents/release-agent/replies/a-92/finish  { "id": "a-92-done", "level": "flag", "mentions": ["marco"] }
-POST /agents/release-agent/status            { "state": "waiting", "on": "marco" }
+POST /orgs/acme/agents/release-agent/messages          { "id": "a-91", "thread": "msg_7Q2", "text": "On it.", "level": "info", "because_of": 312 }
+POST /orgs/acme/agents/release-agent/replies           { "id": "a-92", "thread": "msg_7Q2", "because_of": 312 }        "I am starting a reply"
+POST /orgs/acme/agents/release-agent/replies/a-92/pieces  { "at": 0, "text": "Build 2.4.1 " }
+POST /orgs/acme/agents/release-agent/replies/a-92/finish  { "id": "a-92-done", "level": "flag", "mentions": ["marco"] }
+POST /orgs/acme/agents/release-agent/status            { "state": "waiting", "on": "marco" }
 
 answers: 200 · 200 already had it · 409 { "have": 12 } a piece is missing · 409 closed · 429 slow down · 410 { "too_far_behind": true, "oldest": 290 }
 ```

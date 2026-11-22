@@ -8,17 +8,17 @@ Conversations' door for people (and its live connection) calls the activity feed
 
 ## 2. Operations
 
-Every call is made for one organization (D-026). The organization is in the address (`/orgs/acme/…`) and in every item sent, and all numbers count within that organization. Nothing of another organization is ever sent or accepted.
+Every call is made for one organization (D-026). It is in the address of every call a screen, an agent or the door makes (`/orgs/acme/…`) and in every item a worker delivers; a live connection is opened for one organization. All numbers, places and logs count within that organization. Nothing of another organization is ever sent or accepted.
 
 All are questions; none changes anything.
 
 ```json
-GET feed/people/marco/rows                     → { "edition": "feed-7c1", "through": 4861, "number": 103, "rows": [ { "conversation": "#launch", "bucket": "needs_you", "unread": true, "kept": false, "why": "Anna mentioned you", "newest": 4812 } ], "counts": { "focus": 1, "needs_you": 4, "fyi": true } }
-GET feed/people/marco/history?tab=mentions     → entries with an unread mark each, and the tab's unread count
-GET feed/people/marco/settings                 → Focus people, removed people, each thread's and channel's level as it is in effect
-GET feed/people/marco/preview?change=…         → what the change would have moved in the last 7 days
-GET feed/people/marco/updates?after=97&edition=feed-7c1&wait=25   → row changes after 97, each with the number before it; or { "new_edition": "feed-9d4" }
-GET search/query?q=pricing&as=marco            → { "through": 4855, "results": [ { "message": "msg_7Q2", "version": 2, "text": "…" } ] }
+GET feed/orgs/acme/people/marco/rows                     → { "edition": "feed-7c1", "through": 4861, "number": 103, "rows": [ { "conversation": "#launch", "bucket": "needs_you", "unread": true, "kept": false, "why": "Anna mentioned you", "newest": 4812 } ], "counts": { "focus": 1, "needs_you": 4, "fyi": true } }
+GET feed/orgs/acme/people/marco/history?tab=mentions     → entries with an unread mark each, and the tab's unread count
+GET feed/orgs/acme/people/marco/settings                 → Focus people, removed people, each thread's and channel's level as it is in effect
+GET feed/orgs/acme/people/marco/preview?change=…         → what the change would have moved in the last 7 days
+GET feed/orgs/acme/people/marco/updates?after=97&edition=feed-7c1&wait=25   → row changes after 97, each with the number before it; or { "new_edition": "feed-9d4" }
+GET search/orgs/acme/query?q=pricing&as=marco            → { "through": 4855, "results": [ { "message": "msg_7Q2", "version": 2, "text": "…" } ] }
 ```
 
 `through` is the number of the last change the answering part has applied. The door compares it with the head of the log to know how far behind the answer is.

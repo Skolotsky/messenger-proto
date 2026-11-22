@@ -8,7 +8,7 @@ The feed delivery worker (ours) calls the activity feed. The feed never calls Co
 
 ## 2. Events
 
-Every call is made for one organization (D-026). The organization is in the address (`/orgs/acme/…`) and in every item sent, and all numbers count within that organization. Nothing of another organization is ever sent or accepted.
+Every call is made for one organization (D-026). It is in the address of every call a screen, an agent or the door makes (`/orgs/acme/…`) and in every item a worker delivers; a live connection is opened for one organization. All numbers, places and logs count within that organization. Nothing of another organization is ever sent or accepted.
 
 Every change, in log order: messages (created, changed, deleted; finished ones only), what readers did (read, watching, keep, done, dial, focus rule, focus person, focus only), and clock ticks. Each carries its number, the number before it, and the log's timestamp.
 
@@ -22,7 +22,7 @@ POST /changes
 
 POST /changes/batch   { "changes": [ …up to 100 of the above, in order… ] }      for a backlog
 
-answers: 200 applied · 200 already had it · 409 { "i_am_at": 4811 } · anything else, or 3 s of silence: down
+answers: 200 applied · 200 already had it · 409 { "i_am_at": 4811 } · 423 { "organization_stopped": "acme" } · anything else, or 3 s of silence: down (for every organization)
 Applying a batch stops at the first change that is not answered 200, and answers with that one.
 ```
 
@@ -32,14 +32,15 @@ Applying a batch stops at the first change that is not answered 200, and answers
 - The feed's rows always equal what the rules give for the log up to its place. A feed rebuilt from the start of the log equals the live one.
 - The feed holds nothing original: wiping it loses nothing.
 - When healthy, a change is reflected within 2 seconds, 19 times in 20.
-- Log timestamps never decrease. While there has been a change in the last 10 seconds, the log carries a clock tick every second.
+- Timestamps never decrease within an organization's log. When an organization goes quiet, its log gets one clock tick 6 seconds after its last change, so that everything before it is known to be more than 5 seconds old; there is no tick while changes keep coming, since they carry the time themselves.
+- The feed's rows, its place, its own log of notification notes and that log's edition are all per organization. One organization's feed can be rebuilt without touching another's.
 
 ## 4. Failure behaviour
 
 - Out of sequence, or asked while idle: the feed answers with its place and the worker continues from there.
 - The worker keeps a place per organization and takes the organizations in turn, so one organization's backlog does not delay another's.
 - Down: the worker waits and retries without limit. A person sees the rows the feed had, with "Catching up"; conversations, unread marks on channels and search are unaffected; notifications wait with the feed.
-- A change the feed cannot apply: it is set aside and a fence goes up around the one conversation, or the one reader, it touches. Later changes inside the fence are set aside too; those rows are marked "may be out of date" and nothing new notifies from them. Everything outside stays exact. More than five fences in one organization: the feed stops for that organization only. Repair: fix the fault, rebuild that organization's feed.
+- A change the feed cannot apply: it is set aside and a fence goes up around the one conversation, or the one reader, it touches. Later changes inside the fence are set aside too; those rows are marked "may be out of date" and nothing new notifies from them. Everything outside stays exact. More than five fences in one organization: the feed stops for that organization only and answers "organization stopped" for it; the worker keeps that organization's place, shows it, and carries on with the others. Repair: fix the fault, rebuild that organization's feed.
 
 ## 5. Evolution
 
