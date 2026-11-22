@@ -16,7 +16,6 @@ _Nothing in progress._
 
 ## Next
 
-- **T-044** `implement` Foundation: `make up` starts PostgreSQL and the six programs; shared pieces (clock, calls between parts, database per organization); fast check and full verify. First, by the lead session. Plan: `tasks/T-043-build-plan.md`
 - **T-045** `implement` Contracts in machine form with examples; the log writer, the mock door and the test harness. Second, by the lead session. Needs T-044
 - **T-046** `implement` Wave 1 · Conversations: saving and the log (G-003, G-004, G-005). Needs T-045
 - **T-047** `implement` Wave 1 · Delivery workers (G-012, G-014, G-023, G-026, G-029). Needs T-045

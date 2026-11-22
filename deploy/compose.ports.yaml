@@ -1,0 +1,15 @@
+services:
+  postgres:
+    ports: ["127.0.0.1:15432:5432"]
+  conversations:
+    ports: ["127.0.0.1:18081:8080"]
+  delivery:
+    ports: ["127.0.0.1:18082:8080"]
+  feed:
+    ports: ["127.0.0.1:18083:8080"]
+  search:
+    ports: ["127.0.0.1:18084:8080"]
+  sender:
+    ports: ["127.0.0.1:18085:8080"]
+  demo:
+    ports: ["127.0.0.1:18086:8080"]

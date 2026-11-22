@@ -27,3 +27,6 @@ __pycache__/
 # Scratch files of the experiments
 experiments/*/.ack
 experiments/*/.ctl
+
+# Tool caches (Go and Node run in Docker)
+.cache/

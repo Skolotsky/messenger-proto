@@ -134,8 +134,23 @@ PY
 if [ -z "$trace" ]; then pass "contracts name existing guardrails; guardrails come from accepted decisions"; else while IFS= read -r line; do fail "$line"; done <<< "$trace"; fi
 
 # ---------------------------------------------------------------------------
-# Product checks (lint, types, tests, guardrail tests) are added here once the
-# stack is chosen. Each one calls pass or fail like the checks above.
+section "Server (Go, in Docker)"
+
+if ! docker info >/dev/null 2>&1; then
+  fail "Docker is not running. Start it: the Go checks run in a container"
+else
+  unformatted=$(./scripts/tool gofmt -l server tests 2>&1 | grep -v '^\.cache' | tr '\n' ' ')
+  if [ -z "$unformatted" ]; then pass "Go code is formatted"; else fail "not formatted: $unformatted. Run: ./scripts/tool gofmt -w server tests"; fi
+
+  for mod in server tests; do
+    if out=$(TOOL_DIR=$mod ./scripts/tool go vet ./... 2>&1); then pass "go vet ($mod)"; else fail "go vet ($mod) found problems. Run: TOOL_DIR=$mod ./scripts/tool go vet ./..."; printf '%s\n' "$out" | tail -15; fi
+  done
+
+  if out=$(TOOL_DIR=server ./scripts/tool go test ./... 2>&1); then pass "server unit tests"; else fail "server unit tests failed. Run: TOOL_DIR=server ./scripts/tool go test ./..."; printf '%s\n' "$out" | tail -25; fi
+fi
+
+# ---------------------------------------------------------------------------
+# Later checks (contracts, web app) are added here. Each calls pass or fail.
 
 printf '\n'
 if [ "$failures" -eq 0 ]; then

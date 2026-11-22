@@ -2,7 +2,7 @@
 
 A prototype of a real-time team messaging system, focused on the messaging experience, the activity feed, and reliable delivery of message changes to independent systems (search, notifications, the feed itself).
 
-**Status:** project setup. There is nothing to run yet.
+**Status:** foundation built. `make up` starts the empty programs; `make verify` runs the full suite. Only Docker and make are needed.
 
 ## How this repo is organised
 

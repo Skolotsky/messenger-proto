@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# The full suite: starts the composed system in its own throwaway project,
+# checks every part is alive, and runs the guardrail tests against it.
+set -uo pipefail
+cd "$(dirname "$0")/.." || exit 2
+project="contexia-verify-$$"
+compose=(docker compose -p "$project" -f deploy/compose.yaml)
+cleanup() { "${compose[@]}" down -v --remove-orphans >/dev/null 2>&1; }
+trap cleanup EXIT
+
+./scripts/check || { echo "verify: fix ./scripts/check first"; exit 1; }
+
+echo; echo "Starting the system"
+if ! "${compose[@]}" up -d --build --wait --quiet-pull; then
+  "${compose[@]}" ps; "${compose[@]}" logs --tail 30
+  echo "verify: FAIL the system did not start. The logs are above."; exit 1
+fi
+
+echo; echo "Every part answers alive"
+for p in conversations delivery feed search sender demo; do
+  answer=$("${compose[@]}" exec -T "$p" wget -q -O - http://127.0.0.1:8080/alive)
+  case "$answer" in
+    *"\"part\":\"$p\""*'"status":"alive"'*) echo "  ok    $p" ;;
+    *) echo "  FAIL  $p answered: $answer. See: docker compose -f deploy/compose.yaml logs $p"; exit 1 ;;
+  esac
+done
+
+echo; echo "Guardrail tests"
+export CONTEXIA_TOOL_NETWORK="${project}_default"
+export CONTEXIA_TOOL_ENV="CONTEXIA_PG_HOST=postgres"
+if ! TOOL_DIR=tests ./scripts/tool go test -count=1 ./... ; then
+  echo "verify: FAIL a guardrail test failed. A failing guardrail is a finding: fix the cause, never the test."; exit 1
+fi
+if ! TOOL_DIR=server ./scripts/tool go test -count=1 -tags integration ./... ; then
+  echo "verify: FAIL a server integration test failed."; exit 1
+fi
+echo; echo "verify: all passed"

@@ -1,0 +1,73 @@
+# The whole system. Host ports are in compose.ports.yaml, so tests can run
+# beside a running copy.
+name: contexia
+
+x-part: &part
+  image: contexia-server:dev
+  restart: unless-stopped
+  depends_on:
+    postgres:
+      condition: service_healthy
+  healthcheck:
+    test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8080/alive"]
+    interval: 2s
+    timeout: 2s
+    retries: 15
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: contexia_admin
+      POSTGRES_PASSWORD: admin_dev
+      POSTGRES_DB: contexia
+    volumes:
+      - ./postgres:/docker-entrypoint-initdb.d:ro
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U contexia_admin -d contexia"]
+      interval: 1s
+      timeout: 2s
+      retries: 30
+
+  conversations:
+    <<: *part
+    build:
+      context: ../server
+      dockerfile: ../deploy/server.Dockerfile
+    command: ["conversations"]
+    environment:
+      CONTEXIA_DATABASE_URL: postgres://conversations:conversations_dev@postgres:5432/contexia
+
+  delivery:
+    <<: *part
+    command: ["delivery"]
+    environment:
+      CONTEXIA_DATABASE_URL: postgres://delivery:delivery_dev@postgres:5432/contexia
+
+  feed:
+    <<: *part
+    command: ["feed"]
+    environment:
+      CONTEXIA_DATABASE_URL: postgres://feed:feed_dev@postgres:5432/contexia
+
+  search:
+    <<: *part
+    command: ["search"]
+    environment:
+      CONTEXIA_DATABASE_URL: postgres://search:search_dev@postgres:5432/contexia
+
+  sender:
+    <<: *part
+    command: ["sender"]
+    environment:
+      CONTEXIA_DATABASE_URL: postgres://sender:sender_dev@postgres:5432/contexia
+
+  demo:
+    <<: *part
+    command: ["demo"]
+    environment:
+      CONTEXIA_DATABASE_URL: postgres://demo:demo_dev@postgres:5432/contexia
+
+volumes:
+  pgdata:
