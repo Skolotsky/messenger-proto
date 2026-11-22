@@ -23,3 +23,7 @@ tmp/
 
 # Python caches from the experiments
 __pycache__/
+
+# Scratch files of the experiments
+experiments/*/.ack
+experiments/*/.ctl

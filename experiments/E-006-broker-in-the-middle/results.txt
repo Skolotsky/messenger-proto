@@ -1,0 +1,30 @@
+Lanes: org0 and org2 share one; org1 travels in another. In the backlog scenarios applying a change costs the ordered receiver 1 ms.
+holds      | healthy: three organizations at 100 saves a second each for 20 s | saved 5891, in the logs 5891, the ordered receiver applied 5891, the other saw 5891; 0 arrivals out of order were refused
+           save to applied by the ordered receiver: median 128 ms, 19 in 20 within 506 ms, worst 1466 ms (5891 changes)
+           save to seen by the other receiver:      median 127 ms, 19 in 20 within 563 ms, worst 1510 ms (5891 changes)
+holds      | the relay killed five times mid-burst | saved 4417, in the logs 4417, the ordered receiver applied 4417, the other saw 4417; 0 arrivals out of order were refused
+holds      | Kafka stopped for 8 s mid-burst | saved 7058, in the logs 7058, the ordered receiver applied 7058, the other saw 7058; 0 arrivals out of order were refused; level 0 s after the last save
+           while Kafka was down, 2822 saves were accepted; a save took median 1 ms, worst 5 ms
+holds      | the ordered receiver killed three times mid-burst | saved 4713, in the logs 4713, the ordered receiver applied 4713, the other saw 4713; 0 arrivals out of order were refused
+holds      | the other receiver stopped for 8 s mid-burst | saved 5888, in the logs 5888, the ordered receiver applied 5888, the other saw 5888; 0 arrivals out of order were refused
+           the ordered receiver meanwhile: median 119 ms, 19 in 20 within 210 ms, worst 226 ms (2355 changes)
+holds      | a plain receiver: org0 gets 20,000 changes at once while org2 and org1 carry on | saved 21591, in the logs 21591, the ordered receiver applied 21591, the other saw 21591; 0 arrivals out of order were refused
+           org2 (same lane as the backlog):  median 6867 ms, 19 in 20 within 22186 ms, worst 23840 ms (715 changes)
+           org1 (another lane):              median 6913 ms, 19 in 20 within 22148 ms, worst 23847 ms (716 changes)
+holds      | a receiver that takes organizations in turn: org0 gets 20,000 changes at once while org2 and org1 carry on | saved 21592, in the logs 21592, the ordered receiver applied 21592, the other saw 21592; 0 arrivals out of order were refused
+           org2 (same lane as the backlog):  median 53 ms, 19 in 20 within 886 ms, worst 2024 ms (717 changes)
+           org1 (another lane):              median 52 ms, 19 in 20 within 849 ms, worst 1975 ms (715 changes)
+holds      | the in-turn receiver killed three times with its queues full | saved 21194, in the logs 21194, the ordered receiver applied 21194, the other saw 21194; 0 arrivals out of order were refused
+holds      | org0 is stopped at the ordered receiver and gets 20,000 changes; its lane-mate must not wait | 0 arrivals out of order were refused
+           org2 (same lane as the stopped one): median 121 ms, 19 in 20 within 215 ms, worst 232 ms (318 changes)
+holds      | org2 wiped at the ordered receiver and rebuilt by reading the topic from the start | 398 of 398 changes back in 0.5 s, reading past 20796 records
+caught     | broken on purpose: a relay that takes "sending finished" for "confirmed", Kafka stopped for 8 s | saved 7064, in the logs 7064, the ordered receiver applied 1550, the other saw 6169; 4619 arrivals out of order were refused
+caught     | broken on purpose: the relay publishes without the organization as key (any lane) | saved 2949, in the logs 2949, the ordered receiver applied 6, the other saw 2949; 2943 arrivals out of order were refused
+holds      | no Kafka, our own worker taking organizations in turn: org0 gets 20,000 changes at once; the others' changes must be applied within 2 s (19 in 20) | saved 21592, applied 21592
+           org2: median 24 ms, 19 in 20 within 56 ms, worst 61 ms (718 changes)
+           org1: median 25 ms, 19 in 20 within 57 ms, worst 62 ms (718 changes)
+caught     | no Kafka, broken on purpose: a worker that finishes one organization before the next: org0 gets 20,000 changes at once; the others' changes must be applied within 2 s (19 in 20) | saved 21589, applied 21589
+           org2: median 6673 ms, 19 in 20 within 22474 ms, worst 24189 ms (715 changes)
+           org1: median 6079 ms, 19 in 20 within 21844 ms, worst 23569 ms (714 changes)
+
+all as expected
