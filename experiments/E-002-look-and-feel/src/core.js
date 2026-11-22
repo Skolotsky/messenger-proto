@@ -24,6 +24,9 @@ const IC = {
   chat: '<path d="M4 5h16v11H9l-5 4z"/>', home: '<path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/>',
   check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
   pin: '<path d="M7 4h10v16l-5-4-5 4z"/>',
+  pencil: '<path d="M4 20l4-1 11-11-3-3L5 16z"/>',
+  trash: '<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/>',
+  unflag: '<path d="M6 21V4h11l-2 4 2 4H6"/><path d="M3 3l18 18"/>',
   smile: '<circle cx="11" cy="13" r="7"/><path d="M8.5 14.5a3 3 0 0 0 5 0M9 11h.01M13 11h.01M19 3v4M17 5h4"/>',
   open: '<path d="M14 5h5v5"/><path d="M19 5l-8 8"/><path d="M10 6H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3"/>',
   rules: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>'
@@ -47,17 +50,17 @@ const CH = [ // name, dial, unread, people
 const DMS = ['anna', 'sam', 'marco', 'lena', 'tomas', 'ship', 'triage'];
 const BG = { // ordinary traffic in conversations that carry no situation
   'ch-pricing': [['omar', 'Yesterday 14:10', 'Team plan stays at €79 per location through launch. We revisit in January.'], ['jonas', 'Yesterday 14:32', 'Good. Two pilots already have that number in their contracts.']],
-  'ch-mobile': [['kofi', '09:05', 'iOS build 412 is on TestFlight. Android 388 follows after lunch.'], ['yuki', '09:40', 'Smoke run on 412 is clean.']],
+  'ch-mobile': [['kofi', '09:05', 'iOS build 412 is on TestFlight. Android 388 follows after lunch.', [['yuki', '09:40', 'Smoke run on 412 is clean.'], ['lena', '09:44', 'The new tab bar looks right on a small phone.']]], ['kofi', '09:50', 'Does anyone still have an Android 11 device?', [['yuki', '09:52', 'QA has one. Desk by the window.']]]],
   'ch-frontend': [['ines', '09:15', 'Storybook is updated for the new date picker.'], ['lena', '09:22', 'Looks right. The focus ring is finally visible on dark.']],
   'ch-backend': [['tomas', 'Yesterday 18:20', 'Migration 0412 adds the location index. Dry run took 41 seconds on a copy of prod.'], ['marco', 'Yesterday 18:31', 'Run it before the freeze tonight.']],
-  'ch-qa': [['yuki', '08:50', 'Regression pass for rc3 starts as soon as Shipwright posts the build.'], ['kofi', '08:58', 'Ping me for anything on Android 12.']],
-  'ch-customers': [['ruth', 'Yesterday 11:02', 'Brightwell renewed for 12 months, 9 locations.'], ['jonas', 'Yesterday 11:05', 'That is our biggest account now.']],
+  'ch-qa': [['yuki', '08:50', 'Regression pass for rc3 starts as soon as Shipwright posts the build.', [['kofi', '08:58', 'Ping me for anything on Android 12.'], ['ines', '09:03', 'And me for Safari.']]], ['yuki', '09:30', 'Flaky test of the week: calendar drag on Firefox. Fails one run in ten.', [['ines', '09:36', 'It is the animation timing. Fix is in review.']]]],
+  'ch-customers': [['ruth', 'Yesterday 11:02', 'Brightwell renewed for 12 months, 9 locations.', [['jonas', 'Yesterday 11:05', 'That is our biggest account now.'], ['anna', 'Yesterday 11:20', 'Well done, both of you.']]], ['sam', 'Yesterday 14:15', 'Northgate Dental asked for an invoice per location.', [['omar', 'Yesterday 14:40', 'Possible from January. I will write to them.']]]],
   'ch-ops': [['omar', 'Mon 16:45', 'Launch day lunch is ordered for 34 people.'], ['anna', 'Mon 16:50', 'Thank you. Make it 36, two contractors are in.']],
   'ch-random': [['kofi', '08:12', 'The coffee machine on the 2nd floor is fixed.'], ['priya', '08:15', 'Best news of launch week.']],
-  'ch-releases': [['marco', 'Yesterday 17:10', 'Cutting 2.0.0-rc3 tonight. Thread below.'], ['yuki', 'Yesterday 17:14', 'QA is ready for it in the morning.']],
-  'ch-research': [['dele', 'Mon 10:02', 'Interview notes from the six pilot clinics are in the shared folder.'], ['lena', 'Mon 10:20', 'Reading them before the empty-state work.']],
-  'ch-design': [['lena', 'Yesterday 15:20', 'Empty states v3 is in the file. Thread below.'], ['ines', 'Yesterday 15:44', 'On it for web this afternoon.']],
-  'ch-product': [['maya', 'Mon 11:00', 'Launch checklist for Thursday is in the doc. Thread below.'], ['dele', 'Mon 11:30', 'Dashboards will be ready for the Wednesday review.']],
+  'ch-releases': [['yuki', 'Fri 15:02', '1.9.4 is verified on all three browsers.', [['marco', 'Fri 15:10', 'Shipping it at 16:00.'], ['ship', 'Fri 16:04', '1.9.4 is live. No errors in the first 500 sessions.']]], 'rc1', ['yuki', 'Yesterday 17:14', 'QA is ready for rc3 in the morning.']],
+  'ch-research': [['dele', 'Mon 10:02', 'Interview notes from the six pilot clinics are in the shared folder.', [['lena', 'Mon 10:20', 'Reading them before the empty-state work.'], ['maya', 'Mon 10:44', 'The note on double bookings is worth a ticket.']]], 'p1'],
+  'ch-design': ['k1', ['lena', 'Mon 16:05', 'Does anyone have the old illustration files? The ones from the 1.0 site.', [['priya', 'Mon 16:20', 'In the marketing drive, folder "2023 site".'], ['lena', 'Mon 16:22', 'Found them. Thank you.']]], 'e1', ['ines', 'Yesterday 15:44', 'Starting the web side of the empty states this afternoon.']],
+  'ch-product': ['c1', ['dele', 'Mon 11:30', 'Dashboards will be ready for the Wednesday review.', [['omar', 'Mon 11:41', 'Include revenue per location, please.'], ['dele', 'Mon 11:50', 'It is in.']]], ['jonas', 'Yesterday 09:20', 'Two pilots asked whether recurring appointments make it into 2.0.', [['maya', 'Yesterday 09:31', 'Yes, weekly and monthly. Custom patterns come later.'], ['jonas', 'Yesterday 09:33', 'That is enough for both.'], ['ruth', 'Yesterday 10:02', 'I will tell Brightwell too.']]]],
   'ch-data': [['dele', 'Mon 09:12', 'Weekly refresh is running. Thread below.'], ['omar', 'Mon 09:40', 'I need the revenue one by Wednesday noon.']],
   'dm-marco': [['marco', 'Yesterday 17:40', 'Freeze is at 20:00 tonight, not 18:00.'], ['maya', 'Yesterday 17:42', 'Noted. I will tell marketing.']],
   'dm-lena': [['lena', 'Mon 15:02', 'Sent you the v3 file for the empty states.'], ['maya', 'Mon 15:30', 'Much better. One comment on the mascot.']],
@@ -70,7 +73,7 @@ const LONG_EDIT = '@Maya the export API can\'t ship both CSV and XLSX by Thursda
 function seed() {
   const msgs = {}, convs = {};
   const M = (id, by, t, text, o) => { msgs[id] = Object.assign({ id, by, t, text, rx: [] }, o || {}); return id; };
-  const C = (id, kind, title, o, list) => { convs[id] = Object.assign({ id, kind, title, msgs: list }, o || {}); list.forEach(function tag(m) { msgs[m].conv = id; (msgs[m].replies || []).forEach(tag); }); };
+  const C = (id, kind, title, o, list) => { convs[id] = Object.assign({ id, kind, title, msgs: list }, o || {}); list.forEach(function tag(m) { if (!msgs[m]) return; msgs[m].conv = id; (msgs[m].replies || []).forEach(tag); }); };
   C('dm-anna', 'dm', '', { with: 'anna' }, [
     M('a-1', 'anna', 'Yesterday 18:05', 'The board deck is due Friday. Can you own the roadmap slide?'),
     M('a0', 'maya', 'Yesterday 18:09', 'Yes. Draft by Wednesday night.'),
@@ -93,7 +96,7 @@ function seed() {
     M('rc3', 'ship', '09:14', 'Progress: 212 of 340 tests passed, none failed.', { info: 1 }),
     M('rc4', 'ship', '10:21', '2.0.0-rc3 is built and all 340 tests pass. I have stopped before the rollout: I need your approval to release it to the 5% beta ring, @Maya.', { flag: 1, isNew: 1, status: 'Waiting on Maya' })]);
   C('ch-incidents', 'channel', '', { name: 'incidents' }, [
-    M('i0', 'marco', 'Yesterday 09:30', 'Resolved: the calendar sync delay was a stuck worker. Post-mortem on Friday.'),
+    M('i0', 'marco', 'Yesterday 09:30', 'Resolved: the calendar sync delay was a stuck worker. Post-mortem on Friday.', { replies: [M('i0a', 'tomas', 'Yesterday 09:41', 'I will add an alert on queue age.'), M('i0b', 'yuki', 'Yesterday 09:50', 'No customer tickets came in for it.')] }),
     M('i1', 'yuki', '10:02', 'Checkout is slow on staging and prod. p95 went from 400 ms to 2.9 s around 09:55.', { isNew: 1 }),
     M('i2', 'marco', '10:05', 'Looking. It lines up with the 09:50 config push.', { isNew: 1 }),
     M('i3', 'triage', '10:09', '9 customers reported failed bookings in the last 15 minutes. Their tickets are tagged checkout-slow.', { isNew: 1 }),
@@ -101,7 +104,7 @@ function seed() {
     M('i5', 'tomas', '10:19', 'Revert is out. p95 is back to 430 ms.', { isNew: 1 }),
     M('i6', 'yuki', '10:24', 'Confirmed on prod. Leaving this open until the 11:00 check.', { isNew: 1, rx: [['🙏', ['marco', 'sam']]] })]);
   C('ch-launch', 'channel', '', { name: 'launch' }, [
-    M('l1', 'priya', 'Yesterday 16:40', 'The press embargo lifts Thursday 09:00 CET. Three outlets are confirmed.'),
+    M('l1', 'priya', 'Yesterday 16:40', 'The press embargo lifts Thursday 09:00 CET. Three outlets are confirmed.', { replies: [M('l1a', 'anna', 'Yesterday 16:48', 'Which three?'), M('l1b', 'priya', 'Yesterday 16:52', 'Clinic Weekly, Practice Today and the Health Tech Letter.'), M('l1c', 'jonas', 'Yesterday 17:00', 'Send me the quotes when they are final.')] }),
     M('l2', 'priya', 'Yesterday 17:02', '', { deleted: 1, replies: [
       M('l2a', 'marco', 'Yesterday 17:20', 'Thursday still works for engineering if rc3 is clean.'),
       M('l2b', 'lena', 'Yesterday 17:26', 'Design is done except the empty states.')] }),
@@ -111,7 +114,7 @@ function seed() {
     M('e1', 'lena', 'Yesterday 15:20', 'Empty states v3 is in the file. I dropped the mascot and kept one line of copy and one action per screen. The calendar screen now offers "Add your first location".', { edited: '08:47' }),
     M('e2', 'ines', 'Yesterday 15:44', 'The "no appointments yet" one is much calmer now.')]);
   C('ch-engineering', 'channel', '', { name: 'engineering' }, [
-    M('g1', 'ines', '09:15', 'Storybook is updated for the new date picker.'),
+    M('g1', 'ines', '09:15', 'Storybook is updated for the new date picker.', { replies: [M('g1a', 'lena', '09:22', 'The focus ring is finally visible on dark.'), M('g1b', 'kofi', '09:30', 'Can mobile reuse the tokens?'), M('g1c', 'ines', '09:34', 'Yes, they are exported.')] }),
     M('mig1', 'maya', '10:05', '@Marco can you confirm the migration runs before the code freeze tonight?', { rx: [['✅', ['marco']]] }),
     M('t1', 'tomas', '10:31', '@Maya the export API can\'t ship both CSV and XLSX by Thursday. Which one matters for launch?', { isNew: 1 }),
     M('g2', 'kofi', '10:39', 'Android build 388 is green.')]);
@@ -122,10 +125,10 @@ function seed() {
     M('c4', 'lena', '10:11', 'Screenshots by 14:00 today.', { isNew: 1 }),
     M('c5', 'priya', '10:33', 'Blocked: the pricing page still shows the old Team plan. Who owns that?', { isNew: 1 })]);
   C('ch-support', 'channel', '', { name: 'support' }, [
-    M('u1', 'ruth', 'Yesterday 11:02', 'Brightwell renewed for 12 months.'),
+    M('u1', 'sam', 'Yesterday 10:30', 'New macro for refund requests is live.', { replies: [M('u1a', 'ruth', 'Yesterday 10:42', 'Used it twice already. Reads well.')] }),
     M('u2', 'triage', '09:58', '14 tickets since 09:00 mention double-booked slots, all from clinics with two locations. This looks like a product bug, not a support question. Someone from product or engineering should look.', { flag: 1, isNew: 1, rx: [['👀', ['sam']]] })]);
   C('ch-sales', 'channel', '', { name: 'sales' }, [
-    M('j0', 'jonas', 'Yesterday 16:15', 'The Brightwell call moved to Tuesday 15:00.'),
+    M('j0', 'jonas', 'Yesterday 16:15', 'The Brightwell call moved to Tuesday 15:00.', { replies: [M('j0a', 'ruth', 'Yesterday 16:20', 'I can join for the first half.'), M('j0b', 'jonas', 'Yesterday 16:22', 'Perfect.')] }),
     M('j1', 'jonas', '10:27', '@Maya can we promise Brightwell SSO in Q1? They will ask on the call today.', { isNew: 1 }),
     M('j2', 'ruth', '10:35', 'Their admin team is 4 people, for what it is worth.')]);
   C('th-comp', 'thread', 'Competitor pricing scan', { where: 'research', tdial: 'needs', tauto: 'you started this thread' }, [
@@ -138,7 +141,8 @@ function seed() {
   C('th-beta', 'thread', 'Your message in #general', { where: 'general', tdial: 'needs', tauto: 'you started this thread' }, [
     M('b1', 'maya', 'Yesterday 16:02', '2.0 beta is open to the whole team from today. Break it and tell me.', { rx: [['🎉', ['anna', 'marco', 'lena', 'sam', 'kofi', 'ines']], ['❤️', ['priya', 'ruth']]] })]);
   C('ch-general', 'channel', '', { name: 'general' }, [
-    M('n0', 'anna', 'Yesterday 09:00', 'Two days to go. All-hands is Wednesday 16:00, short.'),
+    M('n0', 'anna', 'Yesterday 09:00', 'Two days to go. All-hands is Wednesday 16:00, short.', { replies: [M('n0a', 'kofi', 'Yesterday 09:04', 'Will it be recorded?'), M('n0b', 'anna', 'Yesterday 09:06', 'Yes.')] }),
+    'b1',
     M('n1', 'sam', '09:30', '@channel the support rota for launch week is pinned. Check your slot before Wednesday.', { isNew: 1 })]);
   C('th-icons', 'thread', 'Icon set for 2.0', { where: 'design', tdial: 'fyi', tauto: 'you clicked Follow' }, [
     M('k1', 'lena', 'Mon 13:30', 'Icon set for 2.0: outline, 1.5 px stroke. Objections by Wednesday.'),
@@ -146,11 +150,13 @@ function seed() {
     M('k3', 'lena', '09:41', 'Trying 1.75 for the tab bar only.', { isNew: 1 }),
     M('k4', 'ines', '09:52', 'Web is fine either way.', { isNew: 1 })]);
   C('ch-marketing', 'channel', '', { name: 'marketing' }, [
-    M('q0', 'priya', 'Yesterday 15:00', 'Newsletter goes out Thursday 09:05, five minutes after the embargo.'),
+    M('q0', 'priya', 'Yesterday 15:00', 'Newsletter goes out Thursday 09:05, five minutes after the embargo.', { replies: [M('q0a', 'jonas', 'Yesterday 15:12', 'Can sales get a preview link?'), M('q0b', 'priya', 'Yesterday 15:15', 'In your inbox.')] }),
     M('q1', 'priya', '10:18', 'The launch post is scheduled. Thanks @Maya for the copy review.', { info: 1, isNew: 1 })]);
   C('ch-data', 'channel', '', { name: 'data' }, [
-    M('d0', 'dele', 'Mon 09:12', 'Weekly refresh is running. Thread below.'),
+    'w1',
     M('d00', 'omar', 'Mon 09:40', 'I need the revenue one by Wednesday noon.')]);
+  // each seeded thread hangs off its first message, which also sits in its channel
+  Object.entries({ 'th-check': 'c1', 'th-rc': 'rc1', 'th-empty': 'e1', 'th-icons': 'k1', 'th-comp': 'p1', 'th-metrics': 'w1', 'th-beta': 'b1' }).forEach(([t, m]) => { msgs[m].thread = t; convs[t].msgs.forEach(x => { msgs[x].conv = t; }); });
   const R = (id, conv, bucket, items, by, t, reason, why, o) => Object.assign({ id, conv, bucket, items, by, t, reason, why, sec: 'new', read: false, kept: null, done: false, replies: [] }, o || {});
   const rows = [
     R('r-anna', 'dm-anna', 'focus', ['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9', 'a10'], 'anna', '10:41', 'In Focus: direct message from Anna', 'Anna is one of your Focus people: everyone who writes to you directly is added.', { rule: 'dm' }),
@@ -173,7 +179,7 @@ function seed() {
   const T = (row, mid, bucket) => ({ row, mid, bucket });
   return {
     msgs, convs, rows, view: 'feed', btab: 'focus', htab: 'dms', conv: null, exp: new Set(), open: new Set(), lock: {}, menu: null, modal: null,
-    pending: null, arrived: false, fyiSeen: false, level: '', focusOnly: false, demo: false, note: '', q: '', resort: false,
+    w: { side: 250, act: 500 }, pending: null, arrived: false, fyiSeen: false, level: '', focusOnly: false, demo: false, note: '', q: '', resort: false,
     dmAuto: true, dmPeople: ['anna', 'sam', 'marco', 'lena', 'tomas'], dmRemoved: [], dmAsk: false, off: {}, gone: [],
     rules: [{ id: 'flag', label: 'Flags that name you', n: 6, start: 1 }, { id: 'ch:incidents', label: 'Every new post in #incidents', n: 23, kind: 'channel', target: 'incidents' }],
     tray: [T('r-anna', 'a10', 'focus'), T('r-check', 'c5', 'needs'), T('r-export', 't1', 'needs'), T('r-sso', 'j1', 'needs'), T('r-inc', 'i6', 'focus'), T('r-rc', 'rc4', 'focus'), Object.assign(T('r-mig', 'mig1', 'needs'), { as: 'marco', lead: 'Reacted ✅ to your message: ', at: '10:16' }), T('r-comp', 'p3', 'needs'), T('r-triage', 'u2', 'needs'), T('r-go', 'l3', 'focus')],
@@ -183,7 +189,7 @@ function seed() {
 let S = seed();
 function conv(id) {
   if (!S.convs[id] && BG[id]) {
-    const list = BG[id].map((x, i) => { const mid = id + '-' + i; S.msgs[mid] = { id: mid, by: x[0], t: x[1], text: x[2], rx: [], conv: id }; return mid; });
+    const list = BG[id].map((x, i) => { if (typeof x === 'string') return x; const mid = id + '-' + i; S.msgs[mid] = { id: mid, by: x[0], t: x[1], text: x[2], rx: [], conv: id, replies: (x[3] || []).map((y, j) => { const rid = mid + '-' + j; S.msgs[rid] = { id: rid, by: y[0], t: y[1], text: y[2], rx: [], conv: id }; return rid; }) }; return mid; });
     S.convs[id] = id.startsWith('dm-') ? { id, kind: 'dm', title: '', with: id.slice(3), msgs: list } : { id, kind: 'channel', title: '', name: id.slice(3), msgs: list };
   }
   const c = S.convs[id];
@@ -226,8 +232,8 @@ function rxHTML(m) {
 function msgHTML(id, ctx) {
   const m = S.msgs[id], k = ctx + ':' + id, L = S.lock[k] || {};
   // replies are never shown inline: a message with replies carries a link that opens its thread (the habit people know)
-  const rs = m.replies || [], replies = rs.length, inThread = S.conv === 'th-' + id, lastR = replies && S.msgs[rs[rs.length - 1]];
-  const rep = replies && !inThread ? `<button class="thread-link" data-act="openThread" data-m="${id}">${[...new Set(rs.map(x => S.msgs[x].by))].slice(0, 3).map(x => av(x, 'xs')).join('')}<b>${replies} ${replies === 1 ? 'reply' : 'replies'}</b><small>Last reply ${lastR.t}</small><span class="tl-go">View thread ›</span></button>` : '';
+  const tid = m.thread || 'th-' + id, rs = m.thread ? conv(m.thread).msgs.slice(1) : (m.replies || []), replies = rs.length, inThread = ctx === 'thr' || S.conv === tid, lastR = replies && S.msgs[rs[rs.length - 1]];
+  const rep = replies && !inThread ? `<button class="thread-link${S.thread === tid ? ' open' : ''}" data-act="openThread" data-m="${id}">${[...new Set(rs.map(x => S.msgs[x].by))].slice(0, 3).map(x => av(x, 'xs')).join('')}<b>${replies} ${replies === 1 ? 'reply' : 'replies'}</b><small>Last reply ${lastR.t}</small><span class="tl-go">View thread ›</span></button>` : '';
   if (m.deleted) {
     if (!replies && !L.self) return '';
     return `<div class="msg deleted" data-k="${k}"><div class="msg-self"${L.self ? ` style="height:${L.self}px"` : ''}><span class="tomb">${first(m.by)} deleted this message</span></div>${rep}</div>`;
@@ -235,8 +241,8 @@ function msgHTML(id, ctx) {
   const locked = m.edited && L.body && !S.open.has(k);
   const tags = (isAgent(m.by) ? '<span class="tag ag">agent</span>' : '') + (m.flag ? '<span class="tag flag">⚑ Flag</span>' : '') + (m.info ? '<span class="tag info">Info</span>' : '');
   const ed = m.edited ? `<span class="edited">edited</span>` + (locked ? `<button class="link" data-act="openMsg" data-k="${k}">Show all</button>` : '') : '';
-  const tools = `<span class="msg-tools">${EMO.map(e => `<button class="rx-btn" data-act="reactMsg" data-m="${id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}<button class="rx-pick" data-act="pick" data-m="${id}" aria-label="More reactions" title="More reactions">${ic('smile')}</button></span>`;
-  return `<div class="msg${m.by === ME ? ' mine' : ''}${m.flag ? ' is-flag' : ''}${m.info ? ' is-info' : ''}" data-k="${k}"><div class="msg-self">${tools}${av(m.by)}<div class="msg-main"><div class="msg-head"><b>${pn(m.by)}</b>${tags}<time>${m.t}</time>${ed}</div><div class="msg-body${locked ? ' locked' : ''}"${locked ? ` style="max-height:${L.body}px"` : ''}>${rich(m.text)}</div>${rxHTML(m)}${m.status ? `<div class="status"><span class="st-dot"></span>${m.status}</div>` : ''}</div></div>${rep}</div>`;
+  const tools = `<span class="msg-tools">${EMO.map(e => `<button class="rx-btn" data-act="reactMsg" data-m="${id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}<button class="rx-pick" data-act="pick" data-m="${id}" aria-label="More reactions" title="More reactions">${ic('smile')}</button>${m.by === ME ? `${m.flag ? `<button class="own-tool" data-act="unflag" data-m="${id}" aria-label="Remove the flag" title="Remove the flag">${ic('unflag')}</button>` : ''}<button class="own-tool" data-act="editMsg" data-mk="${k}" aria-label="Edit" title="Edit">${ic('pencil')}</button><button class="own-tool" data-act="askDel" data-mk="${k}" aria-label="Delete" title="Delete">${ic('trash')}</button>` : ''}</span>`;
+  return `<div class="msg${m.failed ? ' is-failed' : ''}${m.pending ? ' is-pending' : ''}${m.by === ME ? ' mine' : ''}${m.flag ? ' is-flag' : ''}${m.info ? ' is-info' : ''}" data-k="${k}"><div class="msg-self">${tools}${av(m.by)}<div class="msg-main"><div class="msg-head"><b>${pn(m.by)}</b>${tags}<time>${m.t}</time>${ed}</div>${S.editing === k ? `<form class="edit" data-form="edit" data-m="${id}"><input name="t" value="${esc(m.text)}" aria-label="Edit your message" autocomplete="off"><button class="btn sm pri">Save</button><button type="button" class="btn sm" data-act="cancelEdit">Cancel</button></form>` : S.delAsk === k ? `<div class="del-ask"><span>Delete this message? It disappears for everyone${replies ? '; its replies stay' : ''}. This cannot be undone.</span><button class="btn sm danger" data-act="delMsg" data-m="${id}">Delete</button><button class="btn sm" data-act="cancelEdit">Cancel</button></div>` : `<div class="msg-body${locked ? ' locked' : ''}"${locked ? ` style="max-height:${L.body}px"` : ''}>${rich(m.text)}</div>`}${m.failed ? `<div class="send-state fail">Not sent. <button class="link" data-act="retry" data-m="${id}">Try again</button> · <button class="link" data-act="discard" data-m="${id}">Discard</button></div>` : m.pending ? '<div class="send-state">Waiting for the connection. It will be sent when you are back online.</div>' : ''}${rxHTML(m)}${m.status ? `<div class="status"><span class="st-dot"></span>${m.status}</div>` : ''}</div></div>${rep}</div>`;
 }
 function dialCtl(c, ctx) {
   const key = 'dial:' + c.id + ':' + ctx, open = S.menu === key;
@@ -327,7 +333,7 @@ function bucketHTML(b) {
   const cnt = b === 'fyi' ? (n ? '<span class="bk-dot" title="Something new"></span>' : '') : `<span class="bk-count">${n}</span>`;
   let body = nw.length ? nw.map(rowHTML).join('') : `<div class="empty">${SUN}<p>${EMPTY[b]}</p></div>`;
   if (kp.length) body += `<div class="kept-head"><b>Kept · ${kp.length}</b><small>Stays until you press Done, reply or react</small></div>` + kp.map(rowHTML).join('');
-  return `<section class="bucket b-${b}" data-b="${b}"><header class="bk-head"><h2>${BK[b][0]}</h2>${cnt}<span class="bk-desc">${BK[b][1]}</span><span class="bk-acts">${b === 'focus' ? `<button class="btn sm" data-act="modal" data-m="rules">Rules · ${S.rules.length + S.dmPeople.length}</button>` : ''}<button class="btn sm" data-act="markAll" data-b="${b}">Mark all read</button></span></header>${body}</section>`;
+  return `<section class="bucket b-${b}" data-b="${b}"><header class="bk-head"><h2>${BK[b][0]}</h2>${cnt}<span class="bk-desc">${BK[b][1]}</span><span class="bk-acts"><button class="btn sm" data-act="markAll" data-b="${b}">Mark all read</button></span></header>${body}</section>`;
 }
 const counts = () => ({ focus: S.rows.filter(r => r.bucket === 'focus' && r.sec !== 'kept' && !r.read).length, needs: S.rows.filter(r => r.bucket === 'needs' && !r.read).length, fyi: S.rows.filter(r => r.bucket === 'fyi' && !r.read).length });
 function pillHTML() {
@@ -367,19 +373,21 @@ function chats() {
   const dm = DMS.map(p => { const un = S.rows.some(r => r.conv === 'dm-' + p && !r.read); return `<button class="chat${un ? ' unread' : ''}${S.conv === 'dm-' + p ? ' on' : ''}" data-act="openConv" data-c="dm-${p}">${av(p, 'xs')}<span class="chat-n">${pn(p)}</span>${isAgent(p) ? '<span class="tag ag">agent</span>' : ''}${un ? '<span class="dot"></span>' : ''}</button>`; }).join('');
   return `<div class="chats"><h3>Channels <small>${CH.length}</small></h3>${ch}<h3>Direct messages</h3>${dm}</div>`;
 }
-function convPane() {
-  if (!S.conv) return `<div class="conv none"><div class="empty">${SUN}<p>${S.actOpen === false ? 'Choose a channel or a person on the left. Activity is closed; its count stays in the sidebar.' : 'Open a row to read the conversation here, next to the feed.'}</p></div></div>`;
-  const c = conv(S.conv);
+function convView(cid, side) {
+  const ctx = side ? 'thr' : 'conv';
+  if (!cid) return `<div class="conv none"><div class="empty">${SUN}<p>${S.actOpen === false ? 'Choose a channel or a person on the left. Activity is closed; its count stays in the sidebar.' : 'Open a row to read the conversation here, next to the feed.'}</p></div></div>`;
+  const c = conv(cid);
   const title = c.kind === 'dm' ? pn(c.with) : c.kind === 'channel' ? '#' + c.name : c.title;
-  const sub = c.kind === 'dm' ? P[c.with][1] + (isAgent(c.with) ? ' · agent' : '') : c.kind === 'channel' ? `Channel · ${c.people} people` : `<button class="link to-chan" data-act="openConv" data-c="ch-${c.where}">‹ #${c.where}</button> · Thread`;
+  const sub = c.kind === 'dm' ? P[c.with][1] + (isAgent(c.with) ? ' · agent' : '') : c.kind === 'channel' ? `Channel · ${c.people} people` : side ? `Thread in #${c.where}` : `<button class="link to-chan" data-act="openConv" data-c="ch-${c.where}">‹ #${c.where}</button> · Thread`;
   let seenNew = false;
-  const body = c.msgs.map(id => { const m = S.msgs[id]; let d = ''; if (m.isNew && !seenNew) { seenNew = true; d = '<div class="newline"><span>New</span></div>'; } return d + msgHTML(id, 'conv'); }).join('');
+  const body = c.msgs.map(id => { const m = S.msgs[id]; let d = ''; if (m.isNew && !seenNew) { seenNew = true; d = '<div class="newline"><span>New</span></div>'; } return d + msgHTML(id, ctx); }).join('');
   const lv = l => `<button type="button" class="btn sm lv-${l}${S.level === l ? ' on' : ''}" data-act="level" data-l="${l}">${l === 'flag' ? '⚑ Flag' : 'Info'}</button>`;
   const by = c.kind === 'dm' ? c.with : S.msgs[c.msgs[c.msgs.length - 1]].by;
-  return `<div class="conv k-${c.kind}"><header class="conv-head"><button class="icon-btn back" data-act="closeConv" aria-label="Back to the feed">${ic('back')}</button><div class="conv-title"><b>${esc(title)}</b><small>${sub}</small></div><div class="conv-acts">${dialCtl(c, 'conv')}<button class="btn sm" data-act="ruleFor" data-c="${c.id}" data-by="${by}">Add to Focus…</button></div></header>
-    <div class="conv-body" data-scroll="conv">${body}</div>
-    <form class="composer" data-form="send"><div class="levels">${lv('flag')}${lv('info')}<small>${S.level === 'flag' ? 'Needs attention. Stays with whoever you mention until they deal with it.' : S.level === 'info' ? 'For the record. Notifies nobody.' : ''}</small></div><div class="reply"><input name="t" autocomplete="off" aria-label="Message" placeholder="Message ${esc(title)}…"><button class="btn pri">Send</button></div></form></div>`;
+  return `<div class="conv k-${c.kind}${side ? ' side-thread' : ''}"><header class="conv-head">${side ? '' : `<button class="icon-btn back" data-act="closeConv" aria-label="Back to the feed">${ic('back')}</button>`}<div class="conv-title"><b>${esc(title)}</b><small>${sub}</small></div><div class="conv-acts">${dialCtl(c, ctx)}<button class="btn sm" data-act="ruleFor" data-c="${c.id}" data-by="${by}">Add to Focus…</button>${side ? '<button class="icon-btn" data-act="closeThread" aria-label="Close the thread" title="Close the thread">×</button>' : ''}</div></header>
+    <div class="conv-body" data-scroll="${ctx}">${body}</div>
+    <form class="composer" data-form="send" data-c="${c.id}"><div class="mp"></div><div class="cbox"><div class="reply"><input name="t" autocomplete="off" aria-label="Message" placeholder="${c.kind === 'thread' ? 'Reply in thread' : 'Message ' + esc(title)}…"></div><div class="cbar"><div class="levels">${lv('flag')}${lv('info')}<small>${S.net === 'off' ? 'You are offline. What you write is sent when the connection is back.' : S.level === 'flag' ? 'Needs attention. Stays with whoever you mention until they deal with it.' : S.level === 'info' ? 'For the record. Notifies nobody.' : ''}</small></div><button class="btn pri send" aria-label="Send">Send</button></div></div></form></div>`;
 }
+const convPane = () => convView(S.conv), threadPane = () => S.thread ? convView(S.thread, true) : '';
 function modalHTML() {
   const m = S.modal; if (!m) return '';
   let h = '';
@@ -440,19 +448,21 @@ const OTHER = { 'slack-like': 'Slack-like', 'telegram-like': 'Telegram-like', 'o
 function demoHTML() {
   const b = (a, t) => `<button class="btn sm" data-act="${a}">${t}</button>`;
   const panel = S.demo ? `<div class="demo" data-stop="1"><h2>Demo controls</h2><p>Not part of the product. They stand in for the team acting while you watch.</p>
-    ${b('playEdit', 'Tomás edits his message, longer')}${b('playDelete', 'Jonas deletes his message')}${b('playNew', 'Three new things arrive')}${b('leave', 'Leave the feed and come back')}<button class="btn sm" data-act="modal" data-m="tray">Open the notification app (outside the product)</button>${b('reset', 'Reset')}
+    ${b('playEdit', 'Tomás edits his message, longer')}${b('playDelete', 'Jonas deletes his message')}${b('playNew', 'Three new things arrive')}${b('leave', 'Leave the feed and come back')}<h2>When things go wrong</h2>${b('netToggle', S.net === 'off' ? 'Connection returns' : 'Connection drops')}${b('failToggle', S.failNext ? 'Sending works again' : 'The next message fails to send')}${b('lagToggle', S.searchLag ? 'Search catches up' : 'Search falls behind')}<button class="btn sm" data-act="modal" data-m="tray">Open the notification app (outside the product)</button>${b('reset', 'Reset')}
     <p class="demo-note">${esc(S.note) || 'Tomás and Jonas are in Needs you.'}</p>
     <div class="demo-row">Theme ${['auto', 'light', 'dark'].map(t => `<button class="btn sm${(document.documentElement.dataset.theme || 'auto') === t ? ' on' : ''}" data-act="theme" data-t="${t}">${t}</button>`).join('')}</div>
     <div class="demo-row">Version ${Object.keys(OTHER).map(k => k === Skin.file ? `<b>${OTHER[k]}</b>` : `<a href="${k}.html">${OTHER[k]}</a>`).join(' · ')}</div></div>` : '';
   return `<button class="demo-btn" data-act="demo" aria-expanded="${S.demo}">Demo</button>${panel}`;
 }
 const h = {
-  get S() { return S; }, pill: pillHTML, feed, history, chats, conv: convPane, bucketTabs, histTabs, counts, ic, HT, BK,
+  get S() { return S; }, pill: pillHTML, feed, history, chats, conv: convPane, thread: threadPane, bucketTabs, histTabs, counts, ic, HT, BK,
   badge() { const c = counts(), n = c.focus + c.needs; return n ? `<span class="badge">${n}</span>` : ''; },
   bell() { return ''; },
   bellOld() { const n = S.tray.filter(e => { const r = S.rows.find(x => x.id === e.row); return r && !r.read && (!S.focusOnly || e.bucket === 'focus'); }).length; return `<button class="icon-btn bell" data-act="modal" data-m="tray" aria-label="Notifications">${ic('bell')}${n ? `<span class="badge">${n}</span>` : ''}</button>`; },
   search() { return `<div class="search">${ic('search')}<input type="search" data-search="1" aria-label="Search messages" placeholder="Search messages" value="${esc(S.q)}"><div class="sr" id="sr"></div></div>`; },
   me() { const open = S.menu === 'me'; return `<div class="me"><button class="me-btn" data-act="menu" data-key="me" aria-expanded="${open}" aria-label="Your account menu">${av(ME)}<span><b>${pn(ME)}</b><small>${P[ME][1]}</small></span>${ic('chev')}</button>${open ? `<div class="pop me-pop"><button class="opt" data-act="modal" data-m="rules" data-s="account"><b>Settings</b><span>Account, activity feed, notifications, channels</span></button><button class="opt" data-act="modal" data-m="rules" data-s="feed"><b>Activity feed settings</b><span>Focus people and rules</span></button><div class="pop-f">Switch person and Sign out come with the running product.</div></div>` : ''}</div>`; },
+  rz(k) { return `<div class="rz" data-rz="${k}" role="separator" aria-orientation="vertical" title="Drag to resize. Double-click to reset"></div>`; },
+  net() { return S.net === 'off' ? '<span class="netpill" role="status">Offline · showing 10:42</span>' : ''; },
   nav(v, label, icon, extra) { return `<button class="nav${S.view === v ? ' on' : ''}" data-act="view" data-v="${v}">${ic(icon)}<span>${label}</span>${extra || ''}</button>`; }
 };
 
@@ -506,13 +516,25 @@ function setLevel(c, v) { c.dial = v; const id = 'ch:' + c.name; S.rules = S.rul
 const A = {
   toggle(d) { const r = row(d.id); if (S.exp.has(d.id)) S.exp.delete(d.id); else { S.exp.add(d.id); r.read = true; } },
   more(d) { row(d.id).all = true; },
-  openConv(d) { if (S.conv !== d.c) S.lock = Object.fromEntries(Object.entries(S.lock).filter(([k]) => !k.startsWith('conv:'))); S.conv = d.c; conv(d.c); S.menu = null; S.modal = null; S.rows.forEach(r => { if (r.conv === d.c && (!d.id || r.id === d.id || conv(d.c).kind !== 'channel')) r.read = true; }); const sr = document.getElementById('sr'); if (sr) sr.innerHTML = ''; S.q = ''; },
+  openConv(d) { S.thread = null; if (S.conv !== d.c) S.lock = Object.fromEntries(Object.entries(S.lock).filter(([k]) => !k.startsWith('conv:'))); S.conv = d.c; conv(d.c); S.menu = null; S.modal = null; S.rows.forEach(r => { if (r.conv === d.c && (!d.id || r.id === d.id || conv(d.c).kind !== 'channel')) r.read = true; }); const sr = document.getElementById('sr'); if (sr) sr.innerHTML = ''; S.q = ''; },
   openThread(d) { // a thread opens as its own conversation, in place of the channel, with a way back
-    const m = S.msgs[d.m], id = 'th-' + d.m, par = conv(m.conv);
+    const m = S.msgs[d.m], id = m.thread || 'th-' + d.m, par = conv(m.conv);
     if (!S.convs[id]) S.convs[id] = { id, kind: 'thread', title: m.deleted ? 'Thread' : m.text.slice(0, 40) + (m.text.length > 40 ? '…' : ''), where: par.name || par.where, tdial: 'off', tauto: 'you are not part of it', msgs: [d.m, ...m.replies] };
-    A.openConv({ c: id });
+    if (Skin.threadBeside && !isPhone()) { S.thread = S.thread === id ? null : id; S.menu = null; } else A.openConv({ c: id }); // beside the channel where there is room, in its place on a phone
   },
-  closeConv() { S.conv = null; S.menu = null; },
+  closeThread() { S.thread = null; },
+  editMsg(d) { S.editing = d.mk; S.delAsk = null; },
+  askDel(d) { S.delAsk = d.mk; S.editing = null; },
+  cancelEdit() { S.editing = null; S.delAsk = null; },
+  delMsg(d) { S.msgs[d.m].deleted = 1; S.delAsk = null; S.rows = S.rows.filter(r => !r.items.every(i => S.msgs[i].deleted)); }, // your own delete: nothing is left unless it has replies (D-004)
+  unflag(d) { S.msgs[d.m].flag = 0; },
+  retry(d) { S.msgs[d.m].failed = 0; },
+  discard(d) { const m = S.msgs[d.m], c = conv(m.conv); c.msgs = c.msgs.filter(x => x !== d.m); delete S.msgs[d.m]; },
+  mention(d) { const i = window._mi; i.value = i.value.replace(/@([\wÀ-ÿ]*)$/, '@' + d.n + ' '); i.closest('.composer').querySelector('.mp').innerHTML = ''; i.focus(); return true; },
+  netToggle() { if (S.net === 'off') { S.net = 'ok'; Object.values(S.msgs).forEach(m => { m.pending = 0; }); if (!S.arrived) A.playNew(); S.note = 'Back online. What you wrote was sent; what arrived meanwhile waits behind Show.'; } else { S.net = 'off'; S.note = 'The connection is lost. Nothing on screen moved; a notice says since when.'; } },
+  lagToggle() { S.searchLag = !S.searchLag; S.note = S.searchLag ? 'The search index is behind. Search says so.' : 'Search has caught up.'; },
+  failToggle() { S.failNext = !S.failNext; S.note = S.failNext ? 'The next message you send will fail.' : 'Sending works again.'; },
+  closeConv() { S.thread = null; S.conv = null; S.menu = null; },
   read(d) { row(d.id).read = true; },
   keep(d) { const r = row(d.id); r.kept = r.kept || 'you'; r.read = true; r.done = false; r.replied = false; r.keptNow = r.sec !== 'kept'; }, // also the way back from a Done pressed by mistake
   done(d) { const r = row(d.id); r.done = true; r.read = true; },
@@ -527,7 +549,7 @@ const A = {
   setDial(d) { setLevel(conv(d.c), d.l); S.menu = null; S.note = 'Dial changed. Unread rows are re-sorted the next time the feed is opened.'; },
   setT(d) { const c = conv(d.c); c.tdial = d.l; c.tset = true; S.menu = null; },
   follow(d) { const c = conv(d.c); c.tdial = c.tdial === 'off' ? 'fyi' : 'off'; c.tset = true; S.menu = null; },
-  modal(d) { S.modal = { type: d.m }; S.menu = null; if (d.m === 'rules') S.setSec = d.s || 'feed'; },
+  modal(d) { S.modal = { type: d.m }; S.menu = null; if (d.m === 'tray') S.demo = false; if (d.m === 'rules') S.setSec = d.s || 'feed'; },
   setSec(d) { S.setSec = d.s; },
   notify(d) { S.focusOnly = d.v === 'focus'; },
   actToggle() { if (S.actOpen === false) { S.actOpen = true; S.view = 'feed'; } else { if (S.view === 'feed') settle(); S.actOpen = false; } S.menu = null; },
@@ -579,22 +601,24 @@ const A = {
     S.note = 'Three arrived. Nothing in the list moved; they wait behind "3 new".';
   },
   leave() { settle(); S.note = 'You left and came back: read rows are in History, kept rows are under Kept, rule and dial changes are applied.'; },
-  reset() { const t = S.demo; S = seed(); S.demo = t; },
+  reset() { const t = S.demo, w = S.w; S = seed(); S.demo = t; S.w = w; },
   theme(d) { if (d.t === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = d.t; }
 };
 function submit(f) {
   const text = f.elements.t.value.trim(); if (!text) return;
+  if (f.dataset.form === 'edit') { const m = S.msgs[f.dataset.m]; if (m.text !== text) { m.text = text; m.edited = 'now'; } S.editing = null; render(); return; }
   const id = 'me' + (++S.nid);
   if (f.dataset.form === 'reply') { const r = row(f.dataset.id); S.msgs[id] = { id, by: ME, t: 'now', text, rx: [], conv: r.conv }; conv(r.conv).msgs.push(id); r.replies.push(id); act(r); r.replied = true; S.exp.delete(r.id); } // sent: the row closes again; staying in the conversation is what opening it is for
-  else { const c = conv(S.conv); S.msgs[id] = { id, by: ME, t: 'now', text, rx: [], conv: c.id, flag: S.level === 'flag' ? 1 : 0, info: S.level === 'info' ? 1 : 0 }; c.msgs.push(id); S.level = ''; S.rows.forEach(r => { if (r.conv === c.id && r.read) act(r); }); }
+  else { const c = conv(f.dataset.c || S.conv); S.msgs[id] = { id, by: ME, t: 'now', text, rx: [], conv: c.id, flag: S.level === 'flag' ? 1 : 0, info: S.level === 'info' ? 1 : 0 }; if (S.net === 'off') S.msgs[id].pending = 1; else if (S.failNext) { S.msgs[id].failed = 1; S.failNext = false; } c.msgs.push(id); S.level = ''; S.rows.forEach(r => { if (r.conv === c.id && r.read) act(r); }); }
   render();
-  const b = document.querySelector('.conv-body'); if (b && f.dataset.form === 'send') b.scrollTop = b.scrollHeight;
+  if (f.dataset.form === 'send') document.querySelectorAll('.conv-body').forEach(b => { if (b.closest('.conv').querySelector(`form[data-c="${f.dataset.c}"]`)) b.scrollTop = b.scrollHeight; });
 }
 function search(q) {
   S.q = q; const sr = document.getElementById('sr'); if (!sr) return;
   if (q.trim().length < 2) { sr.innerHTML = ''; return; }
   const hits = Object.values(S.msgs).filter(m => !m.deleted && m.conv && m.text.toLowerCase().includes(q.trim().toLowerCase())).slice(0, 7);
-  sr.innerHTML = `<div class="sr-box">${hits.length ? hits.map(m => { const c = conv(m.conv); return `<button class="tray-e" data-act="openConv" data-c="${m.conv}">${av(m.by, 'xs')}<span class="tray-t"><b>${pn(m.by)}</b> <small>${c.kind === 'dm' ? 'Direct message' : '#' + (c.name || c.where)} · ${m.t}${m.edited ? ' · edited' : ''}</small><span>${rich(m.text)}</span></span></button>`; }).join('') : '<p class="sheet-note">Nothing found. Deleted messages are not searchable.</p>'}</div>`;
+  const qe = esc(q.trim()).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), hl = t => esc(t).replace(new RegExp('(' + qe + ')', 'ig'), '<mark>$1</mark>');
+  sr.innerHTML = `<div class="sr-box"><div class="sr-h"><b>${hits.length} ${hits.length === 1 ? 'message' : 'messages'}</b>${S.searchLag ? '<span class="lag">Search is catching up. Changes from the last minute may be missing.</span>' : ''}</div>${hits.length ? hits.map(m => { const c = conv(m.conv); return `<button class="tray-e" data-act="openConv" data-c="${m.conv}">${av(m.by, 'xs')}<span class="tray-t"><b>${pn(m.by)}</b> <small>${c.kind === 'dm' ? 'Direct message' : '#' + (c.name || c.where)} · ${m.t}${m.edited ? ' · edited' : ''}</small><span>${hl(m.text)}</span></span></button>`; }).join('') : '<p class="sheet-note">Nothing found.</p>'}<p class="sr-f">An edited message is found by its new text. A deleted message is not found.</p></div>`;
 }
 /* swipe on a phone: to the right marks read (Done on a kept row), to the left keeps. Reacting is a button on the row, not a swipe (user, 2026-11-22). */
 let sw = null, swallow = false;
@@ -617,6 +641,16 @@ const swEnd = () => {
   render();
 };
 document.addEventListener('pointerup', swEnd); document.addEventListener('pointercancel', swEnd);
+/* panels are resized by dragging the line between them; a double click puts the line back */
+let rz = null;
+document.addEventListener('pointerdown', e => { const hnd = e.target.closest('.rz'); if (!hnd) return; e.preventDefault(); rz = { k: hnd.dataset.rz, x: e.clientX, w0: S.w[hnd.dataset.rz] }; document.body.classList.add('resizing'); });
+document.addEventListener('pointermove', e => {
+  if (!rz) return; const app = document.querySelector('.app');
+  const lim = rz.k === 'side' ? [180, 380] : [340, Math.max(340, innerWidth - S.w.side - 320)];
+  S.w[rz.k] = Math.max(lim[0], Math.min(lim[1], rz.w0 + e.clientX - rz.x)); app.style.setProperty('--w-' + rz.k, S.w[rz.k] + 'px');
+});
+document.addEventListener('pointerup', () => { if (rz) { rz = null; document.body.classList.remove('resizing'); } });
+document.addEventListener('dblclick', e => { const hnd = e.target.closest('.rz'); if (hnd) { S.w[hnd.dataset.rz] = hnd.dataset.rz === 'side' ? 250 : 500; render(); } });
 document.addEventListener('click', e => {
   if (swallow) { swallow = false; return; }
   const el = e.target.closest('[data-act]');
@@ -636,6 +670,7 @@ document.addEventListener('click', e => {
   }
   if (el.dataset.act === 'pick' && S.pick && matchMedia('(hover:hover)').matches) { const pi = document.querySelector('.picker input'); if (pi) pi.focus(); }
   if (el.dataset.act === 'applyNew') { const sc = document.querySelector('.feed-scroll'); if (sc) sc.scrollTop = 0; } // you asked for them: go to where they are
+  if (an === 'editMsg') { const ei = document.querySelector('.edit input'); if (ei) { ei.focus(); ei.setSelectionRange(ei.value.length, ei.value.length); } }
   if (an === 'openConv' && matchMedia('(hover:hover)').matches) { const ci = document.querySelector('.composer input'); if (ci) ci.focus({ preventScroll: true }); } // ready to answer
   if (an === 'openConv') { const nl = document.querySelector('.conv .newline'); if (nl) nl.scrollIntoView({ block: 'start' }); }
 });
@@ -644,6 +679,7 @@ document.addEventListener('change', e => { if (e.target.dataset.dial) { setLevel
 document.addEventListener('submit', e => { e.preventDefault(); submit(e.target); });
 document.addEventListener('input', e => {
   if (e.target.dataset.search) search(e.target.value);
+  if (e.target.closest('.composer') && e.target.name === 't') { window._mi = e.target; const mp = e.target.closest('.composer').querySelector('.mp'), mm = e.target.value.match(/@([\wÀ-ÿ]*)$/); mp.innerHTML = mm ? `<div class="mp-box">${[...PID.filter(x => x !== ME && pn(x).toLowerCase().includes(mm[1].toLowerCase())).slice(0, 6).map(x => `<button type="button" data-act="mention" data-n="${first(x)}">${av(x, 'xs')}<b>${pn(x)}</b><small>${P[x][1]}</small></button>`), 'channel'.startsWith(mm[1].toLowerCase()) ? '<button type="button" data-act="mention" data-n="channel"><span class="hash">@</span><b>channel</b><small>Everyone here. Not a mention of anyone in particular.</small></button>' : ''].join('')}</div>` : ''; }
   if (e.target.dataset.pickSearch) { const q = e.target.value.trim().toLowerCase(); let any = false; document.querySelectorAll('.pk-sec').forEach(sec => { let n = 0; sec.querySelectorAll('button').forEach(b => { const hit = !q || b.dataset.n.includes(q); b.hidden = !hit; if (hit) n++; }); sec.hidden = !n; any = any || n > 0; }); document.querySelector('.pk-none').hidden = any; }
 });
 document.addEventListener('scroll', seeFyi, true);

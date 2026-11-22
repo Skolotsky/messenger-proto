@@ -405,3 +405,56 @@ button.rx:hover{border-color:var(--accent)}
 .row-btns .mark-read{border-right:1px solid var(--line)}
 .row-btns .mark-read:last-child{border-right:0}
 @media (max-width:760px){.row-btns .keep-btn{display:none}}
+/* writing: edit in place, ask before delete, send states, mention suggestions */
+.msg-tools .own-tool{width:30px;height:26px;display:grid;place-items:center;color:var(--muted);border-left:1px solid var(--line)}
+.msg-tools .own-tool:hover{background:var(--accent-soft);color:var(--accent)}
+.edit{display:flex;gap:6px;margin:2px 0}
+.edit input{flex:1;min-width:0;border:1.5px solid var(--accent);border-radius:6px;padding:6px 9px;background:var(--panel)}
+.del-ask{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 8px;border:1px solid var(--flag);border-radius:6px;background:var(--flag-soft);font-size:13.5px}
+.del-ask span{flex:1 1 220px}
+.btn.danger{background:var(--flag);color:#fff;border-color:transparent;font-weight:600}
+.send-state{font-size:12.5px;color:var(--muted);margin-top:2px}
+.send-state.fail{color:var(--flag)}
+.msg.is-failed .msg-body,.msg.is-pending .msg-body{opacity:.55}
+.msg.is-failed>.msg-self{box-shadow:inset 3px 0 0 var(--flag)}
+.composer{position:relative}
+.mp{position:absolute;left:16px;right:16px;bottom:100%;z-index:6}
+.mp-box{background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:4px;margin-bottom:4px}
+.mp-box button{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px;border-radius:6px}
+.mp-box button:hover,.mp-box button:first-child{background:var(--hover)}
+.mp-box small{color:var(--muted);font-size:12.5px}
+/* when things go wrong: say so in a place that moves nothing */
+.netpill{flex:none;background:var(--flag-soft);color:var(--flag);border:1px solid var(--flag);border-radius:99px;padding:3px 12px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.net-line{color:#ffb4ab !important;font-weight:600}
+.sr-h{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;padding:6px 8px;font-size:13px}
+.sr-h .lag{color:var(--flag);font-size:12.5px}
+.sr-f{font-size:12px;color:var(--muted);padding:6px 8px 4px;border-top:1px solid var(--line);margin-top:4px}
+mark{background:color-mix(in srgb,var(--focus) 30%,transparent);color:inherit;border-radius:2px;padding:0 1px}
+.demo h2{margin-top:6px}
+/* resize handles */
+.rz{position:absolute;top:0;bottom:0;right:-4px;width:8px;cursor:col-resize;z-index:15}
+.rz::after{content:"";position:absolute;top:0;bottom:0;left:3px;width:2px;background:transparent;transition:background .12s}
+.rz:hover::after,body.resizing .rz::after{background:var(--accent)}
+body.resizing{cursor:col-resize;user-select:none}
+@media (max-width:760px){.rz{display:none}}
+/* quiet scrollbars: thin, rounded, visible when the pointer is over the list */
+*{scrollbar-width:thin;scrollbar-color:transparent transparent}
+*:hover{scrollbar-color:color-mix(in srgb,var(--muted) 45%,transparent) transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:transparent;border-radius:99px;border:3px solid transparent;background-clip:content-box}
+*:hover>::-webkit-scrollbar-thumb,*:hover::-webkit-scrollbar-thumb{background-color:color-mix(in srgb,var(--muted) 45%,transparent)}
+::-webkit-scrollbar-thumb:hover{background-color:color-mix(in srgb,var(--muted) 70%,transparent)}
+/* the message box: one box, field on top, levels and Send on a bar inside */
+.composer{padding:8px 16px 14px;border-top:0}
+.cbox{border:1px solid var(--line);border-radius:10px;background:var(--panel);transition:border-color .12s,box-shadow .12s}
+.cbox:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.cbox .reply input{border:0;background:none;outline:0;padding:11px 12px 6px;width:100%}
+.cbar{display:flex;align-items:center;gap:8px;padding:4px 6px 6px 8px}
+.cbar .levels{margin:0;min-height:0;flex:1;min-width:0}
+.cbar .levels .btn.sm{border-color:transparent;background:none;color:var(--muted);padding:3px 8px}
+.cbar .levels .btn.sm:hover{background:var(--hover);color:var(--text)}
+.cbar .levels .btn.sm.on{background:var(--accent-soft);color:var(--text)}
+.cbar .levels .lv-flag.on{background:var(--flag-soft);color:var(--flag)}
+.cbar .send{padding:5px 14px;border-radius:7px}
+@media (max-width:760px){.msg-head{padding-right:42px}}

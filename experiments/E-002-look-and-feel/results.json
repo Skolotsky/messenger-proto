@@ -268,14 +268,35 @@
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "the thread opens on its own, with the marker on top and its two replies",
+  "check": "the channel has more than one thread to find",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "and there is a way back to the channel",
+  "check": "the thread opens beside the channel, which stays",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "all four panels fit without sideways scroll",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a reply written in the thread panel lands in the thread",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "closing the thread leaves the channel",
   "pass": true,
   "detail": ""
  },
@@ -1003,6 +1024,13 @@
  {
   "page": "slack-like",
   "width": "phone",
+  "check": "the channel has more than one thread to find",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
   "check": "the thread opens on its own, with the marker on top and its two replies",
   "pass": true,
   "detail": ""
@@ -1654,6 +1682,13 @@
  {
   "page": "telegram-like",
   "width": "desktop",
+  "check": "the channel has more than one thread to find",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
   "check": "the thread opens on its own, with the marker on top and its two replies",
   "pass": true,
   "detail": ""
@@ -2236,6 +2271,13 @@
   "page": "telegram-like",
   "width": "phone",
   "check": "a deleted message with replies keeps a marker and a link to its thread; no replies inline",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "the channel has more than one thread to find",
   "pass": true,
   "detail": ""
  },
@@ -2795,6 +2837,13 @@
  {
   "page": "own",
   "width": "desktop",
+  "check": "the channel has more than one thread to find",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
   "check": "the thread opens on its own, with the marker on top and its two replies",
   "pass": true,
   "detail": ""
@@ -3377,6 +3426,13 @@
   "page": "own",
   "width": "phone",
   "check": "a deleted message with replies keeps a marker and a link to its thread; no replies inline",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "the channel has more than one thread to find",
   "pass": true,
   "detail": ""
  },
