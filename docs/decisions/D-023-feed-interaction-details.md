@@ -57,13 +57,16 @@ As listed under "Decided"; where the agent had built something else first, the r
 
 22. **Done can be taken back.** "When it's done I should be able to click keep again, if I mistakenly clicked done." While a row marked Done is still in the feed (until the person leaves it, D-003), Keep is offered on it and puts it back as kept. On a phone the Keep swipe does the same.
 
+23. **On a wide screen a thread opens beside its channel, not in its place.** "Threads should open alongside with the channel on a desktop, not replacing it. At least this is Slack pattern and I find it good enough." Activity gives up room for it while it is open. On a phone the thread opens in place of the channel, with a way back.
+24. **Panels can be resized** by dragging the line between them. "It's basics."
+25. **One settings button on Activity.** "Rules and feed settings open the same screen. A bit strange, let's leave just settings button."
+
 ### Still the agent's proposal, shown in the mock-up, awaiting the user's word
 
 - Lapsed with point 21: context above the new messages in an opened row, and how a long burst is shown there. The conversation shows the whole exchange with a "New" line at the first new message.
 - **The arrivals button is called "Show"**, and the control names how many arrived in Focus and Needs you.
 - **Which swipe is which:** the user set the pair; that right is read and left is keep is the agent's pick.
 - **On a phone the reply box is not given the cursor automatically**, since that opens the keyboard.
-- **Where a thread opens on a wide screen:** in the conversation pane, in place of the channel, with a link back to the channel. The messenger people know opens it beside the channel; here Activity already takes the second column.
 - **The settings sections** are Account, Activity feed (with Focus people and Channel levels under it) and Notifications. Sign out and switching person are named in the menu but not built: the first version has a person switcher in place of sign-in (D-009).
 - **The Notifications page** asks one question, "What should send you a notification?", with two choices and their daily figures from E-001. The user disliked the first form and did not understand the first Channels page; both were redrawn and not yet reviewed.
 

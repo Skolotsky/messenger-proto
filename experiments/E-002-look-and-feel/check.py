@@ -432,6 +432,94 @@ def chrome(browser, slug, size, vp, scale):
     ok("and clicking it once more closes it", pg.locator(".main").is_hidden())
     ctx.close()
 
+def writing(browser, slug, size, vp, scale):
+    """Slack-like, desktop: your own message (mention, edit, delete), what going wrong looks like, search, resizing (proposals, 2026-11-22)."""
+    if slug != "slack-like" or size != "desktop": return
+    ctx = browser.new_context(viewport=vp, device_scale_factor=scale)
+    pg = ctx.new_page(); pg.goto(f"file://{here.resolve()}/{slug}.html")
+    def ok(name, cond, detail=""):
+        results.append({"page": slug, "width": size, "check": name, "pass": bool(cond), "detail": str(detail)})
+        if not cond: failures.append(f"{slug} @ {size}: {name} {detail}")
+    def shot(n): pg.screenshot(path=str(shots / f"{slug}-{size}-{n}.jpg"), type="jpeg", quality=80)
+    def demo(act): pg.locator(".demo-btn").click(); pg.locator(f'.demo [data-act="{act}"]').click(); pg.locator(".demo-btn").click()
+    pg.locator('.side [data-c="ch-engineering"]').click()
+    box = pg.locator(".pane .composer input")
+    box.press_sequentially("Thanks @to")
+    ok("typing @ suggests people", pg.locator(".mp-box button").count() >= 1 and "Tomás Rivera" in pg.locator(".mp-box").inner_text())
+    shot("30-mention")
+    pg.locator(".mp-box button").first.click()
+    ok("picking one completes the mention", box.input_value() == "Thanks @Tomás ")
+    box.press_sequentially("CSV first is fine."); pg.locator(".pane .composer .send").click()
+    mine = pg.locator(".pane .msg.mine").last
+    ok("the message is sent with the mention", "@Tomás" in mine.inner_text())
+    mine.locator(".msg-self").hover(); mine.locator('[data-act="editMsg"]').click()
+    ok("editing happens in place, with the cursor in the text", pg.evaluate("document.activeElement === document.querySelector('.edit input')"))
+    shot("31-edit")
+    pg.locator(".edit input").fill("Thanks @Tomás CSV on Thursday, XLSX the week after."); pg.locator(".edit .btn.pri").click()
+    mine = pg.locator(".pane .msg.mine").last
+    ok("the edit shows the new text and says edited", "XLSX the week after" in mine.inner_text() and "edited" in mine.inner_text())
+    n = pg.locator(".pane .msg").count()
+    mine.locator(".msg-self").hover(); mine.locator('[data-act="askDel"]').click()
+    ok("delete asks first, in the message's own place", "cannot be undone" in mine.locator(".del-ask").inner_text() and pg.locator(".scrim").count() == 0)
+    shot("32-delete-ask")
+    mine.locator('[data-act="delMsg"]').click()
+    ok("a deleted message without replies leaves nothing", pg.locator(".pane .msg").count() == n - 1 and "XLSX the week after" not in pg.locator(".pane .conv-body").inner_text())
+    # a failed send
+    demo("failToggle")
+    box = pg.locator(".pane .composer input"); box.fill("Can QA take the export on Wednesday?"); pg.locator(".pane .composer .send").click()
+    ok("a message that fails to send stays in place and says so", "Not sent" in pg.locator(".pane .msg.is-failed").inner_text() and pg.locator('.pane [data-act="retry"]').count() == 1)
+    shot("33-failed-send")
+    pg.locator('.pane [data-act="retry"]').click()
+    ok("Try again sends it", pg.locator(".pane .msg.is-failed").count() == 0 and "Can QA take the export" in pg.locator(".pane .conv-body").inner_text())
+    # the connection drops
+    y = pg.locator(".row").first.bounding_box()["y"]
+    demo("netToggle")
+    ok("offline is said beside the title and in the sidebar, and nothing moves", pg.locator(".netpill").is_visible() and "Reconnecting" in pg.locator(".ws").inner_text() and abs(pg.locator(".row").first.bounding_box()["y"] - y) < 0.5)
+    pg.locator(".pane .composer input").fill("Writing this on the train."); pg.locator(".pane .composer .send").click()
+    ok("what is written offline waits, and says so", "Waiting for the connection" in pg.locator(".pane .msg.is-pending").inner_text())
+    shot("34-offline")
+    demo("netToggle")
+    ok("back online: it is sent, and what arrived waits behind Show", pg.locator(".pane .msg.is-pending").count() == 0 and pg.locator(".netpill").count() == 0 and pg.locator(".newpill button").inner_text() == "Show" and abs(pg.locator(".row").first.bounding_box()["y"] - y) < 0.5)
+    shot("35-back-online")
+    # search
+    demo("lagToggle")
+    pg.locator('.side [data-search]').fill("embargo")
+    t = pg.locator("#sr").inner_text()
+    ok("search says how many it found, marks the match and says when it is behind", "messages" in t and pg.locator("#sr mark").count() >= 1 and "catching up" in t)
+    shot("36-search")
+    pg.locator('.side [data-search]').fill("")
+    # resizing
+    w0 = pg.locator(".main").bounding_box()["width"]; bb = pg.locator('.rz[data-rz="act"]').bounding_box()
+    pg.mouse.move(bb["x"] + 4, 400); pg.mouse.down(); pg.mouse.move(bb["x"] - 96, 400, steps=5); pg.mouse.up()
+    ok("the line between panels can be dragged", abs(pg.locator(".main").bounding_box()["width"] - (w0 - 100)) < 3, pg.locator(".main").bounding_box()["width"])
+    pg.locator('.rz[data-rz="act"]').dblclick()
+    ok("a double click puts it back", abs(pg.locator(".main").bounding_box()["width"] - w0) < 3)
+    ctx.close()
+
+def extras(browser):
+    """The two pages outside the product: the control panel (D-010) and the notification app (D-022)."""
+    for size, vp, scale in SIZES:
+        pg = browser.new_page(viewport=vp, device_scale_factor=scale); errs = []
+        pg.on("pageerror", lambda e: errs.append(str(e)))
+        def ok(page, name, cond, detail=""):
+            results.append({"page": page, "width": size, "check": name, "pass": bool(cond), "detail": str(detail)})
+            if not cond: failures.append(f"{page} @ {size}: {name} {detail}")
+        pg.goto(f"file://{here.resolve()}/control-panel.html")
+        ok("control-panel", "shows what happened, what comes next, situations and the three systems", pg.locator("#next li").count() == 7 and pg.locator("#done li").count() == 7 and pg.locator("#sit button").count() == 14 and pg.locator(".sys").count() == 3)
+        pg.locator('[data-sys="search"][data-v="off"]').click(); pg.locator('[data-sys="notif"][data-v="slow"]').click()
+        ok("control-panel", "a system switched off says how much is waiting", "14 changes waiting" in pg.locator(".sys").first.inner_text())
+        pg.locator("[data-play]").first.click()
+        ok("control-panel", "Play now moves an event from next to happened", pg.locator("#next li").count() == 6 and pg.locator("#done li").count() == 8)
+        ok("control-panel", "no sideways scroll", pg.evaluate("document.documentElement.scrollWidth <= innerWidth"))
+        pg.screenshot(path=str(shots / f"control-panel-{size}.jpg"), type="jpeg", quality=80, full_page=size == "phone")
+        pg.goto(f"file://{here.resolve()}/notification-app.html")
+        ok("notification-app", "lists what was delivered to one person, in its current state", pg.locator(".n").count() == 7 and "Message deleted" in pg.locator("#list").inner_text() and "For your information" not in pg.locator("#list").inner_text())
+        pg.screenshot(path=str(shots / f"notification-app-{size}.jpg"), type="jpeg", quality=80)
+        pg.locator("#who").select_option("tomas")
+        ok("notification-app", "another person can be chosen", pg.locator(".n").count() == 2 and "Focus only" in pg.locator("#note").inner_text())
+        ok("notification-app", "no script errors on either page", not errs, errs)
+        pg.close()
+
 def hist_unread(browser, slug, size, vp, scale):
     """History tabs carry an unread count, and unread entries a mark; opening one clears both (user, 2026-11-22)."""
     ctx = browser.new_context(viewport=vp, device_scale_factor=scale, has_touch=size == "phone")
@@ -460,11 +548,13 @@ with sync_playwright() as p:
                 run(b, slug, size, vp, scale)
                 conv_edit(b, slug, size, vp, scale)
                 hist_unread(b, slug, size, vp, scale)
+                writing(b, slug, size, vp, scale)
                 chrome(b, slug, size, vp, scale)
                 bursts(b, slug, size, vp, scale)
                 why_and_people(b, slug, size, vp, scale)
             except Exception as e:
                 failures.append(f"{slug} @ {size}: stopped: {str(e).splitlines()[0][:300]}")
+    extras(b)
     b.close()
 (here / "results.json").write_text(json.dumps(results, indent=1, ensure_ascii=False) + "\n")
 passed = sum(r["pass"] for r in results)

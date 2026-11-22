@@ -52,3 +52,4 @@
   .sk.has-thread.act-closed{grid-template-columns:var(--w-side,250px) minmax(300px,1fr) minmax(320px,440px)}
 }
 .thread-link.open{border-color:var(--accent);background:var(--accent-soft)}
+.sk .ws small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

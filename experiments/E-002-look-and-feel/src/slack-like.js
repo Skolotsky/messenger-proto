@@ -2,7 +2,7 @@
 window.Skin = { file: 'slack-like', title: 'Slack-like', buckets: 'stack', pillTop: true, threadBeside: true, shell(h) {
   const S = h.S;
   return `<div class="app sk v-${S.view}${S.conv ? ' has-conv' : ''}${S.actOpen === false ? ' act-closed' : ''}${S.thread ? ' has-thread' : ''}" style="--w-side:${S.w.side}px;--w-act:${S.w.act}px">
-  <aside class="side"><div class="ws"><b>Larkspur</b><small${S.net === 'off' ? ' class="net-line"' : ''}>${S.net === 'off' ? 'Reconnecting… showing what was here at 10:42' : 'Maya Okafor · Product'}</small></div>${h.search()}
+  <aside class="side"><div class="ws"><b>Larkspur</b><small${S.net === 'off' ? ' class="net-line"' : ''}>${S.net === 'off' ? 'Reconnecting… last update 10:42' : 'Maya Okafor · Product'}</small></div>${h.search()}
     <button class="side-item${S.view !== 'chats' && S.actOpen !== false ? ' on' : ''}" data-act="actToggle" aria-pressed="${S.actOpen !== false}" title="Open or close Activity">${h.ic('bell')}<span>Activity</span>${h.badge()}</button>
     <div class="side-scroll" data-scroll="side">${h.chats()}</div>${h.me()}${h.rz('side')}</aside>
   <main class="main"><header class="top"><h1>Activity</h1>${h.net()}${h.pill()}<button class="icon-btn" data-act="modal" data-m="rules" aria-label="Feed and notification settings" title="Feed and notification settings">${h.ic('rules')}</button>${h.bell()}<button class="icon-btn act-close" data-act="actToggle" aria-label="Close Activity" title="Close Activity">×</button></header>

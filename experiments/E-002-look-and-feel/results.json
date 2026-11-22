@@ -471,6 +471,111 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "typing @ suggests people",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "picking one completes the mention",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the message is sent with the mention",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "editing happens in place, with the cursor in the text",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the edit shows the new text and says edited",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "delete asks first, in the message's own place",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a deleted message without replies leaves nothing",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a message that fails to send stays in place and says so",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Try again sends it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "offline is said beside the title and in the sidebar, and nothing moves",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "what is written offline waits, and says so",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "back online: it is sent, and what arrived waits behind Show",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "search says how many it found, marks the match and says when it is behind",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the line between panels can be dragged",
+  "pass": true,
+  "detail": "400"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a double click puts it back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "settings is one screen, opened on Activity feed when reached from the feed",
   "pass": true,
   "detail": ""
@@ -3722,5 +3827,103 @@
   "check": "a removed person is not added back when they write again",
   "pass": true,
   "detail": ""
+ },
+ {
+  "page": "control-panel",
+  "width": "desktop",
+  "check": "shows what happened, what comes next, situations and the three systems",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "control-panel",
+  "width": "desktop",
+  "check": "a system switched off says how much is waiting",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "control-panel",
+  "width": "desktop",
+  "check": "Play now moves an event from next to happened",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "control-panel",
+  "width": "desktop",
+  "check": "no sideways scroll",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "notification-app",
+  "width": "desktop",
+  "check": "lists what was delivered to one person, in its current state",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "notification-app",
+  "width": "desktop",
+  "check": "another person can be chosen",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "notification-app",
+  "width": "desktop",
+  "check": "no script errors on either page",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "page": "control-panel",
+  "width": "phone",
+  "check": "shows what happened, what comes next, situations and the three systems",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "control-panel",
+  "width": "phone",
+  "check": "a system switched off says how much is waiting",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "control-panel",
+  "width": "phone",
+  "check": "Play now moves an event from next to happened",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "control-panel",
+  "width": "phone",
+  "check": "no sideways scroll",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "notification-app",
+  "width": "phone",
+  "check": "lists what was delivered to one person, in its current state",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "notification-app",
+  "width": "phone",
+  "check": "another person can be chosen",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "notification-app",
+  "width": "phone",
+  "check": "no script errors on either page",
+  "pass": true,
+  "detail": "[]"
  }
 ]

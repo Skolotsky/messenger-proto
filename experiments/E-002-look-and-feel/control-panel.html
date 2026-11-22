@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E-002 control panel (mock-up)</title>
+<!-- A mock-up of the demonstration control panel (D-010). Outside the product. Nothing here is connected to anything. -->
+<style>
+:root{--bg:#f4f4f1;--panel:#fff;--text:#1c1d1f;--muted:#62666d;--line:#dddcd6;--accent:#0f6e64;--on:#fff;--ok:#1a7f4b;--slow:#a85b00;--off:#b3261e;--soft:#eef1f0;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#141516;--panel:#1d1f22;--text:#e9e9e6;--muted:#a0a4ab;--line:#33363b;--accent:#4fc3b3;--on:#06201c;--ok:#5fd08f;--slow:#f0a94a;--off:#ff8a80;--soft:#24282a;color-scheme:dark}}
+*{box-sizing:border-box}body{margin:0;font:14.5px/1.45 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line);background:var(--panel)}
+h1{font-size:18px;margin:0}h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 8px}
+.tag{font:600 11px ui-monospace,Menlo,monospace;background:#111;color:#ffd479;padding:3px 8px;border-radius:4px}
+.sp{flex:1}button,select{font:inherit;color:inherit}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:5px 12px;cursor:pointer}.btn:hover{background:var(--soft)}
+.btn.pri{background:var(--accent);color:var(--on);border-color:transparent;font-weight:600}
+main{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:14px;padding:14px 20px;align-items:start}
+section{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.clock{font:600 15px ui-monospace,Menlo,monospace}.state{font-weight:700}.state.run{color:var(--ok)}.state.pause{color:var(--slow)}
+ul{list-style:none;margin:0;padding:0}li{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--line)}li:last-child{border:0}
+time{font:12px ui-monospace,Menlo,monospace;color:var(--muted);flex:none;width:44px}li span{flex:1}li .btn{padding:2px 8px;font-size:12.5px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.grid .btn{text-align:left;font-size:13.5px}
+.sys{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px}.sys b{display:block}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin:6px 0}.seg button{border:0;background:none;padding:4px 12px;cursor:pointer}
+.seg button.on{background:var(--accent);color:var(--on);font-weight:600}
+.read{font-size:13px;color:var(--muted)}.read b{display:inline}.ok{color:var(--ok)}.slow{color:var(--slow)}.off{color:var(--off)}
+.note{font-size:12.5px;color:var(--muted);margin:8px 0 0}
+@media (max-width:900px){main{grid-template-columns:1fr}}
+</style></head><body>
+<header><h1>Demonstration control panel</h1><span class="tag">OUTSIDE THE PRODUCT</span><span class="sp"></span>
+<span class="clock" id="clock">Tue 10:42:10</span><span class="state run" id="state">Running</span>
+<button class="btn pri" id="toggle">Pause</button><button class="btn" id="reset">Reset to the start</button>
+<label>Pace <select id="pace"><option>0.5×</option><option selected>1×</option><option>4×</option></select></label>
+<a class="btn" href="notification-app.html">Open the notification app</a><a class="btn" href="slack-like.html">Open the product</a></header>
+<main>
+<div><section><h2>What comes next</h2><ul id="next"></ul><p class="note">The schedule is fixed, so the same thing happens after every reset. "Play now" brings one forward.</p></section>
+<section style="margin-top:14px"><h2>What happened</h2><ul id="done"></ul></section></div>
+<section><h2>Situations on demand</h2><div class="grid" id="sit"></div><p class="note">Each one can be replayed at any time, whatever the schedule says.</p></section>
+<section><h2>The three systems</h2><div id="sys"></div><p class="note">Nothing is lost while a system is slow or off: its changes wait in order and are delivered when it returns. The product shows a notice on any surface that is more than 10 seconds behind.</p></section>
+</main>
+<script>
+const NEXT=[['10:43','Sam writes to Maya directly'],['10:43','Dele mentions Maya in #data'],['10:44','Kofi replies in "Icon set for 2.0"'],['10:44','Tomás edits his message to five times the length'],['10:45','Jonas deletes his mention of Maya'],['10:47','Shipwright posts a progress update, marked Info'],['10:50','Anna removes her flag in #launch']];
+const DONE=[['10:41','Anna sent 10 direct messages to Maya'],['10:33','Priya replied in "Launch checklist"'],['10:31','Tomás mentioned Maya in #engineering'],['10:27','Jonas mentioned Maya in #sales'],['10:24','Six posts in #incidents in 22 minutes'],['10:21','Shipwright stopped and flagged Maya for approval'],['10:16','Marco reacted ✅ to Maya\'s message']];
+const SIT=['A flag that names you, from a person','A flag from an agent waiting for approval','A flag that names nobody','A direct mention','A mention added by a later edit','A mention removed by an edit','A message edited to a different length','A message deleted after it reached the feed','A pile of reactions on your message','A reaction taken back','Replies in a thread you started','A burst in #incidents','An agent\'s progress updates, result and stop','A courtesy mention marked Info'];
+const SYS=[['Search index','search'],['Notification sender','notif'],['Activity feed','feed']];let st={search:'run',notif:'run',feed:'run'},run=true,next=NEXT.slice(),done=DONE.slice();
+const READ={run:'<b class="ok">Up to date.</b> Last change 10:42:07.',slow:'<b class="slow">Slow.</b> 8 seconds behind · 3 changes waiting.',off:'<b class="off">Off.</b> 14 changes waiting · the oldest for 42 seconds.'};
+function draw(){
+  document.getElementById('next').innerHTML=next.map((x,i)=>`<li><time>${x[0]}</time><span>${x[1]}</span><button class="btn" data-play="${i}">Play now</button></li>`).join('')||'<li><span>The schedule is finished. Reset to run it again.</span></li>';
+  document.getElementById('done').innerHTML=done.map(x=>`<li><time>${x[0]}</time><span>${x[1]}</span></li>`).join('');
+  document.getElementById('sit').innerHTML=SIT.map(x=>`<button class="btn" data-sit="${x}">${x}</button>`).join('');
+  document.getElementById('sys').innerHTML=SYS.map(([n,k])=>`<div class="sys"><b>${n}</b><div class="seg" role="group" aria-label="${n}">${[['run','Running'],['slow','Slow'],['off','Off']].map(([v,t])=>`<button class="${st[k]===v?'on':''}" data-sys="${k}" data-v="${v}">${t}</button>`).join('')}</div><div class="read">${READ[st[k]]}</div></div>`).join('');
+  document.getElementById('state').textContent=run?'Running':'Paused';document.getElementById('state').className='state '+(run?'run':'pause');document.getElementById('toggle').textContent=run?'Pause':'Start';
+}
+document.addEventListener('click',e=>{const t=e.target;
+  if(t.dataset.play){done.unshift(['now',next.splice(+t.dataset.play,1)[0][1]]);draw()}
+  if(t.dataset.sit){done.unshift(['now','Played on demand: '+t.dataset.sit.toLowerCase()]);draw()}
+  if(t.dataset.sys){st[t.dataset.sys]=t.dataset.v;draw()}
+  if(t.id==='toggle'){run=!run;draw()} if(t.id==='reset'){next=NEXT.slice();done=DONE.slice();st={search:'run',notif:'run',feed:'run'};run=true;draw()}});
+draw();
+</script></body></html>
