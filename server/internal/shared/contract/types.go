@@ -2075,6 +2075,11 @@ type SeedThrough struct {
 	Through int64 `json:"through"`
 }
 
+// WipeRequest is the contract type of the same name.
+type WipeRequest struct {
+	RulesChanged *bool `json:"rules_changed,omitempty"`
+}
+
 // Empty is the contract type of the same name.
 type Empty struct {
 }
@@ -2269,4 +2274,5 @@ var Types = map[string]func([]byte) (any, error){
 	"SeedBatch":                   func(b []byte) (any, error) { return decode[SeedBatch](b) },
 	"SeedThrough":                 func(b []byte) (any, error) { return decode[SeedThrough](b) },
 	"Empty":                       func(b []byte) (any, error) { return decode[Empty](b) },
+	"WipeRequest":                 func(b []byte) (any, error) { return decode[WipeRequest](b) },
 }

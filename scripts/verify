@@ -61,6 +61,9 @@ mustfail tests fault_no_lease_check Frozen ./guardrails/watching-lapses/
 mustfail tests fault_no_watch_end Vanished ./guardrails/watching-lapses/
 mustfail tests fault_idle_scan TestHousekeeping ./guardrails/idle-organizations-cost-nothing/
 mustfail server "integration fault_tick_from_newest" BusyOrganization ./internal/conversations
+if ! CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 -tags feedfaults -run 'Fails' ./guardrails/feed-equals-replay/ ./guardrails/feed-fence/ ./guardrails/feed-two-copies/ ; then
+  echo "verify: FAIL a feed guardrail no longer fails with its rule switched off, so it cannot be trusted."; exit 1
+fi
 if ! TOOL_DIR=server ./scripts/tool go test -count=1 -tags integration ./... ; then
   echo "verify: FAIL a server integration test failed."; exit 1
 fi

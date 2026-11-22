@@ -5873,6 +5873,17 @@
     "at"
    ],
    "additionalProperties": false
+  },
+  "WipeRequest": {
+   "type": "object",
+   "description": "Optional. rules_changed marks what fell due before this wipe as history, never delivered (D-034).",
+   "properties": {
+    "rules_changed": {
+     "type": "boolean"
+    }
+   },
+   "required": [],
+   "additionalProperties": false
   }
  }
 }

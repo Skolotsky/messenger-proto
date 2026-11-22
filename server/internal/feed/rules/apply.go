@@ -539,6 +539,7 @@ func (e *Engine) messageChanged(c contract.Message, f *fx) error {
 		e.noteNewText(cv, m, f)
 	}
 	e.settleConversation(cv, f)
+	touchShowing(cv, m, f) // a row showing it through a reaction shows the new text too
 	return nil
 }
 
@@ -703,6 +704,7 @@ func (e *Engine) reactionAdded(v contract.ChangeReactionAdded, f *fx) error {
 		}
 	}
 	m.reactions = append(m.reactions, &reaction{person: v.Person, emoji: v.Emoji, number: f.number, at: f.atText})
+	defer touchShowing(cv, m, f)
 
 	// The person reacting acted on their own row (D-014, D-011, D-023 point 26).
 	if p := e.people[v.Person]; !p.agent {
@@ -724,6 +726,20 @@ func (e *Engine) reactionAdded(v contract.ChangeReactionAdded, f *fx) error {
 	e.reactionToAuthor(cv, m, v.Person, v.Emoji, f)
 	e.settleConversation(cv, f)
 	return nil
+}
+
+// touchShowing marks every row that shows this message: a row carries its
+// message's reactions (D-014, T-038 point 18), so a reaction changes the row of
+// everyone who has it, not only the author's and the reactor's.
+func touchShowing(cv *conv, m *message, f *fx) {
+	for _, u := range sortedKeys(cv.readers) {
+		r := cv.readers[u]
+		for k, rk := range r.itemRow {
+			if k.msg == m.id && r.rows[rk] != nil {
+				f.touch(cv, u, rk)
+			}
+		}
+	}
 }
 
 func (e *Engine) reactionToAuthor(cv *conv, m *message, reactor, emoji string, f *fx) {
@@ -796,6 +812,7 @@ func (e *Engine) reactionRemoved(v contract.ChangeReactionRemoved, f *fx) error 
 	if !found {
 		return nil
 	}
+	defer touchShowing(cv, m, f)
 	a := e.people[m.author]
 	if a == nil || a.agent || cv.readers[a.id] == nil {
 		return nil
