@@ -13,11 +13,11 @@ Every call is made for one organization (D-026). It is in the address of every c
 All are questions; none changes anything.
 
 ```json
-GET feed/orgs/acme/people/marco/rows                     → { "edition": "feed-7c1", "through": 4861, "number": 103, "rows": [ { "conversation": "#launch", "thread": null, "bucket": "needs_you", "unread": true, "kept": false, "why": "Anna mentioned you", "newest": 4812 } ], "counts": { "focus": 1, "needs_you": 4, "fyi": true } }
+GET feed/orgs/acme/people/marco/rows                     → { "edition": 7, "through": 4861, "number": 103, "rows": [ { "conversation": "#launch", "thread": null, "bucket": "needs_you", "unread": true, "kept": false, "why": "Anna mentioned you", "newest": 4812 } ], "counts": { "focus": 1, "needs_you": 4, "fyi": true } }
 GET feed/orgs/acme/people/marco/history?tab=mentions     → entries with an unread mark each, and the tab's unread count
 GET feed/orgs/acme/people/marco/settings                 → Focus people, removed people, each thread's and channel's level as it is in effect
 GET feed/orgs/acme/people/marco/preview?change=…         → what the change would have moved in the last 7 days
-GET feed/orgs/acme/updates?after=103&edition=feed-7c1                        → the organization's row changes after 103, a page at a time, each naming its reader and the number before it for that reader; or { "new_edition": "feed-9d4" }
+GET feed/orgs/acme/updates?after=103&edition=7                        → the organization's row changes after 103, a page at a time, each `{ number, person, after, parts }` with `after` the number before it for that reader; or { "new_edition": 8 }
 GET search/orgs/acme/query?q=pricing&as=marco&after=…     → { "through": 4855, "total": 37, "next": "…", "results": [ { "message": "msg_7Q2", "version": 2, "conversation": "#launch", "thread": null, "author": "anna", "edited": true, "text": "…", "match": [[34, 41]] } ] }
 ```
 
@@ -25,7 +25,7 @@ GET search/orgs/acme/query?q=pricing&as=marco&after=…     → { "through": 485
 
 ## 3. Guarantees
 
-- An answer includes everything up to `through`, and possibly later changes (the feed may work on conversations side by side, D-030).
+- An answer includes everything up to `through`, except rows under a fence, and possibly later changes (the feed may work on conversations side by side, D-030).
 - A search answer holds only what `as` may see: every channel message, and a direct message only if `as` is one of its participants (D-031). It gives the true total, not the number shown, marks where the text matched, says whether a message was edited, and names the thread of a reply so the screen can open it there (D-024; T-038, points 20 to 22).
 - The feed's row updates are numbered by its own log and carry its edition; after a rebuild the edition changes and the door tells screens to load the feed fresh.
 - The door adds nothing and remembers nothing: what it shows is what the part answered, or a notice.

@@ -14,7 +14,7 @@ Every change, in log order, with no number skipped. Each carries `org`, `number`
 
 | Kind | Payload |
 |---|---|
-| `message.created`, `message.changed` | the whole finished message (`README.md`). A reply closed as stopped is a `message.created` with `stopped: true` and no mentions (D-031): a For your information row for people in the thread |
+| `message.created`, `message.changed` | the whole finished message (`README.md`). A reply closed as stopped is a `message.created` with `stopped: true` and no mentions (D-031): a For your information row for the people in its thread (or the other person of a direct conversation), at any dial except Off, overriding the dial's bucket, and it never notifies (D-032) |
 | `message.deleted` | `message: { id, version, conversation, thread }` |
 | `reply.started` | `message, conversation, thread, author`. No text. The feed counts it and does nothing |
 | `reaction.added`, `reaction.removed` | `person, emoji, message, conversation, thread`. Does not change the message's version |
@@ -65,7 +65,7 @@ Applying a batch stops at the first change that is not answered 200, and answers
 - A claim that runs out is taken over by another worker, so a change can reach the feed twice. That is safe because the feed takes only the change that follows its last one; the claim saves work, it is not what keeps delivery correct.
 - Workers are not woken through the database on each save; they ask every few tens of milliseconds.
 - Down: the worker waits and retries without limit. A person sees the rows the feed had, with "Catching up"; conversations, unread marks on channels and search are unaffected; notifications wait with the feed.
-- A change the feed cannot apply: it is set aside and a fence goes up around the one conversation, or the one reader, it touches. Later changes inside the fence are set aside too; those rows are marked "may be out of date" and nothing new notifies from them. Raising a fence writes `withdrawn` (`because: "fenced"`) for every notification on hold that the fence covers. A set-aside change counts as applied for `through` and for clock notes, so one fence cannot freeze the organization's notifications. Everything outside stays exact. More than five fences in one organization: the feed stops for that organization only and answers "organization stopped" for it; the worker keeps that organization's place, shows it, and carries on with the others. Repair: fix the fault, rebuild that organization's feed.
+- A change the feed cannot apply: it is set aside and a fence goes up around the one conversation, or that one reader in that conversation, it touches. A fault on a reader-wide change stops that organization's feed, since no smaller fence can hold it (D-032). Later changes inside the fence are set aside too; those rows are marked "may be out of date" and nothing new notifies from them. Raising a fence writes `withdrawn` (`because: "fenced"`) for every notification on hold that the fence covers. A set-aside change counts as applied for `through` and for clock notes, so one fence cannot freeze the organization's notifications. Everything outside stays exact. More than five fences in one organization: the feed stops for that organization only and answers "organization stopped" for it; the worker keeps that organization's place, shows it, and carries on with the others. Repair: fix the fault, rebuild that organization's feed.
 
 ## 5. Evolution
 

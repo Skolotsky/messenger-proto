@@ -17,6 +17,7 @@ Every action is one call carrying an ID the caller chose. Conversations saves it
 | send | a new message: conversation, optional thread (any channel message can start one), text of several lines, mentions (people, or "channel" for everyone, which names nobody), level (Flag, Info or none) |
 | edit, delete | a change to the caller's own message; removing its flag is an edit |
 | create channel, add people | a new channel with a name and people; more people later (D-009, D-024) |
+| open direct | the direct conversation with one other person, created if there is none. Opening it twice gives the same conversation |
 | react | add or remove one emoji on a message |
 | read | "I have read this row up to here" (opening a conversation or thread, or Mark read on a row) |
 | watching | "this row is open in front of me", and "no longer" when it stops. Not a call: said only over the live connection (`conversations-to-screen.md`); only the start and the end are saved as changes |
@@ -28,7 +29,7 @@ Every action is one call carrying an ID the caller chose. Conversations saves it
 | profile line | the person's own line under their name (D-023, point 29). No receiver acts on it |
 | preference | a setting that only changes the person's own screens, such as which key sends a message (D-024). It follows the person to every screen; no receiver acts on it |
 
-Questions, which change nothing. Every answer that fills a view carries `number`: the last number of its stream for this person, read together with the content, so the screen can resume from it (`after`).
+Questions, which change nothing. The first full load (`start` for the `conversations` stream, `feed` for the `feed` stream) answers with `number`, the last number of that stream for this person, read together with the content, plus the reset number and, for the feed, the edition. Only that load sets the screen's position. Later views never move it: the screen keeps applying updates, by message version. If the feed is unavailable, `feed` answers with a notice and no number, and the screen loads it when it returns.
 
 | Question | Answers with |
 |---|---|
@@ -62,7 +63,8 @@ GET /orgs/acme/people/marco/preview?change=dial&channel=%23incidents&level=muted
 - "Saved" is answered only after the action and its log entry are saved together.
 - The same ID again changes nothing and gets the same answer (scope: `README.md`, "IDs").
 - A read position only moves forward.
-- Acting implies read (D-015): a reply, reaction, Keep or Done moves the person's read position on that row in the same step as the act, up to the message acted on.
+- Acting implies read (D-014, D-015): a reply, reaction, Keep or Done writes its fact and a `reader.read` of the whole row, up to its newest message, in one step. The answer carries the number of the fact.
+- An arrival on a row someone is watching: Conversations writes that person's `reader.read` in the same step as the arrival.
 - Watching is per connection and belongs to its row: "connection X of Marco is watching #launch". A person counts as watching a conversation while at least one such entry is open, so the start on a new connection and the end of an old one can arrive in either order.
 - It lasts only as long as its connection. The connection is checked every 20 seconds and counts as gone after 40 without an answer; Conversations then writes the end to the log. Each copy of Conversations holds a lease in the database, renewed every 5 seconds and valid for 15; a start is saved only in a step that also confirms the copy's lease is valid. Housekeeping, every 5 seconds, declares a copy whose lease ran out dead and ends every watching it had started; a copy declared dead cannot save anything further under that identity. So a vanished screen is "no longer watching" within about 40 seconds and the screens of a dead copy within about 25, both inside 60 (D-015: nothing is read while the person is not looking), and keeping a watching alive writes nothing per screen (D-029).
 - Actions of one screen are saved in the order they were sent; an answer comes within 3 seconds or the screen treats the action as not sent.

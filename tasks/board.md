@@ -6,18 +6,16 @@ Work in flight. Order inside a section is priority. Finished work moves to `done
 
 ## Now
 
-_Nothing in progress._
+- **T-045** `implement` Contracts in machine form with examples; the log writer, the mock door and the test harness. D-031 and D-032 are applied; the schemas settle the remaining shapes and get an independent check before Wave 1. Detail: `tasks/T-045-contracts-and-tools.md`
 
 
 ## Waiting on user
 
-- **T-063** `decide` D-031 is applied to the contracts. A second independent check found guarantees that still break, so D-032 proposes the corrections, with four choices for the user (`docs/visuals/D-032-second-contract-corrections.html`). Blocks T-045
 - **T-034** `guardrails` Seven contracts (`docs/contracts/`) and guardrails G-003 to G-030 are written (G-027 to G-030 for growing by adding copies and databases and for one large organization, D-029 and D-030) (with the organization in every contract since D-026, and G-025, G-026 for keeping organizations apart and independent) from the accepted technical decisions; the user reviews the sentences in `docs/visuals/T-034-guardrails.html`. All product guardrails are `pending` until their tests exist. An independent verifier found four blockers and six larger gaps (delivery of notifications unprotected, a screen numbering that could not work with filtered updates, two boundaries without a contract, a guardrail whose check could pass while it was false); all answered, corrections not re-checked
 - **T-021** `decide` Nine small behaviours the E-001 model still chooses on its own (list in `experiments/E-001-feed-rules-model/README.md`, "Still open after this run"). None blocks the look-and-feel work. The notification default was confirmed by the user at about 29 a day
 
 ## Next
 
-- **T-045** `implement` Contracts in machine form with examples; the log writer, the mock door and the test harness. Second, by the lead session. Needs T-044
 - **T-046** `implement` Wave 1 · Conversations: saving and the log (G-003, G-004, G-005). Needs T-045
 - **T-047** `implement` Wave 1 · Delivery workers (G-012, G-014, G-023, G-026, G-029). Needs T-045
 - **T-048** `implement` Wave 1 · Search and notification stand-ins (G-006, G-010, G-011). Needs T-045

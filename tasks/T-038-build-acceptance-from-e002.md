@@ -18,7 +18,7 @@ The prototype fixes the look and the flows. It fakes the rules with a few hand-w
 
 **One read position (D-015)**
 5. Reading a thread beside its channel marks its feed row read at every width.
-6. Reading a conversation reads all its rows, and clears its unread mark in the sidebar.
+6. Opening a channel reads the channel's row and clears its unread mark in the sidebar; its threads stay unread until opened (D-032).
 7. Mark all read leaves no unread mark behind on a channel with no unread rows.
 8. An arrival in a conversation you are watching, with its newest message visible, is read at once: no row, no count.
 9. The "New" line is gone once a conversation has been read.

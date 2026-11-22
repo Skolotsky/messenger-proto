@@ -1,5 +1,5 @@
 -- One login and one schema per part (D-005, G-008). A schema is reachable only
--- by its owner. Delivery works on Conversations' log: its rights are granted
+-- by its owner. Delivery works on Conversations' log and the feed's notes: its rights are granted
 -- table by table with those tables, never on the schema's contents as a whole.
 -- These passwords protect nothing: the database is local to the Compose network.
 REVOKE ALL ON SCHEMA public FROM PUBLIC;
@@ -18,6 +18,7 @@ CREATE SCHEMA sender        AUTHORIZATION sender;
 CREATE SCHEMA demo          AUTHORIZATION demo;
 
 GRANT USAGE ON SCHEMA conversations TO delivery;
+GRANT USAGE ON SCHEMA feed TO delivery;
 
 ALTER ROLE conversations SET search_path = conversations;
 ALTER ROLE delivery      SET search_path = conversations;

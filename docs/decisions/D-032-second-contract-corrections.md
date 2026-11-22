@@ -1,6 +1,6 @@
 # D-032: Second corrections to the contracts, and the schemas settle the shapes
 
-- Status: proposed
+- Status: accepted
 - Level: contract
 - Date: 2026-11-22
 - Decided by: user
@@ -68,7 +68,7 @@ A on all four, plus the corrections. Reversibility: cheap now, moderate after T-
 
 ## Decision
 
-_Waiting for the user._
+The user accepted the recommended answer on all four on 2026-11-22 ("Accept all four"): 1A opening a channel does not read its threads; 2A a reply does not mark its channel in the sidebar; 3A the text of a reply in progress is saved about once a second; 4A seeded history creates no notifications. The corrections with one sensible answer are accepted with them.
 
 ## Consequences
 

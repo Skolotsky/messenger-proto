@@ -21,6 +21,7 @@ POST /orgs/acme/agents/release-agent/replies           { "id": "a-92", "conversa
 → 200 { "message": "msg_9A1", "number": 4871 }          later calls name the reply by the agent's ID, a-92; screens see msg_9A1
 POST /orgs/acme/agents/release-agent/replies/a-92/pieces  { "at": 0, "text": "Build 2.4.1 " }
 POST /orgs/acme/agents/release-agent/replies/a-92/finish  { "id": "a-92-done", "level": "flag", "mentions": ["marco"] }
+POST /orgs/acme/agents/release-agent/direct            { "with": "marco" }        → 200 { "conversation": "dm:marco:release-agent" }, the same one each time
 POST /orgs/acme/agents/release-agent/status            { "state": "waiting", "on": "marco" }
 POST /orgs/acme/agents/release-agent/reactions         { "id": "a-93", "message": "msg_7Q2", "emoji": "eyes", "on": true }
 PUT  /orgs/acme/agents/release-agent/subscriptions/%23launch      everything in that channel from now on; DELETE to stop
@@ -33,11 +34,11 @@ An agent is told what addresses it: a mention, a direct message, a reply in a th
 
 ## 3. Guarantees
 
-- Events are numbered per agent, kept 7 days, delivered in order, and may be read again; the agent ignores a number it has handled. An agent that asks for events older than 7 days is told so and from which number it can continue.
+- Each event carries the organization's reset number; after a Reset the agent starts again from the number it is told. A `reaction` event names who reacted, the emoji and whether it was added. Events are numbered per agent, kept 7 days, delivered in order, and may be read again; the agent ignores a number it has handled. An agent that asks for events older than 7 days is told so and from which number it can continue.
 - Event kinds are named for what happened to the agent (`mentioned`, `direct_message`, `reply`, `reaction`, `changed`, `deleted`); the message inside has the same shape as everywhere else.
 - Anything an agent posts with the same ID is saved once. A piece is identified by its reply and its position, so it needs no ID of its own; a status has none either, the latest one counts.
 - Text of a reply in progress goes to open screens only. The log carries a text-free `reply.started`; search, the feed and notifications learn the text when it is finished, as one whole message.
-- A reply with no new piece for 60 seconds, or older than 10 minutes, is closed as "stopped" with the text so far: a finished message marked `stopped`, searchable, a For your information row for people in the thread, and no notification (D-031).
+- A reply with no new piece for 60 seconds, or older than 10 minutes, is closed as "stopped" with the text last saved: a finished message marked `stopped`, searchable, a For your information row for people in the thread, and no notification (D-031). The text so far is saved about once a second outside the log, so a crash loses at most the last second; a reply with no saved text is closed with no message (D-032).
 - A piece that repeats text already received adds nothing.
 - An agent is not told about another agent's message unless it is named in it. Each message counts the agents in a row behind it; after three, no further agent is told until a person writes.
 - At most 20 messages a minute per agent. An organization's agents are served by one copy of Conversations (D-029), which keeps that count in memory; it starts fresh if the copy restarts.

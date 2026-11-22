@@ -17,8 +17,10 @@ POST /changes
 { "org": "acme", "number": 4830, "kind": "message.changed",
   "message": { "id": "msg_7Q2", "version": 2, "conversation": "#launch", "thread": null, "edited": true, "participants": null, "author": "anna",
                "text": "@Marco @Lena can you sign off the pricing page?", "mentions": ["marco", "lena"],
-               "level": null, "reactions": [] } }
+               "level": null } }
 { "org": "acme", "number": 4855, "kind": "message.deleted", "message": { "id": "msg_7Q2", "version": 3 } }
+
+Every answer carries the index's `wipe` number for this organization. A changed number sends the worker back to the start (D-032).
 
 answers: 200 applied · 200 already had it · 422 I refuse this one · anything else, or 3 s of silence: down (for every organization)
 ```
@@ -37,7 +39,7 @@ answers: 200 applied · 200 already had it · 422 I refuse this one · anything 
 - While the index is unreachable a person sees "Search is unavailable right now. Your messages are safe."; while it is more than 10 s behind, results carry "the last N minutes may be missing".
 - A place is kept per organization; workers find work through an index of the organizations that have some, claim an organization for a few seconds and deliver outside any transaction, so any number can run (D-029). A claim that runs out is taken over, so a change can arrive twice; the version rule makes that harmless.
 - How long to wait before the next try at an index that is down is kept once per receiver and shared by all workers, so more workers do not mean more retries. How often a change was refused is kept with the organization's place.
-- Wiped, for one organization or for all: the index answers with its place when asked (`operations-and-control.md`); the place of each wiped organization is set back to the start and its entries refill.
+- Wiped, for one organization or for all: its `wipe` number rises, and the worker, seeing it on the next answer or when it asks for the place (`operations-and-control.md`), goes back to the start and refills it.
 
 ## 5. Evolution
 

@@ -2,7 +2,7 @@
 
 - Phase: implement (the plan for all of it)
 - Written 2026-11-22, for a new session to pick up
-- Rests on: the brief; product decisions D-001 to D-004, D-009 to D-016, D-019 to D-024; technical decisions D-005, D-006, D-007, D-008, D-017, D-018, D-025, D-026, D-028, D-029, D-030; the seven contracts in `docs/contracts/`; guardrails G-003 to G-030; `tasks/T-038-build-acceptance-from-e002.md`
+- Rests on: the brief; product decisions D-001 to D-004, D-009 to D-016, D-019 to D-024; technical decisions D-005, D-006, D-007, D-008, D-017, D-018, D-025, D-026, D-028, D-029, D-030; the eight contracts in `docs/contracts/`; guardrails G-003 to G-030; `tasks/T-038-build-acceptance-from-e002.md`
 - Visual: `docs/visuals/T-043-build-plan.html`
 
 ## How to start (for the session that picks this up)
@@ -61,7 +61,7 @@ Order on the board is priority. "Needs" is what must be merged first. Packages i
 **T-044 Foundation.** Outcome: `make up` starts PostgreSQL and six empty programs that answer "alive"; `make test` and `make verify` run. Includes: the layout above; Docker images for Go and Node; Compose file; one database login and schema per part (G-008); the shared pieces: the clock, the one client for calls between parts with its 3 s limit (G-023), "the database for this organization" with the organization bound to the session (G-025, G-028), IDs; `./scripts/check` stays fast (format, vet, unit tests, generated files up to date, the existing repository checks) and `./scripts/verify` runs the full suite (Compose, guardrail tests, browser tests).
 - Acceptance: a fresh clone runs `make up` and `make verify` with nothing installed but Docker and make; each part's login is refused on the other parts' schemas (first half of G-008's test, seen failing with one shared login).
 
-**T-045 Contracts in machine form, and the stand-ins the packages build against.** Needs T-044. Outcome: every operation and event of the seven contracts has a schema and at least one example; TypeScript types are generated; Go types pass every example; and three tools exist so that packages can work without each other:
+**T-045 Contracts in machine form, and the stand-ins the packages build against.** Needs T-044. Outcome: every operation and event of the eight contracts has a schema and at least one example; TypeScript types are generated; Go types pass every example; and three tools exist so that packages can work without each other:
 - a **log writer** that produces a valid change log for one or two organizations from a seeded script (the driver of E-003, as a Go test helper);
 - a **mock door** that serves the people door and the live connection from fixtures, for the web app;
 - the **test harness**: start and stop parts, the troublemaker (repeats, lost answers, late copies), move the clock, two organizations with the same names and numbers.
@@ -126,6 +126,10 @@ Order on the board is priority. "Needs" is what must be merged first. Packages i
 **T-061 Milestone 3: validation.** Needs all above. A fresh verifier checks the running product against the brief, every contract and every guardrail; findings become tasks. The known-shortcuts list is brought up to date; a short "how to run and what to look at" is written.
 
 **T-062 Text rules judged by a model.** Last (D-001): an experiment first, then the build, with the guardrail for a slow or failing model.
+
+## Who builds `operations-and-control.md` (D-032)
+
+The nudge: T-047 sends, T-053 receives. Place and control (mode, wipe): T-048 for search and the sender, T-052 for the feed. Delivery status, parked list, retry, restart: T-047. Seed session, people list, replies' text so far, open direct: T-046 (saved text of a reply: T-054). Rebuild, Reset, script: T-059. The notification app's list: T-048.
 
 ## Verification strategy
 
