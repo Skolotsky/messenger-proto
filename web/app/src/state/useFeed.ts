@@ -25,6 +25,8 @@ export interface Feed {
   waitingBy: ReturnType<typeof waitingBy>;
   /** Unread rows in Focus and Needs you: the one number that calls (D-019). */
   attention: number;
+  /** Rises with every full load: what hangs on the feed (history tabs, settings) loads again. */
+  freshLoads: number;
   problem: string | null;
   clearProblem(): void;
   settings: SettingsAnswer | null;
@@ -54,25 +56,35 @@ export function useFeed(session: Session): Feed {
   modelRef.current = model;
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
-  const wasConnected = useRef(false);
+  const { link } = session;
+  const [freshLoads, setFreshLoads] = useState(0);
 
   const load = useCallback(
-    async (mode: 'lay-out' | 'in-place') => {
+    async (mode: 'lay-out' | 'in-place', takePosition = false) => {
       if (!person) return;
       try {
         const answer = await loadFeed(person);
         if (!answer.counts) {
           dispatch({ type: 'unavailable', notice: answer.notice ?? 'Catching up' });
-        } else if (mode === 'lay-out') {
+          link?.feedAway();
+          return;
+        }
+        if (mode === 'lay-out') {
           dispatch({ type: 'loaded', rows: answer.rows, counts: answer.counts, notice: answer.notice });
         } else {
           dispatch({ type: 'refreshed', rows: answer.rows, counts: answer.counts, notice: answer.notice, inView: inViewOf });
         }
+        // Only a full load sets the stream's position; opening Activity again does not.
+        if (takePosition && answer.number !== null && answer.edition !== null) {
+          link?.feedLoaded(answer.number, answer.edition);
+          setFreshLoads((n) => n + 1);
+        }
       } catch {
         dispatch({ type: 'unavailable', notice: 'Catching up' });
+        link?.feedAway();
       }
     },
-    [person],
+    [person, link],
   );
 
   const reloadSettings = useCallback(() => {
@@ -80,10 +92,27 @@ export function useFeed(session: Session): Feed {
   }, [person]);
 
   useEffect(() => {
-    if (!ready || !person) return;
-    void load('lay-out');
+    if (!ready || !person || !link) return;
+    // The first load, and any fresh one the connection asks for (too far behind, a new edition,
+    // the feed back after being unavailable): what is on screen stays where it is.
+    link.setFeedLoader(() => load(modelRef.current.phase === 'ready' ? 'in-place' : 'lay-out', true));
+    link.loadFeed();
     reloadSettings();
-  }, [ready, person, load, reloadSettings]);
+    return () => link.setFeedLoader(null);
+  }, [ready, person, link, load, reloadSettings]);
+
+  useEffect(() => {
+    if (freshLoads > 1) reloadSettings();
+  }, [freshLoads, reloadSettings]);
+
+  const { onActionProblem } = session;
+  useEffect(() => {
+    onActionProblem((text) => {
+      setProblem(text);
+      void load('in-place');
+    });
+    return () => onActionProblem(null);
+  }, [onActionProblem, load]);
 
   useEffect(
     () =>
@@ -101,13 +130,6 @@ export function useFeed(session: Session): Feed {
     [reloadSettings],
   );
 
-  // Back on the connection: what was missed is applied without moving the list. T-056 replaces
-  // this with the numbered catch-up.
-  useEffect(() => {
-    if (session.connected && !wasConnected.current && modelRef.current.phase !== 'loading') void load('in-place');
-    wasConnected.current = session.connected;
-  }, [session.connected, load]);
-
   const send = useCallback(
     async (action: PeopleAction) => {
       try {
@@ -122,14 +144,7 @@ export function useFeed(session: Session): Feed {
     [load],
   );
 
-  const quiet = useCallback(
-    (action: PeopleAction) => {
-      send(action).catch(() => undefined);
-    },
-    [send],
-  );
-
-  const { read } = session;
+  const { read, rowAction } = session;
 
   const markRead = useCallback(
     (row: FeedRow) => {
@@ -153,18 +168,18 @@ export function useFeed(session: Session): Feed {
     (row: FeedRow) => {
       if (!person) return;
       dispatch({ type: 'keep', key: rowKey(row) });
-      quiet({ kind: 'keep', id: newId('act'), as: person, conversation: row.conversation, thread: row.thread });
+      rowAction({ kind: 'keep', id: newId('act'), as: person, conversation: row.conversation, thread: row.thread });
     },
-    [person, quiet],
+    [person, rowAction],
   );
 
   const done = useCallback(
     (row: FeedRow) => {
       if (!person) return;
       dispatch({ type: 'done', key: rowKey(row) });
-      quiet({ kind: 'done', id: newId('act'), as: person, conversation: row.conversation, thread: row.thread });
+      rowAction({ kind: 'done', id: newId('act'), as: person, conversation: row.conversation, thread: row.thread });
     },
-    [person, quiet],
+    [person, rowAction],
   );
 
   const react = useCallback(
@@ -173,9 +188,9 @@ export function useFeed(session: Session): Feed {
       const on = !row.reactions.some((r) => r.emoji === emoji && r.people.includes(person));
       const release = (settingsRef.current?.release_on_act ?? true) && row.kept !== null;
       dispatch({ type: 'reacted', key: rowKey(row), emoji, me: person, on, release });
-      quiet({ kind: 'react', id: newId('act'), as: person, message: row.message, emoji, on });
+      rowAction({ kind: 'react', id: newId('act'), as: person, message: row.message, emoji, on });
     },
-    [person, quiet],
+    [person, rowAction],
   );
 
   const perform = useCallback(
@@ -216,6 +231,7 @@ export function useFeed(session: Session): Feed {
     waitingCount: model.waiting.length,
     waitingBy: counted,
     attention: counts ? counts.focus + counts.needs_you : 0,
+    freshLoads,
     problem,
     clearProblem,
     settings,

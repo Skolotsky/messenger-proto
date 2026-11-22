@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useCallback, useMemo, useState, useSyncExternalStore, type CSSProperties } from 'react';
+import { goneState, goToEntry, subscribeGone } from '../api/entry';
 import type { ConversationSummary, FeedRow, HistoryEntry, PersonView } from '../api/types';
 import { HOME_PERSON } from '../config';
 import { useFeed } from '../state/useFeed';
@@ -22,6 +23,25 @@ export function App() {
     stored.set(PERSON_KEY, id === HOME_PERSON ? null : id);
     setPerson(id);
   };
+  const gone = useSyncExternalStore(subscribeGone, goneState);
+  if (gone !== 'here') {
+    return (
+      <div className="boot">
+        <div className="empty" role="alert">
+          <p>
+            <b>This organization was reset.</b>
+            <br />
+            {gone === 'leaving' ? 'Opening the current one…' : 'The current one could not be reached.'}
+          </p>
+          {gone === 'failed' && (
+            <button className="btn" onClick={() => void goToEntry()}>
+              Try again
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
   // A new person is a new session: nothing of the previous view is carried over.
   return <Shell key={person} person={person} onChoose={choose} />;
 }
@@ -43,10 +63,7 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
   const [visiting, setVisiting] = useState<ConversationSummary | null>(null);
   const shown = useMemo(() => ({ activity: activityOpen, thread: thread !== null }), [activityOpen, thread]);
   const { widths, resize, reset } = usePanels(shown);
-  const { setOpenConversation } = session;
   const closeSettings = useCallback(() => setSettings(null), []);
-
-  useEffect(() => setOpenConversation(open), [open, setOpenConversation]);
 
   const conversation =
     session.conversations.find((c) => c.conversation === open) ??
@@ -162,6 +179,7 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
             <ConversationView
               key={conversation.conversation}
               session={session}
+              feed={feed}
               conversation={conversation}
               thread={null}
               active={!(isPhone && thread)}
@@ -196,6 +214,7 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
             <ConversationView
               key={thread}
               session={session}
+              feed={feed}
               conversation={conversation}
               thread={thread}
               openThread={null}

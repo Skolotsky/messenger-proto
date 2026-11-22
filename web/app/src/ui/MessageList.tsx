@@ -14,6 +14,8 @@ interface Props {
   /** A search hit to bring into view, once. */
   target?: Jump | null;
   onLanded?(nonce: number): void;
+  /** Under the last message: replies being written. */
+  footer?: ReactNode;
 }
 
 const NEAR_BOTTOM = 8;
@@ -23,7 +25,7 @@ const NEAR_BOTTOM = 8;
  * away from the bottom, the message at the top of the view keeps its exact place through
  * arrivals and through a change of the panel's width. At the bottom, the list stays there.
  */
-export function MessageList({ rows, renderRow, onPinnedChange, afterFirst, newFrom = null, target, onLanded }: Props) {
+export function MessageList({ rows, renderRow, onPinnedChange, afterFirst, newFrom = null, target, onLanded, footer }: Props) {
   const scroller = useRef<HTMLDivElement>(null);
   const inner = useRef<HTMLDivElement>(null);
   const pinned = useRef(true);
@@ -132,6 +134,7 @@ export function MessageList({ rows, renderRow, onPinnedChange, afterFirst, newFr
             </Fragment>
           );
         })}
+        {footer}
       </div>
     </div>
   );
