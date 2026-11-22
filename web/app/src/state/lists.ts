@@ -22,6 +22,8 @@ export function upsert(rows: MessageRow[], message: ChatMessage, summary?: Threa
 export function mergePage(current: MessageRow[] | undefined, page: MessageRow[]): MessageRow[] {
   let rows = page;
   for (const row of current ?? []) {
+    // A marker held on screen goes when the person moves on (D-004).
+    if (row.message.deleted && !row.thread_summary?.replies) continue;
     const loaded = page.find((r) => r.message.id === row.message.id);
     if (!loaded || row.message.version > loaded.message.version) rows = upsert(rows, row.message, row.thread_summary);
   }
@@ -40,6 +42,11 @@ function mapMessage(lists: Lists, id: string, change: (row: MessageRow) => Messa
     next = { ...next, [key]: copy };
   }
   return next;
+}
+
+/** The person's own delete: without replies nothing stays, not even for them (D-004, D-024). */
+export function dropOwnDeleted(lists: Lists, id: string): Lists {
+  return mapMessage(lists, id, (row) => (row.thread_summary?.replies ? row : null));
 }
 
 /** Applies one live part to the loaded lists. A part this screen does not know changes nothing. */
@@ -61,8 +68,7 @@ export function applyToLists(lists: Lists, part: ConversationPart): Lists {
       const gone = part.message;
       return mapMessage(lists, gone.id, (row) => {
         if (gone.version < row.message.version) return row;
-        // D-004: a deleted message leaves no trace unless something depends on it (replies).
-        if (!row.thread_summary?.replies) return null;
+        // D-004: it keeps its space for whoever has it on screen; without replies it is gone at the next load.
         return {
           ...row,
           message: { ...row.message, version: gone.version, deleted: true, text: '', mentions: [], reactions: [] },

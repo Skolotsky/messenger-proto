@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
-import type { PersonView } from '../api/types';
+import type { ConversationSummary, PersonView } from '../api/types';
 import { HOME_PERSON } from '../config';
 import { useSession } from '../state/useSession';
 import { Activity } from './Activity';
 import { ConversationView } from './ConversationView';
 import { stored, useIsPhone } from './hooks';
 import { Icon } from './Icon';
+import type { Jump } from './jump';
 import { usePanels } from './panels';
 import { Resizer } from './Resizer';
 import { Sidebar } from './Sidebar';
@@ -30,13 +31,18 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
   const [open, setOpen] = useState<string | null>(null);
   const [thread, setThread] = useState<string | null>(null);
   const [asking, setAsking] = useState<PersonView | null>(null);
+  const [jump, setJump] = useState<Jump | null>(null);
+  // A search hit can be in a channel this person is not in (D-009: every channel can be seen).
+  const [visiting, setVisiting] = useState<ConversationSummary | null>(null);
   const shown = useMemo(() => ({ activity: activityOpen, thread: thread !== null }), [activityOpen, thread]);
   const { widths, resize, reset } = usePanels(shown);
   const { setOpenConversation } = session;
 
   useEffect(() => setOpenConversation(open), [open, setOpenConversation]);
 
-  const conversation = session.conversations.find((c) => c.conversation === open) ?? null;
+  const conversation =
+    session.conversations.find((c) => c.conversation === open) ??
+    (visiting?.conversation === open ? visiting : null);
   const viewing = person !== HOME_PERSON;
   const home = session.people.get(HOME_PERSON);
 
@@ -61,6 +67,16 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
   const openConversation = (id: string | null) => {
     setOpen(id);
     setThread(null);
+    setJump(null);
+  };
+  const openHit = (hit: Jump) => {
+    if (!session.conversations.some((c) => c.conversation === hit.conversation)) {
+      const name = hit.conversation.replace(/^#/, '');
+      setVisiting({ conversation: hit.conversation, type: 'channel', name, people: [], unread: false, dial: 'default' });
+    }
+    setOpen(hit.conversation);
+    setThread(hit.thread);
+    setJump(hit);
   };
   const classes = [
     'app sk',
@@ -97,6 +113,7 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
             onToggleActivity={() => setActivityOpen((o) => !o)}
             onOpen={openConversation}
             onSwitch={setAsking}
+            onSearchHit={openHit}
           />
           <Resizer panel="side" label="Resize the sidebar" width={widths.side} onResize={resize} onReset={reset} />
         </aside>
@@ -115,6 +132,7 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
               openThread={thread}
               onOpenThread={setThread}
               onClose={() => openConversation(null)}
+              target={jump && jump.thread === null ? jump : null}
             />
           ) : (
             <div className="conv none">
@@ -145,7 +163,11 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
               thread={thread}
               openThread={null}
               onOpenThread={setThread}
-              onClose={() => setThread(null)}
+              onClose={() => {
+                setThread(null);
+                setJump(null);
+              }}
+              target={jump?.thread === thread ? jump : null}
             />
           </section>
         )}

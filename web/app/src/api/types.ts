@@ -8,7 +8,10 @@ export type {
   PeopleAction,
   PersonView,
   Reaction,
+  ScreenSearchAnswer,
+  SearchResult,
   StartAnswer,
+  SuggestAnswer,
   ThreadSummary,
 } from '../../../../contracts/generated/types';
 
@@ -45,4 +48,5 @@ export interface MessageRow {
 export interface MessagesPage {
   number: number;
   messages: MessageRow[];
+  has_after?: boolean;
 }

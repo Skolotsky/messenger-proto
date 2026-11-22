@@ -5,6 +5,7 @@ import type { Session } from '../state/useSession';
 import { Composer } from './Composer';
 import { useIsLooking } from './hooks';
 import { Icon } from './Icon';
+import type { Jump } from './jump';
 import { MessageItem } from './MessageItem';
 import { MessageList } from './MessageList';
 
@@ -24,6 +25,8 @@ interface Props {
   onClose(): void;
   /** False while something covers this view: what is covered is not being read (D-015). */
   active?: boolean;
+  /** A search hit to open this view at. */
+  target?: Jump | null;
 }
 
 /** One conversation or one thread: its header, its messages, its message box. */
@@ -35,6 +38,7 @@ export function ConversationView({
   onOpenThread,
   onClose,
   active = true,
+  target = null,
 }: Props) {
   const id = conversation.conversation;
   const key = listKey(id, thread);
@@ -45,23 +49,57 @@ export function ConversationView({
   const { loadList, read } = session;
   const title = conversationTitle(conversation, session);
 
+  // Showing a page around a search hit, with newer messages not loaded: nothing here counts as read up to the newest.
+  const [away, setAway] = useState(false);
+  const [landed, setLanded] = useState<number | null>(null);
+  const [hitGone, setHitGone] = useState(false);
+  const nonce = target?.nonce ?? null;
+
   useEffect(() => {
     setFailed(false);
+    setHitGone(false);
+    if (target && session.lists[key]?.some((r) => r.message.id === target.message)) return;
     setPinned(true);
-    loadList(id, thread).catch(() => setFailed(true));
-  }, [id, thread, loadList]);
+    if (!target) {
+      // Coming back from a page around a hit: the page is replaced, so no gap stays in the list.
+      loadList(id, thread, away ? { replace: true } : undefined).catch(() => setFailed(true));
+      setAway(false);
+      return;
+    }
+    loadList(id, thread, { around: target.number })
+      .then((page) => {
+        setAway(Boolean(page.has_after));
+        if (!page.messages.some((r) => r.message.id === target.message)) {
+          setHitGone(true);
+          setLanded(target.nonce);
+        }
+      })
+      .catch(() => setFailed(true));
+    // Only a new place to open: the list itself changes all the time.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, thread, loadList, nonce]);
+
+  const goToLatest = () => {
+    setAway(false);
+    setHitGone(false);
+    setPinned(true);
+    loadList(id, thread, { replace: true }).catch(() => setFailed(true));
+  };
 
   // Read means seen: this window is in front of the person and the newest message is in view (D-015).
   const newest = rows?.[rows.length - 1]?.message;
+  const jumping = nonce !== null && landed !== nonce;
   useEffect(() => {
-    if (active && looking && pinned && newest) read(id, thread, newest.number);
-  }, [active, looking, pinned, newest, id, thread, read]);
+    if (active && looking && pinned && newest && !away && !jumping) read(id, thread, newest.number);
+  }, [active, looking, pinned, newest, id, thread, read, away, jumping]);
 
-  const replies = thread && rows ? rows.length - 1 : 0;
+  const replies = thread && rows ? rows.slice(1).filter((r) => !r.message.deleted).length : 0;
   const subtitle = thread
     ? title
     : conversation.type === 'channel'
-      ? `${conversation.people.length} members`
+      ? conversation.people.length
+        ? `${conversation.people.length} members`
+        : 'Channel'
       : 'Direct message';
 
   return (
@@ -110,6 +148,8 @@ export function ConversationView({
           key={key}
           rows={rows}
           onPinnedChange={setPinned}
+          target={target}
+          onLanded={setLanded}
           afterFirst={
             thread ? (
               <div className="dayline replies-line">
@@ -130,12 +170,26 @@ export function ConversationView({
           )}
         />
       )}
+      {hitGone && (
+        <div className="hit-gone" role="status">
+          That message is no longer here. It was probably deleted.
+        </div>
+      )}
+      {away && (
+        <div className="away-strip" role="status">
+          <span>You are looking at older messages.</span>
+          <button className="btn sm" onClick={goToLatest}>
+            Go to the latest
+          </button>
+        </div>
+      )}
       <Composer
         key={key}
         session={session}
         conversation={id}
         thread={thread}
         placeholder={thread ? 'Reply in thread…' : `Message ${title}…`}
+        onSent={away ? goToLatest : undefined}
       />
     </div>
   );
