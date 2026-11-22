@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Contexia architecture proposal</title>
+<title>Contexia architecture review</title>
 <style>
 /* Layout: one reading column. Diagrams, tables and code may run wider inside their own scroll box. */
 :root {
@@ -159,37 +159,35 @@ details > .stack { gap: 10px; }
 <body>
 <main class="page">
 <header class="top">
-  <div class="label">Architecture proposal · T-022 · 2026-11-22 · a draft: nothing here is decided yet</div>
-  <h1>Contexia: the system on one page, and the six technical decisions behind it</h1>
+  <div class="label">Architecture review · T-022 · 2026-11-22 · one page, from the big picture down</div>
+  <h1>Contexia: the architecture, for review</h1>
   <p class="lede">Everything a person or an agent does is saved in one place and written to a numbered log in the same step. Search, the feed and notifications are each fed from that log by their own worker, so one of them being slow or down delays only itself and loses nothing.</p>
 </header>
 
 <div class="ask">
   <div class="label">Needs you</div>
-  <p><strong>Read the picture, then take the first decision: the shape (D-005, section 4).</strong> I recommend parts that talk only over the network and run as separate programs side by side. The other five decisions follow in order; each has a recommendation, and none is taken until you say so.</p>
+  <p><strong>Decided so far: PostgreSQL.</strong> Next is the shape (D-005, section 5). I recommend parts that talk only over the network and run as separate programs. Five more decisions follow in order; each has options, risks, reasoning and a recommendation, and none is taken until you say so.</p>
 </div>
 
 <section>
-  <h2>Tried out before you read it</h2>
-  <p>A throwaway version of this design was built as separate programs and broken on purpose: killed, slowed, fed repeats and late copies, wiped. Nothing was lost, a slow part delayed nobody else, and every receiver ended equal to the truth (75 checks). It changed the proposal in one place that matters: how a notification is held back (section 6). The database-specific part is not verified yet. <a href="E-003-delivery-spine.html">Results of E-003</a>.</p>
-  <p class="note">Since this page was drafted, D-022 moved notifications out of the product into a separate mock notification app. Where this page says "tray", read that app; the design behind it is unchanged.</p>
-</section>
-
-<section>
-  <h2>Contents</h2>
-  <ol>
-    <li><a href="#map">The parts and what moves between them</a></li>
-    <li><a href="#ideas">Three ideas that carry the design</a></li>
-    <li><a href="#parts">What each part holds, and what a person sees when it fails</a></li>
-    <li><a href="#d005">D-005 · The shape, the database, the live connection</a></li>
-    <li><a href="#d017">D-017 · Who owns what a reader did</a></li>
-    <li><a href="#d018">D-018 · Who decides that a notification is due</a></li>
-    <li><a href="#d006">D-006 · What each receiver is promised</a></li>
-    <li><a href="#d007">D-007 · The numbers, and the failure that proves each</a></li>
-    <li><a href="#d008">D-008 · The door for agents</a></li>
-    <li><a href="#rest">Experiments, shortcuts, and what waits for the look-and-feel work</a></li>
-  </ol>
-  <p class="note">Step by step, including every failure case: <a href="T-022-walkthroughs.html">seven walk-throughs</a>.</p>
+  <h2>How to read this page</h2>
+  <p>It goes from general to particular and from core to optional. Stop wherever you have seen enough; each level stands on the ones above it.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Level</th><th>Section</th><th>What you get</th><th>Time</th></tr></thead>
+      <tbody>
+        <tr><td><strong>The big picture</strong></td><td><a href="#map">1 · The map</a> · <a href="#ideas">2 · Three ideas</a></td><td>Which parts exist and what moves between them.</td><td>3 min</td></tr>
+        <tr><td><strong>The parts</strong></td><td><a href="#parts">3 · Each part and its qualities</a></td><td>What each part owns and promises, how, and what a person sees when it fails.</td><td>5 min</td></tr>
+        <tr><td><strong>The contracts</strong></td><td><a href="#contracts">4 · What crosses each boundary</a></td><td>What is sent, what is promised, what happens on failure.</td><td>5 min</td></tr>
+        <tr><td><strong>Your decisions</strong></td><td><a href="#d005">5</a> to <a href="#d008">10</a> · D-005, D-017, D-018, D-006, D-007, D-008</td><td>Options side by side, risk of each, best practice, recommendation.</td><td>3 min each</td></tr>
+        <tr><td><strong>The agent's smaller decisions</strong></td><td><a href="#small">11 · Seventeen choices inside the parts</a></td><td>Chosen, instead of what, and why. Object to any.</td><td>5 min</td></tr>
+        <tr><td><strong>Risks and trade-offs</strong></td><td><a href="#risks">12 · In one table</a></td><td>What can go wrong, what we do about it, what remains.</td><td>4 min</td></tr>
+        <tr><td><strong>Evidence</strong></td><td><a href="#evidence">13 · What was tried, what was not</a></td><td>Two experiments that broke a small build on purpose.</td><td>3 min</td></tr>
+        <tr><td><strong>Later and optional</strong></td><td><a href="#rest">14 · Built last, larger size, shortcuts, open points</a></td><td>What is deliberately simple, and what waits.</td><td>as needed</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Step by step through seven situations, including every failure: <a href="T-022-walkthroughs.html">the walk-throughs</a>. Results of the first experiment: <a href="E-003-delivery-spine.html">E-003</a>.</p>
 </section>
 
 <section id="map">
@@ -293,7 +291,7 @@ details > .stack { gap: 10px; }
         <rect class="box" x="630" y="450" width="250" height="70" rx="6"/>
         <text class="t" x="755" y="474" text-anchor="middle">Notification sender (stand-in)</text>
         <text class="t2" x="755" y="492" text-anchor="middle">waits a few seconds, sends once,</text>
-        <text class="t2" x="755" y="506" text-anchor="middle">fills the notification tray</text>
+        <text class="t2" x="755" y="506" text-anchor="middle">fills the notification app</text>
 
         <!-- later -->
         <line class="edge" x1="350" y1="520" x2="350" y2="566" stroke-dasharray="4 4" marker-end="url(#arrow)"/>
@@ -316,26 +314,88 @@ details > .stack { gap: 10px; }
 </section>
 
 <section id="parts">
-  <h2>3 · What each part holds, and what a person sees when it is slow or down</h2>
+  <h2>3 · Each part: what it owns, what it promises, how</h2>
+  <p>Core parts first. "Stand-in" means a simple local fake behind a real boundary, as the brief allows.</p>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>Part</th><th>Holds</th><th>If it is slow or down</th><th>At 100 times the size</th></tr></thead>
+      <thead><tr><th>Part</th><th>Owns</th><th>Promises</th><th>How it keeps the promise</th><th>If it is slow or down, a person sees</th><th>Trade-off accepted</th></tr></thead>
       <tbody>
-        <tr><td><strong>Conversations</strong></td><td>The only original copy of everything: messages, reactions, what each person read, set, kept and is watching, and the change log. Every other part can be emptied and refilled from it.</td><td>Screens say "Reconnecting" and keep what they show. A message typed meanwhile waits as "not sent" and is retried without posting twice.</td><td>Still one database for a long time (about 1.5 messages a second). First to change: the single numbering of the log is split by conversation.</td></tr>
-        <tr><td><strong>Delivery workers</strong></td><td>One place in the log per receiver, and the parking place.</td><td>Receivers fall behind and catch up from the saved place. The control panel shows how far behind each one is.</td><td>Read the database's own replication log instead of asking for new changes; several workers per receiver.</td></tr>
-        <tr><td><strong>Activity feed</strong></td><td>Rows per reader, its own copy of what it needs to judge them, and its own numbered log of row changes.</td><td>The feed shows the last rows it had with "Catching up". Conversations, unread marks on channels and search work as usual. Notifications wait with it.</td><td>A post in a 3,000-person channel should not write 3,000 rows: large channels are worked out when the feed is read, not when the post is written.</td></tr>
-        <tr><td><strong>Search index</strong> <span class="chip">stand-in</span></td><td>The current text of every message that is not deleted, with its version.</td><td>The search box says "Search is unavailable right now", or shows results with "the last few minutes may be missing". Messaging is unaffected.</td><td>A real search engine behind the same boundary; nothing else moves.</td></tr>
-        <tr><td><strong>Notification sender</strong> <span class="chip">stand-in</span></td><td>What it was asked to send, the list of what it sent, and the tray. All of it can be refilled from the feed's log without interrupting anyone.</td><td>Notifications arrive late, once, and not at all if the message was deleted or read before they went out. The feed is still right.</td><td>A real push or email provider behind the same boundary, with limits per person.</td></tr>
-        <tr><td><strong>Live connection</strong></td><td>Nothing lasting: it only forwards numbered updates to open screens.</td><td>A screen that lost updates asks for everything after the last number it saw, or reloads if it was away too long.</td><td>Several of them, with a way to pass updates between them.</td></tr>
-        <tr><td><strong>Agent door</strong></td><td>Each agent's place in its own stream of events.</td><td>An agent that was away reads on from its place. Agents cannot hold back people or each other.</td><td>Limits per agent, and permissions on what an agent may read.</td></tr>
-        <tr><td><strong>Scripted team and control panel</strong></td><td>The schedule of what the seeded team does, and the switches that slow down or stop a receiver.</td><td>The team goes quiet; the product keeps working.</td><td>Not part of a real product.</td></tr>
+        <tr><td><strong>Conversations</strong><br><span class="chip ok">core</span></td><td>The only original copy of everything: messages, reactions, what each person read, set, kept and is watching, and the numbered change log.</td><td>What a screen was told is saved, is saved, exactly once. Every change is in the log, in one order, for good.</td><td>The change and its log entry are one database transaction. Every action carries an ID chosen by the sender, so a retry is recognised. Log numbers are handed out one writer at a time.</td><td>"Reconnecting". The screen keeps what it shows; a new message waits as "not sent".</td><td>It is the one part everything depends on. There is one copy of it.</td></tr>
+        <tr><td><strong>Delivery workers</strong><br><span class="chip ok">core</span></td><td>One place in the log per receiver; the parking place.</td><td>Every change reaches every receiver at least once, in log order. A stopped receiver holds back only itself.</td><td>A worker per receiver; it moves its place only after the receiver confirmed. Outage: wait and retry without limit. Refusal of one change: park it after three tries.</td><td>That receiver's surface says it is behind. The control panel shows how far.</td><td>A receiver may get a change twice. Receivers must cope; see their rows.</td></tr>
+        <tr><td><strong>Activity feed</strong><br><span class="chip ok">core</span></td><td>Nothing original. Rows per reader worked out from the log, its own copy of what it needs to judge, and its own numbered log of notification notes.</td><td>Each reader's rows are exactly what the rules give for the log so far. It can be wiped and rebuilt to the same state.</td><td>It takes only the change that follows the last one it applied, and saves rows, its place and its notes in one step. It never asks another part for anything.</td><td>The rows it had, with "Catching up". Conversations, unread marks on channels and search are unaffected. Notifications wait with it.</td><td>It lags Conversations by a moment (7 ms in the experiment). A change it cannot apply stops it until fixed; it never skips.</td></tr>
+        <tr><td><strong>Search index</strong><br><span class="chip">stand-in</span></td><td>The current text of every message that is not deleted, with its version.</td><td>Finds a message by its current text only; a deleted one never.</td><td>Applies a change only if its version is newer; remembers a delete by its version so a late edit cannot bring the message back.</td><td>"Search is unavailable right now", or results with "the last few minutes may be missing". Messaging is unaffected.</td><td>A new message is findable a moment after it is sent, not at the same instant.</td></tr>
+        <tr><td><strong>Notification sender</strong><br><span class="chip">stand-in</span></td><td>What it was asked to send, the list of what it sent, and what the mock notification app shows (D-022).</td><td>One notification per feed row; never twice; never for something read or deleted within the hold.</td><td>Sends only what the feed tells it is due. Each notification has a fixed name and is sent once. The hold is measured by the log's own clock.</td><td>Notifications arrive late, once. The feed is still right.</td><td>It stands behind the feed, not beside it: if the feed is down, notifications wait. One already sent cannot be recalled.</td></tr>
+        <tr><td><strong>Live connection</strong></td><td>Nothing lasting. It forwards numbered updates to open screens.</td><td>An open screen shows a change within a second, and ends right after any interruption.</td><td>Every update has a number. After a drop the screen asks for everything after the last number it saw, or reloads if it was away too long.</td><td>A quiet "Reconnecting" line.</td><td>The connection itself may lose things; the numbers repair it.</td></tr>
+        <tr><td><strong>Agent door</strong></td><td>Each agent's place in its own stream of events.</td><td>An agent misses nothing while it returns within seven days, and cannot hold up people or other agents.</td><td>The agent calls us and reads from its place. What it posts carries its own ID.</td><td>Nothing: an agent that is away reads on later.</td><td>An agent hears only when it asks.</td></tr>
+        <tr><td><strong>Scripted team and control panel</strong><br><span class="chip">demonstration</span></td><td>The schedule of what the seeded team does; the switches that slow, refuse or stop a receiver.</td><td>The same starting state after every reset; what happens next can be shown in advance.</td><td>A fixed script played through the same two doors real participants use. Reset reloads the truth and lets every receiver rebuild.</td><td>The team goes quiet; the product keeps working.</td><td>Not part of a real product.</td></tr>
       </tbody>
     </table>
   </div>
 </section>
 
+<section id="contracts">
+  <h2>4 · The contracts: what crosses each boundary</h2>
+  <p>A contract says what is sent, what is promised and what happens on failure. These become files under <code>docs/contracts/</code> once the decisions behind them are accepted. Payload examples are in sections 8 and 10.</p>
+  <div class="options">
+    <div class="option">
+      <header><h3>Screen → Conversations</h3><span class="chip you">what a person does</span></header>
+      <dl>
+        <dt>Carries</dt><dd>Send, edit, delete, react, read up to here, watching this conversation, Keep, Done, a dial, a Focus rule. Each with an ID the screen chose.</dd>
+        <dt>Promise</dt><dd>Answered "saved" only after it is saved and logged. The same ID again changes nothing.</dd>
+        <dt>On failure</dt><dd>The screen keeps the action as "not sent" and retries with the same ID.</dd>
+        <dt>Evidence</dt><dd>E-003: core killed five times mid-burst; every acknowledged action saved once.</dd>
+      </dl>
+    </div>
+    <div class="option">
+      <header><h3>Conversations → Screen</h3><span class="chip you">live updates</span></header>
+      <dl>
+        <dt>Carries</dt><dd>Numbered updates for what the screen shows: conversations, the person's feed rows, text of a reply being written.</dd>
+        <dt>Promise</dt><dd>Within a second when connected. After any gap the screen ends equal to a fresh load.</dd>
+        <dt>On failure</dt><dd>"Resume after number N", or "too far behind: reload".</dd>
+        <dt>Evidence</dt><dd><span class="chip risk">not tried yet</span> Needs a browser; planned with the first screens.</dd>
+      </dl>
+    </div>
+    <div class="option">
+      <header><h3>Conversations → Search index</h3></header>
+      <dl>
+        <dt>Carries</dt><dd>Message created, changed, deleted. The whole current message and its version; a delete carries only which message and its version.</dd>
+        <dt>Promise</dt><dd>Never lost; may repeat; in log order, though search does not rely on order.</dd>
+        <dt>On failure</dt><dd>No answer in 3 s or an error: wait, retry, skip nothing. "I refuse this one": parked after three tries, shown, released by hand.</dd>
+        <dt>Evidence</dt><dd>E-003: stopped, slowed, refusing, wiped; always ended equal to the truth.</dd>
+      </dl>
+    </div>
+    <div class="option">
+      <header><h3>Conversations → Activity feed</h3><span class="chip ok">the strict one</span></header>
+      <dl>
+        <dt>Carries</dt><dd>Every change, including what readers did and clock ticks, each with its number and the number before it.</dd>
+        <dt>Promise</dt><dd>Never lost; strictly in order; in effect once.</dd>
+        <dt>On failure</dt><dd>Out of sequence: the feed answers "I am at N" and the worker continues from there. A change it cannot apply: it stops, visibly; nothing is parked or skipped.</dd>
+        <dt>Evidence</dt><dd>E-003: killed, wiped mid-burst, its worker's place moved by mistake; always equal to a clean replay.</dd>
+      </dl>
+    </div>
+    <div class="option">
+      <header><h3>Activity feed → Notification sender</h3></header>
+      <dl>
+        <dt>Carries</dt><dd>"Due", "withdrawn" and clock ticks from the feed's own numbered log. A due note has a fixed name, the person, the reason and the text.</dd>
+        <dt>Promise</dt><dd>Never lost; a name is sent once; nothing is sent for what was read or deleted within the hold.</dd>
+        <dt>On failure</dt><dd>Same waiting and retrying. Late notifications are sent late, marked "delayed" past ten minutes.</dd>
+        <dt>Evidence</dt><dd>E-003: 0 of 160 wrongly sent with the feed down or overloaded; 565 entries before a wipe, the same 565 after.</dd>
+      </dl>
+    </div>
+    <div class="option">
+      <header><h3>Conversations ↔ Agents</h3><span class="chip agent">the agent door</span></header>
+      <dl>
+        <dt>Carries</dt><dd>To the agent: numbered events that address it. From the agent: a message with a level, a streamed reply (start, pieces, finish), a status.</dd>
+        <dt>Promise</dt><dd>Events kept seven days, in order, possibly repeated with the same number. A post with the same ID is saved once.</dd>
+        <dt>On failure</dt><dd>An agent that is away reads on from its place. A reply with no new piece for a minute is closed as "stopped".</dd>
+        <dt>Evidence</dt><dd><span class="chip risk">not tried yet</span></dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
 <section id="d005">
-  <h2>4 · D-005: the shape, the database, the live connection</h2>
+  <h2>5 · D-005: the shape, the database, the live connection</h2>
   <p>The brief allows the search index and the notification sender to be stand-ins inside one program, and asks that their boundaries be treated as real. The question is how real we make them.</p>
   <div class="options">
     <div class="option">
@@ -370,7 +430,7 @@ details > .stack { gap: 10px; }
     <table>
       <thead><tr><th>Comes with it</th><th>Recommended</th><th>Alternative</th><th>Why</th></tr></thead>
       <tbody>
-        <tr><td><strong>Where the truth is stored</strong></td><td>PostgreSQL, run in Docker. Each part has its own area and never reads another's.</td><td>SQLite files: nothing to run, but one writer at a time and no way to wake a worker the moment something is saved.</td><td>Several programs writing at once, and a save-and-log step the whole guarantee rests on. Expensive to change later.</td></tr>
+        <tr><td><strong>Where the truth is stored</strong> <span class="chip ok">decided: PostgreSQL</span></td><td>PostgreSQL, run in Docker. Each part has its own area and never reads another's.</td><td>SQLite files: nothing to run, but one writer at a time and no way to wake a worker the moment something is saved.</td><td>Several programs writing at once, and a save-and-log step the whole guarantee rests on. Expensive to change later.</td></tr>
         <tr><td><strong>How updates reach a screen</strong></td><td>A lasting two-way connection (WebSocket) carrying numbered updates, with "everything after number N" after a drop.</td><td>The browser's one-way stream (server-sent events): reconnects by itself, but a browser allows six per site on a local address, so the seventh tab hangs (browser documentation, re-checked today).</td><td>You will open many tabs as different people. Cheap to change: numbering and catch-up are the same either way.</td></tr>
         <tr><td><strong>Language</strong></td><td>Python 3.12 on the server (installed here).</td><td>The web app's toolkit is left open.</td><td>It depends on what the look-and-feel mock-ups need (T-019). Node is not installed; it could run in Docker.</td></tr>
       </tbody>
@@ -382,7 +442,7 @@ details > .stack { gap: 10px; }
   <mark>INSERT INTO change_log (number, kind, body)
        VALUES (4830, 'message.changed', '{ the whole message, version 2 }');</mark>
 COMMIT;      -- both are saved, or neither</code></pre>
-    <figcaption>The step everything rests on. The log entry is written in the same database transaction as the change. Numbers are handed out one at a time, in the order changes become visible, so a worker reading "everything after 4829" can never step over a change that was saved a moment late.</figcaption>
+    <figcaption>The step everything rests on. The log entry is written in the same database transaction as the change. Numbers are handed out one writer at a time, as the last step, so a worker reading "everything after 4829" can never step over a change that was saved a moment late. On PostgreSQL an ordinary sequence lost about a fifth of the changes in that situation; this rule lost none, at the same speed (E-004).</figcaption>
   </figure>
   <figure class="snippet">
     <pre><code>screen → server   { "resume": { "conversations": 4855, "feed": 97 } }
@@ -391,11 +451,11 @@ server → screen   { "conversations": 4856, "kind": "message.changed", … }
           or      <mark>{ "too_far_behind": "feed" }</mark>      → the screen reloads that view</code></pre>
     <figcaption>How a screen catches up after a drop. The live connection is allowed to lose things; the numbers are what make the screen right again.</figcaption>
   </figure>
-  <p class="note">Best practice: every product in R-002 saves first, publishes each change, and lets search, notifications and the feed consume it off the typing path; at their size with a broker, at ours with a log table and a worker per receiver. An independent second opinion, given the options without my recommendation, chose the same three and asked that the separate-programs mode be the one the tests run.</p>
+  <p class="note">Best practice: every product in R-002 saves first, publishes each change, and lets search, notifications and the feed consume it off the typing path; at their size with a broker, at ours with a log table and a worker per receiver. An independent second opinion, given the options without my recommendation, chose the same three and asked that the separate-programs mode be the one the tests run. E-003 built shape B small and it held under every failure injected.</p>
 </section>
 
 <section id="d017">
-  <h2>5 · D-017: who owns what a reader did</h2>
+  <h2>6 · D-017: who owns what a reader did</h2>
   <p>Where a message lands depends on the reader: their Focus rules, dials, what they read, what they kept. Someone has to own those.</p>
   <div class="options">
     <div class="option pick">
@@ -421,14 +481,14 @@ server → screen   { "conversations": 4856, "kind": "message.changed", … }
 </section>
 
 <section id="d018">
-  <h2>6 · D-018: who decides that a notification is due</h2>
+  <h2>7 · D-018: who decides that a notification is due</h2>
   <p>The brief lists the notification sender beside the feed, as an independent system that receives messages. D-012 says a notification is sent when a feed row becomes unread in Focus or Needs you, once per row. So the sender needs to know something only the feed knows.</p>
   <div class="options">
     <div class="option pick">
       <header><h3>A. The feed decides; the sender delivers</h3><span class="chip ok">Recommended</span></header>
       <p>When a row becomes unread in a bucket that notifies, the feed writes "due" to its own numbered log. A worker carries it to the sender with the same promise as any other change. Later it may write "changed" or "withdrawn".</p>
       <dl>
-        <dt>Upside</dt><dd>The rule lives in one place. The feed and the tray cannot disagree about what deserved an interruption.</dd>
+        <dt>Upside</dt><dd>The rule lives in one place. The feed and the notification app cannot disagree about what deserved an interruption.</dd>
         <dt>Risk</dt><dd>The sender stands behind the feed, not beside it: while the feed is down, notifications wait. This departs from a literal reading of the brief and the proposal says so.</dd>
         <dt>Undo</dt><dd>Moderate.</dd>
       </dl>
@@ -461,13 +521,13 @@ server → screen   { "conversations": 4856, "kind": "message.changed", … }
   "text": "@Marco can you sign off the pricing page?" }
 
 { "name": "marco / thread_77 / 4812", "kind": "withdrawn" }   ← read, deleted or re-sorted meanwhile</code></pre>
-    <figcaption>What the feed tells the sender. The sender waits five seconds before sending (D-004's "brief hold"), measured by the log's own clock: the core writes a clock tick into the log several times a second, the feed passes it on, and the sender sends only once it has received something stamped later than the end of the hold. So a message read or deleted within five seconds never notifies, however late any part is running (E-003: 0 of 160 wrongly sent, against 147 of 160 when the hold is counted from the note's arrival). Past the hold, the notification has gone and the tray entry shows the current truth. It keeps the list of names it has sent, so rebuilding the feed never sends anything again. A "withdrawn" that arrives before its "due" is remembered. A row that moves up into Focus while unread gets a second note with its own name (D-012); the personal "Focus only" switch is a fact the feed applies before writing "due".</figcaption>
+    <figcaption>What the feed tells the sender. The sender waits five seconds before sending (D-004's "brief hold"), measured by the log's own clock: the core writes a clock tick into the log several times a second, the feed passes it on, and the sender sends only once it has received something stamped later than the end of the hold. So a message read or deleted within five seconds never notifies, however late any part is running (E-003: 0 of 160 wrongly sent, against 147 of 160 when the hold is counted from the note's arrival). Past the hold, the notification has gone and its entry shows the current truth. It keeps the list of names it has sent, so rebuilding the feed never sends anything again. A "withdrawn" that arrives before its "due" is remembered. A row that moves up into Focus while unread gets a second note with its own name (D-012); the personal "Focus only" switch is a fact the feed applies before writing "due".</figcaption>
   </figure>
   <p class="note">Best practice: Slack's 2026 notification rebuild separates deciding what deserves attention from delivering it (R-002). A is that separation.</p>
 </section>
 
 <section id="d006">
-  <h2>7 · D-006: what each receiver is promised</h2>
+  <h2>8 · D-006: what each receiver is promised</h2>
   <div class="options">
     <div class="option">
       <header><h3>A. Send once and hope</h3></header>
@@ -511,7 +571,7 @@ answers:  200 applied · 200 already had it · 422 I refuse this one (→ parked
       <tbody>
         <tr><td><strong>Search index</strong></td><td>Finished messages: created, changed, deleted.</td><td>None once saved.</td><td>Possible; ignored by version.</td><td>In log order; not relied on. Newest version wins, delete wins.</td></tr>
         <tr><td><strong>Activity feed</strong></td><td>Every change, including what readers did.</td><td>None.</td><td>Possible; ignored by number. The feed takes only the change that follows the last one it applied, saved in the same step as its rows; anything else it answers with "I am at N" and the worker sends from there. In effect each change counts once.</td><td>Strictly in log order, and relied on. The feed never parks: a change it cannot apply stops it, shows in the control panel, and is fixed or rebuilt.</td></tr>
-        <tr><td><strong>Notification sender</strong></td><td>Due, changed, withdrawn, from the feed's log.</td><td>None; may be late.</td><td>Possible; a name appears in the tray once, because the tray is the stand-in's own store. A real push provider cannot give that: there the rule is "rather twice than never", with the name passed along as the duplicate key where the provider takes one.</td><td>In log order. One already sent cannot be recalled; the tray shows the current truth.</td></tr>
+        <tr><td><strong>Notification sender</strong></td><td>Due, changed, withdrawn, from the feed's log.</td><td>None; may be late.</td><td>Possible; a name appears in the notification app once, because the notification app is the stand-in's own store. A real push provider cannot give that: there the rule is "rather twice than never", with the name passed along as the duplicate key where the provider takes one.</td><td>In log order. One already sent cannot be recalled; the notification app shows the current truth.</td></tr>
         <tr><td><strong>Agents</strong></td><td>Events that address them (D-008).</td><td>None while the agent returns within the kept period.</td><td>Possible; same number.</td><td>In order per agent.</td></tr>
       </tbody>
     </table>
@@ -519,7 +579,7 @@ answers:  200 applied · 200 already had it · 422 I refuse this one (→ parked
 </section>
 
 <section id="d007">
-  <h2>8 · D-007: the numbers, and the failure that proves each</h2>
+  <h2>9 · D-007: the numbers, and the failure that proves each</h2>
   <p>Proposed targets on one local machine with the seeded team. Every claim is paired with the fault a test injects; a claim without one is not made.</p>
   <div class="table-wrap">
     <table>
@@ -538,9 +598,9 @@ answers:  200 applied · 200 already had it · 422 I refuse this one (→ parked
         <tr><td>The feed never skips.</td><td>a change it cannot apply stops it; the control panel says so; everything else runs</td><td>Feed the feed a change it rejects; and stop the feed outright: conversations, unread marks on channels and search keep working.</td></tr>
         <tr><td>A retry never posts twice.</td><td>1 message</td><td>Drop the answer to a person's send and to an agent's post, so each sends again with the same ID.</td></tr>
         <tr><td>Repeats and late arrivals change nothing.</td><td>end state identical</td><td>A troublemaker in front of each receiver that repeats every delivery and shuffles nearby ones.</td></tr>
-        <tr><td>A notification appears in the tray once, late if need be.</td><td>1</td><td>Stop the sender for five minutes; stop it between sending and confirming; rebuild the feed while it runs. One sent more than ten minutes late must carry "delayed".</td></tr>
+        <tr><td>A notification appears once, late if need be.</td><td>1</td><td>Stop the sender for five minutes; stop it between sending and confirming; rebuild the feed while it runs. One sent more than ten minutes late must carry "delayed".</td></tr>
         <tr><td>An agent misses nothing and holds up nobody.</td><td>events kept 7 days, in order</td><td>An agent away for ten minutes; an agent that never reads. People and other agents see no delay.</td></tr>
-        <tr><td>A receiver can be rebuilt from nothing.</td><td>under 1 minute at seeded size; equal to before</td><td>Wipe the feed, then search, then the notification sender, while the team is active; compare with a copy taken before, and confirm the sender interrupted nobody while refilling its tray.</td></tr>
+        <tr><td>A receiver can be rebuilt from nothing.</td><td>under 1 minute at seeded size; equal to before</td><td>Wipe the feed, then search, then the notification sender, while the team is active; compare with a copy taken before, and confirm the sender interrupted nobody while refilling its list.</td></tr>
         <tr><td>A screen that lost its connection ends right.</td><td>caught up 2 s after reconnecting; a silently lost update healed within 20 s; a reload past 500 missed updates</td><td>Cut the connection for 30 s during edits and deletes; swallow single updates on a live connection; keep a screen away past the limit. Each time compare with a fresh load.</td></tr>
         <tr><td>A slow or failing model breaks nothing (built last).</td><td>the row stays where it is</td><td>A model stand-in that times out or errors.</td></tr>
         <tr><td>A surface that is behind says so.</td><td>a notice when more than 10 s behind</td><td>Any of the outages above, looked at on the rendered page.</td></tr>
@@ -553,11 +613,11 @@ answers:  200 applied · 200 already had it · 422 I refuse this one (→ parked
     <div class="panel"><div class="label">Notifications delayed</div><p>They arrive late, once, and not for something deleted or read before they went out. One more than ten minutes late is marked "delayed".</p></div>
     <div class="panel"><div class="label">Conversations unreachable</div><p>"Reconnecting". The screen keeps what it shows; a new message waits as "not sent" and cannot post twice.</p></div>
   </div>
-  <p class="note">Rebuild is also how Reset works: the control panel empties every part, reloads the seeded truth, and the feed, search and then the notification sender refill from the logs, the sender in a quiet mode that fills the tray with the original times and interrupts nobody. So the rebuild path runs at every reset. A rebuilt feed starts a new edition of its own log; screens seeing a new edition reload, and the sender reads it from the start, protected by its list of names. The 3-second answer is Slack's rule for its own Events API (R-002); Slack gives up after three retries, we do not.</p>
+  <p class="note">Rebuild is also how Reset works: the control panel empties every part, reloads the seeded truth, and the feed, search and then the notification sender refill from the logs, the sender in a quiet mode that fills the list with the original times and interrupts nobody. So the rebuild path runs at every reset. A rebuilt feed starts a new edition of its own log; screens seeing a new edition reload, and the sender reads it from the start, protected by its list of names. The 3-second answer is Slack's rule for its own Events API (R-002); Slack gives up after three retries, we do not.</p>
 </section>
 
 <section id="d008">
-  <h2>9 · D-008: the door for agents</h2>
+  <h2>10 · D-008: the door for agents</h2>
   <div class="options">
     <div class="option">
       <header><h3>A. We call the agent</h3></header>
@@ -597,13 +657,84 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
   </div>
 </section>
 
+<section id="small">
+  <h2>11 · The smaller decisions, made by the agent</h2>
+  <p>These sit inside the parts. They are mine to take under our working agreement, but each one is open to objection. Most important first.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Chosen</th><th>Instead of</th><th>Why</th><th>Tried</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>The log number is taken as the last step of a save, one writer at a time.</td><td>An ordinary database sequence.</td><td>A sequence gives out numbers before a save finishes; a worker then steps over the late one. Measured on PostgreSQL: about a fifth of changes missed, against none.</td><td><span class="chip ok">E-004</span></td></tr>
+        <tr><td>2</td><td>A change carries the whole current message and its version.</td><td>Only what differs.</td><td>The newest change alone is enough, a repeat is harmless, and an older one arriving late is recognised.</td><td><span class="chip ok">E-003</span></td></tr>
+        <tr><td>3</td><td>One version per message, raised by every change, reactions included. A delete is remembered by its version.</td><td>Separate counters; forgetting deleted messages.</td><td>One rule for every receiver: apply only what is newer; a delete wins.</td><td><span class="chip ok">E-003</span></td></tr>
+        <tr><td>4</td><td>The sender of an action chooses its ID.</td><td>The server numbering messages on arrival.</td><td>A retry after a lost answer is recognised, for screens and agents alike.</td><td><span class="chip ok">E-003</span></td></tr>
+        <tr><td>5</td><td>Outage and refusal are told apart: no answer or an error means wait; "I refuse this one" means park. Three different refusals in a row count as an outage.</td><td>A fixed number of retries for everything.</td><td>Giving up on an outage loses data; waiting forever on one bad change stalls a receiver.</td><td><span class="chip ok">E-003</span></td></tr>
+        <tr><td>6</td><td>The feed takes only the next change and says where it is, also when idle.</td><td>Accepting anything newer.</td><td>A misplaced worker heals itself, and a wiped feed is noticed at once. Without it 139 of 1,559 feed entries came out wrong.</td><td><span class="chip ok">E-003</span></td></tr>
+        <tr><td>7</td><td>The feed saves rows, its place and its notes in one step.</td><td>Saving them one after another.</td><td>Dying in between would otherwise apply a change twice or lose a notification.</td><td><span class="chip ok">E-003</span></td></tr>
+        <tr><td>8</td><td>The log carries the clock: ticks while there is activity, and timestamps that never go backwards.</td><td>Each part using its own clock.</td><td>The hold before a notification is then exact however late a part is. A machine clock stepping back 0.8 s caused wrong notifications before this.</td><td><span class="chip ok">E-003</span></td></tr>
+        <tr><td>9</td><td>Every notification has a fixed name; the sender keeps the list of names sent.</td><td>Sending whatever arrives.</td><td>Repeats and a rebuilt feed never notify twice (171 repeats without it).</td><td><span class="chip ok">E-003</span></td></tr>
+        <tr><td>10</td><td>"This conversation is open in front of me" is a fact on the log.</td><td>Deciding it at the moment of sending the notification.</td><td>The feed then knows at arrival that the message is read: no row, no notification (D-015, rule 6), and a rebuild gives the same answer.</td><td>part of E-003's rules</td></tr>
+        <tr><td>11</td><td>Workers are woken by the database the moment something is saved, with a slow regular look as a fallback.</td><td>Looking every few milliseconds.</td><td>About 1 ms from save to fetched on PostgreSQL, with no idle load.</td><td><span class="chip ok">E-004</span></td></tr>
+        <tr><td>12</td><td>Text of a reply in progress travels a fast path to open screens; only its start and finish go through the log.</td><td>Every piece through the log.</td><td>A reply of two hundred pieces is not two hundred deliveries to every receiver, and nothing unfinished can be indexed or notified.</td><td><span class="chip risk">no</span></td></tr>
+        <tr><td>13</td><td>A screen reads the feed, search and notifications through Conversations' door.</td><td>The browser calling each part.</td><td>One address for the web app; a part that is down becomes a notice, not a broken page.</td><td><span class="chip risk">no</span></td></tr>
+        <tr><td>14</td><td>The screen shows the person's own action at once and does not wait for the feed.</td><td>Waiting for the round trip.</td><td>Reading a row goes through the log before the feed knows it; the person should not feel that.</td><td><span class="chip risk">no</span></td></tr>
+        <tr><td>15</td><td>Reset reloads the seeded truth and lets every receiver rebuild from the log.</td><td>Restoring saved copies of each part.</td><td>The rebuild path runs at every reset instead of only in an emergency.</td><td><span class="chip ok">E-003</span>, small size</td></tr>
+        <tr><td>16</td><td>A language model's verdict on a text rule is saved as a fact.</td><td>Asking the model again on a rebuild.</td><td>A model does not answer the same way twice; the feed must rebuild to the same state.</td><td>built last</td></tr>
+        <tr><td>17</td><td>A coding agent joins through a small connector over the agent door; acting as a person is off unless switched on at start.</td><td>A private side entrance.</td><td>What it verifies is then the product itself (D-002).</td><td><span class="chip risk">no</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="risks">
+  <h2>12 · Risks and trade-offs in one place</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Risk or trade-off</th><th>What would happen</th><th>What the design does</th><th>What remains</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Notifications depend on the feed</strong> (D-018)</td><td>The feed is down: no notifications until it is back.</td><td>They are held, then sent late, once, marked "delayed". The rule for what notifies lives in one place.</td><td>A departure from the brief's picture of three receivers side by side. Yours to accept or not.</td></tr>
+        <tr><td><strong>The feed never skips</strong></td><td>A fault in the feed's rules on one change stops the whole feed.</td><td>It stops visibly; conversations, search and unread marks keep working; after the fix it continues or is rebuilt.</td><td>Feed downtime until someone acts. Chosen over a feed that is quietly wrong.</td></tr>
+        <tr><td><strong>One writer at a time for log numbers</strong></td><td>A slow save would hold up every other save.</td><td>The number is taken as the very last step. Measured: about 1,000 saves a second either way.</td><td>A ceiling far above this product's size; at very large size the log is split by conversation.</td></tr>
+        <tr><td><strong>A parked change</strong></td><td>Search differs from the truth until someone presses "try again" (a deleted message stays findable).</td><td>Shown in the control panel; the receiver counts as not level; a test proves both states.</td><td>Needs a person. Acceptable for a refusal, which should be rare.</td></tr>
+        <tr><td><strong>Telling an outage from a refusal</strong></td><td>Misread one way, a broken receiver parks everything; the other way, one bad change stalls it.</td><td>Only an explicit "I refuse this one" parks; three in a row are treated as an outage.</td><td>Depends on receivers answering honestly. Fine for our stand-ins; a real provider needs its error codes mapped.</td></tr>
+        <tr><td><strong>A sent notification cannot be recalled</strong></td><td>Someone is notified of a message deleted six seconds later.</td><td>A five-second hold catches typo fixes and quick deletes; afterwards the entry shows "message deleted".</td><td>Inherent. The hold length is yours (D-007).</td></tr>
+        <tr><td><strong>Several programs instead of one</strong> (D-005)</td><td>More to start, watch and explain for a prototype.</td><td>One command starts all; the control panel shows each part's state; the tests run in this mode.</td><td>Slower tests. The price of outages that are real.</td></tr>
+        <tr><td><strong>A row is written per reader for every post</strong></td><td>At thousands of people, one post in a big channel means thousands of writes.</td><td>Nothing at this size (channels of 30).</td><td>A known shortcut; large channels would be worked out when the feed is read.</td></tr>
+        <tr><td><strong>The log is kept forever and a rebuild replays all of it</strong></td><td>Rebuild time grows with history.</td><td>Two weeks of a 36-member team is small. E-003 replayed 2,400 changes in under two seconds with a subset of the rules.</td><td>Speed with the full rules and the full seed is not measured yet.</td></tr>
+        <tr><td><strong>The screen's catch-up is our own</strong></td><td>A fault there shows as a stale or wrong screen after a dropped connection.</td><td>Numbered updates, a "too far behind: reload" answer, a test that cuts the connection mid-burst.</td><td>Not tried yet.</td></tr>
+        <tr><td><strong>The rule against agents setting each other off is ours</strong></td><td>Too strict: agents cannot cooperate. Too loose: a loop floods a channel.</td><td>A cap of three agents in a row and 20 messages a minute, both settings.</td><td>No vendor documents a rule to copy. Needs watching in use.</td></tr>
+        <tr><td><strong>One copy of each part, one database</strong></td><td>If the database is lost, everything is.</td><td>Nothing; this is a local demonstration.</td><td>A known shortcut.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="evidence">
+  <h2>13 · Evidence: what was tried, and what was not</h2>
+  <div class="split">
+    <div class="panel"><div class="label">E-003 · the design, built small and broken on purpose</div><p>The core, workers, search, feed and sender as separate programs; a scripted team at up to 300 actions a second. Programs were killed mid-burst, search was stopped, slowed and made to refuse, half of all deliveries were repeated or delivered late, and each receiver was wiped. <strong>75 checks, all as expected</strong>: nothing lost, a slow part delayed nobody, every receiver ended equal to the truth. Four versions broken on purpose were each caught. <a href="E-003-delivery-spine.html">Results</a>.</p></div>
+    <div class="panel"><div class="label">E-004 · the log on PostgreSQL</div><p>16 writers saving 4,000 changes at once while a worker follows the log. With ordinary numbering the worker <strong>never saw 919 to 948 of 4,000</strong>. With numbering one writer at a time: <strong>0</strong>, at the same speed (about 1,000 saves a second). A worker woken by the database has the change 1 ms after it is saved.</p></div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Changed by the experiments</th><th>Before</th><th>Now</th></tr></thead>
+      <tbody>
+        <tr><td>How a notification is held back</td><td>Counted from when the note reached the sender: 147 of 160 sent wrongly when the feed was overloaded.</td><td>Measured by the log's own clock: 0 of 160.</td></tr>
+        <tr><td>Time in the log</td><td>The machine's clock, which steps backwards here by 0.8 s now and then.</td><td>Timestamps that never decrease.</td></tr>
+        <tr><td>A receiver that insists on order</td><td>A wiped one went unnoticed while idle.</td><td>It says where it is whenever asked.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><span class="chip risk">Not verified</span> The live connection and catch-up on a real screen. Agents and streamed replies. The full feed rules inside this design (a subset was used; E-001 is the evidence for the rules). Speed with the full seeded team. A database on another machine. No independent verifier has looked at the two test harnesses.</p>
+</section>
+
 <section id="rest">
-  <h2>10 · Experiments, shortcuts, and what waits</h2>
+  <h2>14 · Later and optional: experiments still needed, shortcuts, larger size, open points</h2>
   <div class="split">
     <div class="panel agent"><div class="label">Experiments the draft needs</div>
       <ul>
         <li><strong>Done: the spine (E-003).</strong> Loss, repeats, order, outages, parking and rebuild all behaved as promised on a small build without PostgreSQL.</li>
-        <li><strong>The database part.</strong> On PostgreSQL: is no change stepped over with many writers, and does a change still reach a receiver within two seconds under a burst? Needs a download.</li>
+        <li><strong>Done: the log on PostgreSQL (E-004).</strong> No change stepped over with numbering one writer at a time; a worker is woken in about 1 ms.</li>
         <li><strong>Rebuild at full size.</strong> Can the feed for the seeded team (two weeks, 36 participants) with the full rules be rebuilt in under a minute, so Reset can use it? E-003 rebuilt 2,400 changes in under two seconds with a subset of the rules.</li>
         <li><strong>Text rules judged by a model</strong>, already planned for last (D-001).</li>
       </ul>
@@ -612,7 +743,7 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
     <div class="panel"><div class="label">Shortcuts taken knowingly</div>
       <ul>
         <li>No sign-in or permissions; a person switcher.</li>
-        <li>Search and notifications are stand-ins; the tray stands for push.</li>
+        <li>Search and notifications are stand-ins; the notification app stands for push.</li>
         <li>One database server, with an area per part.</li>
         <li>Log numbers handed out one at a time; the log is never trimmed.</li>
         <li>One copy of each part: no spare if one fails.</li>
@@ -624,12 +755,25 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
     <div class="panel you"><div class="label">Waits for the look-and-feel work (T-019)</div>
       <ul>
         <li>What the web app is built with.</li>
-        <li>What exactly a feed row and a tray entry carry.</li>
+        <li>What exactly a feed row and a entry carry.</li>
         <li>How "3 new", dimmed read rows and held space are kept on the screen.</li>
         <li>How a screen knows its newest message is really visible (D-015, rule 6).</li>
         <li>Wording and place of the "catching up" notices; the control panel's layout.</li>
       </ul>
     </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>At a hundred times this size (3,000 people, about 1.5 messages a second)</th><th>What would change</th></tr></thead>
+      <tbody>
+        <tr><td>Conversations and the database</td><td>Still one database for a long time. First to change: the single numbering of the log is split by conversation.</td></tr>
+        <tr><td>Delivery workers</td><td>Read the database's own replication log; several workers per receiver.</td></tr>
+        <tr><td>Activity feed</td><td>Large channels are worked out when the feed is read, not when a post is written; rebuilds start from saved copies, not from the beginning of the log.</td></tr>
+        <tr><td>Search and notifications</td><td>A real search engine and a real push or email provider behind the same contracts; nothing else moves.</td></tr>
+        <tr><td>Live connection</td><td>Several of them, with a way to pass updates between them.</td></tr>
+        <tr><td>Agent door</td><td>Limits per agent and permissions on what an agent may read.</td></tr>
+      </tbody>
+    </table>
   </div>
   <div class="table-wrap">
     <table>
@@ -650,8 +794,8 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
       <ul>
         <li>A read row whose message is deleted keeps a marker (D-004), but the history tabs show "the current truth" and are meant to replace the Earlier list (D-016, the agent's reading). Where does the marker live? To settle when the mock-ups are reviewed.</li>
         <li>An agent's reply closed as "stopped": does it reach anyone's feed, and with which level?</li>
-        <li>A notification already in the tray whose row then leaves the bucket because of a dial change: what does the entry show?</li>
-        <li>A notification that would arrive more than ten minutes late: still an interruption, or only a tray entry marked "delayed"?</li>
+        <li>A notification already in the notification app whose row then leaves the bucket because of a dial change: what does the entry show?</li>
+        <li>A notification that would arrive more than ten minutes late: still an interruption, or only a entry marked "delayed"?</li>
       </ul>
     </div>
   </details>
@@ -681,8 +825,8 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
 </section>
 
 <footer class="foot">
-  <span>Belongs to T-022 · Evidence: the brief, D-001 to D-004, D-009 to D-016, R-002, E-001 · Second opinion and four technical claims checked by separate agents on 2026-11-22</span>
-  <span>Records: <code>docs/decisions/D-005</code> to <code>D-008</code> (proposed), D-017 and D-018 (registered) · Walk-throughs: <a href="T-022-walkthroughs.html">T-022-walkthroughs.html</a></span>
+  <span>Belongs to T-022 · Evidence: the brief, D-001 to D-004, D-009 to D-023, R-002, E-001, E-003, E-004</span>
+  <span>Records: <code>docs/decisions/D-005</code> to <code>D-008</code> (proposed; the database part of D-005 accepted), D-017 and D-018 (registered) · Walk-throughs: <a href="T-022-walkthroughs.html">T-022-walkthroughs.html</a> · Shortcuts: <code>docs/known-shortcuts.md</code></span>
 </footer>
 </main>
 </body>

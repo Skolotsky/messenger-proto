@@ -29,11 +29,11 @@ Line format: `- **D-nnn** [status] The decision as a statement, and what it comm
 ## System shape: components, boundaries, stack
 
 - **D-005** [proposed; the database part accepted 2026-11-22: PostgreSQL] Parts that talk only over the network and run as separate programs from one codebase; PostgreSQL as the one source of truth with a numbered change log; WebSocket with numbered updates and catch-up; Python on the server. Would commit us to network boundaries between parts and a single log every receiver is fed from → [record](D-005-system-shape.md)
-- **D-017** [open] Who owns what a reader did (read positions, dials, Focus rules, Keep and Done): the core as facts on the same log, with the feed worked out from them, or the feed itself. The draft assumes the core. Options: `docs/visuals/T-022-architecture-proposal.html`, section 5
+- **D-017** [open] Who owns what a reader did (read positions, dials, Focus rules, Keep and Done): the core as facts on the same log, with the feed worked out from them, or the feed itself. The draft assumes the core. Options: `docs/visuals/T-022-architecture-proposal.html`, section 6
 
 ## Contracts and qualities: what services promise each other
 
-- **D-018** [open] Who decides that a notification is due: the feed (the sender only delivers and stands behind the feed, not beside it), or the sender from messages. The draft assumes the feed. Options: `docs/visuals/T-022-architecture-proposal.html`, section 6
+- **D-018** [open] Who decides that a notification is due: the feed (the sender only delivers and stands behind the feed, not beside it), or the sender from messages. The draft assumes the feed. Options: `docs/visuals/T-022-architecture-proposal.html`, section 7
 - **D-006** [proposed] Nothing is lost once saved; a change may be repeated; each receiver is fed in log order by its own worker, which waits out an outage and parks a refused change; receivers ignore repeats and older versions, and a delete wins → [record](D-006-delivery-promise.md)
 - **D-007** [proposed] Targets with the failure that proves each: 2 s to search and the feed, a 5 s hold before a notification, 3 s per call, never giving up on an outage, a notice on any surface more than 10 s behind, rebuild in under a minute → [record](D-007-quality-targets.md)
 - **D-008** [proposed] An agent calls us and reads events from its own place; it is told what addresses it; streamed text stays off the reliable path until finished; a cap of three agents in a row and 20 messages a minute → [record](D-008-agent-door.md)

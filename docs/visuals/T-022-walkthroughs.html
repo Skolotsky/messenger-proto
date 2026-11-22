@@ -191,7 +191,7 @@ details > .stack { gap: 10px; }
     <li><div class="body"><h3>Screens with #launch open get it live</h3><p>As numbered update 4812, within a second.</p></div></li>
     <li><div class="body"><h3>The search worker hands it to the search index</h3><p>The whole message with its version. It can be found within about two seconds.</p></div></li>
     <li><div class="body"><h3>The feed works out where it lands for each person</h3><p>Marco is mentioned: a row in Needs you, "Anna mentioned you in #launch". Anna gets nothing (her own message). Others get a row only if their dial for #launch says so. In the same step the feed notes in its own log: "notification due for Marco".</p></div></li>
-    <li><div class="body"><h3>The notification sender waits five seconds, then sends once</h3><p>The entry appears in Marco's tray. If Marco had #launch open in front of him, the feed already knew: his screen had reported "watching #launch", which is on the log too. Then the message is read on arrival: no row and no notification (D-015, rule 6).</p></div></li>
+    <li><div class="body"><h3>The notification sender waits five seconds, then sends once</h3><p>The entry appears in Marco's notification app. If Marco had #launch open in front of him, the feed already knew: his screen had reported "watching #launch", which is on the log too. Then the message is read on arrival: no row and no notification (D-015, rule 6).</p></div></li>
     <li><div class="body"><h3>The release agent receives "you were mentioned"</h3><p>It reads events from its own place in its own stream, and confirms by number. An agent that was away reads on from where it stopped.</p></div></li>
   </ol>
 </section>
@@ -206,7 +206,7 @@ details > .stack { gap: 10px; }
     <li><div class="body"><h3>The delete is saved as version 3</h3><p>Change 4855 carries only which message and its version. In #launch nothing remains, because the message had no replies; people looking at it right now keep the space until they move on.</p></div></li>
     <li><div class="body"><h3>Search removes it and remembers "deleted at version 3"</h3><p>So a late copy of version 2 cannot bring it back.</p></div></li>
     <li><div class="body"><h3>The feed leaves each reader what they had earned</h3><p>Marco had read it: his row keeps its place among read rows as "Anna deleted this message". Lena had not seen it: her row goes without a trace and her count drops. The feed knows which is which because reading is on the same numbered log as the delete, so "had she read it at that moment" has one answer.</p></div></li>
-    <li><div class="body"><h3>The notification follows</h3><p>If Lena's notification was still inside its five seconds, it is withdrawn and never sent. If it had gone out, it cannot be recalled; her tray entry now reads "message deleted".</p><p class="note">Test: play E-001's cases "edit adds a mention" and "delete of a row read, unread and kept" through the real parts and compare what each person is left with.</p></div></li>
+    <li><div class="body"><h3>The notification follows</h3><p>If Lena's notification was still inside its five seconds, it is withdrawn and never sent. If it had gone out, it cannot be recalled; her entry now reads "message deleted".</p><p class="note">Test: play E-001's cases "edit adds a mention" and "delete of a row read, unread and kept" through the real parts and compare what each person is left with.</p></div></li>
   </ol>
 </section>
 
@@ -277,7 +277,7 @@ details > .stack { gap: 10px; }
 
 <footer class="foot">
   <span>Belongs to T-022 · Rules from D-001, D-003, D-004, D-011 to D-015 · Practice from R-002</span>
-  <span>Full draft: <a href="T-022-architecture-proposal.html">the architecture proposal</a></span>
+  <span>Full draft: <a href="T-022-architecture-proposal.html">the architecture review</a></span>
 </footer>
 </main>
 </body>

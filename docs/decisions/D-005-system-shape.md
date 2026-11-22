@@ -6,7 +6,7 @@
 - Decided by: user (not yet decided)
 - Depends on: D-001 to D-004, D-009 to D-016 (what the product demands)
 - Evidence: R-002; the brief; second opinion and claim checks recorded in `tasks/T-022-architecture-draft.md`
-- Visual: `docs/visuals/T-022-architecture-proposal.html`, section 4; walk-throughs in `docs/visuals/T-022-walkthroughs.html`
+- Visual: `docs/visuals/T-022-architecture-proposal.html`, section 5; walk-throughs in `docs/visuals/T-022-walkthroughs.html`
 
 ## Why this needs deciding now
 
