@@ -34,11 +34,27 @@ Every check is in `tests/browser/` and runs at 1280 and 400 px unless it says ot
 ## Log
 
 - 2026-11-22: started.
+- Readings: T-038 point 25 needs an edit box, while editing belongs to T-056, so the smallest edit in place is built here (save, cancel, the empty case); T-056 extends `EditBox`. Opening a conversation sends `read` only while the window is in front, the newest message is in view and nothing covers it (D-015). `watching` is not sent yet (T-053, T-056). A send that fails keeps its text in the box with the same IDs; the waiting and failed message states are T-056.
+- Internal: lines in the message list are a whole 22 px (the prototype's 1.45 gives 21.75), because a scroll position is whole pixels and holding a message in place was otherwise off by 0.5 px, which the "nothing jumps" check caught.
+- Seams: `Activity.tsx` (T-055); `live.ts` `receive` for the numbered catch-up, `Composer` for `@` suggestions, `EditBox` for delete and Remove flag (T-056). Settings are shown disabled.
 
 ## Evidence
 
-_Not yet._
+- `web/app/scripts/browser-tests`: 73 passed, 19 skipped (the other width's tests and the picture writer), Chromium, production build, real mock door, at 1280 and 400 px.
+- Seen failing: 18 planted faults, one at a time, each caught by its spec: message, channel and person names as markup; empty edit silent; list not holding position; toolbar taking room; thread replacing the channel; replies inline; no day lines; Enter sends; failed send loses text; read while away; read while covered; drag dead; panel dragged out of the window; switch without asking; theme after first paint; service worker storing door answers. A first toolbar fault was missed, so the check now also measures the text's left edge and width.
+- Looked at: wide light (thread, band), wide dark (channel, menu), phone light (first screen, channel, switch dialog), phone dark (thread, menu).
+- Not verified: the real server; Firefox and Safari; a real phone or an actual install prompt (manifest and service worker are checked); contrast was not measured.
 
 ## Requests for shared changes
 
-_None yet._
+1. `scripts/verify`, with the browser tests: `web/app/scripts/browser-tests`
+2. `scripts/check`, new section (fast, no browser):
+   ```bash
+   section "Web app"
+   TOOL_DIR=web/app ./scripts/tool npm ci --no-audit --no-fund >/dev/null 2>&1
+   if TOOL_DIR=web/app ./scripts/tool npm run typecheck >/dev/null 2>&1; then pass "web app types"; else fail "web app types. Run: TOOL_DIR=web/app ./scripts/tool npm run typecheck"; fi
+   ```
+3. `contracts/generate.mjs`: the generated `Message` is `{ [k: string]: unknown }` because of the schema's `allOf`. It should carry the fields; `web/app/src/api/types.ts` holds a hand-written `ChatMessage` until then.
+4. Mock door, needed by T-056: (a) the first live update has `after: 0` or the previous global entry instead of the screen's own position, and `last_sent.conversations` is 0 until something was sent, so the contract's `after` rule would reject them; (b) updates go to every connection, unfiltered, including another person's `read.moved`; (c) it sends no `unread` part, so `lists.ts` derives the mark from arrivals as a stopgap; (d) `around` and `limit` are ignored.
+5. Contract wording: the values of the `send_key` preference are not stated; the example has `enter`. Read here as: `enter` means Enter sends, anything else Ctrl+Enter.
+6. Plan gap: no package names the reaction picker (D-023), creating a channel, or starting a new direct message (D-009, D-024).

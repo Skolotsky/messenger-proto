@@ -84,10 +84,15 @@ test('a toolbar on hover moves nothing', async ({ page, request }, info) => {
   const { list, watched } = await reading(page, request, info);
   const before = await topOf(watched);
   const height = await list.evaluate((el) => el.scrollHeight);
+  const body = watched.locator('.msg-body');
+  const place = () => body.evaluate((n) => { const r = n.getBoundingClientRect(); return [r.left, r.width]; });
+  const sideways = await place();
   await watched.locator('.msg-self').hover();
+  await expect(watched.locator('.msg-tools')).toBeVisible();
   await expect(watched.locator('.msg-tools')).toHaveCSS('opacity', '1');
   await expectStill(page, watched, before, 'hover');
   expect(await list.evaluate((el) => el.scrollHeight)).toBe(height);
+  expect(await place(), 'the text keeps its place and width').toEqual(sideways);
 });
 
 test('choosing a level in the message box moves nothing', async ({ page, request }, info) => {
