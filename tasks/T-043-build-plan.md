@@ -105,9 +105,11 @@ Order on the board is priority. "Needs" is what must be merged first. Packages i
 
 **T-055 Web app: Activity.** Needs T-050. The three buckets, rows with reasons and the reason panel, Kept, arrivals behind "Show", history tabs with counts, the settings screen (general rules, Focus people, channel levels, notifications, writing), phone layout with swipes. Against the mock door.
 - Tests: browser tests for D-020, D-021, D-023 and T-038 points 12 to 18.
+- Also (gap found in T-050): the full reaction picker of D-023, on a message and on an unopened row.
 
 **T-056 Web app: writing, going wrong, search, staying current.** Needs T-050. Mentions, edit in place, delete that asks; offline, waiting and failed actions with IDs and order; search results; the live client: numbered updates, resume, reload when too far behind.
 - Guardrails owned: the screen half of G-015; tests for D-024 and T-038 points 20 to 26.
+- Also (gap found in T-050): creating a channel and starting a new direct message (D-009, D-024).
 - Acceptance (architecture note, 2026-11-22): the reconnect pause (0.1 s doubling to 1 s) gets random variation, so a whole organization does not reconnect in the same instant when a copy dies. The varied pause never exceeds its step, so the contract's 1 s ceiling and the 2 s catch-up still hold. Test with a seeded random source.
 
 ### Wave 3, joining up
@@ -154,7 +156,7 @@ Guardrail to package: G-003, G-004, G-005: T-046 Â· G-006, G-010, G-011: T-048 Â
 
 - **One package, one subagent, one worktree.** Start each with the Agent tool on the main model, in its own git worktree. It commits there; the lead merges into `main` when the package's verification passes, one package at a time, running `./scripts/verify` after each merge.
 - **A package edits only what it owns** (table above). If it needs a change to a shared file (`server/internal/shared/`, `contracts/`, `tests/harness/`, Compose, Makefile, the check scripts), it writes the request in its task file and carries on against its own stand-in; the lead makes the shared change between waves.
-- **The brief for a subagent** holds: its section of this plan; the contracts and guardrails it touches, by path; the directories it owns; "write the guardrail tests first and see them fail"; "do not edit outside your directories"; what to report back (what is true now, how it was checked, what was not checked, requests for shared changes). A subagent does not see `CLAUDE.md` rules unless told, so the brief repeats the ones that matter.
+- **The brief for a subagent** holds: its section of this plan; the contracts and guardrails it touches, by path; the directories it owns; "write the guardrail tests first and see them fail"; "do not edit outside your directories"; what to report back (what is true now, how it was checked, what was not checked, requests for shared changes). A subagent does not see `CLAUDE.md` rules unless told, so the brief repeats the ones that matter. Each brief names the agent's own scratch folder: the session scratchpad is shared, and generic file names overwrote each other in Wave 1.
 - **Packages meet only through the contracts.** That is what makes the waves parallel: the log writer stands in for Conversations, the recording receiver for the feed and the stand-ins, the mock door for the whole server. Joining happens in T-057 and T-058, where differences show up as failing tests and are fixed against the contract, not by adjusting the other package.
 - **Board:** one item in Now per agent. The lead keeps the board; subagents report, they do not edit it.
 

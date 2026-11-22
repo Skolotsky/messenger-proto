@@ -152,10 +152,14 @@ else
 
   section "Contracts in machine form (T-045)"
   if out=$(./scripts/contracts --check 2>&1); then pass "TypeScript types match the schema"; else fail "contracts/generated/types.ts is out of date. Run: ./scripts/contracts"; printf '%s\n' "$out" | tail -5; fi
+
+  section "Web app"
+  [ -d web/app/node_modules ] || TOOL_DIR=web/app ./scripts/tool npm ci --no-audit --no-fund >/dev/null 2>&1
+  if out=$(TOOL_DIR=web/app ./scripts/tool npm run typecheck 2>&1); then pass "web app types"; else fail "web app types. Run: TOOL_DIR=web/app ./scripts/tool npm run typecheck"; printf '%s\n' "$out" | tail -15; fi
 fi
 
 # ---------------------------------------------------------------------------
-# Later checks (web app) are added here. Each calls pass or fail.
+# Later checks are added here. Each calls pass or fail.
 
 printf '\n'
 if [ "$failures" -eq 0 ]; then

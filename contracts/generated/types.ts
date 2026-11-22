@@ -106,27 +106,6 @@ export type AgentState = "working" | "waiting" | "done";
 export type ScriptCommand = "start" | "pause" | "pace" | "play_situation";
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "FocusRule".
- */
-export type FocusRule = {
-  [k: string]: unknown;
-};
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "Message".
- */
-export type Message = {
-  [k: string]: unknown;
-};
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "ChangeReaderDial".
- */
-export type ChangeReaderDial = {
-  [k: string]: unknown;
-};
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "Change".
  */
 export type Change =
@@ -157,13 +136,6 @@ export type Change =
   | ChangeTick;
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "ActionDial".
- */
-export type ActionDial = {
-  [k: string]: unknown;
-};
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "PeopleAction".
  */
 export type PeopleAction =
@@ -187,23 +159,9 @@ export type PeopleAction =
   | ActionProfileLine;
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "RowActDial".
- */
-export type RowActDial = {
-  [k: string]: unknown;
-};
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "RowAct".
  */
 export type RowAct = RowActDial | RowActFocusPerson | RowActFocusRule | RowActDone | RowActKeep;
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "LevelEntry".
- */
-export type LevelEntry = {
-  [k: string]: unknown;
-};
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "LiveIn".
@@ -489,6 +447,36 @@ export interface RowKey {
 export interface Reaction {
   emoji: string;
   people: string[];
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "FocusRule".
+ */
+export interface FocusRule {
+  type: RuleType;
+  value: string;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "Message".
+ */
+export interface Message {
+  id: string;
+  number: number;
+  version: number;
+  conversation: string;
+  thread: string | null;
+  author: string;
+  author_is_agent: boolean;
+  participants: string[] | null;
+  text: string;
+  mentions: string[];
+  level: Level | null;
+  reactions: Reaction[];
+  stopped: boolean;
+  created_at: string;
+  edited_at: string | null;
+  deleted: boolean;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -799,6 +787,22 @@ export interface ChangeReaderDone {
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "ChangeReaderDial".
+ */
+export interface ChangeReaderDial {
+  kind: "reader.dial";
+  org: string;
+  reset: number;
+  number: number;
+  previous: number;
+  at: string;
+  person: string;
+  conversation: string;
+  thread: string | null;
+  level: DialLevel;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "ChangeReaderFocusRule".
  */
 export interface ChangeReaderFocusRule {
@@ -1075,6 +1079,18 @@ export interface ActionDone {
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "ActionDial".
+ */
+export interface ActionDial {
+  kind: "dial";
+  id: string;
+  as: string;
+  conversation: string;
+  thread: string | null;
+  level: DialLevel;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "ActionFocusRule".
  */
 export interface ActionFocusRule {
@@ -1202,6 +1218,16 @@ export interface MessagesAnswer {
   read_up_to: number | null;
   has_before: boolean;
   has_after: boolean;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "RowActDial".
+ */
+export interface RowActDial {
+  kind: "dial";
+  conversation: string;
+  thread: string | null;
+  level: DialLevel;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -1355,6 +1381,15 @@ export interface HistoryAnswer {
 export interface FocusPerson {
   person: string;
   items_last_7_days: number;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "LevelEntry".
+ */
+export interface LevelEntry {
+  conversation: string;
+  thread: string | null;
+  level: DialLevel;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema

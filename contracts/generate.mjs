@@ -6,7 +6,8 @@ const schema = JSON.parse(readFileSync(new URL('schema/contexia.json', import.me
 const names = Object.keys(schema.$defs);
 const root = { ...schema, title: 'ContractTypes', type: 'object', additionalProperties: false,
   properties: Object.fromEntries(names.map((n) => [n, { $ref: `#/$defs/${n}` }])) };
-for (const [n, d] of Object.entries(root.$defs)) d.title = n;
+// allOf holds conditions a TypeScript type cannot express; left in, it erases the fields.
+for (const [n, d] of Object.entries(root.$defs)) { d.title = n; delete d.allOf; }
 const out = await compile(root, 'ContractTypes', {
   bannerComment: '// Generated from contracts/schema/contexia.json. Do not edit: run ./scripts/contracts',
   additionalProperties: false, unreachableDefinitions: true, format: true,

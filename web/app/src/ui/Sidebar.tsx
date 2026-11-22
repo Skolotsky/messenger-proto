@@ -1,0 +1,76 @@
+import type { ConversationSummary, PersonView } from '../api/types';
+import type { Session } from '../state/useSession';
+import { Avatar } from './Avatar';
+import { conversationTitle } from './ConversationView';
+import { Icon } from './Icon';
+import { PersonMenu } from './PersonMenu';
+
+interface Props {
+  session: Session;
+  open: string | null;
+  activityOpen: boolean;
+  onToggleActivity(): void;
+  onOpen(conversation: string): void;
+  onSwitch(person: PersonView): void;
+}
+
+/** Organization, Activity, channels, direct messages, and the person's own menu (D-019, D-023). */
+export function Sidebar({ session, open, activityOpen, onToggleActivity, onOpen, onSwitch }: Props) {
+  const channels = session.conversations.filter((c) => c.type === 'channel');
+  const directs = session.conversations.filter((c) => c.type === 'direct');
+
+  const item = (c: ConversationSummary) => {
+    const title = conversationTitle(c, session);
+    const other = c.people.find((p) => p !== session.me?.id) ?? c.people[0];
+    return (
+      <button
+        key={c.conversation}
+        className={`chat${c.conversation === open ? ' on' : ''}${c.unread ? ' unread' : ''}`}
+        aria-current={c.conversation === open || undefined}
+        onClick={() => onOpen(c.conversation)}
+      >
+        {c.type === 'channel' ? (
+          <span className="hash" aria-hidden="true">
+            #
+          </span>
+        ) : (
+          <Avatar id={other} person={session.people.get(other)} small />
+        )}
+        <span className="chat-n">{c.type === 'channel' ? c.name : title}</span>
+        {c.unread && <span className="dot" role="img" aria-label="unread" />}
+      </button>
+    );
+  };
+
+  return (
+    <>
+      <div className="ws">
+        <span className="org-mark" aria-hidden="true">
+          {Array.from(session.orgName)[0]}
+        </span>
+        <span className="ws-t">
+          <b>{session.orgName}</b>
+          <small>{session.peopleList.length} members</small>
+        </span>
+      </div>
+      <button
+        className={`side-item${activityOpen ? ' on' : ''}`}
+        aria-pressed={activityOpen}
+        title="Open or close Activity"
+        onClick={onToggleActivity}
+      >
+        <Icon name="bell" />
+        <span>Activity</span>
+      </button>
+      <div className="side-scroll">
+        <nav className="chats" aria-label="Conversations">
+          <h3>Channels</h3>
+          {channels.map(item)}
+          <h3>Direct messages</h3>
+          {directs.map(item)}
+        </nav>
+      </div>
+      <PersonMenu session={session} onSwitch={onSwitch} />
+    </>
+  );
+}
