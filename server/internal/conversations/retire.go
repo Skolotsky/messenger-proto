@@ -84,11 +84,15 @@ func (s *Store) door(next http.HandlerFunc) http.HandlerFunc {
 // every save either committed before it or is refused after it.
 func (s *Store) Retire(ctx context.Context, org ids.Org) error {
 	now := s.Clock.Now().UTC()
-	return orgdb.InOrg(ctx, s.Dir, org, func(tx pgx.Tx) error {
+	err := orgdb.InOrg(ctx, s.Dir, org, func(tx pgx.Tx) error {
 		_, err := tx.Exec(ctx, `UPDATE org_log SET retired_at = coalesce(retired_at, $2), tick_due_at = NULL WHERE org = $1`,
 			string(org), now)
 		return err
 	})
+	if err == nil && s.OnSaved != nil {
+		s.OnSaved(org, 0, 0) // its open screens are told at once
+	}
+	return err
 }
 
 // DeleteOrg removes every row of a retired organization from Conversations'
