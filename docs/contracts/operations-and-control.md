@@ -65,7 +65,7 @@ GET  conversations/orgs/acme/people                               → the people
 ## 4. Failure behaviour
 
 - A part that is off or unreachable: the control panel shows that part as down and how much is waiting; the other parts carry on.
-- Conversations refuses a delete with `409 { "refused": "not retired" }` or `409 { "refused": "delivery not deleted" }`, so its rows go last. Asking a part about a deleted organization, or telling it to stop or restart, creates nothing; an operation on one answers 404.
+- Conversations refuses a delete with `409 { "refused": "not retired" }` or `409 { "refused": "delivery not deleted" }`, so its rows go last. Asking a part about a deleted organization, or telling it to stop or restart, creates nothing. Restart answers 404 for one. Stop and delete answer 200, so a delete interrupted halfway can simply be repeated.
 - Opening a seed session on an organization that already has changes, or writing to a sealed one: `409 { "refused": "not empty" }`.
 - Reset while the script is running: the script stops on the old organization and starts on the new one.
 

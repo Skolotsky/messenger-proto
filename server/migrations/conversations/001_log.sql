@@ -11,7 +11,8 @@ CREATE TABLE org_log (
   head_at        timestamptz,
   last_change_at timestamptz,          -- newest entry that is not a tick
   tick_due_at    timestamptz,          -- null when no tick is due
-  retired_at     timestamptz           -- set once: accepts nothing more (D-033)
+  retired_at     timestamptz,          -- set once: accepts nothing more (D-033)
+  delivery_cleared_at timestamptz      -- set by delivery's delete: its rows are gone, so the log may go
 );
 CREATE INDEX org_log_tick_due ON org_log (tick_due_at) WHERE tick_due_at IS NOT NULL;
 
@@ -49,6 +50,7 @@ CREATE TABLE delivery_places (
   claimed_until timestamptz,
   refusals      int NOT NULL DEFAULT 0,  -- different changes refused in a row
   paused        boolean NOT NULL DEFAULT false,
+  halted        boolean NOT NULL DEFAULT false, -- set by stop; a claim on this row can no longer be renewed
   PRIMARY KEY (org, receiver)
 );
 
@@ -73,8 +75,9 @@ CREATE TABLE delivery_receivers (
 -- Organizations delivery has been told to stop for (D-033). Read per
 -- organization at the start of a pass, never scanned (G-029).
 CREATE TABLE delivery_stopped (
-  org text PRIMARY KEY
+  org text PRIMARY KEY REFERENCES org_log (org)
 );
 
 GRANT SELECT ON org_log, change_log TO delivery;
+GRANT UPDATE (delivery_cleared_at) ON org_log TO delivery;
 GRANT SELECT, INSERT, UPDATE, DELETE ON delivery_due, delivery_places, delivery_parked, delivery_receivers, delivery_stopped TO delivery;
