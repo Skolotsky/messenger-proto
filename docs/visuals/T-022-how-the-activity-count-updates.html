@@ -159,7 +159,7 @@ details > .stack { gap: 10px; }
 <body>
 <main class="page">
 <header class="top">
-  <div class="label">Architecture · walk-through · 2026-11-22</div>
+  <div class="label">Architecture · walk-through · 2026-11-22 · step 4 corrected: the nudge comes from the delivery worker</div>
   <h1>How the number on "Activity" gets updated</h1>
   <p class="lede">The number is Marco's unread rows in Focus and Needs you. The screen never works it out: the feed keeps it, changes it in the same step as the row that caused the change, and it travels to every open screen of Marco's as a numbered update.</p>
 </header>
@@ -168,7 +168,7 @@ details > .stack { gap: 10px; }
   <h2>Going up: Anna mentions Marco, his badge goes from 9 to 10</h2>
   <figure class="diagram">
     <div class="scroll">
-      <svg viewBox="0 0 900 440" role="img" aria-label="Anna sends a message. Conversations saves it with a log entry. A delivery worker hands it to the feed. The feed makes Marco's row unread and raises his count. The feed nudges Conversations, which fetches Marco's update and pushes it to his screen, where the badge changes.">
+      <svg viewBox="0 0 900 440" role="img" aria-label="Anna sends a message. Conversations saves it with a log entry. A delivery worker hands it to the feed. The feed makes Marco's row unread and raises his count. The delivery worker, told the change is applied, nudges Conversations, which fetches Marco's update and pushes it to his screen, where the badge changes.">
         <defs>
           <marker id="arrowC" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
@@ -208,8 +208,10 @@ details > .stack { gap: 10px; }
         <text class="t" x="690" y="256" text-anchor="middle">his count: 9 → 10</text>
 
         <text class="t" x="248" y="294">4</text>
-        <line class="edge" x1="690" y1="302" x2="234" y2="302" stroke-dasharray="5 4" marker-end="url(#arrowC)"/>
-        <text class="edge-label" x="460" y="294" text-anchor="middle">a nudge: "there is news for this organization"</text>
+        <line class="edge" x1="690" y1="284" x2="544" y2="284" marker-end="url(#arrowC)"/>
+        <text class="edge-label" x="615" y="278" text-anchor="middle">"applied"</text>
+        <line class="edge" x1="540" y1="302" x2="234" y2="302" stroke-dasharray="5 4" marker-end="url(#arrowC)"/>
+        <text class="edge-label" x="385" y="294" text-anchor="middle">a nudge: "the feed has news for this organization"</text>
 
         <text class="t" x="248" y="332">5</text>
         <line class="edge" x1="230" y1="340" x2="686" y2="340" marker-end="url(#arrowC)"/>
@@ -229,7 +231,7 @@ details > .stack { gap: 10px; }
     <li><div class="body"><h3>The message is saved with its log entry</h3><p>Nothing about Marco's feed happens here. Conversations only records what Anna did.</p></div></li>
     <li><div class="body"><h3>A delivery worker hands the change to the feed</h3><p>Within tens of milliseconds. If the feed is down, the change waits; nothing is lost.</p></div></li>
     <li><div class="body"><h3>The feed decides, and counts</h3><p>Marco is mentioned, so the conversation's row for him becomes unread in Needs you. His count goes from 9 to 10 in the same step, and the feed writes "update 98 for Marco". If the row had already been unread, the count would not change: it counts rows, not messages.</p></div></li>
-    <li><div class="body"><h3>The feed nudges Conversations</h3><p>It only says "there is news for this organization". It carries no data, so losing it loses nothing.</p></div></li>
+    <li><div class="body"><h3>The delivery worker nudges Conversations</h3><p>The feed answers the worker "applied"; the worker then tells Conversations "the feed has news for this organization". The nudge carries no data, so losing it loses nothing. The feed itself never calls Conversations.</p></div></li>
     <li><div class="body"><h3>Conversations asks for Marco's updates after the last one it sent</h3><p>It gets update 98: the changed row and Marco's counts.</p></div></li>
     <li><div class="body"><h3>Every open screen of Marco's gets update 98</h3><p>Phone and laptop alike, also with Activity closed. The badge shows 10. The screen does no counting.</p></div></li>
   </ol>
@@ -250,7 +252,7 @@ details > .stack { gap: 10px; }
     <table>
       <thead><tr><th>What happens</th><th>What the badge does</th></tr></thead>
       <tbody>
-        <tr><td>The nudge is lost</td><td>Conversations checks every 10 seconds for organizations with open screens, so the badge is at most that late.</td></tr>
+        <tr><td>The nudge is lost</td><td>Conversations checks every 5 seconds for organizations with open screens, so the badge is at most that late.</td></tr>
         <tr><td>Marco's connection drops</td><td>The badge stays. On reconnecting the screen says "I have up to 97" and receives 98 and 99 in order.</td></tr>
         <tr><td>The feed is down or far behind</td><td>The badge stays at its last value and Activity says "Catching up". Messages, channels and their unread marks keep working.</td></tr>
         <tr><td>The same change is delivered to the feed twice</td><td>Nothing: the feed takes only the change that follows the last one, so the count cannot go up twice.</td></tr>
@@ -261,13 +263,23 @@ details > .stack { gap: 10px; }
 </section>
 
 <section>
+  <h2>What "Conversations" is in this picture</h2>
+  <p>One program with three jobs: it is the public address for screens and agents, it holds their open connections, and it does the conversation logic and owns the original data. It also passes a screen's questions on to the feed and to search, so a screen only ever talks to it.</p>
+  <div class="split">
+    <div class="panel"><div class="label">Why one program</div><p>The copy that saves a message is the copy that holds the organization's connections, so it can push at once without any messaging between programs. Fewer parts, and nothing to keep in step.</p></div>
+    <div class="panel"><div class="label">What that costs</div><p>Restarting it for a change to the logic drops every open connection (screens reconnect and catch up by number). Connections and logic cannot be grown separately.</p></div>
+    <div class="panel"><div class="label">When to split them</div><p>When connections must stay up across releases, when one organization needs more connections than one copy holds, or when other services need to push to screens. Then a thin gateway holds connections and the address, and a shared in-memory channel sits between it and the logic.</p></div>
+  </div>
+</section>
+
+<section>
   <h2>Where the number lives</h2>
   <div class="split">
     <div class="panel"><div class="label">Kept by the feed</div><p>One count per reader and bucket, in the feed's own area of PostgreSQL, changed in the same transaction as the row. It can always be rebuilt from the rows, and the rows from the log.</p></div>
     <div class="panel"><div class="label">Not worked out on the screen</div><p>A screen sees only some rows and may have missed updates. If it counted for itself, two devices could disagree. It shows the number it was sent.</p></div>
     <div class="panel"><div class="label">With many organizations</div><p>Every step is inside one organization: its log, its rows, its copy of Conversations. Nothing here gets slower because other organizations exist.</p></div>
   </div>
-  <p class="note">How fast: the experiments measured 7 to 12 ms from save to the feed on a small build; the target the product is held to is 2 seconds, 19 times in 20 (G-013). The nudge and the 10-second check are part of the design and are not tried yet.</p>
+  <p class="note">How fast: the experiments measured 7 to 12 ms from save to the feed on a small build; the target the product is held to is 2 seconds, 19 times in 20 (G-013). The nudge and the 5-second check are part of the design and are not tried yet.</p>
 </section>
 
 <footer class="foot">
