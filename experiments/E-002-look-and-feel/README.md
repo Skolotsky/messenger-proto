@@ -3,7 +3,7 @@
 - Date: 2026-11-22
 - Status: closed. The user chose the Slack-like direction (D-019) and signed off the design (T-035)
 - Feeds: D-019 to D-024
-- What the prototype only approximates: the build-acceptance task named in `tasks/board.md`
+- What the prototype only approximates: `tasks/T-038-build-acceptance-from-e002.md`
 
 ## Open it
 
@@ -43,7 +43,7 @@ The Slack-like layout carries the model, with the model showing through the reas
 
 ### What this does not show
 
-- **The rules are approximated.** Sorting after a change, read state across surfaces, arrivals and search are faked with a few lines, and some are wrong here on purpose of scope. They are acceptance criteria for the build. Do not reuse this code.
+- **The rules are approximated.** Sorting after a change, read state across surfaces, arrivals and search are faked with a few lines, so some behave wrongly here. They are acceptance criteria for the build (T-038). Do not reuse this code.
 - The fixes after the verifier's third round have regression checks but were not rechecked by it.
 - No real phone, on-screen keyboard or installed web app; swipes were driven by a mouse drag. History tabs were not reviewed in dark.
 - Switch account keeps Maya's messages. Counts in "Add to Focus" and the daily notification figures are written by hand or come from E-001, which predates D-021.
