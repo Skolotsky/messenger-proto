@@ -10,7 +10,7 @@ _Nothing in progress._
 
 ## Waiting on user
 
-- **T-019** `experiment` E-002, look and feel: the three clickable versions are built and checked (`experiments/E-002-look-and-feel/`, open the three `.html` files). Needs the user's review: which direction to build, or what to take from each (the agent recommends its own, with the channel list from the Slack-like one and the phone habits of the Telegram-like one), and whether the history tabs replace the Earlier list (D-016). The choice becomes a decision record
+- **T-023** `decide` Two small points left from the look-and-feel review: confirm that the history tabs replace the single Earlier list (D-016), and whether Activity or the channel list is the first screen on a phone (D-019). Neither blocks the technical decisions
 - **T-022** `decide` The architecture proposal is ready for review: `docs/visuals/T-022-architecture-proposal.html` (system map, six technical decisions with options, payloads and failure tests) and `docs/visuals/T-022-walkthroughs.html` (seven walk-throughs). D-005 to D-008 are proposed; D-017 and D-018 are registered. First question to the user: the shape (D-005). Then D-017, D-018, D-006, D-007, D-008, one at a time. Detail: `tasks/T-022-architecture-draft.md`
 - **T-021** `decide` Nine small behaviours the E-001 model still chooses on its own (list in `experiments/E-001-feed-rules-model/README.md`, "Still open after this run"). None blocks the look-and-feel work. The notification default was confirmed by the user at about 29 a day
 

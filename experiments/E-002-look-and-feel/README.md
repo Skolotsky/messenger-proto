@@ -33,7 +33,7 @@ These are mock-ups. Nothing here chooses a front-end stack or is the start of th
 
 ## Result
 
-**Every listed behaviour works in all three directions at both widths.** 318 checks pass (53 per page and width): `results.json`. No direction had to bend a decision. Screenshots of 14 states per page and width are in `screenshots/` (84 files; light theme, plus the opening screen in dark).
+**Every listed behaviour works in all three directions at both widths.** 318 checks passed at the time of the comparison (53 per page and width); with the checks added after the user's review there are 337: `results.json`. No direction had to bend a decision. Screenshots of 15 states per page and width are in `screenshots/` (90 files; light theme, plus the opening screen in dark).
 
 **Nothing jumps.** After the edit to five times the length and after the delete, the row below moved 0.00 px in the feed and the next message moved 0.00 px in the conversation, in every direction at both widths. The longer text waits behind "Show all" and opens only when asked. To see that the check can fail, the size lock was switched off once: the conversation checks then failed in all six runs (the next message moved 77 to 232 px) and the feed delete check failed in several (7 to 18 px). The feed's edit check did not fail without the lock, because a row's preview is cut to a fixed number of lines anyway; in the feed it is the line limit, not the lock, that holds the row still.
 
@@ -78,6 +78,10 @@ Reason: what we are testing in early access is whether people trust a feed that 
 Confidence: moderate. It rests on one seeded moment, on the agent's own reading of the screens, and on no real users.
 
 **For the user to confirm (D-016):** the pages show the history tabs as the replacement for the single Earlier list. A row that leaves a bucket is found in the tab for its type; there is no Earlier list anywhere.
+
+### Outcome
+
+The user chose the **Slack-like** direction on 2026-11-22, against the recommendation above ("People used to it. We can reuse habits."), and asked for unread counts and marks in the history tabs. Both are recorded in D-019 and the pages now show the counts and marks. The other two pages stay as a record.
 
 ### What this does not show
 

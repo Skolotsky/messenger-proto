@@ -223,6 +223,26 @@ def conv_edit(browser, slug, size, vp, scale):
     check("ch-sales", "j1", "j2", "playDelete", "in the conversation, a delete does not move the next message")
     ctx.close()
 
+def hist_unread(browser, slug, size, vp, scale):
+    """History tabs carry an unread count, and unread entries a mark; opening one clears both (user, 2026-11-22)."""
+    ctx = browser.new_context(viewport=vp, device_scale_factor=scale, has_touch=size == "phone")
+    pg = ctx.new_page(); pg.goto(f"file://{here.resolve()}/{slug}.html")
+    def ok(name, cond, detail=""):
+        results.append({"page": slug, "width": size, "check": name, "pass": bool(cond), "detail": str(detail)})
+        if not cond: failures.append(f"{slug} @ {size}: {name} {detail}")
+    def vis(sel): return pg.locator(sel).locator("visible=true")
+    if slug != "slack-like": vis('[data-act="view"][data-v="history"]').first.click()
+    counts = {t: (vis(f'[data-act="htab"][data-t="{t}"] .h-count').first.inner_text() if vis(f'[data-act="htab"][data-t="{t}"] .h-count').count() else "0") for t in ["dms", "mentions", "threads", "reactions"]}
+    ok("history tabs show their unread counts", counts == {"dms": "1", "mentions": "4", "threads": "5", "reactions": "2"}, counts)
+    if slug == "slack-like" and size == "desktop": ok("all five Activity tabs fit without scrolling", pg.evaluate("(() => { const t = document.querySelector('.main .tabs'); return t.scrollWidth <= t.clientWidth; })()"))
+    vis('[data-act="htab"][data-t="mentions"]').first.click()
+    ok("unread history entries carry a mark, read ones do not", pg.locator(".hrow.unread .dot").count() == 4 and pg.locator(".hrow:not(.unread) .dot").count() == 0, pg.locator(".hrow.unread .dot").count())
+    pg.screenshot(path=str(shots / f"{slug}-{size}-14-history-unread.jpg"), type="jpeg", quality=80)
+    vis('.hrow.unread .row-main').first.click()
+    if size == "phone": vis('[data-act="closeConv"]').first.click()
+    ok("opening an entry clears its mark and lowers the count; the entry stays", vis('[data-act="htab"][data-t="mentions"] .h-count').first.inner_text() == "3" and pg.locator(".hrow").count() == 7, pg.locator(".hrow").count())
+    ctx.close()
+
 with sync_playwright() as p:
     b = p.chromium.launch()
     for slug in PAGES:
@@ -230,6 +250,7 @@ with sync_playwright() as p:
             try:
                 run(b, slug, size, vp, scale)
                 conv_edit(b, slug, size, vp, scale)
+                hist_unread(b, slug, size, vp, scale)
             except Exception as e:
                 failures.append(f"{slug} @ {size}: stopped: {str(e).splitlines()[0][:300]}")
     b.close()

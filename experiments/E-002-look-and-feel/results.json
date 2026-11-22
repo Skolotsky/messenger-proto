@@ -372,6 +372,34 @@
  },
  {
   "page": "slack-like",
+  "width": "desktop",
+  "check": "history tabs show their unread counts",
+  "pass": true,
+  "detail": "{'dms': '1', 'mentions': '4', 'threads': '5', 'reactions': '2'}"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "all five Activity tabs fit without scrolling",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "unread history entries carry a mark, read ones do not",
+  "pass": true,
+  "detail": "4"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "opening an entry clears its mark and lowers the count; the entry stays",
+  "pass": true,
+  "detail": "7"
+ },
+ {
+  "page": "slack-like",
   "width": "phone",
   "check": "focus: every row gives its reason",
   "pass": true,
@@ -742,6 +770,27 @@
   "detail": "moved 0.00px"
  },
  {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "history tabs show their unread counts",
+  "pass": true,
+  "detail": "{'dms': '1', 'mentions': '4', 'threads': '5', 'reactions': '2'}"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "unread history entries carry a mark, read ones do not",
+  "pass": true,
+  "detail": "4"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "opening an entry clears its mark and lowers the count; the entry stays",
+  "pass": true,
+  "detail": "7"
+ },
+ {
   "page": "telegram-like",
   "width": "desktop",
   "check": "focus: every row gives its reason",
@@ -1114,6 +1163,27 @@
  },
  {
   "page": "telegram-like",
+  "width": "desktop",
+  "check": "history tabs show their unread counts",
+  "pass": true,
+  "detail": "{'dms': '1', 'mentions': '4', 'threads': '5', 'reactions': '2'}"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "unread history entries carry a mark, read ones do not",
+  "pass": true,
+  "detail": "4"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "opening an entry clears its mark and lowers the count; the entry stays",
+  "pass": true,
+  "detail": "7"
+ },
+ {
+  "page": "telegram-like",
   "width": "phone",
   "check": "focus: every row gives its reason",
   "pass": true,
@@ -1484,6 +1554,27 @@
   "detail": "moved 0.00px"
  },
  {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "history tabs show their unread counts",
+  "pass": true,
+  "detail": "{'dms': '1', 'mentions': '4', 'threads': '5', 'reactions': '2'}"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "unread history entries carry a mark, read ones do not",
+  "pass": true,
+  "detail": "4"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "opening an entry clears its mark and lowers the count; the entry stays",
+  "pass": true,
+  "detail": "7"
+ },
+ {
   "page": "own",
   "width": "desktop",
   "check": "focus: every row gives its reason",
@@ -1856,6 +1947,27 @@
  },
  {
   "page": "own",
+  "width": "desktop",
+  "check": "history tabs show their unread counts",
+  "pass": true,
+  "detail": "{'dms': '1', 'mentions': '4', 'threads': '5', 'reactions': '2'}"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "unread history entries carry a mark, read ones do not",
+  "pass": true,
+  "detail": "4"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "opening an entry clears its mark and lowers the count; the entry stays",
+  "pass": true,
+  "detail": "7"
+ },
+ {
+  "page": "own",
   "width": "phone",
   "check": "focus: every row gives its reason",
   "pass": true,
@@ -2224,5 +2336,26 @@
   "check": "in the conversation, a delete does not move the next message",
   "pass": true,
   "detail": "moved 0.00px"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "history tabs show their unread counts",
+  "pass": true,
+  "detail": "{'dms': '1', 'mentions': '4', 'threads': '5', 'reactions': '2'}"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "unread history entries carry a mark, read ones do not",
+  "pass": true,
+  "detail": "4"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "opening an entry clears its mark and lowers the count; the entry stays",
+  "pass": true,
+  "detail": "7"
  }
 ]

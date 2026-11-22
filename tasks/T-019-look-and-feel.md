@@ -67,4 +67,5 @@ The same content in all three, from the seeded team (D-010), viewed as the produ
 - Criterion 4: `README.md` in the experiment folder, with the recommendation.
 - Criterion 5: `./scripts/check` passes.
 - Nothing jumps: 0.00 px in every run; the check was seen to fail with the size lock switched off.
-- Not done: review by the user; an independent verifier.
+- Reviewed by the user on 2026-11-22: the Slack-like direction is chosen, with unread counts and marks added to the history tabs (D-019; now shown in all three pages, 337 checks pass).
+- Not done: an independent verifier.

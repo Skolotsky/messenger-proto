@@ -20,6 +20,7 @@ Line format: `- **D-nnn** [status] The decision as a statement, and what it comm
 - **D-014** [accepted] A reaction from someone you addressed is an answer and lands in Needs you with their name; feed rows show the reactions on their message; the grouped row shows the split by emoji. No emoji has a built-in meaning → [record](D-014-reactions-in-the-feed.md)
 - **D-015** [accepted] Read is one position per person and conversation, shared by the feed, channel unread marks and notifications on every device. Opening marks read in Focus and Needs you; acting implies read; nothing is read while the person is not looking; no mark-as-unread → [record](D-015-what-read-means.md)
 - **D-016** [accepted] Besides the feed there are four history tabs for finding things again: Direct messages, Mentions, Threads, Reactions. They are not sorted by buckets or dials and nothing leaves them by being read → [record](D-016-history-tabs.md)
+- **D-019** [accepted] The product is laid out like the work messenger people already know (the Slack-like direction of E-002): a sidebar of channels, Activity as a view holding the feed and the history tabs, the conversation in a pane beside it. Each history tab shows a count of its unread entries and marks them. Commits us to reusing those habits and to showing the model inside a familiar frame → [record](D-019-look-and-feel-direction.md)
 
 ## System shape: components, boundaries, stack
 

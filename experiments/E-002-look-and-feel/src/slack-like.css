@@ -33,3 +33,6 @@
   .sk .chat{min-height:42px;font-size:16px}
   .sk .tabs-sep{padding-left:8px;margin-left:2px}
 }
+.sk .tabs{padding:0 8px;gap:0}
+.sk .tab{padding:9px 7px;gap:4px}
+.sk .tabs-sep{padding:0 4px 0 8px;margin-left:4px;font-size:10px}

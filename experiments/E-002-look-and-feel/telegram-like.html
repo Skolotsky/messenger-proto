@@ -215,6 +215,10 @@ h1,h2,h3,p{margin:0}
   .conv-acts .pop{left:0;right:auto}
   .demo{right:8px;left:8px;width:auto;top:auto;bottom:8px}
 }
+.h-count{font-size:11px;font-weight:700;color:var(--muted);background:var(--panel2);border-radius:99px;min-width:18px;padding:0 5px;line-height:18px;text-align:center}
+.tab.on .h-count{color:var(--text)}
+.hrow.unread .row-preview{font-weight:600}
+.hrow .dot{margin-right:2px}
 
 /* Telegram-like: one list, round avatars, big targets, folders for buckets, bubbles. Own colours. */
 :root{--accent:#6a4fd0;--accent-soft:#ebe6fb;--r:14px;--wall:#eeebe4}
@@ -566,20 +570,21 @@ function bucketTabs() {
   return `<nav class="tabs btabs">${['focus', 'needs', 'fyi'].map(b => `<button class="tab b-${b}${S.btab === b ? ' on' : ''}" data-act="btab" data-b="${b}">${BK[b][0]}${b === 'fyi' ? (c.fyi ? '<span class="bk-dot"></span>' : '') : `<span class="bk-count">${c[b]}</span>`}</button>`).join('')}</nav>`;
 }
 const HT = { dms: 'Direct messages', mentions: 'Mentions', threads: 'Threads', reactions: 'Reactions' };
-function histTabs(short) {
-  return Object.keys(HT).map(t => `<button class="tab${S.view === 'history' && S.htab === t ? ' on' : ''}" data-act="htab" data-t="${t}" aria-label="${HT[t]}">${short && t === 'dms' ? 'DMs' : HT[t]}</button>`).join('');
+const hUnread = e => !!e[2] && !S.msgs[e[2]].deleted && S.rows.some(r => !r.read && r.items.includes(e[2]));
+function histTabs(short) { // each tab counts its unread entries; the count is quiet, so the feed's badge stays the one that calls
+  return Object.keys(HT).map(t => { const n = HIST[t].filter(hUnread).length; return `<button class="tab${S.view === 'history' && S.htab === t ? ' on' : ''}" data-act="htab" data-t="${t}" aria-label="${HT[t]}${n ? ', ' + n + ' unread' : ''}">${short && t === 'dms' ? 'DMs' : HT[t]}${n ? `<span class="h-count">${n}</span>` : ''}</button>`; }).join('');
 }
 function history() {
   const list = HIST[S.htab].filter(e => !e[2] || !S.msgs[e[2]].deleted).map(e => {
     const [cid, by, mid, text, when, where] = e, c = conv(cid), m = mid && S.msgs[mid];
-    const unread = S.rows.some(r => !r.read && mid && r.items.includes(mid));
+    const unread = hUnread(e);
     const title = S.htab === 'threads' ? c.title : S.htab === 'reactions' ? '' : pn(by);
     const body = S.htab === 'reactions' ? esc(text) + (m ? `<span class="h-quote">${rich(m.text)}</span>` : '') : `${S.htab === 'threads' ? `<b>${first(by)}:</b> ` : ''}${rich(m ? m.text : text)}`;
     const extra = S.htab === 'threads' ? `<span class="row-sub">#${c.where} · ${TDIAL[c.tdial][0]}</span>` : where ? `<span class="row-sub">${where}</span>` : '';
     const kk = cid + ':' + (mid || text);
-    return `<article class="row hrow${unread ? ' unread' : ''}"><div class="row-main" role="button" tabindex="0" data-act="openConv" data-c="${cid}">${av(by)}<div class="row-text"><div class="row-head">${title ? `<span class="row-title">${esc(title)}</span>` : ''}${extra}${m && m.flag ? '<span class="tag flag">⚑</span>' : ''}${m && m.info ? '<span class="tag info">Info</span>' : ''}<span class="row-time">${when}${m && m.edited ? ' · edited' : ''}</span></div><div class="row-preview">${body}</div></div><div class="row-side"><button class="btn sm${S.kept.has(kk) ? ' on' : ''}" data-act="keepH" data-k="${esc(kk)}">${S.kept.has(kk) ? 'Kept' : 'Keep'}</button></div></div></article>`;
+    return `<article class="row hrow${unread ? ' unread' : ''}"><div class="row-main" role="button" tabindex="0" data-act="openConv" data-c="${cid}">${av(by)}<div class="row-text"><div class="row-head">${unread ? '<span class="dot" title="Unread"></span>' : ''}${title ? `<span class="row-title">${esc(title)}</span>` : ''}${extra}${m && m.flag ? '<span class="tag flag">⚑</span>' : ''}${m && m.info ? '<span class="tag info">Info</span>' : ''}<span class="row-time">${when}${m && m.edited ? ' · edited' : ''}</span></div><div class="row-preview">${body}</div></div><div class="row-side"><button class="btn sm${S.kept.has(kk) ? ' on' : ''}" data-act="keepH" data-k="${esc(kk)}">${S.kept.has(kk) ? 'Kept' : 'Keep'}</button></div></div></article>`;
   }).join('');
-  return `<div class="feed-wrap"><div class="feed-scroll" data-scroll="hist"><p class="hist-note">History, for finding things again. Newest first, read and unread together. Nothing here is sorted by buckets, and nothing leaves by being read.</p>${list}</div></div>`;
+  return `<div class="feed-wrap"><div class="feed-scroll" data-scroll="hist"><p class="hist-note">History, for finding things again. Newest first, read and unread together; a dot marks what you have not read yet. Nothing here is sorted by buckets, and nothing leaves by being read.</p>${list}</div></div>`;
 }
 function chats() {
   const dialTag = d => d === 'default' ? '' : `<span class="lvl l-${d}">${DIAL[d][0]}</span>`;
