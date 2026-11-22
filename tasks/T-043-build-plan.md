@@ -155,7 +155,7 @@ Guardrail to package: G-003, G-004, G-005: T-046 Â· G-006, G-010, G-011: T-048 Â
 ## Risks, and what to do
 
 - **The feed's rules are the largest single piece (T-049)** and everything visible depends on them. It starts in wave 1 with nothing in its way; if it is late, T-052 and T-055 still proceed against fixtures.
-- **Guardrail tests need the user's approval to edit** (the protection in `.claude/settings.json` covers all of `tests/guardrails/`). Writing them the first time will therefore ask. Raise this with the user at the start of T-046; the plan's suggestion is to protect each guardrail's folder from the moment its test has passed once, not before.
+- **Guardrail tests are protected once they have passed** (user's decision, 2026-11-22). Writing one the first time is free. When a package has seen its guardrail test fail and then pass, the lead sets that guardrail to `enforced` in `docs/guardrails.md` and adds `Edit(/tests/guardrails/<name>/**)` to `permissions.ask` in `.claude/settings.json`; `./scripts/check` fails if an enforced guardrail's folder is unprotected. From then on, changing that test asks the user.
 - **Two packages disagreeing about a contract.** The schemas and examples of T-045 are the tie-breaker; if they are unclear, fix them there, with the words in `docs/contracts/` as authority.
 - **Scope.** The three measures of D-030, a second copy of Conversations in production form, trimming, and an entry point that routes by organization are not built. The tests for G-027 and G-028 use the harness's small router and two databases.
 

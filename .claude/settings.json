@@ -5,7 +5,6 @@
     ],
     "ask": [
       "Edit(/docs/brief.md)",
-      "Edit(/tests/guardrails/**)",
       "Bash(git push *)"
     ]
   }
