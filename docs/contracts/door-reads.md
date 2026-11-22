@@ -35,7 +35,7 @@ GET search/orgs/acme/query?q=pricing&as=marco&after=…     → { "through": 485
 ## 4. Failure behaviour
 
 - No answer within 3 seconds, or an error: the door answers the screen at once with a notice instead of the content ("Search is unavailable right now. Your messages are safe." / the rows it last showed, with "Catching up"). Sending, reading and channel unread marks do not depend on these calls.
-- More than 10 seconds behind (the newest change the receiver is sent against its delivery place, by the log's timestamps): the answer is shown with "the last N minutes may be missing" or "Catching up".
+- More than 10 seconds behind (the age of the oldest change still waiting for that receiver, by its log timestamp against the clock): the answer is shown with "the last N minutes may be missing" or "Catching up".
 - A fenced conversation or reader is reported in the rows as "may be out of date".
 
 ## 5. Evolution

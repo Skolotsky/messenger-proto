@@ -16,7 +16,8 @@
       "Edit(/tests/guardrails/retire-and-delete-retry/**)",
       "Edit(/tests/guardrails/agent-events/**)",
       "Edit(/tests/guardrails/reply-in-progress/**)",
-      "Edit(/tests/guardrails/agent-limits/**)"
+      "Edit(/tests/guardrails/agent-limits/**)",
+      "Edit(/tests/guardrails/watching-lapses/**)"
     ]
   }
 }

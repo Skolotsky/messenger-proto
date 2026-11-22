@@ -92,6 +92,9 @@ func (s *Store) Retire(ctx context.Context, org ids.Org) error {
 	})
 	if err == nil {
 		s.forgetOrgReplies(org) // what was in progress is dropped (D-033)
+		if s.OnSaved != nil {
+			s.OnSaved(org, 0, 0) // its open screens are told at once
+		}
 	}
 	s.agents.wake(org) // a waiting agent hears it is gone now, not after its wait
 	return err
