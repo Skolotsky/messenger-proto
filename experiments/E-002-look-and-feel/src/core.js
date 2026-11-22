@@ -261,8 +261,8 @@ function whyBody(r, full) {
   const acts = e.off ? '' : e.acts.map(a => `<div class="why-act"><button class="btn sm" data-act="${a.act}" ${a.d}>${esc(a.label)}</button><small>${esc(a.note)}</small></div>`).join('');
   return `<div class="why-steps"><div><i>1</i><span><b>What it is</b>${esc(e.what)}</span></div><div><i>2</i><span><b>What put it in ${b}</b>${esc(e.by)}</span></div>${e.alt && !full ? `<div><i>3</i><span><b>Otherwise</b>${esc(e.alt)}</span></div>` : ''}</div>${path}${acts || done ? `<div class="why-acts"><b class="why-q">Not what you want in ${b}?</b>${acts}${done}</div>` : ''}`;
 }
-const CAP = 6; // a long burst opens in steps, and only what was shown counts as read
-const left = r => r.read ? 0 : r.items.length - (r.pos || 0);
+const CAP = 6; // a long burst shows its newest messages by the reply box; the earlier new ones are one click above them
+const left = r => r.read ? 0 : r.items.length;
 function ctxFor(r) { // context is what the new messages answer: the message before them in a direct conversation, or the start of the thread
   const c = conv(r.conv); if (c.kind === 'channel' || r.kind === 'rx') return '';
   const i = c.msgs.indexOf(r.items[0]), ids = [];
@@ -278,7 +278,7 @@ function rowHTML(r) {
   if (ms.every(m => m.deleted)) return `<article class="row gone b-${r.bucket}" data-row="${r.id}"><div class="row-main" style="height:${L.self || 64}px"><span class="tomb">${first(last.by)} deleted this message</span><small>${where} · it was here because ${first(last.by)} mentioned you</small></div></article>`;
   const title = r.title || (c.kind === 'dm' ? pn(c.with) : c.kind === 'channel' ? (r.chan ? '#' + c.name : pn(last.by)) : c.title);
   const sub = r.sub || (c.kind === 'dm' ? '' : c.kind === 'channel' ? (r.chan ? '' : '#' + c.name) : '#' + c.where);
-  const n = left(r), cnt = n > 1 || (n && r.pos) ? `<span class="row-count">${n} new</span>` : '';
+  const n = left(r), cnt = n > 1 ? `<span class="row-count">${n} new</span>` : '';
   const marks = (ms.some(m => m.flag) ? '<span class="tag flag">⚑</span>' : '') + (ms.some(m => m.info) ? '<span class="tag info">Info</span>' : '') + (isAgent(r.by) ? '<span class="tag ag">agent</span>' : '');
   const state = r.done ? '<span class="state">Done</span>' : r.keptNow ? '<span class="state">Kept</span>' : '';
   const badge = r.read ? '' : `<span class="row-badge">${n > 1 ? n : ''}</span>`;
@@ -287,7 +287,7 @@ function rowHTML(r) {
   if (exp) {
     const mine = r.replies.map(i => msgHTML(i, 'exp')).join('');
     const kd = r.kept && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : r.done ? '' : `<button class="btn sm" data-act="keep" data-id="${r.id}">Keep</button>`;
-    x = `<div class="row-exp">${WHY === 'b' ? `<div class="why-inline">${whyBody(r)}</div>` : `<p class="why"><b>Why it is here.</b> ${esc(r.why)}</p>`}${ctxFor(r)}${ctxFor(r) ? '<div class="newline"><span>New</span></div>' : ''}${(r.read ? r.items : r.items.slice(0, r.pos)).map(i => msgHTML(i, 'exp')).join('')}${n ? `<div class="more-new"><button class="btn sm pri" data-act="more" data-id="${r.id}">Show the next ${Math.min(n, CAP)}</button><span>${n} more new. They stay unread until you have seen them.</span></div>` : ''}${mine}
+    x = `<div class="row-exp">${WHY === 'b' ? `<div class="why-inline">${whyBody(r)}</div>` : `<p class="why"><b>Why it is here.</b> ${esc(r.why)}</p>`}${ctxFor(r)}${ctxFor(r) ? '<div class="newline"><span>New</span></div>' : ''}${r.items.length > CAP && !r.all ? `<div class="more-new"><button class="btn sm" data-act="more" data-id="${r.id}">Show ${r.items.length - CAP} earlier new messages</button></div>` : ''}${(r.all ? r.items : r.items.slice(-CAP)).map(i => msgHTML(i, 'exp')).join('')}${mine}
       <div class="acts"><span class="quick">${['👍', '✅', '👀', '🎉'].map(e => `<button class="rx-btn" data-act="react" data-id="${r.id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}</span>${kd}<button class="btn sm" data-act="openConv" data-c="${r.conv}" data-id="${r.id}">Open conversation</button>${dialCtl(c, r.id)}<button class="btn sm" data-act="ruleFor" data-c="${r.conv}" data-by="${r.by}">Add to Focus…</button></div>
       <form class="reply" data-form="reply" data-id="${r.id}"><input name="t" autocomplete="off" aria-label="Reply" placeholder="Reply ${c.kind === 'dm' ? 'to ' + first(c.with) : 'in ' + where}…"><button class="btn pri">Send</button></form></div>`;
   }
@@ -450,8 +450,8 @@ function below(rid) { const el = document.querySelector(`[data-row="${rid}"]`); 
 function onScreen(rid) { const el = document.querySelector(`[data-row="${rid}"]`); if (!el) return false; const b = el.getBoundingClientRect(); return b.bottom > 0 && b.top < innerHeight; }
 function measured(rid, fn, what) { const a = below(rid); fn(); render(); const b = below(rid); S.note = a === null || b === null ? what + ' The row was not on screen.' : `${what} The row below moved by ${Math.abs(b - a).toFixed(1)} px.`; render(); }
 const A = {
-  toggle(d) { const r = row(d.id); if (S.exp.has(d.id)) S.exp.delete(d.id); else { S.exp.add(d.id); if (!r.pos) r.pos = Math.min(CAP, r.items.length); if (r.pos >= r.items.length) r.read = true; } },
-  more(d) { const r = row(d.id); r.pos = Math.min(r.pos + CAP, r.items.length); if (r.pos >= r.items.length) r.read = true; },
+  toggle(d) { const r = row(d.id); if (S.exp.has(d.id)) S.exp.delete(d.id); else { S.exp.add(d.id); r.read = true; } },
+  more(d) { row(d.id).all = true; },
   openConv(d) { if (S.conv !== d.c) S.lock = Object.fromEntries(Object.entries(S.lock).filter(([k]) => !k.startsWith('conv:'))); S.conv = d.c; conv(d.c); S.menu = null; S.modal = null; S.rows.forEach(r => { if (r.conv === d.c && (!d.id || r.id === d.id || conv(d.c).kind !== 'channel')) r.read = true; }); const sr = document.getElementById('sr'); if (sr) sr.innerHTML = ''; S.q = ''; },
   closeConv() { S.conv = null; S.menu = null; },
   read(d) { row(d.id).read = true; },

@@ -422,21 +422,21 @@
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "expanding shows the first six new messages after the one before them",
+  "check": "expanding shows the six newest messages, after the one before the burst",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "the four not yet shown stay unread",
+  "check": "the four earlier new ones are one click above, and the row is read",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "showing the rest reads the row",
+  "check": "showing the earlier ones gives all ten in order",
   "pass": true,
   "detail": ""
  },
@@ -933,21 +933,21 @@
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "expanding shows the first six new messages after the one before them",
+  "check": "expanding shows the six newest messages, after the one before the burst",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "the four not yet shown stay unread",
+  "check": "the four earlier new ones are one click above, and the row is read",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "showing the rest reads the row",
+  "check": "showing the earlier ones gives all ten in order",
   "pass": true,
   "detail": ""
  },
@@ -1444,21 +1444,21 @@
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "expanding shows the first six new messages after the one before them",
+  "check": "expanding shows the six newest messages, after the one before the burst",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "the four not yet shown stay unread",
+  "check": "the four earlier new ones are one click above, and the row is read",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "showing the rest reads the row",
+  "check": "showing the earlier ones gives all ten in order",
   "pass": true,
   "detail": ""
  },
@@ -1955,21 +1955,21 @@
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "expanding shows the first six new messages after the one before them",
+  "check": "expanding shows the six newest messages, after the one before the burst",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "the four not yet shown stay unread",
+  "check": "the four earlier new ones are one click above, and the row is read",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "showing the rest reads the row",
+  "check": "showing the earlier ones gives all ten in order",
   "pass": true,
   "detail": ""
  },
@@ -2466,21 +2466,21 @@
  {
   "page": "own",
   "width": "desktop",
-  "check": "expanding shows the first six new messages after the one before them",
+  "check": "expanding shows the six newest messages, after the one before the burst",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "desktop",
-  "check": "the four not yet shown stay unread",
+  "check": "the four earlier new ones are one click above, and the row is read",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "desktop",
-  "check": "showing the rest reads the row",
+  "check": "showing the earlier ones gives all ten in order",
   "pass": true,
   "detail": ""
  },
@@ -2977,21 +2977,21 @@
  {
   "page": "own",
   "width": "phone",
-  "check": "expanding shows the first six new messages after the one before them",
+  "check": "expanding shows the six newest messages, after the one before the burst",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "phone",
-  "check": "the four not yet shown stay unread",
+  "check": "the four earlier new ones are one click above, and the row is read",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "phone",
-  "check": "showing the rest reads the row",
+  "check": "showing the earlier ones gives all ten in order",
   "pass": true,
   "detail": ""
  },

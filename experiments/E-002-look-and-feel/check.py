@@ -275,7 +275,7 @@ def why_and_people(browser, slug, size, vp, scale):
     ctx.close()
 
 def bursts(browser, slug, size, vp, scale):
-    """Ten messages from one person: one row, read in steps, with context, and one click to the conversation (proposal, 2026-11-22)."""
+    """Ten messages from one person: one row, newest by the reply box, with context, and one click to the conversation (proposal, 2026-11-22)."""
     ctx = browser.new_context(viewport=vp, device_scale_factor=scale, has_touch=size == "phone")
     pg = ctx.new_page(); pg.goto(f"file://{here.resolve()}/{slug}.html")
     def ok(name, cond, detail=""):
@@ -284,11 +284,11 @@ def bursts(browser, slug, size, vp, scale):
     row = pg.locator('article[data-row="r-anna"]')
     ok("ten messages are one row that says so", pg.locator('article[data-row="r-anna"]').count() == 1 and ("10 new" in row.inner_text() or row.locator(".row-badge").inner_text() == "10"), row.inner_text()[:60])
     row.locator(".row-main").click(position={"x": 24, "y": 24})
-    ok("expanding shows the first six new messages after the one before them", row.locator(".row-exp > .msg").count() == 6 and row.locator(".ctx .msg").count() == 1 and "Draft by Wednesday night" in row.locator(".ctx").inner_text())
-    ok("the four not yet shown stay unread", "unread" in row.get_attribute("class").split() and "4 more new" in row.locator(".more-new").inner_text())
+    ok("expanding shows the six newest messages, after the one before the burst", row.locator(".row-exp > .msg").count() == 6 and "Call me if 3 pm" in row.locator(".row-exp > .msg").last.inner_text() and row.locator(".ctx .msg").count() == 1 and "Draft by Wednesday night" in row.locator(".ctx").inner_text())
+    ok("the four earlier new ones are one click above, and the row is read", "Show 4 earlier new messages" in row.locator(".more-new").inner_text() and "read" in row.get_attribute("class").split())
     pg.screenshot(path=str(shots / f"{slug}-{size}-18-ten-messages.jpg"), type="jpeg", quality=80)
     row.locator('[data-act="more"]').click()
-    ok("showing the rest reads the row", row.locator(".row-exp > .msg").count() == 10 and "read" in row.get_attribute("class").split())
+    ok("showing the earlier ones gives all ten in order", row.locator(".row-exp > .msg").count() == 10 and "pricing call" in row.locator(".row-exp > .msg").first.inner_text())
     if slug == "telegram-like": pg.locator('[data-act="btab"][data-b="needs"]').click()
     t = pg.locator('article[data-row="r-check"]')
     t.locator(".row-main").click(position={"x": 24, "y": 24})
