@@ -159,76 +159,76 @@ details > .stack { gap: 10px; }
 <body>
 <main class="page">
 <header class="top">
-  <div class="label">Decision brief · D-003 · 2026-11-22</div>
-  <h1>How does an item leave the feed?</h1>
-  <p class="lede">We decided what enters and where it lands. A short list also needs a way out, or Focus stops being short within a day.</p>
+  <div class="label">Decision · D-003 · accepted 2026-11-22</div>
+  <h1>Reading is enough, and you can keep what you still mean to handle</h1>
+  <p class="lede">Most rows leave the feed once read. The few that matter stay, because someone flagged them for you or because you kept them.</p>
 </header>
 
-<div class="ask">
-  <div class="label">Needs you</div>
-  <p><strong>Pick how a row leaves.</strong> I recommend B: a row stays until it is done, and acting on it (a reply or a reaction) counts as done.</p>
-</div>
-
 <section>
-  <h2>The three options</h2>
-  <div class="options">
-    <div class="option">
-      <header><h3>A. Read is enough</h3></header>
-      <p>Opening a conversation marks its row read. Read rows stay, dimmed, and age out after some weeks. Mostly how Slack and Teams behave.</p>
-      <dl>
-        <dt>Upside</dt><dd>Nothing to learn or do.</dd>
-        <dt>Risk</dt><dd>The list never empties. Something opened on a phone and meant for later looks finished.</dd>
-      </dl>
-    </div>
-    <div class="option pick">
-      <header><h3>B. Done, by hand or by acting</h3><span class="chip ok">Recommended</span></header>
-      <p>A row stays until it is done. Reading alone does not remove it. Done rows go to a Done list and can be brought back.</p>
-      <dl>
-        <dt>Upside</dt><dd>A bucket can reach empty, and empty means something. “Read but not dealt with” survives.</dd>
-        <dt>Risk</dt><dd>One more thing to do per row. Eased by acting-is-done and “mark all done”.</dd>
-      </dl>
-    </div>
-    <div class="option">
-      <header><h3>C. Gone once seen</h3></header>
-      <p>A row disappears as soon as its conversation is opened.</p>
-      <dl>
-        <dt>Upside</dt><dd>No effort at all.</dd>
-        <dt>Risk</dt><dd>Anything opened and not handled is lost. The fastest way to stop trusting the feed.</dd>
-      </dl>
-    </div>
+  <h2>When a row leaves</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>A row…</th><th>Leaves when</th></tr></thead>
+      <tbody>
+        <tr><td>is ordinary</td><td>You have read it.</td></tr>
+        <tr><td>is <span class="chip you">flagged for you</span></td><td>The flag closes: you respond, someone else answers one that named nobody, or the sender withdraws it. Reading is not enough.</td></tr>
+        <tr><td>is <span class="chip you">kept by you</span></td><td>You mark it done, or you reply or react to it.</td></tr>
+      </tbody>
+    </table>
   </div>
+  <p class="note">A flag is someone else saying “this stays until you deal with it”. Keep is you saying it to yourself. A flag is visible to everyone in the conversation; Keep is private.</p>
 </section>
 
 <section>
-  <h2>The life of a row under B</h2>
+  <h2>The life of a row</h2>
   <ol class="steps">
-    <li><div class="body"><h3>It arrives, unread</h3><p>“Anna flagged you in #launch: need your sign-off on the pricing page.” <span class="chip you">Focus</span></p></div></li>
-    <li><div class="body"><h3>You read it</h3><p>It is shown as read and stays where it is. Reading is not handling.</p></div></li>
-    <li><div class="body"><h3>It becomes done, one of three ways</h3><p><strong>You act:</strong> reply or react from the row, without leaving the feed. For a flag, that also closes it for you.<br><strong>You mark it done:</strong> one click, or a swipe on a phone.<br><strong>Its reason goes away:</strong> someone else answers a flag that named nobody, or the sender withdraws it.</p></div></li>
-    <li><div class="body"><h3>It moves to Done</h3><p>Still there if you need it, and you can bring it back.</p></div></li>
-    <li><div class="body"><h3>It returns when something new happens</h3><p>A new reply in that thread puts the row back in its bucket, unread.</p></div></li>
+    <li><div class="body"><h3>It arrives, unread</h3><p>“Marco mentioned you in #product: does this copy work for the launch email?” <span class="chip">Needs you</span></p></div></li>
+    <li><div class="body"><h3>You open it</h3><p>Now it is read. It stays in place, dimmed, until you leave the feed, so nothing moves under you.</p></div></li>
+    <li><div class="body"><h3>Either you are finished with it…</h3><p>On your next visit it is in the Earlier list, still findable.</p></div></li>
+    <li><div class="body"><h3>…or you keep it</h3><p>It moves to the Kept section of Focus with the reason “Kept by you”, and stays until you mark it done or reply or react to it.</p></div></li>
+    <li><div class="body"><h3>It returns when something new happens</h3><p>A new reply in that conversation puts the row back in its bucket, unread.</p></div></li>
   </ol>
 </section>
 
 <section>
-  <h2>The list does not move while you look at it</h2>
-  <p>This extends “nothing jumps” from edits to arrivals.</p>
+  <h2>Where kept rows live</h2>
   <div class="split">
-    <div class="panel">
-      <div class="label">New activity</div>
-      <p>Nothing is pushed down or reordered. A quiet “3 new” marker appears at the top and applies when you choose.</p>
+    <div class="panel you">
+      <div class="label">Focus · 2 unread</div>
+      <ul>
+        <li><strong>New</strong><br>Direct message from Anna<br>Release agent flagged you: approve the deploy?</li>
+        <li><strong>Kept · 3</strong><br>Marco: launch email copy <span class="chip you">Kept by you</span><br>Thread: pricing page numbers <span class="chip you">Kept by you</span><br>Priya: contract draft <span class="chip you">Kept by you</span></li>
+      </ul>
     </div>
     <div class="panel">
-      <div class="label">A row you just finished</div>
-      <p>It leaves its space in place until you move on, so the row under your finger is still the row you meant.</p>
-    </div>
-    <div class="panel">
-      <div class="label">An empty bucket</div>
-      <p>An illustration and one line, not a blank space. An empty Focus with no rules offers the suggested ones.</p>
+      <div class="label">Why Focus, not a fourth bucket</div>
+      <ul>
+        <li>Focus is your own judgement of what matters; keeping is that judgement for one item.</li>
+        <li>One place to start, not a second list to remember.</li>
+        <li>The Focus count shows unread only. Kept has its own count and collapses past a handful, so it cannot push new items down.</li>
+      </ul>
     </div>
   </div>
-  <p class="note">Counts: Focus and Needs you show how many rows are not done. For your information shows a dot, not a number. Out for now: snooze, “remind me later”, saving a row.</p>
 </section>
+
+<section>
+  <h2>The list does not move while you look at it</h2>
+  <div class="split">
+    <div class="panel"><div class="label">New activity</div><p>Nothing is pushed down or reordered. A quiet “3 new” marker appears at the top and applies when you choose.</p></div>
+    <div class="panel"><div class="label">What “read” means</div><p>In Focus and Needs you: you opened the row. Scrolling past does not count. In For your information: you viewed the bucket.</p></div>
+    <div class="panel"><div class="label">An empty bucket</div><p>An illustration and one line, not a blank space. An empty Focus with no rules offers the suggested ones.</p></div>
+  </div>
+  <p class="note">Also in: reply and react from the row; mark all read per bucket. Out for now: snooze and “remind me later”.</p>
+</section>
+
+<details>
+  <summary>The options that were set aside</summary>
+  <div class="stack">
+    <p><strong>Done on every row</strong> (the agent's first recommendation). A bucket reaching empty means something, but it asks for an action on every row to protect the few that matter.</p>
+    <p><strong>Read is enough, with no Keep.</strong> Something opened on a phone and meant for later is gone.</p>
+    <p><strong>Gone once seen.</strong> Anything seen and not handled is lost.</p>
+  </div>
+</details>
 
 <footer class="foot">
   <span>Belongs to D-003 · Depends on D-001, D-009 · Evidence: R-002</span>
