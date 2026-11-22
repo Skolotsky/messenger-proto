@@ -12,7 +12,7 @@ Line format: `- **D-nnn** [status] The decision as a statement, and what it comm
 - **D-002** [proposed] How real the AI agents are in the first version (recommended: scripted agents through the same door a real one would use; one real assistant when the model arrives with the text rules) → [record](D-002-agents-in-first-version.md)
 - **D-003** [open] What the activity feed contains and how it is cleared: item types, grouping, read state, triage action. Evidence: R-002
 - **D-004** [open] What an edit or a delete does to feed items and notifications that already exist. Evidence: R-002
-- **D-009** [accepted] The first version is the feed plus what makes it observable: direct messages, a search box, a notification tray, a Focus rules list, unread marks, creating channels, and a layout that works on a phone-sized screen. Commits us to two widths for every surface; sign-in, group messages, ad-hoc topics, profiles, files and formatted text stay out → [record](D-009-first-version-surfaces.md)
+- **D-009** [accepted] The first version is the feed plus what makes it observable: direct messages, a search box, a notification tray, a Focus rules list, unread marks, creating channels, and a layout that works on a phone-sized screen, delivered as an installable web app (PWA). Commits us to two widths for every surface; the access model, sign-in, group messages, ad-hoc topics, profiles, files and formatted text stay out → [record](D-009-first-version-surfaces.md)
 - **D-010** [open] The seeded team: how many people and agents, which roles, how busy. Depends on D-002
 
 ## System shape: components, boundaries, stack

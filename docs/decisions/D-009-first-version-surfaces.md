@@ -68,6 +68,11 @@ Accepted by the user on 2026-11-22: **B, with two additions.**
 
 Both were listed under C and under "out of the first version" above; the user's choice overrides that. The rest of the out list stands: sign-in and accounts, group direct messages and ad-hoc topics, profiles, presence and typing indicators, files and formatted text, settings beyond the dials and Focus rules.
 
+### Clarified by the user, 2026-11-22 (added after acceptance; the decision itself is unchanged)
+
+- Web only, delivered as a PWA: a web app that can be installed on a phone or desktop and opens full-screen like an app. Taken to mean installable and laid out for a phone; working offline and real push notifications are not part of it (the notification tray stands in for push).
+- The access model as a whole is out of scope: no private channels, roles or permissions. Every person can see and join every channel.
+
 ## Consequences
 
 - Easier: every promise in D-001 and every system in the brief has a visible surface. The product can be shown on a phone, where a feed of "what needs you" is most natural.
