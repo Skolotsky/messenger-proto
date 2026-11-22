@@ -266,7 +266,7 @@ func TestASaveCaughtMidRemovalIsNotStranded(t *testing.T) {
 	if _, err := b.DB.Del.Exec(ctx, `INSERT INTO delivery_places (org, receiver, place) VALUES ($1, 'search', 1), ($1, 'feed', 1)`, org); err != nil {
 		t.Fatal(err)
 	}
-	b.Feed.SetReset(org, 1, 1)
+	b.Feed.SetPlace(org, 1)
 
 	// A save that has already passed its "add the due row" step, uncommitted.
 	committed := make(chan struct{})
@@ -277,7 +277,7 @@ func TestASaveCaughtMidRemovalIsNotStranded(t *testing.T) {
 			if _, err := tx.Exec(ctx, `UPDATE org_log SET head = 2, head_at = now() WHERE org = $1`, org); err != nil {
 				return err
 			}
-			body := fmt.Sprintf(`{"kind":"tick","org":%q,"reset":1,"number":2,"previous":1,"at":"2026-11-22T10:00:00.000Z"}`, org)
+			body := fmt.Sprintf(`{"kind":"tick","org":%q,"number":2,"previous":1,"at":"2026-11-22T10:00:00.000Z"}`, org)
 			if _, err := tx.Exec(ctx, `INSERT INTO change_log (org, number, at, kind, body) VALUES ($1, 2, now(), 'tick', $2)`, org, body); err != nil {
 				return err
 			}

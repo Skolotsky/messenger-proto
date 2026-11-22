@@ -1503,15 +1503,15 @@ func TestKindsWithNoEffectAreCounted(t *testing.T) {
 
 func TestNoteContractForm(t *testing.T) {
 	// The drafts become the contract's notes with the feed's own numbers.
-	due := NoteDraft{Kind: "due", At: "t", Name: "n", Person: "you", Bucket: "focus", Why: "w", Text: "x"}.Contract("acme", 2, 10, 9, 7)
+	due := NoteDraft{Kind: "due", At: "t", Name: "n", Person: "you", Bucket: "focus", Why: "w", Text: "x"}.Contract("acme", 10, 9, 7)
 	v, ok := due.Value.(contract.NoteDue)
-	if !ok || v.Number != 10 || v.Previous != 9 || v.Edition != 7 || v.Reset != 2 || v.Org != "acme" || v.Name != "n" {
+	if !ok || v.Number != 10 || v.Previous != 9 || v.Edition != 7 || v.Org != "acme" || v.Name != "n" {
 		t.Errorf("due note: %+v", due.Value)
 	}
-	if _, ok := (NoteDraft{Kind: "clock", At: "t"}).Contract("acme", 2, 11, 10, 7).Value.(contract.NoteClock); !ok {
+	if _, ok := (NoteDraft{Kind: "clock", At: "t"}).Contract("acme", 11, 10, 7).Value.(contract.NoteClock); !ok {
 		t.Error("clock note has the wrong form")
 	}
-	if w, ok := (NoteDraft{Kind: "withdrawn", Name: "n", Because: "read"}).Contract("acme", 2, 12, 11, 7).Value.(contract.NoteWithdrawn); !ok || w.Because != "read" {
+	if w, ok := (NoteDraft{Kind: "withdrawn", Name: "n", Because: "read"}).Contract("acme", 12, 11, 7).Value.(contract.NoteWithdrawn); !ok || w.Because != "read" {
 		t.Error("withdrawn note has the wrong form")
 	}
 }

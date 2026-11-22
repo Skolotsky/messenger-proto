@@ -1,7 +1,6 @@
 {
  "kind": "reader.read",
  "org": "acme",
- "reset": 2,
  "number": 4813,
  "previous": 4812,
  "at": "2026-11-22T10:14:03.120Z",

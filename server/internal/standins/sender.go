@@ -45,7 +45,6 @@ func (s *Sender) Routes() http.Handler {
 type wireNote struct {
 	Kind     string `json:"kind"`
 	Org      string `json:"org"`
-	Reset    int64  `json:"reset"`
 	Number   int64  `json:"number"`
 	Previous int64  `json:"previous"`
 	Edition  int64  `json:"edition"`
@@ -92,8 +91,8 @@ func (n wireNote) problem() (time.Time, string) {
 }
 
 type senderState struct {
-	reset, edition, place int64
-	clock                 *time.Time
+	edition, place int64
+	clock          *time.Time
 }
 
 func lockSenderState(ctx context.Context, tx pgx.Tx, org ids.Org) (senderState, error) {
@@ -101,14 +100,14 @@ func lockSenderState(ctx context.Context, tx pgx.Tx, org ids.Org) (senderState, 
 		return senderState{}, err
 	}
 	var st senderState
-	err := tx.QueryRow(ctx, "SELECT reset, edition, place, clock FROM state WHERE org = $1 FOR UPDATE", string(org)).
-		Scan(&st.reset, &st.edition, &st.place, &st.clock)
+	err := tx.QueryRow(ctx, "SELECT edition, place, clock FROM state WHERE org = $1 FOR UPDATE", string(org)).
+		Scan(&st.edition, &st.place, &st.clock)
 	return st, err
 }
 
 func saveSenderState(ctx context.Context, tx pgx.Tx, org ids.Org, st senderState) error {
-	_, err := tx.Exec(ctx, "UPDATE state SET reset = $2, edition = $3, place = $4, clock = $5 WHERE org = $1",
-		string(org), st.reset, st.edition, st.place, st.clock)
+	_, err := tx.Exec(ctx, "UPDATE state SET edition = $2, place = $3, clock = $4 WHERE org = $1",
+		string(org), st.edition, st.place, st.clock)
 	return err
 }
 
@@ -140,11 +139,6 @@ func (s *Sender) note(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return err
 		}
-		if n.Reset < st.reset {
-			status, answer = http.StatusConflict, contract.StaleReset{StaleReset: st.reset}
-			return nil
-		}
-		st.reset = n.Reset
 		if n.Edition < st.edition {
 			status, answer = http.StatusConflict, contract.NoteBehind{IAmAt: st.place, Edition: st.edition}
 			return nil
@@ -323,7 +317,7 @@ func (s *Sender) place(w http.ResponseWriter, r *http.Request) {
 	var p contract.SenderPlace
 	err := orgdb.InOrg(r.Context(), s.opt.Dir, org, func(tx pgx.Tx) error {
 		st, err := lockSenderState(r.Context(), tx, org)
-		p = contract.SenderPlace{Reset: st.reset, Through: st.place, Edition: st.edition}
+		p = contract.SenderPlace{Through: st.place, Edition: st.edition}
 		return err
 	})
 	if err != nil {

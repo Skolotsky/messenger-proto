@@ -166,15 +166,12 @@ func (s *Service) retry(w http.ResponseWriter, r *http.Request, org ids.Org) {
 
 func (l *lane) retryChange(ctx context.Context, org ids.Org, number int64) (bool, error) {
 	var kind, body string
-	var reset, wipe int64
 	err := l.inOrg(ctx, org, func(tx pgx.Tx) error {
-		return tx.QueryRow(ctx, `SELECT c.kind, c.body::text, l.reset, p.wipe
+		return tx.QueryRow(ctx, `SELECT c.kind, c.body::text
 			FROM delivery_parked n
 			JOIN change_log c ON c.org = n.org AND c.number = n.number
-			JOIN org_log l ON l.org = n.org
-			JOIN delivery_places p ON p.org = n.org AND p.receiver = n.receiver
 			WHERE n.org = $1 AND n.receiver = $2 AND n.number = $3 AND n.tries >= $4`,
-			string(org), l.name, number, triesToPark).Scan(&kind, &body, &reset, &wipe)
+			string(org), l.name, number, triesToPark).Scan(&kind, &body)
 	})
 	if errors.Is(err, pgx.ErrNoRows) {
 		return false, nil
@@ -182,7 +179,7 @@ func (l *lane) retryChange(ctx context.Context, org ids.Org, number int64) (bool
 	if err != nil {
 		return false, err
 	}
-	item, send, err := forSearch(org, reset, number, kind, []byte(body))
+	item, send, err := forSearch(org, number, kind, []byte(body))
 	if err != nil {
 		return true, err
 	}
@@ -217,13 +214,13 @@ func (l *lane) retryChange(ctx context.Context, org ids.Org, number int64) (bool
 
 func (l *lane) retryNote(ctx context.Context, org ids.Org, number int64) (bool, error) {
 	var body string
-	var reset, edition int64
+	var edition int64
 	err := l.inOrg(ctx, org, func(tx pgx.Tx) error {
-		return tx.QueryRow(ctx, `SELECT c.body::text, h.reset, h.edition
+		return tx.QueryRow(ctx, `SELECT c.body::text, h.edition
 			FROM feed.note_parked n
 			JOIN feed.note_heads h ON h.org = n.org AND h.edition = n.edition
 			JOIN feed.note_log c ON c.org = n.org AND c.edition = n.edition AND c.number = n.number
-			WHERE n.org = $1 AND n.number = $2 AND n.tries >= $3`, string(org), number, triesToPark).Scan(&body, &reset, &edition)
+			WHERE n.org = $1 AND n.number = $2 AND n.tries >= $3`, string(org), number, triesToPark).Scan(&body, &edition)
 	})
 	if errors.Is(err, pgx.ErrNoRows) {
 		return false, nil
@@ -231,11 +228,7 @@ func (l *lane) retryNote(ctx context.Context, org ids.Org, number int64) (bool, 
 	if err != nil {
 		return false, err
 	}
-	item, err := stamped([]byte(body), reset)
-	if err != nil {
-		return true, err
-	}
-	o := l.rc.post(ctx, "/notes", item)
+	o := l.rc.post(ctx, "/notes", json.RawMessage(body))
 	pool, err := l.s.cfg.DB.PoolFor(ctx, org)
 	if err != nil {
 		return true, err

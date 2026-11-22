@@ -158,7 +158,7 @@ func (r *Rig) Wipe(org string) {
 
 // Log returns the log writer's log for one organization.
 func Log(org string, seed int64, changes int) []logwriter.Entry {
-	return logwriter.Write(logwriter.Config{Orgs: []string{org}, Seed: seed, Changes: changes, Reset: 1, Start: Start})[org]
+	return logwriter.Write(logwriter.Config{Orgs: []string{org}, Seed: seed, Changes: changes, Start: Start})[org]
 }
 
 type wireMessage struct {
@@ -224,7 +224,7 @@ func SearchChanges(org string, log []logwriter.Entry) ([]Change, map[string]Doc)
 		}
 		w := parse(e)
 		m := w.Message
-		body := map[string]any{"kind": e.Kind, "org": org, "reset": 1, "number": e.Number}
+		body := map[string]any{"kind": e.Kind, "org": org, "number": e.Number}
 		if e.Kind == "message.deleted" {
 			body["message"] = map[string]any{"id": m.ID, "version": m.Version}
 			delete(truth, m.ID)
@@ -317,7 +317,7 @@ type Builder struct {
 // Add appends one note; fields is what is specific to its kind.
 func (b *Builder) Add(kind, name string, when time.Time, fields map[string]any) {
 	n := int64(len(b.Notes)) + 1
-	body := map[string]any{"kind": kind, "org": b.Org, "reset": 1, "number": n, "previous": n - 1, "edition": b.Edition, "at": stamp(when)}
+	body := map[string]any{"kind": kind, "org": b.Org, "number": n, "previous": n - 1, "edition": b.Edition, "at": stamp(when)}
 	if name != "" {
 		body["name"] = name
 	}

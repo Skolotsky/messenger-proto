@@ -1,7 +1,6 @@
 {
  "kind": "message.changed",
  "org": "acme",
- "reset": 2,
  "number": 4830,
  "message": {
   "id": "msg_7Q2",

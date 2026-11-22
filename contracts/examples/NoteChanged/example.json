@@ -1,7 +1,6 @@
 {
  "kind": "changed",
  "org": "acme",
- "reset": 2,
  "number": 1301,
  "previous": 1300,
  "edition": 7,

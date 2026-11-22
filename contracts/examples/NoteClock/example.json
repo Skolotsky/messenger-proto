@@ -1,7 +1,6 @@
 {
  "kind": "clock",
  "org": "acme",
- "reset": 2,
  "number": 1318,
  "previous": 1317,
  "edition": 7,

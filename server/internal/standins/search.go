@@ -42,8 +42,8 @@ func (s *Search) Routes() http.Handler {
 }
 
 type searchState struct {
-	reset, through, wipe int64
-	refillHigh           *int64
+	through, wipe int64
+	refillHigh    *int64
 }
 
 func lockSearchState(ctx context.Context, tx pgx.Tx, org ids.Org) (searchState, error) {
@@ -51,8 +51,8 @@ func lockSearchState(ctx context.Context, tx pgx.Tx, org ids.Org) (searchState, 
 		return searchState{}, err
 	}
 	var st searchState
-	err := tx.QueryRow(ctx, "SELECT reset, through, wipe, refill_high FROM state WHERE org = $1 FOR UPDATE", string(org)).
-		Scan(&st.reset, &st.through, &st.wipe, &st.refillHigh)
+	err := tx.QueryRow(ctx, "SELECT through, wipe, refill_high FROM state WHERE org = $1 FOR UPDATE", string(org)).
+		Scan(&st.through, &st.wipe, &st.refillHigh)
 	return st, err
 }
 
@@ -73,7 +73,6 @@ func nextThrough(st searchState, n int64) (through int64, refillHigh *int64) {
 type wireChange struct {
 	Kind    string                 `json:"kind"`
 	Org     string                 `json:"org"`
-	Reset   int64                  `json:"reset"`
 	Number  int64                  `json:"number"`
 	Message contract.SearchMessage `json:"message"`
 }
@@ -121,27 +120,21 @@ func (s *Search) change(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return err
 		}
-		if c.Reset < st.reset {
-			status, answer = http.StatusConflict, contract.StaleReset{StaleReset: st.reset}
-			return nil
-		}
-		st.reset = c.Reset
 		why := c.problem()
 		if why == "" && s.opt.Refuse != nil {
 			why = s.opt.Refuse(c.Org, c.Number)
 		}
 		if why != "" {
 			status, answer = http.StatusUnprocessableEntity, contract.SearchRefusal{Refused: why, Wipe: st.wipe}
-			_, err := tx.Exec(ctx, "UPDATE state SET reset = $2 WHERE org = $1", string(org), st.reset)
-			return err
+			return nil
 		}
 		applied, err := applyChange(ctx, tx, org, c)
 		if err != nil {
 			return err
 		}
 		through, refill := nextThrough(st, c.Number)
-		if _, err := tx.Exec(ctx, "UPDATE state SET reset = $2, through = $3, refill_high = $4 WHERE org = $1",
-			string(org), st.reset, through, refill); err != nil {
+		if _, err := tx.Exec(ctx, "UPDATE state SET through = $2, refill_high = $3 WHERE org = $1",
+			string(org), through, refill); err != nil {
 			return err
 		}
 		a := contract.SearchApplied{Applied: true, Wipe: st.wipe}
@@ -315,7 +308,7 @@ func (s *Search) place(w http.ResponseWriter, r *http.Request) {
 	var p contract.SearchPlace
 	err := orgdb.InOrg(r.Context(), s.opt.Dir, org, func(tx pgx.Tx) error {
 		st, err := lockSearchState(r.Context(), tx, org)
-		p = contract.SearchPlace{Reset: st.reset, Through: st.through, Wipe: st.wipe}
+		p = contract.SearchPlace{Through: st.through, Wipe: st.wipe}
 		return err
 	})
 	if err != nil {

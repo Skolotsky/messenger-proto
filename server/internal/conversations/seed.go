@@ -113,7 +113,7 @@ func (st *Step) appendSeeded(change contract.Change) error {
 		return SeedRefused{"a message's number must be its change's number"}
 	}
 	st.at, st.headAt = at, &at
-	_, err = st.Append(change.Value) // Append sets the header, with this log's reset number
+	_, err = st.Append(change.Value) // Append sets the header
 	return err
 }
 

@@ -8,7 +8,8 @@
   "request": "PeopleAction",
   "answers": {
    "ActionSaved": 200,
-   "Refusal": 409
+   "Refusal": 409,
+   "OrganizationGone": 410
   },
   "also": []
  },
@@ -20,7 +21,8 @@
   "query": {},
   "request": null,
   "answers": {
-   "StartAnswer": 200
+   "StartAnswer": 200,
+   "OrganizationGone": 410
   },
   "also": []
  },
@@ -37,7 +39,8 @@
   },
   "request": null,
   "answers": {
-   "MessagesAnswer": 200
+   "MessagesAnswer": 200,
+   "OrganizationGone": 410
   },
   "also": []
  },
@@ -49,7 +52,8 @@
   "query": {},
   "request": null,
   "answers": {
-   "ScreenFeedAnswer": 200
+   "ScreenFeedAnswer": 200,
+   "OrganizationGone": 410
   },
   "also": []
  },
@@ -65,7 +69,8 @@
   "request": null,
   "answers": {
    "HistoryAnswer": 200,
-   "NotAvailable": 503
+   "NotAvailable": 503,
+   "OrganizationGone": 410
   },
   "also": []
  },
@@ -78,7 +83,8 @@
   "request": null,
   "answers": {
    "SettingsAnswer": 200,
-   "NotAvailable": 503
+   "NotAvailable": 503,
+   "OrganizationGone": 410
   },
   "also": []
  },
@@ -93,7 +99,8 @@
   "request": null,
   "answers": {
    "PreviewAnswer": 200,
-   "NotAvailable": 503
+   "NotAvailable": 503,
+   "OrganizationGone": 410
   },
   "also": []
  },
@@ -108,7 +115,8 @@
   },
   "request": null,
   "answers": {
-   "ScreenSearchAnswer": 200
+   "ScreenSearchAnswer": 200,
+   "OrganizationGone": 410
   },
   "also": []
  },
@@ -123,7 +131,8 @@
   },
   "request": null,
   "answers": {
-   "SuggestAnswer": 200
+   "SuggestAnswer": 200,
+   "OrganizationGone": 410
   },
   "also": []
  },
@@ -250,8 +259,7 @@
   "answers": {
    "ChangeApplied": 200,
    "IAmAt": 409,
-   "OrganizationStopped": 423,
-   "StaleReset": 409
+   "OrganizationStopped": 423
   },
   "also": []
  },
@@ -265,8 +273,7 @@
   "answers": {
    "ChangeApplied": 200,
    "IAmAt": 409,
-   "OrganizationStopped": 423,
-   "StaleReset": 409
+   "OrganizationStopped": 423
   },
   "also": []
  },
@@ -279,8 +286,7 @@
   "request": "SearchChange",
   "answers": {
    "SearchApplied": 200,
-   "SearchRefusal": 422,
-   "StaleReset": 409
+   "SearchRefusal": 422
   },
   "also": []
  },
@@ -294,8 +300,7 @@
   "answers": {
    "NoteTaken": 200,
    "NoteBehind": 409,
-   "Refusal": 422,
-   "StaleReset": 409
+   "Refusal": 422
   },
   "also": []
  },
@@ -311,7 +316,8 @@
   "request": null,
   "answers": {
    "AgentEvents": 200,
-   "TooFarBehind": 410
+   "TooFarBehind": 410,
+   "OrganizationGone": 410
   },
   "also": []
  },
@@ -324,7 +330,8 @@
   "request": "AgentPost",
   "answers": {
    "AgentPosted": 200,
-   "Refusal": 409
+   "Refusal": 409,
+   "OrganizationGone": 410
   },
   "also": [
    429
@@ -339,7 +346,8 @@
   "request": "AgentReplyStart",
   "answers": {
    "AgentPosted": 200,
-   "Refusal": 409
+   "Refusal": 409,
+   "OrganizationGone": 410
   },
   "also": [
    429
@@ -355,7 +363,8 @@
   "answers": {
    "Empty": 200,
    "PieceMissing": 409,
-   "Refusal": 409
+   "Refusal": 409,
+   "OrganizationGone": 410
   },
   "also": [
    429
@@ -370,7 +379,8 @@
   "request": "AgentReplyFinish",
   "answers": {
    "AgentPosted": 200,
-   "Refusal": 409
+   "Refusal": 409,
+   "OrganizationGone": 410
   },
   "also": [
    429
@@ -384,7 +394,8 @@
   "query": {},
   "request": "AgentStatus",
   "answers": {
-   "Empty": 200
+   "Empty": 200,
+   "OrganizationGone": 410
   },
   "also": [
    429
@@ -399,7 +410,8 @@
   "request": "AgentReaction",
   "answers": {
    "AgentPosted": 200,
-   "Refusal": 409
+   "Refusal": 409,
+   "OrganizationGone": 410
   },
   "also": [
    429
@@ -414,7 +426,8 @@
   "request": "AgentDirect",
   "answers": {
    "AgentDirectAnswer": 200,
-   "Refusal": 409
+   "Refusal": 409,
+   "OrganizationGone": 410
   },
   "also": [
    429
@@ -428,7 +441,8 @@
   "query": {},
   "request": null,
   "answers": {
-   "Empty": 200
+   "Empty": 200,
+   "OrganizationGone": 410
   },
   "also": []
  },
@@ -440,7 +454,8 @@
   "query": {},
   "request": null,
   "answers": {
-   "Empty": 200
+   "Empty": 200,
+   "OrganizationGone": 410
   },
   "also": []
  },
@@ -458,7 +473,8 @@
   "request": null,
   "answers": {
    "MessagesAnswer": 200,
-   "Refusal": 409
+   "Refusal": 409,
+   "OrganizationGone": 410
   },
   "also": []
  },
@@ -634,18 +650,6 @@
  },
  {
   "contract": "operations-and-control",
-  "name": "reset",
-  "method": "POST",
-  "path": "demo:/orgs/{org}/reset",
-  "query": {},
-  "request": "Empty",
-  "answers": {
-   "Empty": 200
-  },
-  "also": []
- },
- {
-  "contract": "operations-and-control",
   "name": "notifications",
   "method": "GET",
   "path": "sender:/orgs/{org}/notifications",
@@ -700,7 +704,7 @@
   "method": "POST",
   "path": "conversations:/orgs/{org}/seed/open",
   "query": {},
-  "request": "Empty",
+  "request": "SeedOpenRequest",
   "answers": {
    "SeedOpened": 200,
    "Refusal": 409
@@ -730,6 +734,103 @@
   "answers": {
    "SeedThrough": 200,
    "Refusal": 409
+  },
+  "also": []
+ },
+ {
+  "contract": "operations-and-control",
+  "name": "retire",
+  "method": "POST",
+  "path": "conversations:/orgs/{org}/retire",
+  "query": {},
+  "request": "Empty",
+  "answers": {
+   "Empty": 200
+  },
+  "also": []
+ },
+ {
+  "contract": "operations-and-control",
+  "name": "delivery-stop",
+  "method": "POST",
+  "path": "delivery:/orgs/{org}/stop",
+  "query": {},
+  "request": "Empty",
+  "answers": {
+   "Empty": 200
+  },
+  "also": []
+ },
+ {
+  "contract": "operations-and-control",
+  "name": "delete-part",
+  "method": "DELETE",
+  "path": "{part}:/orgs/{org}",
+  "query": {},
+  "request": null,
+  "answers": {
+   "Empty": 200
+  },
+  "also": []
+ },
+ {
+  "contract": "operations-and-control",
+  "name": "demo-reset",
+  "method": "POST",
+  "path": "demo:/reset",
+  "query": {},
+  "request": "Empty",
+  "answers": {
+   "CurrentOrganization": 200
+  },
+  "also": []
+ },
+ {
+  "contract": "operations-and-control",
+  "name": "demo-current",
+  "method": "GET",
+  "path": "demo:/current",
+  "query": {},
+  "request": null,
+  "answers": {
+   "CurrentOrganization": 200
+  },
+  "also": []
+ },
+ {
+  "contract": "operations-and-control",
+  "name": "demo-organizations",
+  "method": "GET",
+  "path": "demo:/organizations",
+  "query": {},
+  "request": null,
+  "answers": {
+   "OrganizationList": 200
+  },
+  "also": []
+ },
+ {
+  "contract": "operations-and-control",
+  "name": "demo-delete",
+  "method": "DELETE",
+  "path": "demo:/organizations/{org}",
+  "query": {},
+  "request": null,
+  "answers": {
+   "Empty": 200,
+   "Refusal": 409
+  },
+  "also": []
+ },
+ {
+  "contract": "operations-and-control",
+  "name": "demo-delete-retired",
+  "method": "POST",
+  "path": "demo:/organizations/delete-retired",
+  "query": {},
+  "request": "Empty",
+  "answers": {
+   "Empty": 200
   },
   "also": []
  }

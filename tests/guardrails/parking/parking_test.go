@@ -1,6 +1,6 @@
 // Package parking holds G-014: a refused change is parked after three tries,
 // shown, and can be sent again; refusals pause one organization and no other.
-// It also holds how the workers follow a receiver's reset, wipe and edition.
+// It also holds how the workers follow a receiver's wipe and edition.
 package parking
 
 import (
@@ -293,7 +293,7 @@ func TestTheFeedsPlaceWinsWhenOutOfSequence(t *testing.T) {
 	if _, err := b.DB.Del.Exec(bg, `INSERT INTO delivery_places (org, receiver, place) VALUES ($1, 'feed', 25)`, org); err != nil {
 		t.Fatal(err)
 	}
-	b.Feed.SetReset(org, 1, 20)
+	b.Feed.SetPlace(org, 20)
 	b.Start(t, "copy-1")
 	rig.Until(t, 10*time.Second, "the worker continues from the feed's place", func() bool { return b.Feed.Place(org) >= 30 })
 	for n := int64(21); n <= 30; n++ {
@@ -326,25 +326,6 @@ func TestANewEditionRestartsTheNotesAtZero(t *testing.T) {
 	}
 	rig.Until(t, 10*time.Second, "the sender is at the new edition's third note", func() bool {
 		return b.Sender.Place(org) == 3 && status(t, b, org, "sender").Place == 3
-	})
-}
-
-func TestAResetIsFollowed(t *testing.T) {
-	b := rig.NewBench(t, nil)
-	const org = "acme"
-	b.DB.AddOrg(t, org, 80)
-	b.Start(t, "copy-1")
-	saveUpTo(t, b, org, 20)
-	rig.Until(t, 10*time.Second, "the feed is level", func() bool { return b.Feed.Place(org) >= 20 })
-
-	// Reset: the log's number rises and the feed is restored to its saved copy at 10.
-	b.Feed.SetReset(org, 2, 10)
-	if _, err := b.DB.Conversations.Exec(bg, `UPDATE org_log SET reset = 2 WHERE org = $1`, org); err != nil {
-		t.Fatal(err)
-	}
-	saveUpTo(t, b, org, 5)
-	rig.Until(t, 25*time.Second, "the worker follows the reset and carries on from the receiver's place", func() bool {
-		return b.Feed.Place(org) >= 25
 	})
 }
 

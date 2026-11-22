@@ -3,7 +3,6 @@ import type { ConversationPart, LiveOut } from './types';
 
 export interface LiveHandlers {
   onParts(parts: ConversationPart[]): void;
-  onReset(): void;
   onConnected(connected: boolean): void;
 }
 
@@ -14,7 +13,7 @@ export interface LiveHandlers {
  * Seam for T-056: the contract's numbered catch-up (`after`, `last_sent`, `too_far_behind`,
  * the feed stream, pieces of a reply) replaces the handling in `receive` below.
  */
-export function connectLive(person: string, reset: number, startNumber: number, handlers: LiveHandlers): () => void {
+export function connectLive(person: string, startNumber: number, handlers: LiveHandlers): () => void {
   let socket: WebSocket | null = null;
   let stopped = false;
   let delay = 100;
@@ -23,8 +22,7 @@ export function connectLive(person: string, reset: number, startNumber: number, 
 
   const receive = (data: string) => {
     const message = JSON.parse(data) as LiveOut;
-    if ('reset' in message) handlers.onReset();
-    else if ('stream' in message && message.stream === 'conversations') {
+    if ('stream' in message && message.stream === 'conversations') {
       number = Math.max(number, message.number);
       handlers.onParts(message.parts);
     }
@@ -38,7 +36,7 @@ export function connectLive(person: string, reset: number, startNumber: number, 
     ws.onopen = () => {
       delay = 100;
       handlers.onConnected(true);
-      ws.send(JSON.stringify({ resume: { reset, conversations: number, feed: null, feed_edition: null } }));
+      ws.send(JSON.stringify({ resume: { conversations: number, feed: null, feed_edition: null } }));
     };
     ws.onmessage = (event) => receive(String(event.data));
     ws.onclose = () => {

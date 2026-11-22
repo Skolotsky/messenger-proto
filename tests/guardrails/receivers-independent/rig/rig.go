@@ -133,7 +133,7 @@ func (d *DB) AddOrg(t testing.TB, org string, n int) {
 	if _, err := d.Feed.Exec(ctx, `INSERT INTO note_heads (org) VALUES ($1)`, org); err != nil {
 		t.Fatal(err)
 	}
-	script := logwriter.Write(logwriter.Config{Orgs: []string{org}, Seed: 47, Changes: max(n, 60), Reset: 1})
+	script := logwriter.Write(logwriter.Config{Orgs: []string{org}, Seed: 47, Changes: max(n, 60)})
 	d.mu.Lock()
 	d.entries[org] = script[org]
 	d.next[org] = 0
@@ -213,13 +213,13 @@ func (d *DB) save(ctx context.Context, org string, hold time.Duration) (int64, e
 func (d *DB) SaveNote(ctx context.Context, org, kind string) (int64, error) {
 	var number int64
 	err := orgdb.InOrg(ctx, orgdb.Single{Pool: d.Feed}, ids.Org(org), func(tx pgx.Tx) error {
-		var edition, reset int64
-		if err := tx.QueryRow(ctx, `UPDATE note_heads SET head = head + 1 WHERE org = $1 RETURNING head, edition, reset`, org).
-			Scan(&number, &edition, &reset); err != nil {
+		var edition int64
+		if err := tx.QueryRow(ctx, `UPDATE note_heads SET head = head + 1 WHERE org = $1 RETURNING head, edition`, org).
+			Scan(&number, &edition); err != nil {
 			return err
 		}
 		at := time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
-		note := map[string]any{"org": org, "reset": reset, "number": number, "previous": number - 1, "edition": edition, "at": at, "kind": kind}
+		note := map[string]any{"org": org, "number": number, "previous": number - 1, "edition": edition, "at": at, "kind": kind}
 		name := fmt.Sprintf("%s / marco / #launch:msg_1 / %d", org, number)
 		switch kind {
 		case "due":
@@ -268,7 +268,6 @@ type Receiver struct {
 	mu       sync.Mutex
 	places   map[string]int64
 	editions map[string]int64
-	resets   map[string]int64
 	wipes    map[string]int64
 	stopped  map[string]bool
 	refuse   func(org string, number int64) bool
@@ -280,7 +279,7 @@ type Receiver struct {
 
 // NewReceiver starts a recording receiver of the given kind.
 func NewReceiver(t testing.TB, kind string) *Receiver {
-	r := &Receiver{Kind: kind, places: map[string]int64{}, editions: map[string]int64{}, resets: map[string]int64{},
+	r := &Receiver{Kind: kind, places: map[string]int64{}, editions: map[string]int64{},
 		wipes: map[string]int64{}, stopped: map[string]bool{}, seen: map[key]int{}, first: map[key]time.Time{},
 		closing: make(chan struct{})}
 	r.srv = httptest.NewServer(r)
@@ -325,19 +324,12 @@ func (r *Receiver) Wipe(org string) {
 	}
 }
 
-// SetEdition makes a sender start a new edition for org, as a higher note does.
-func (r *Receiver) SetReset(org string, reset, through int64) {
+// SetPlace makes the receiver stand at through for org, as one that lost or
+// already holds changes would.
+func (r *Receiver) SetPlace(org string, through int64) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.resets[org] = reset
 	r.places[org] = through
-}
-
-func (r *Receiver) resetOf(org string) int64 {
-	if v, ok := r.resets[org]; ok {
-		return v
-	}
-	return 1
 }
 
 func (r *Receiver) ServeHTTP(w http.ResponseWriter, q *http.Request) {
@@ -378,7 +370,7 @@ func (r *Receiver) ServeHTTP(w http.ResponseWriter, q *http.Request) {
 	case q.Method == http.MethodGet && strings.HasSuffix(q.URL.Path, "/place"):
 		org := strings.Split(q.URL.Path, "/")[2]
 		r.mu.Lock()
-		out := map[string]int64{"reset": r.resetOf(org), "through": r.places[org], "wipe": r.wipes[org], "edition": max(r.editions[org], 1)}
+		out := map[string]int64{"through": r.places[org], "wipe": r.wipes[org], "edition": max(r.editions[org], 1)}
 		r.mu.Unlock()
 		writeJSON(w, 200, out)
 	case q.URL.Path == "/changes/batch":
@@ -411,7 +403,6 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 func (r *Receiver) apply(raw []byte) (int, any) {
 	var h struct {
 		Org      string `json:"org"`
-		Reset    int64  `json:"reset"`
 		Number   int64  `json:"number"`
 		Previous int64  `json:"previous"`
 		Edition  int64  `json:"edition"`
@@ -424,9 +415,6 @@ func (r *Receiver) apply(raw []byte) (int, any) {
 	}
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	if h.Reset < r.resetOf(h.Org) {
-		return 409, map[string]int64{"stale_reset": r.resetOf(h.Org)}
-	}
 	k := key{h.Org, h.Number}
 	switch r.Kind {
 	case "search":

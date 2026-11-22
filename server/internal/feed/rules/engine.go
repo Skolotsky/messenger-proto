@@ -104,16 +104,16 @@ type NoteDraft struct {
 }
 
 // Contract gives the note its place in the feed's numbered log.
-func (n NoteDraft) Contract(org string, reset, number, previous, edition int64) contract.Note {
+func (n NoteDraft) Contract(org string, number, previous, edition int64) contract.Note {
 	switch n.Kind {
 	case "due":
-		return contract.Note{Value: contract.NoteDue{Kind: "due", Org: org, Reset: reset, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name, Row: n.Row, Person: n.Person, Bucket: n.Bucket, Why: n.Why, Text: n.Text}}
+		return contract.Note{Value: contract.NoteDue{Kind: "due", Org: org, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name, Row: n.Row, Person: n.Person, Bucket: n.Bucket, Why: n.Why, Text: n.Text}}
 	case "changed":
-		return contract.Note{Value: contract.NoteChanged{Kind: "changed", Org: org, Reset: reset, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name, Text: n.Text}}
+		return contract.Note{Value: contract.NoteChanged{Kind: "changed", Org: org, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name, Text: n.Text}}
 	case "withdrawn":
-		return contract.Note{Value: contract.NoteWithdrawn{Kind: "withdrawn", Org: org, Reset: reset, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name, Because: n.Because}}
+		return contract.Note{Value: contract.NoteWithdrawn{Kind: "withdrawn", Org: org, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name, Because: n.Because}}
 	}
-	return contract.Note{Value: contract.NoteClock{Kind: "clock", Org: org, Reset: reset, Number: number, Previous: previous, Edition: edition, At: n.At}}
+	return contract.Note{Value: contract.NoteClock{Kind: "clock", Org: org, Number: number, Previous: previous, Edition: edition, At: n.At}}
 }
 
 // Engine is the rules' state for one organization.

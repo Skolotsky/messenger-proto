@@ -3,7 +3,6 @@
 -- One row per organization: numbers and times only (G-025).
 CREATE TABLE state (
   org     text PRIMARY KEY,
-  reset   bigint NOT NULL DEFAULT 1,
   edition bigint NOT NULL DEFAULT 1,
   place   bigint NOT NULL DEFAULT 0,
   clock   timestamptz                 -- the newest clock note; moved by nothing else

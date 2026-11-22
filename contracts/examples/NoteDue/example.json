@@ -1,7 +1,6 @@
 {
  "kind": "due",
  "org": "acme",
- "reset": 2,
  "number": 1286,
  "previous": 1285,
  "edition": 7,

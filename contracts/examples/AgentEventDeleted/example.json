@@ -2,7 +2,6 @@
  "kind": "deleted",
  "org": "acme",
  "number": 312,
- "reset": 2,
  "agent_chain": 2,
  "message": {
   "id": "msg_7Q2",

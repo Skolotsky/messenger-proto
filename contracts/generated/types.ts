@@ -133,7 +133,8 @@ export type Change =
   | ChangeReaderReleaseSetting
   | ChangeReaderPreference
   | ChangeReaderProfileLine
-  | ChangeTick;
+  | ChangeTick
+  | ChangeSeedSealed;
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "PeopleAction".
@@ -197,7 +198,13 @@ export type FeedPart =
  * via the `definition` "LiveOut".
  */
 export type LiveOut =
-  LiveFeedUpdate | LiveConversationsUpdate | LiveLastSent | LiveTooFarBehind | LiveReset | LivePiece | LiveAgentStatus;
+  | LiveFeedUpdate
+  | LiveConversationsUpdate
+  | LiveLastSent
+  | LiveTooFarBehind
+  | LivePiece
+  | LiveAgentStatus
+  | OrganizationGone;
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "SearchChange".
@@ -284,7 +291,6 @@ export interface ContractTypes {
   ChangeBatch?: ChangeBatch;
   ChangeApplied?: ChangeApplied;
   IAmAt?: IAmAt;
-  StaleReset?: StaleReset;
   OrganizationStopped?: OrganizationStopped;
   NewMessage?: NewMessage;
   ActionSend?: ActionSend;
@@ -367,7 +373,6 @@ export interface ContractTypes {
   LastSentNumbers?: LastSentNumbers;
   LiveLastSent?: LiveLastSent;
   LiveTooFarBehind?: LiveTooFarBehind;
-  LiveReset?: LiveReset;
   PieceBody?: PieceBody;
   LivePiece?: LivePiece;
   AgentStatusBody?: AgentStatusBody;
@@ -431,6 +436,12 @@ export interface ContractTypes {
   SeedBatch?: SeedBatch;
   SeedThrough?: SeedThrough;
   Empty?: Empty;
+  OrganizationGone?: OrganizationGone;
+  ChangeSeedSealed?: ChangeSeedSealed;
+  SeedOpenRequest?: SeedOpenRequest;
+  CurrentOrganization?: CurrentOrganization;
+  OrganizationEntry?: OrganizationEntry;
+  OrganizationList?: OrganizationList;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -552,7 +563,6 @@ export interface ConversationSummary {
 export interface ChangeMessageCreated {
   kind: "message.created";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -565,7 +575,6 @@ export interface ChangeMessageCreated {
 export interface ChangeMessageChanged {
   kind: "message.changed";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -578,7 +587,6 @@ export interface ChangeMessageChanged {
 export interface ChangeMessageDeleted {
   kind: "message.deleted";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -591,7 +599,6 @@ export interface ChangeMessageDeleted {
 export interface ChangeReplyStarted {
   kind: "reply.started";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -607,7 +614,6 @@ export interface ChangeReplyStarted {
 export interface ChangeReplyAbandoned {
   kind: "reply.abandoned";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -622,7 +628,6 @@ export interface ChangeReplyAbandoned {
 export interface ChangeReactionAdded {
   kind: "reaction.added";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -639,7 +644,6 @@ export interface ChangeReactionAdded {
 export interface ChangeReactionRemoved {
   kind: "reaction.removed";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -656,7 +660,6 @@ export interface ChangeReactionRemoved {
 export interface ChangePersonJoined {
   kind: "person.joined";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -671,7 +674,6 @@ export interface ChangePersonJoined {
 export interface ChangeChannelCreated {
   kind: "channel.created";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -686,7 +688,6 @@ export interface ChangeChannelCreated {
 export interface ChangeChannelPeopleAdded {
   kind: "channel.people_added";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -700,7 +701,6 @@ export interface ChangeChannelPeopleAdded {
 export interface ChangeDirectCreated {
   kind: "direct.created";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -714,7 +714,6 @@ export interface ChangeDirectCreated {
 export interface ChangeReaderRead {
   kind: "reader.read";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -730,7 +729,6 @@ export interface ChangeReaderRead {
 export interface ChangeReaderWatchingStarted {
   kind: "reader.watching_started";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -746,7 +744,6 @@ export interface ChangeReaderWatchingStarted {
 export interface ChangeReaderWatchingEnded {
   kind: "reader.watching_ended";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -762,7 +759,6 @@ export interface ChangeReaderWatchingEnded {
 export interface ChangeReaderKeep {
   kind: "reader.keep";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -777,7 +773,6 @@ export interface ChangeReaderKeep {
 export interface ChangeReaderDone {
   kind: "reader.done";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -792,7 +787,6 @@ export interface ChangeReaderDone {
 export interface ChangeReaderDial {
   kind: "reader.dial";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -808,7 +802,6 @@ export interface ChangeReaderDial {
 export interface ChangeReaderFocusRule {
   kind: "reader.focus_rule";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -823,7 +816,6 @@ export interface ChangeReaderFocusRule {
 export interface ChangeReaderFocusPerson {
   kind: "reader.focus_person";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -838,7 +830,6 @@ export interface ChangeReaderFocusPerson {
 export interface ChangeReaderFocusAutoAdd {
   kind: "reader.focus_auto_add";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -852,7 +843,6 @@ export interface ChangeReaderFocusAutoAdd {
 export interface ChangeReaderFocusOnly {
   kind: "reader.focus_only";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -866,7 +856,6 @@ export interface ChangeReaderFocusOnly {
 export interface ChangeReaderReleaseSetting {
   kind: "reader.release_setting";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -880,7 +869,6 @@ export interface ChangeReaderReleaseSetting {
 export interface ChangeReaderPreference {
   kind: "reader.preference";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -895,7 +883,6 @@ export interface ChangeReaderPreference {
 export interface ChangeReaderProfileLine {
   kind: "reader.profile_line";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -909,7 +896,19 @@ export interface ChangeReaderProfileLine {
 export interface ChangeTick {
   kind: "tick";
   org: string;
-  reset: number;
+  number: number;
+  previous: number;
+  at: string;
+}
+/**
+ * Closes a seed session: no notification is written for anything up to and including it (D-032, D-033).
+ *
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "ChangeSeedSealed".
+ */
+export interface ChangeSeedSealed {
+  kind: "seed.sealed";
+  org: string;
   number: number;
   previous: number;
   at: string;
@@ -939,13 +938,6 @@ export interface ChangeApplied {
  */
 export interface IAmAt {
   i_am_at: number;
-}
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "StaleReset".
- */
-export interface StaleReset {
-  stale_reset: number;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -1189,7 +1181,6 @@ export interface StartAnswer {
   people: PersonView[];
   preferences: Preference[];
   conversations: ConversationSummary[];
-  reset: number;
   number: number;
 }
 /**
@@ -1323,7 +1314,6 @@ export interface FeedCounts {
  * via the `definition` "FeedRowsAnswer".
  */
 export interface FeedRowsAnswer {
-  reset: number;
   edition: number;
   through: number;
   number: number;
@@ -1335,7 +1325,6 @@ export interface FeedRowsAnswer {
  * via the `definition` "ScreenFeedAnswer".
  */
 export interface ScreenFeedAnswer {
-  reset: number;
   edition: number | null;
   through: number | null;
   number: number | null;
@@ -1491,7 +1480,6 @@ export interface ReplyText {
  * via the `definition` "ResumeNumbers".
  */
 export interface ResumeNumbers {
-  reset: number;
   conversations: number;
   feed: number | null;
   feed_edition: number | null;
@@ -1736,13 +1724,6 @@ export interface LiveTooFarBehind {
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "LiveReset".
- */
-export interface LiveReset {
-  reset: number;
-}
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "PieceBody".
  */
 export interface PieceBody {
@@ -1777,6 +1758,15 @@ export interface LiveAgentStatus {
   agent_status: AgentStatusBody;
 }
 /**
+ * A retired organization (D-033). The same body on the doors (410) and as the last message on a live connection.
+ *
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "OrganizationGone".
+ */
+export interface OrganizationGone {
+  organization_gone: true;
+}
+/**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "RowUpdate".
  */
@@ -1791,7 +1781,6 @@ export interface RowUpdate {
  * via the `definition` "RowUpdatesPage".
  */
 export interface RowUpdatesPage {
-  reset: number;
   updates: RowUpdate[];
   next: number | null;
 }
@@ -1835,7 +1824,6 @@ export interface SearchDeleted {
 export interface SearchCreated {
   kind: "message.created";
   org: string;
-  reset: number;
   number: number;
   message: SearchMessage;
 }
@@ -1846,7 +1834,6 @@ export interface SearchCreated {
 export interface SearchChanged {
   kind: "message.changed";
   org: string;
-  reset: number;
   number: number;
   message: SearchMessage;
 }
@@ -1857,7 +1844,6 @@ export interface SearchChanged {
 export interface SearchDeletedChange {
   kind: "message.deleted";
   org: string;
-  reset: number;
   number: number;
   message: SearchDeleted;
 }
@@ -1885,7 +1871,6 @@ export interface SearchRefusal {
 export interface NoteDue {
   kind: "due";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   edition: number;
@@ -1904,7 +1889,6 @@ export interface NoteDue {
 export interface NoteChanged {
   kind: "changed";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   edition: number;
@@ -1919,7 +1903,6 @@ export interface NoteChanged {
 export interface NoteWithdrawn {
   kind: "withdrawn";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   edition: number;
@@ -1934,7 +1917,6 @@ export interface NoteWithdrawn {
 export interface NoteClock {
   kind: "clock";
   org: string;
-  reset: number;
   number: number;
   previous: number;
   edition: number;
@@ -1978,7 +1960,6 @@ export interface AgentEventMentioned {
   kind: "mentioned";
   org: string;
   number: number;
-  reset: number;
   agent_chain: number;
   message: Message;
 }
@@ -1990,7 +1971,6 @@ export interface AgentEventDirectMessage {
   kind: "direct_message";
   org: string;
   number: number;
-  reset: number;
   agent_chain: number;
   message: Message;
 }
@@ -2002,7 +1982,6 @@ export interface AgentEventReply {
   kind: "reply";
   org: string;
   number: number;
-  reset: number;
   agent_chain: number;
   message: Message;
 }
@@ -2014,7 +1993,6 @@ export interface AgentEventChanged {
   kind: "changed";
   org: string;
   number: number;
-  reset: number;
   agent_chain: number;
   message: Message;
 }
@@ -2026,7 +2004,6 @@ export interface AgentEventDeleted {
   kind: "deleted";
   org: string;
   number: number;
-  reset: number;
   agent_chain: number;
   message: Message;
 }
@@ -2038,7 +2015,6 @@ export interface AgentEventReaction {
   kind: "reaction";
   org: string;
   number: number;
-  reset: number;
   agent_chain: number;
   message: Message;
   by: string;
@@ -2050,7 +2026,6 @@ export interface AgentEventReaction {
  * via the `definition` "AgentEvents".
  */
 export interface AgentEvents {
-  reset: number;
   continue_from: number | null;
   events: AgentEvent[];
 }
@@ -2154,7 +2129,6 @@ export interface AgentDirectAnswer {
  * via the `definition` "FeedPlace".
  */
 export interface FeedPlace {
-  reset: number;
   through: number;
   edition: number;
 }
@@ -2163,7 +2137,6 @@ export interface FeedPlace {
  * via the `definition` "SearchPlace".
  */
 export interface SearchPlace {
-  reset: number;
   through: number;
   wipe: number;
 }
@@ -2172,7 +2145,6 @@ export interface SearchPlace {
  * via the `definition` "SenderPlace".
  */
 export interface SenderPlace {
-  reset: number;
   through: number;
   edition: number;
 }
@@ -2312,3 +2284,42 @@ export interface SeedThrough {
  * via the `definition` "Empty".
  */
 export interface Empty {}
+/**
+ * The display name is optional; without it, the organization's ID.
+ *
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "SeedOpenRequest".
+ */
+export interface SeedOpenRequest {
+  name?: string;
+}
+/**
+ * The organization the entry address loads; known only to the demo program (D-033).
+ *
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "CurrentOrganization".
+ */
+export interface CurrentOrganization {
+  org: string;
+  name: string;
+}
+/**
+ * One line of the control panel's operator list: no content (G-025).
+ *
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "OrganizationEntry".
+ */
+export interface OrganizationEntry {
+  org: string;
+  name: string;
+  state: "current" | "retired";
+  created_at: string;
+  approx_changes: number;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "OrganizationList".
+ */
+export interface OrganizationList {
+  organizations: OrganizationEntry[];
+}

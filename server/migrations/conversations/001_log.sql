@@ -7,7 +7,6 @@
 -- commit in order and a reader never steps over one (G-005).
 CREATE TABLE org_log (
   org            text PRIMARY KEY,
-  reset          bigint NOT NULL DEFAULT 1,
   head           bigint NOT NULL DEFAULT 0,
   head_at        timestamptz,
   last_change_at timestamptz,          -- newest entry that is not a tick
@@ -44,7 +43,6 @@ CREATE TABLE delivery_places (
   org           text NOT NULL REFERENCES org_log (org),
   receiver      text NOT NULL CHECK (receiver IN ('search', 'feed')),
   place         bigint NOT NULL DEFAULT 0,
-  reset         bigint NOT NULL DEFAULT 1,
   wipe          bigint NOT NULL DEFAULT 0,
   claimed_by    text,
   claimed_until timestamptz,

@@ -38,7 +38,6 @@ type Step struct {
 	ctx     context.Context
 	Tx      pgx.Tx
 	org     ids.Org
-	reset   int64
 	head    int64
 	headAt  *time.Time
 	at      time.Time
@@ -66,14 +65,15 @@ func (s *Store) open(ctx context.Context, tx pgx.Tx, org ids.Org) (*Step, error)
 	step := &Step{ctx: ctx, Tx: tx, org: org}
 	if plainSequence {
 		// Test-only fault for G-005: no lock, so numbers can commit out of order.
-		if err := tx.QueryRow(ctx, `SELECT reset FROM org_log WHERE org = $1`, string(org)).Scan(&step.reset); err != nil {
+		var one int
+		if err := tx.QueryRow(ctx, `SELECT 1 FROM org_log WHERE org = $1`, string(org)).Scan(&one); err != nil {
 			return nil, unknownOrg(err)
 		}
 		step.at = s.Clock.Now().UTC().Truncate(time.Millisecond)
 		return step, nil
 	}
-	err := tx.QueryRow(ctx, `SELECT reset, head, head_at FROM org_log WHERE org = $1 FOR UPDATE`, string(org)).
-		Scan(&step.reset, &step.head, &step.headAt)
+	err := tx.QueryRow(ctx, `SELECT head, head_at FROM org_log WHERE org = $1 FOR UPDATE`, string(org)).
+		Scan(&step.head, &step.headAt)
 	if err != nil {
 		return nil, unknownOrg(err)
 	}
@@ -120,7 +120,7 @@ func (s *Step) Append(change any) (int64, error) {
 		previous = number - 1
 	}
 	stamp := s.At()
-	for k, v := range map[string]any{"org": string(s.org), "reset": s.reset, "number": number, "previous": previous, "at": stamp} {
+	for k, v := range map[string]any{"org": string(s.org), "number": number, "previous": previous, "at": stamp} {
 		b, _ := json.Marshal(v)
 		fields[k] = b
 	}

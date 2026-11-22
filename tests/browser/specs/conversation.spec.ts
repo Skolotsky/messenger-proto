@@ -121,19 +121,6 @@ test('a send with the door down keeps the text, and goes through once when it is
   await expect(pane.locator('.msg-body', { hasText: arrival })).toBeVisible();
 });
 
-test('a Reset of the organization loads everything fresh', async ({ page, request }, info) => {
-  await start(page);
-  const pane = await openConversation(page, info, 'general');
-  const reloaded = page.waitForRequest((r) => r.url().endsWith('/people/marco/start'));
-  await control(request, { reset: true });
-  await reloaded;
-  await expect(page.locator('.app[data-live="on"]')).toBeVisible();
-  await expect(pane.locator('[data-msg]').first(), 'the open conversation comes back').toBeVisible();
-  const text = unique('After the reset');
-  await post(request, 'anna', '#general', text);
-  await expect(pane.locator('.msg-body', { hasText: text })).toBeVisible();
-});
-
 const readsOf = (page: Page) => {
   const reads: { conversation: string; thread: string | null }[] = [];
   page.on('request', (r) => {
