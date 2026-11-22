@@ -78,6 +78,7 @@ type Door struct {
 	feedDown   bool
 	down       bool
 	refuseLive bool
+	quiet      bool // the regular last_sent is kept back
 	hold       bool
 	dropNext   int
 	refuse     string
@@ -391,10 +392,10 @@ type replyCommand struct {
 
 func (d *Door) control(w http.ResponseWriter, r *http.Request) {
 	var in struct {
-		Down, FeedDown, RefuseLive, Hold, Cut, Beat, NewEdition, Retire, Restore, Forget *bool
-		Refuse, Release                                                                  *string
-		DropNext                                                                         *int
-		Burst                                                                            *struct {
+		Down, FeedDown, RefuseLive, Hold, Cut, Beat, NewEdition, Retire, Restore, Forget, Quiet *bool
+		Refuse, Release                                                                         *string
+		DropNext                                                                                *int
+		Burst                                                                                   *struct {
 			As, Conversation string
 			Count            int
 		}
@@ -418,6 +419,9 @@ func (d *Door) control(w http.ResponseWriter, r *http.Request) {
 	}
 	if in.RefuseLive != nil {
 		d.refuseLive = *in.RefuseLive
+	}
+	if in.Quiet != nil {
+		d.quiet = *in.Quiet
 	}
 	if in.Cut != nil && *in.Cut {
 		d.cutAll()
@@ -1347,8 +1351,11 @@ func (d *Door) live(w http.ResponseWriter, r *http.Request) {
 			}
 		case <-beat.C:
 			d.mu.Lock()
-			b := d.lastSent(person)
+			b, quiet := d.lastSent(person), d.quiet
 			d.mu.Unlock()
+			if quiet {
+				continue
+			}
 			if conn.Write(ctx, websocket.MessageText, b) != nil {
 				return
 			}

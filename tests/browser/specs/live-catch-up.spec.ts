@@ -73,36 +73,50 @@ test('G-015: with every nudge lost, a lost update is healed by the regular last_
 test('G-015: updates arriving in the wrong order end in the right one', async ({ page, request }, info) => {
   await start(page);
   const pane = await openConversation(page, info, 'general');
-  await control(request, { hold: true });
+  // A reaction carries no version: only the numbers can tell which of these is the last.
+  const target = await say(request, unique('Reacted to twice'));
+  await expect(pane.locator(`[data-msg="${target}"]`)).toBeVisible();
+  // Without the regular last_sent, only the update's own numbers can put this right.
+  await control(request, { hold: true, quiet: true });
   const texts = [unique('First'), unique('Second'), unique('Third')];
   for (const t of texts) await say(request, t);
+  await doorAct(request, { as: 'lena', kind: 'react', message: target, emoji: '🎉', on: true });
+  await doorAct(request, { as: 'lena', kind: 'react', message: target, emoji: '🎉', on: false });
   await control(request, { release: 'reverse' });
   for (const t of texts) await expect(body(pane, t)).toBeVisible();
+  await expect(pane.locator(`[data-msg="${target}"]`)).toBeVisible();
+  // The first message arrives last in reverse, so everything held has been received by now.
+  await expect(pane.locator(`[data-msg="${target}"] .rx`), 'the last change wins').toHaveCount(0);
   const shown = await pane.locator('.msg-body').allTextContents();
   expect(texts.map((t) => shown.indexOf(t))).toEqual([...texts.map((t) => shown.indexOf(t))].sort((a, b) => a - b));
   await expectEqualsFreshLoad(page, 'general');
 });
 
 test('G-015: another view opened with updates in flight does not move the position', async ({ page, request }, info) => {
+  const phone = info.project.name === 'phone';
+  const go = async (from: import('@playwright/test').Locator | null, name: string) => {
+    if (phone && from) await from.getByRole('button', { name: 'Back' }).click();
+    return openConversation(page, info, name);
+  };
   await start(page);
-  const pane = await openConversation(page, info, 'general');
-  await control(request, { hold: true });
-  const inFlight = unique('In flight');
-  await say(request, inFlight);
-  const elsewhere = unique('In flight elsewhere');
-  await post(request, 'anna', '#launch', elsewhere);
-  // Opening another conversation loads a view newer than the screen's position.
-  if (info.project.name === 'phone') await pane.getByRole('button', { name: 'Back' }).click();
-  const other = await openConversation(page, info, 'launch');
-  await expect(body(other, elsewhere), 'the fresh view has it').toBeVisible();
+  // Read, so that its mark can only come back through the update held on its way.
+  const first = await go(null, 'incidents');
+  const pane = await go(first, 'general');
+  await expect(page.locator('.chat.unread', { hasText: 'incidents' })).toHaveCount(0);
+
+  await control(request, { hold: true, quiet: true });
+  await post(request, 'anna', '#incidents', unique('In flight elsewhere'));
+  const inView = unique('Newer than the position');
+  await post(request, 'anna', '#launch', inView);
+  // This view is loaded with a number past the update still on its way.
+  const other = await go(pane, 'launch');
+  await expect(body(other, inView), 'the fresh view has it').toBeVisible();
   await control(request, { release: 'order' });
-  if (info.project.name === 'phone') await other.getByRole('button', { name: 'Back' }).click();
-  const back = await openConversation(page, info, 'general');
-  await expect(body(back, inFlight)).toBeVisible();
-  // Only updates count: one more proves the stream is still applied from the right place.
-  const after = unique('After the view');
-  await say(request, after);
-  await expect(body(back, after)).toBeVisible();
+  if (phone) await other.getByRole('button', { name: 'Back' }).click();
+  if (phone) await page.getByRole('navigation', { name: 'Main' }).getByRole('button', { name: 'Channels' }).click();
+  await expect(page.locator('.chat.unread', { hasText: 'incidents' }), 'the update in flight was still applied').toHaveCount(1);
+  await control(request, { quiet: false });
+  await openConversation(page, info, 'general');
   await expectEqualsFreshLoad(page, 'general');
 });
 
@@ -138,6 +152,8 @@ test('G-015: a new edition of the feed loads the feed fresh', async ({ page, req
 
 test('D-033: a retired organization sends the screen to the entry address, into the current one', async ({ page, request }, info) => {
   await start(page);
+  // No door answer reaches the screen: only the message on the live connection can tell it.
+  await page.route('**/orgs/acme/**', (route) => route.abort());
   await control(request, { retire: true });
   await expect(page).toHaveURL(/\?org=acme-2/);
   await expect(live(page)).toBeVisible();

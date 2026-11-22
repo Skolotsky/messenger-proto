@@ -85,6 +85,6 @@ export const offline = (page: Page) => page.locator('.app[data-live="off"]');
 
 /** Every test leaves the door's going-wrong switches as it found them. */
 export async function resetDoor(request: APIRequestContext) {
-  await control(request, { down: false, refuseLive: false, hold: false, dropNext: 0, feedDown: false, restore: true });
+  await control(request, { down: false, refuseLive: false, hold: false, dropNext: 0, feedDown: false, restore: true, quiet: false });
   await control(request, { release: 'order' });
 }
