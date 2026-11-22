@@ -11,6 +11,7 @@ Work in flight. Order inside a section is priority. Finished work moves to `done
 
 ## Waiting on user
 
+- **T-065** `decide` D-034, given by the user 2026-11-22: the notification hold moves into the feed; the coding-agent connector and text rules leave scope; no scale testing in the product; the 100,000 figure is withdrawn; simulated figures are never validation. Five points need the user's answer before it is recorded. Starts after T-064 merges and before T-052
 - **T-034** `guardrails` Seven contracts (`docs/contracts/`) and guardrails G-003 to G-030 are written (G-027 to G-030 for growing by adding copies and databases and for one large organization, D-029 and D-030) (with the organization in every contract since D-026, and G-025, G-026 for keeping organizations apart and independent) from the accepted technical decisions; the user reviews the sentences in `docs/visuals/T-034-guardrails.html`. All product guardrails are `pending` until their tests exist. An independent verifier found four blockers and six larger gaps (delivery of notifications unprotected, a screen numbering that could not work with filtered updates, two boundaries without a contract, a guardrail whose check could pass while it was false); all answered, corrections not re-checked
 - **T-021** `decide` Nine small behaviours the E-001 model still chooses on its own (list in `experiments/E-001-feed-rules-model/README.md`, "Still open after this run"). None blocks the look-and-feel work. The notification default was confirmed by the user at about 29 a day
 
