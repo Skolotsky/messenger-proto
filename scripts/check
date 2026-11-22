@@ -159,6 +159,10 @@ else
   section "Web app"
   [ -d web/app/node_modules ] || TOOL_DIR=web/app ./scripts/tool npm ci --no-audit --no-fund >/dev/null 2>&1
   if out=$(TOOL_DIR=web/app ./scripts/tool npm run typecheck 2>&1); then pass "web app types"; else fail "web app types. Run: TOOL_DIR=web/app ./scripts/tool npm run typecheck"; printf '%s\n' "$out" | tail -15; fi
+  for page in web/control-panel web/notification-app; do
+    [ -d "$page/node_modules" ] || TOOL_DIR=$page ./scripts/tool npm ci --no-audit --no-fund >/dev/null 2>&1
+    if out=$(TOOL_DIR=$page ./scripts/tool npm run typecheck 2>&1); then pass "$page types"; else fail "$page types. Run: TOOL_DIR=$page ./scripts/tool npm run typecheck"; printf '%s\n' "$out" | tail -15; fi
+  done
 fi
 
 # ---------------------------------------------------------------------------

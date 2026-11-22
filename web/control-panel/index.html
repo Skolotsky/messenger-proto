@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>Contexia control panel</title>
+    <script>
+      /* Theme: System (the default), Light or Dark, applied before the first paint. Shared key with the product. */
+      (function () {
+        var K = 'contexia-theme', mem = null, d = document.documentElement, mq = matchMedia('(prefers-color-scheme: dark)');
+        function read() { try { return localStorage.getItem(K); } catch (e) { return mem; } }
+        function write(v) { mem = v; try { if (v === 'system') localStorage.removeItem(K); else localStorage.setItem(K, v); } catch (e) {} }
+        function pref() { var v = read(); return v === 'light' || v === 'dark' ? v : 'system'; }
+        function resolved() { var p = pref(); return p === 'system' ? (mq.matches ? 'dark' : 'light') : p; }
+        function apply() {
+          var p = pref(); if (p === 'system') delete d.dataset.theme; else d.dataset.theme = p;
+          var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = resolved() === 'dark' ? '#17181a' : '#ffffff';
+        }
+        window.Theme = { pref: pref, set: function (v) { write(v); apply(); } };
+        apply();
+        mq.addEventListener('change', apply);
+        window.addEventListener('storage', function (e) { if (e.key === K) apply(); });
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

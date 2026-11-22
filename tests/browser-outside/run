@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Build the two outside pages and run their browser tests, all in Docker.
+# Usage: tests/browser-outside/run [playwright arguments]
+# CONTEXIA_SHOTS=1 also writes the review screenshots to tests/browser-outside/shots.
+set -euo pipefail
+root="$(cd "$(dirname "$0")/../.." && pwd)"
+cd "$root"
+image=mcr.microsoft.com/playwright:v1.49.1-noble
+
+for dir in web/control-panel web/notification-app tests/browser-outside; do
+  [ -d "$dir/node_modules" ] || TOOL_DIR="$dir" ./scripts/tool npm ci --no-audit --no-fund
+done
+for dir in web/control-panel web/notification-app; do
+  # The default build answers from its fixtures; the network build makes the real calls the tests answer.
+  TOOL_DIR="$dir" ./scripts/tool npm run build
+  CONTEXIA_TOOL_ENV="VITE_API=network" TOOL_DIR="$dir" ./scripts/tool npx vite build --outDir dist-network --emptyOutDir
+done
+
+exec docker run --rm --init --ipc=host -u "$(id -u):$(id -g)" -v "$root":/repo -w /repo/tests/browser-outside \
+  -e HOME=/tmp -e CI=1 -e "CONTEXIA_SHOTS=${CONTEXIA_SHOTS:-}" "$image" npx playwright test "$@"

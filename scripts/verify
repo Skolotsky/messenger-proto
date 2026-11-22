@@ -46,4 +46,8 @@ echo; echo "Browser tests, at 1280 and 400 px"
 if ! env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV web/app/scripts/browser-tests --reporter=line; then
   echo "verify: FAIL a browser test failed. See the output above."; exit 1
 fi
+echo; echo "Control panel and notification app, at 1280 and 400 px"
+if ! env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV tests/browser-outside/run --reporter=line; then
+  echo "verify: FAIL a browser test of the outside pages failed. See the output above."; exit 1
+fi
 echo; echo "verify: all passed"
