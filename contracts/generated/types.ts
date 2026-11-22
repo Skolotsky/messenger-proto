@@ -443,6 +443,7 @@ export interface ContractTypes {
   OrganizationEntry?: OrganizationEntry;
   OrganizationList?: OrganizationList;
   ChangeSeedOpened?: ChangeSeedOpened;
+  WipeRequest?: WipeRequest;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -2299,4 +2300,13 @@ export interface OrganizationEntry {
  */
 export interface OrganizationList {
   organizations: OrganizationEntry[];
+}
+/**
+ * Optional. rules_changed marks what fell due before this wipe as history, never delivered (D-034).
+ *
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "WipeRequest".
+ */
+export interface WipeRequest {
+  rules_changed?: boolean;
 }

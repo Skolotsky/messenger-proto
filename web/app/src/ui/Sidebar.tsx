@@ -2,6 +2,8 @@ import type { ConversationSummary, PersonView } from '../api/types';
 import type { Session } from '../state/useSession';
 import { Avatar } from './Avatar';
 import { conversationTitle } from './ConversationView';
+import { timeOf } from './format';
+import { useOfflineNotice } from './hooks';
 import { Icon } from './Icon';
 import type { Jump } from './jump';
 import { NewConversationButton } from './NewConversation';
@@ -25,6 +27,7 @@ interface Props {
 export function Sidebar({ session, open, activityOpen, onToggleActivity, onOpen, onSwitch, onSettings, attention, onSearchHit }: Props) {
   const channels = session.conversations.filter((c) => c.type === 'channel');
   const directs = session.conversations.filter((c) => c.type === 'direct');
+  const offline = useOfflineNotice(session.offlineSince);
 
   const item = (c: ConversationSummary) => {
     const title = conversationTitle(c, session);
@@ -57,7 +60,13 @@ export function Sidebar({ session, open, activityOpen, onToggleActivity, onOpen,
         </span>
         <span className="ws-t">
           <b>{session.orgName}</b>
-          <small>{session.peopleList.length} members</small>
+          {offline !== null ? (
+            <small className="ws-off" role="status">
+              Reconnecting · since {timeOf(new Date(offline).toISOString())}
+            </small>
+          ) : (
+            <small>{session.peopleList.length} members</small>
+          )}
         </span>
       </div>
       <SearchBox session={session} onHit={onSearchHit} />

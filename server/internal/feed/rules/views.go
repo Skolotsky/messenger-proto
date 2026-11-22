@@ -195,9 +195,16 @@ func (e *Engine) explain(cv *conv, p *person, r *convReader, rw *row, it *item, 
 		return mk(what, decided, "With "+who+" in your Focus it would land in Focus.", "Move what "+who+" sends into Focus",
 			ruleAct(personRule, true), ruleAct(personRule, false))
 	}
+	// A thread level needs a thread: a direct conversation's row has none of its
+	// own, so the change names the thread of the message it shows.
+	ownThread := thread
+	if ownThread == nil {
+		root := it.msg.root
+		ownThread = &root
+	}
 	unfollow := func(what, decided string) contract.RowExplanation {
 		return mk(what, decided, "With the thread off, only what names you would reach you.", "Turn this thread off",
-			dialAct(cv, thread, levelOff), dialAct(cv, thread, levelAuto))
+			dialAct(cv, ownThread, levelOff), dialAct(cv, ownThread, levelAuto))
 	}
 	switch it.decider {
 	case byDMPerson:
@@ -237,7 +244,7 @@ func (e *Engine) explain(cv *conv, p *person, r *convReader, rw *row, it *item, 
 			"Mute "+cv.name, dialAct(cv, nil, "muted"), dialAct(cv, nil, channelDial(cv, view{p, r})))
 	case byThreadFocus:
 		return mk("A reply in a thread you put in Focus.", "The thread's own level is Focus.", "At its usual level it would land lower.",
-			"Take this thread out of Focus", dialAct(cv, thread, levelAuto), dialAct(cv, thread, levelFocus))
+			"Take this thread out of Focus", dialAct(cv, ownThread, levelAuto), dialAct(cv, ownThread, levelFocus))
 	case byThreadNeeds:
 		return unfollow("A reply in a thread you are part of.", "A reply in a thread you started or replied in lands in Needs you.")
 	case byThreadFYI:
@@ -259,17 +266,50 @@ func (e *Engine) explain(cv *conv, p *person, r *convReader, rw *row, it *item, 
 // within a section (D-003). A read row is not in it: it is found in its history
 // tab; a screen that shows it keeps it, dimmed, until the person moves on.
 func (e *Engine) Rows(person string) []contract.FeedRow {
+	list := e.KeyedRows(person)
+	if list == nil {
+		return nil
+	}
+	out := make([]contract.FeedRow, len(list))
+	for i, x := range list {
+		out[i] = x.Row
+	}
+	return out
+}
+
+// HeldNow is one notification on hold, for the store that keeps it with its row.
+type HeldNow struct {
+	Name, Person, Conversation, Message, Item, At string
+}
+
+// AllHeld lists everything on hold in the organization, sorted by name.
+func (e *Engine) AllHeld() []HeldNow {
+	var out []HeldNow
+	for _, cv := range e.allConvs() {
+		for d := range cv.holding {
+			out = append(out, HeldNow{d.name, d.person, cv.id, d.item.msg, d.item.kind, d.atText})
+		}
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].Name < out[j].Name })
+	return out
+}
+
+// KeyedRow is a feed row with what orders it, for a store that keeps rows one
+// by one: section, then newest activity first, then key.
+type KeyedRow struct {
+	Key     string
+	Section int
+	Last    int64
+	Row     contract.FeedRow
+}
+
+// KeyedRows is Rows with each row's key and sort position.
+func (e *Engine) KeyedRows(person string) []KeyedRow {
 	p := e.people[person]
 	if p == nil {
 		return nil
 	}
-	type entry struct {
-		fr      contract.FeedRow
-		section int
-		last    int64
-		key     string
-	}
-	var list []entry
+	list := []KeyedRow{}
 	for _, cv := range e.allConvs() {
 		r := cv.readers[person]
 		if r == nil {
@@ -287,23 +327,19 @@ func (e *Engine) Rows(person string) []contract.FeedRow {
 			} else if b != Focus {
 				section++
 			}
-			list = append(list, entry{e.render(cv, p, r, rw), section, rw.last, cv.id + "/" + k.kind + "/" + k.id})
+			list = append(list, KeyedRow{cv.id + "/" + k.kind + "/" + k.id, section, rw.last, e.render(cv, p, r, rw)})
 		}
 	}
 	sort.Slice(list, func(i, j int) bool {
-		if list[i].section != list[j].section {
-			return list[i].section < list[j].section
+		if list[i].Section != list[j].Section {
+			return list[i].Section < list[j].Section
 		}
-		if list[i].last != list[j].last {
-			return list[i].last > list[j].last
+		if list[i].Last != list[j].Last {
+			return list[i].Last > list[j].Last
 		}
-		return list[i].key < list[j].key
+		return list[i].Key < list[j].Key
 	})
-	out := make([]contract.FeedRow, len(list))
-	for i, x := range list {
-		out[i] = x.fr
-	}
-	return out
+	return list
 }
 
 // Counts is the feed's counts: unread rows in Focus and Needs you, a dot for

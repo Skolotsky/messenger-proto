@@ -6,10 +6,9 @@ Work in flight. Order inside a section is priority. Finished work moves to `done
 
 ## Now
 
+- **T-057** `validate` Wave 3 · Milestone 1: the spine runs end to end; delivery guardrails with two copies (G-013, G-025, G-027); independent verifier. Needs T-046, T-047, T-048, T-052
 - **T-059** `implement` Wave 3 · The demonstration: scripted team, control panel, notification app, reset (G-020). The two pages are merged against fixtures (`tasks/T-059-outside-pages.md`); the demo program, its routes and the connection to real parts remain. Needs T-051, T-053, T-054
-- **T-052** `implement` Wave 2 · The feed as a service (G-007, G-009, G-008). Needs T-049
 - **T-065** `implement` D-034: the hold moves into the feed; scope and claims narrowed. Started beside T-064's last delivery fix, at the user's request to remove bottlenecks; its delivery part follows that merge. Before T-052. Detail: `tasks/T-065-hold-in-the-feed.md`
-- **T-056** `implement` Wave 2 · Web app: writing, going wrong, search, staying current (screen half of G-015). First half merged (mentions, edit, delete, search, new conversations; `tasks/T-056-writing-and-search.md`); the live client, waiting and failed states and `organization_gone` remain. Needs T-050
 - **T-064** `implement` D-033: remove the Reset number from contracts and code; retire and delete organizations; G-031. Before T-052, T-053 and T-054. Detail: `tasks/T-064-reset-removal.md`
 
 
@@ -20,7 +19,6 @@ Work in flight. Order inside a section is priority. Finished work moves to `done
 
 ## Next
 
-- **T-057** `validate` Wave 3 · Milestone 1: the spine runs end to end; delivery guardrails with two copies (G-013, G-025, G-027); independent verifier. Needs T-046, T-047, T-048, T-052
 - **T-058** `validate` Wave 3 · Milestone 2: the web app on the real programs at both widths (G-015, G-019, all of T-038); independent verifier. Needs T-053, T-055, T-056, T-057
 - **T-061** `validate` Wave 4 · Milestone 3: validation of the running product against the brief, contracts and guardrails; how to run it; known shortcuts up to date. Needs all above
 - **T-038** `implement` Rules the prototype only approximates, kept as acceptance criteria for the build. Detail: `tasks/T-038-build-acceptance-from-e002.md`

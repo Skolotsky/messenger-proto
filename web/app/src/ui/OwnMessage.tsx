@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type 
 import { DoorError, newId } from '../api/door';
 import type { ChatMessage, MessageRow } from '../api/types';
 import { mentionsIn } from '../state/mentions';
+import type { OutItem } from '../state/outbox';
 import type { Session } from '../state/useSession';
 import { AutoTextarea } from './AutoTextarea';
 import { Icon } from './Icon';
@@ -49,6 +50,51 @@ export function ActionProblem({
         </button>
       )}
     </div>
+  );
+}
+
+const WAITING: Partial<Record<string, string>> = {
+  send: 'Waiting to send',
+  edit: 'Edit waiting to be saved',
+  delete: 'Delete waiting to be saved',
+  react: 'Reaction waiting to be saved',
+};
+
+const NOT_DONE: Partial<Record<string, string>> = {
+  send: 'Not sent',
+  edit: 'Not saved',
+  delete: 'Not deleted',
+  react: 'Reaction not saved',
+};
+
+/** What is waiting on this message, or did not go through, said under it (D-024; T-038 point 26). */
+export function OutLines({ session, items }: { session: Session; items: OutItem[] }) {
+  return (
+    <>
+      {items.map((item) => {
+        const kind = item.action.kind;
+        if (item.state === 'waiting') {
+          return (
+            <div className="send-state waiting" role="status" key={item.id}>
+              {WAITING[kind]}{' '}
+              <button type="button" className="link" onClick={() => session.discardAction(item.id)}>
+                Discard
+              </button>
+            </div>
+          );
+        }
+        if (item.state === 'sending') return null;
+        const refused = item.state === 'refused';
+        return (
+          <ActionProblem
+            key={item.id}
+            problem={{ text: `${NOT_DONE[kind]}: ${refused ? item.reason : 'no answer from the server'}.`, canRetry: !refused }}
+            onRetry={() => session.retryAction(item.id)}
+            onDiscard={() => session.discardAction(item.id)}
+          />
+        );
+      })}
+    </>
   );
 }
 

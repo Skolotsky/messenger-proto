@@ -75,3 +75,22 @@ mark { background: color-mix(in srgb, var(--focus) 30%, transparent); color: inh
   .nc-input { font-size: 16px; }
   .nc-add { width: 30px; height: 30px; }
 }
+
+/* staying current (T-056): said in place, nothing moves */
+.send-state.waiting { color: var(--muted); }
+.send-state .link { font-size: 12px; }
+.msg.replying .msg-body { white-space: pre-wrap; overflow-wrap: anywhere; }
+.top-notice { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12.5px; color: var(--flag); }
+.sk .ws-t small.ws-off { color: #f2b8a8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lv-ctl { position: relative; display: inline-flex; align-items: center; gap: 4px; flex: none; margin-left: auto; }
+.lv-ctl .btn { display: inline-flex; align-items: center; gap: 4px; }
+.lv-ctl .ic { width: 12px; height: 12px; }
+.lv-more { padding-left: 5px; padding-right: 5px; }
+.lv-err { color: var(--flag); font-size: 12px; }
+.lv-menu { position: absolute; right: 0; top: calc(100% + 4px); z-index: 40; width: min(280px, calc(100vw - 24px)); padding: 4px; background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); }
+.lv-menu button { display: block; width: 100%; text-align: left; padding: 6px 8px; border-radius: 6px; }
+.lv-menu button:hover { background: var(--hover); }
+.lv-menu button[aria-checked="true"] { background: var(--accent-soft); }
+.lv-menu b { display: block; font-weight: 600; font-size: 13.5px; }
+.lv-menu small { display: block; color: var(--muted); font-size: 12px; line-height: 1.3; white-space: normal; }
+.thread-link .dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }

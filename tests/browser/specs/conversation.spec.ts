@@ -83,7 +83,7 @@ test('an arrival in a channel not open marks it unread, and opening clears the m
   await expect(row.getByRole('img', { name: 'unread' })).toHaveCount(0);
 });
 
-test('a send the door refuses keeps the text and says so', async ({ page, request }, info) => {
+test('a send the door refuses stays in its place, says so, and offers Discard', async ({ page, request }, info) => {
   await start(page);
   const pane = await openConversation(page, info, 'general');
   await control(request, { refuse: 'not allowed here' });
@@ -91,27 +91,30 @@ test('a send the door refuses keeps the text and says so', async ({ page, reques
   const box = pane.getByRole('textbox', { name: 'Message' });
   await box.fill(text);
   await box.press('Control+Enter');
-  await expect(pane.getByRole('alert')).toContainText('not allowed here');
-  await expect(box).toHaveValue(text);
+  await expect(pane.getByRole('alert')).toContainText('Not sent: not allowed here');
+  const msg = pane.locator('.msg', { hasText: text });
+  await expect(msg.locator('.msg-body')).toHaveText(text);
+  await expect(msg.getByRole('button', { name: 'Try again' }), 'trying again cannot help').toHaveCount(0);
+  await msg.getByRole('button', { name: 'Discard' }).click();
   await expect(pane.locator('.msg-body', { hasText: text })).toHaveCount(0);
 });
 
-test('a send with the door down keeps the text, and goes through once when it is back', async ({ page, request }, info) => {
+test('a send with the door down waits in its place, and goes through once when it is back', async ({ page, request }, info) => {
   await start(page);
   const pane = await openConversation(page, info, 'general');
   const box = pane.getByRole('textbox', { name: 'Message' });
   const text = unique('Written while down');
   try {
     await control(request, { down: true });
+    await expect(page.locator('.app[data-live="off"]')).toBeVisible();
     await box.fill(text);
     await box.press('Control+Enter');
-    await expect(pane.getByRole('alert')).toContainText('no answer');
-    await expect(box).toHaveValue(text);
+    await expect(box).toHaveValue('');
+    await expect(pane.locator('.msg', { hasText: text }).getByRole('status')).toContainText('Waiting to send');
   } finally {
     await control(request, { down: false });
   }
-  await box.press('Control+Enter');
-  await expect(box).toHaveValue('');
+  await expect(pane.locator('.msg', { hasText: text }).getByRole('status')).toHaveCount(0);
   await expect(pane.locator('.msg-body', { hasText: text })).toHaveCount(1);
 
   // The live connection came back by itself.

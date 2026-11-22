@@ -17,7 +17,9 @@
       "Edit(/tests/guardrails/agent-events/**)",
       "Edit(/tests/guardrails/reply-in-progress/**)",
       "Edit(/tests/guardrails/agent-limits/**)",
-      "Edit(/tests/guardrails/watching-lapses/**)"
+      "Edit(/tests/guardrails/watching-lapses/**)",
+      "Edit(/tests/guardrails/feed-equals-replay/**)",
+      "Edit(/tests/guardrails/feed-fence/**)"
     ]
   }
 }

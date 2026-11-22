@@ -23,6 +23,7 @@ GET  delivery/orgs/acme/parked           → { "parked": [ { "receiver": "search
 POST delivery/orgs/acme/parked/4830/retry?receiver=search        → 200
 
 POST {feed|search|sender}/orgs/acme/control/mode    { "mode": "running" }   running · slow · off      (also /control/mode with no organization: all)
+POST {feed|search|sender}/orgs/acme/control/wipe  { "rules_changed": true } optional, the feed only: what fell due before this is history (D-034)
 POST {feed|search|sender}/orgs/acme/control/wipe                            → 200; the sender keeps its list of names sent
 POST demo/orgs/acme/rebuild              { "receiver": "feed", "rules_changed": false }     wipe, set its place to the start, refill
 POST demo/reset                                                             seed a fresh organization, wait until level, make it current, retire the previous one → { "org": "acme-8", "name": "Larkmere" }
