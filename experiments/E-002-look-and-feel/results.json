@@ -58,23 +58,23 @@
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "row expands in place with its six posts",
+  "check": "a click opens the conversation at the first new message, and nothing expands",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "expanding marks the row read",
+  "check": "opening the conversation reads the row",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "sending a reply from the row closes the row and shows the reply on it",
+  "check": "a reply in the conversation reads the row",
   "pass": true,
-  "detail": "AL\nAnna Lindqvist\n10:41\nIn Focus: direct message from Anna\nYou: Yes to 3 pm. Legal cleared the terms page yesterday.\nREPLIED"
+  "detail": ""
  },
  {
   "page": "slack-like",
@@ -86,7 +86,14 @@
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "reacting from the row releases the flagged row",
+  "check": "replying releases the flagged row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "and the row is done",
   "pass": true,
   "detail": ""
  },
@@ -170,7 +177,7 @@
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "expanded row shows the full edit",
+  "check": "the conversation shows the full edit",
   "pass": true,
   "detail": ""
  },
@@ -578,54 +585,33 @@
   "width": "desktop",
   "check": "ten messages are one row that says so",
   "pass": true,
-  "detail": "AL\nAnna Lindqvist\n10 new\n10:41\nIn Focus: direct message from"
+  "detail": ""
  },
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "an opened row has its reply box on screen",
-  "pass": true,
-  "detail": "{'x': 312, 'y': 759.75, 'width': 358.203125, 'height': 39.75}"
- },
- {
-  "page": "slack-like",
-  "width": "desktop",
-  "check": "and the cursor is in it",
+  "check": "the row toolbar is React, Mark read, Keep",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "expanding shows the six newest messages, after the one before the burst",
+  "check": "a click opens the conversation beside the feed, at the first new message; the row does not open",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "the four earlier new ones are one click above, and the row is read",
+  "check": "the message box has the cursor",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "showing the earlier ones gives all ten in order",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "slack-like",
-  "width": "desktop",
-  "check": "a thread row shows the message that started the thread and the reply before the new ones",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "slack-like",
-  "width": "desktop",
-  "check": "a reaction can be put on any message in the row",
+  "check": "a reaction can be put on any message",
   "pass": true,
   "detail": ""
  },
@@ -660,14 +646,14 @@
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "a collapsed row takes a reaction without being expanded",
+  "check": "a row takes a reaction without anything being opened",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "one click on the row opens the conversation at the first new message",
+  "check": "Keep is on the row",
   "pass": true,
   "detail": ""
  },
@@ -800,7 +786,7 @@
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "on a phone a tap opens the conversation at the first new message, and nothing expands",
+  "check": "a click opens the conversation at the first new message, and nothing expands",
   "pass": true,
   "detail": ""
  },
@@ -1444,23 +1430,23 @@
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "row expands in place with its six posts",
+  "check": "a click opens the conversation at the first new message, and nothing expands",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "expanding marks the row read",
+  "check": "opening the conversation reads the row",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "sending a reply from the row closes the row and shows the reply on it",
+  "check": "a reply in the conversation reads the row",
   "pass": true,
-  "detail": "AL\nAnna Lindqvist\n10:41\nIn Focus: direct message from Anna\nYou: Yes to 3 pm. Legal cleared the terms page yesterday.\nREPLIED"
+  "detail": ""
  },
  {
   "page": "telegram-like",
@@ -1472,7 +1458,14 @@
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "reacting from the row releases the flagged row",
+  "check": "replying releases the flagged row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "and the row is done",
   "pass": true,
   "detail": ""
  },
@@ -1556,7 +1549,7 @@
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "expanded row shows the full edit",
+  "check": "the conversation shows the full edit",
   "pass": true,
   "detail": ""
  },
@@ -1817,54 +1810,33 @@
   "width": "desktop",
   "check": "ten messages are one row that says so",
   "pass": true,
-  "detail": "AL\nAnna Lindqvist\n10:41\nIn Focus: direct message from Anna\nA"
+  "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "an opened row has its reply box on screen",
-  "pass": true,
-  "detail": "{'x': 12, 'y': 692.765625, 'width': 328.765625, 'height': 45.1875}"
- },
- {
-  "page": "telegram-like",
-  "width": "desktop",
-  "check": "and the cursor is in it",
+  "check": "the row toolbar is React, Mark read, Keep",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "expanding shows the six newest messages, after the one before the burst",
+  "check": "a click opens the conversation beside the feed, at the first new message; the row does not open",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "the four earlier new ones are one click above, and the row is read",
+  "check": "the message box has the cursor",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "showing the earlier ones gives all ten in order",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "telegram-like",
-  "width": "desktop",
-  "check": "a thread row shows the message that started the thread and the reply before the new ones",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "telegram-like",
-  "width": "desktop",
-  "check": "a reaction can be put on any message in the row",
+  "check": "a reaction can be put on any message",
   "pass": true,
   "detail": ""
  },
@@ -1899,14 +1871,14 @@
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "a collapsed row takes a reaction without being expanded",
+  "check": "a row takes a reaction without anything being opened",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "one click on the row opens the conversation at the first new message",
+  "check": "Keep is on the row",
   "pass": true,
   "detail": ""
  },
@@ -2039,7 +2011,7 @@
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "on a phone a tap opens the conversation at the first new message, and nothing expands",
+  "check": "a click opens the conversation at the first new message, and nothing expands",
   "pass": true,
   "detail": ""
  },
@@ -2585,23 +2557,23 @@
  {
   "page": "own",
   "width": "desktop",
-  "check": "row expands in place with its six posts",
+  "check": "a click opens the conversation at the first new message, and nothing expands",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "desktop",
-  "check": "expanding marks the row read",
+  "check": "opening the conversation reads the row",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "desktop",
-  "check": "sending a reply from the row closes the row and shows the reply on it",
+  "check": "a reply in the conversation reads the row",
   "pass": true,
-  "detail": "AL\nAnna Lindqvist\n10:41\nIn Focus: direct message from Anna\nYou: Yes to 3 pm. Legal cleared the terms page yesterday.\nREPLIED"
+  "detail": ""
  },
  {
   "page": "own",
@@ -2613,7 +2585,14 @@
  {
   "page": "own",
   "width": "desktop",
-  "check": "reacting from the row releases the flagged row",
+  "check": "replying releases the flagged row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "and the row is done",
   "pass": true,
   "detail": ""
  },
@@ -2697,7 +2676,7 @@
  {
   "page": "own",
   "width": "desktop",
-  "check": "expanded row shows the full edit",
+  "check": "the conversation shows the full edit",
   "pass": true,
   "detail": ""
  },
@@ -2958,54 +2937,33 @@
   "width": "desktop",
   "check": "ten messages are one row that says so",
   "pass": true,
-  "detail": "AL\nAnna Lindqvist\n10 new\n10:41\nIn Focus: direct message from"
+  "detail": ""
  },
  {
   "page": "own",
   "width": "desktop",
-  "check": "an opened row has its reply box on screen",
-  "pass": true,
-  "detail": "{'x': 336, 'y': 760.21875, 'width': 620.765625, 'height': 39.75}"
- },
- {
-  "page": "own",
-  "width": "desktop",
-  "check": "and the cursor is in it",
+  "check": "the row toolbar is React, Mark read, Keep",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "desktop",
-  "check": "expanding shows the six newest messages, after the one before the burst",
+  "check": "a click opens the conversation beside the feed, at the first new message; the row does not open",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "desktop",
-  "check": "the four earlier new ones are one click above, and the row is read",
+  "check": "the message box has the cursor",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "desktop",
-  "check": "showing the earlier ones gives all ten in order",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "own",
-  "width": "desktop",
-  "check": "a thread row shows the message that started the thread and the reply before the new ones",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "own",
-  "width": "desktop",
-  "check": "a reaction can be put on any message in the row",
+  "check": "a reaction can be put on any message",
   "pass": true,
   "detail": ""
  },
@@ -3040,14 +2998,14 @@
  {
   "page": "own",
   "width": "desktop",
-  "check": "a collapsed row takes a reaction without being expanded",
+  "check": "a row takes a reaction without anything being opened",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "desktop",
-  "check": "one click on the row opens the conversation at the first new message",
+  "check": "Keep is on the row",
   "pass": true,
   "detail": ""
  },
@@ -3180,7 +3138,7 @@
  {
   "page": "own",
   "width": "phone",
-  "check": "on a phone a tap opens the conversation at the first new message, and nothing expands",
+  "check": "a click opens the conversation at the first new message, and nothing expands",
   "pass": true,
   "detail": ""
  },

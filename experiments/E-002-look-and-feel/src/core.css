@@ -400,3 +400,8 @@ button.rx:hover{border-color:var(--accent)}
 .thread-link .tl-go{color:var(--muted);visibility:hidden}
 .thread-link:hover .tl-go{visibility:visible}
 .to-chan{font-size:12px}
+/* rows have no opened state; the toolbar is React, Mark read, Keep */
+.row-btns .keep-btn{width:32px;height:28px;border:0;background:none;color:var(--muted);display:grid;place-items:center}
+.row-btns .mark-read{border-right:1px solid var(--line)}
+.row-btns .mark-read:last-child{border-right:0}
+@media (max-width:760px){.row-btns .keep-btn{display:none}}

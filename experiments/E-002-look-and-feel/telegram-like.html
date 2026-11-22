@@ -408,6 +408,11 @@ button.rx:hover{border-color:var(--accent)}
 .thread-link .tl-go{color:var(--muted);visibility:hidden}
 .thread-link:hover .tl-go{visibility:visible}
 .to-chan{font-size:12px}
+/* rows have no opened state; the toolbar is React, Mark read, Keep */
+.row-btns .keep-btn{width:32px;height:28px;border:0;background:none;color:var(--muted);display:grid;place-items:center}
+.row-btns .mark-read{border-right:1px solid var(--line)}
+.row-btns .mark-read:last-child{border-right:0}
+@media (max-width:760px){.row-btns .keep-btn{display:none}}
 
 /* Telegram-like: one list, round avatars, big targets, folders for buckets, bubbles. Own colours. */
 :root{--accent:#6a4fd0;--accent-soft:#ebe6fb;--r:14px;--wall:#eeebe4}
@@ -808,7 +813,7 @@ function rowHTML(r) {
         <div class="row-reason"><span class="why-dot"></span>${WHY === 'a' ? `<button class="why-btn" data-act="why" data-id="${r.id}" aria-expanded="${S.whyOpen === r.id}">${esc(r.reason)} ${ic('chev')}</button>` : esc(r.reason)}${r.note ? ` · <em>${r.note}</em>` : ''}${WHY === 'c' ? `<button class="why-btn c" data-act="whySheet" data-id="${r.id}">Why? Change…</button>` : ''}</div>
         <div class="row-preview" data-k="${k}"${lockS}>${r.replies.length ? `<b>You:</b> ${rich(S.msgs[r.replies[r.replies.length - 1]].text)}` : `<b>${last.by === ME ? 'You' : first(last.by)}:</b> ${rich(last.text)}`}</div>
         ${r.kind !== 'rx' && last.rx.length ? rxHTML(last) : ''}</div>
-      <div class="row-side">${state}${badge}<span class="row-btns"><button class="rx-pick" data-act="pick" data-m="${last.id}" aria-label="React without opening" title="React to the latest message without opening">${ic('smile')}</button>${!r.read ? `<button class="mark-read" data-act="read" data-id="${r.id}" aria-label="Mark read without opening" title="Mark read without opening">${ic('check')}</button>` : ''}<button class="open-btn" data-act="openConv" data-c="${r.conv}" data-id="${r.id}" aria-label="Open the conversation" title="Open the conversation at the first new message">${ic('open')}</button></span>${r.sec === 'kept' && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : ''}<span class="row-chev">${ic('chev')}</span></div></div>${WHY === 'a' && S.whyOpen === r.id ? `<div class="why-pop" data-stop="1"><h3>Why this is in ${BK[r.bucket][0]}</h3>${whyBody(r)}</div>` : ''}${x}</article>`;
+      <div class="row-side">${state}${badge}<span class="row-btns"><button class="rx-pick" data-act="pick" data-m="${last.id}" aria-label="React without opening" title="React to the latest message without opening">${ic('smile')}</button>${!r.read ? `<button class="mark-read" data-act="read" data-id="${r.id}" aria-label="Mark read without opening" title="Mark read without opening">${ic('check')}</button>` : ''}${r.kept || r.done ? '' : `<button class="keep-btn" data-act="keep" data-id="${r.id}" aria-label="Keep" title="Keep until you press Done">${ic('pin')}</button>`}</span>${r.sec === 'kept' && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : ''}<span class="row-chev">${ic('chev')}</span></div></div>${WHY === 'a' && S.whyOpen === r.id ? `<div class="why-pop" data-stop="1"><h3>Why this is in ${BK[r.bucket][0]}</h3>${whyBody(r)}</div>` : ''}${x}</article>`;
 }
 const SUN = '<svg class="ill" viewBox="0 0 120 64" aria-hidden="true"><path d="M8 52h104" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M36 52a24 24 0 0 1 48 0" fill="currentColor" opacity=".18"/><path d="M60 14v8M30 26l6 6M90 26l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 60h30M62 60h38" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".4"/></svg>';
 function bucketHTML(b) {
@@ -1115,7 +1120,7 @@ document.addEventListener('click', e => {
   if (el.dataset.act === 'closeModal' && el.classList.contains('scrim') && e.target.closest('[data-stop]')) return;
   if (el.tagName === 'INPUT' && el.type !== 'checkbox') return;
   let an = el.dataset.act, ad = el.dataset;
-  if (an === 'toggle' && isPhone()) { an = 'openConv'; ad = { c: row(ad.id).conv, id: ad.id }; } // on a phone a tap goes straight to the conversation
+  if (an === 'toggle') { an = 'openConv'; ad = { c: row(ad.id).conv, id: ad.id }; } // a row has no opened state: a click goes to the conversation, beside the feed or over it (user, 2026-11-22)
   if (S.swipe && !e.target.closest('.sw-under')) { S.swipe = null; if (an === 'openConv' && isPhone()) { render(); return; } }
   if (e.target.closest('.sw-under')) S.swipe = null;
   const skip = A[an](ad, e);
@@ -1126,6 +1131,7 @@ document.addEventListener('click', e => {
   }
   if (el.dataset.act === 'pick' && S.pick && matchMedia('(hover:hover)').matches) { const pi = document.querySelector('.picker input'); if (pi) pi.focus(); }
   if (el.dataset.act === 'applyNew') { const sc = document.querySelector('.feed-scroll'); if (sc) sc.scrollTop = 0; } // you asked for them: go to where they are
+  if (an === 'openConv' && matchMedia('(hover:hover)').matches) { const ci = document.querySelector('.composer input'); if (ci) ci.focus({ preventScroll: true }); } // ready to answer
   if (an === 'openConv') { const nl = document.querySelector('.conv .newline'); if (nl) nl.scrollIntoView({ block: 'start' }); }
 });
 document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"]')) { e.preventDefault(); e.target.click(); } if (e.key === 'Escape' && (S.modal || S.menu || S.pick)) { S.modal = null; S.menu = null; S.pick = null; render(); } });

@@ -5,7 +5,7 @@
 - Date: 2026-11-22
 - Decided by: user
 - Depends on: D-003, D-015, D-019, D-020, D-022
-- Supersedes in part: D-003 (expanding a row in place, and replying and reacting from the row, now hold on a wide screen only)
+- Supersedes in part: D-003 (expanding a row in place and replying from the row are dropped at every width, point 21; reacting from the row stays, through a button)
 - Evidence: E-002 (all of it is shown in `experiments/E-002-look-and-feel/slack-like.html` and covered by `check.py`)
 - Visual: `experiments/E-002-look-and-feel/screenshots/slack-like-*-18` to `-26`
 
@@ -53,10 +53,11 @@ As listed under "Decided"; where the agent had built something else first, the r
 
 20. **No inline threads.** "Please don't do inlined threads. Do it Slack way. I hate inlined threads." A message with replies shows a link under it (who replied, how many, when last) and the thread opens on its own. A deleted message that has replies keeps its marker and that link (D-004).
 
+21. **A feed row has no opened state, at any width. A click opens the conversation.** "There is no need to have expanded state in the activity feed if clicking doesn't close activity feed but just opens it alongside. So both for desktop and for mobile we don't need it for different reasons." On a wide screen the conversation opens beside the feed, at the first new message, with the cursor in the message box; on a phone it opens over the feed. This supersedes D-003's expanding in place and replying from the row at every width, and with it points 4, 5, 6 and the wide-screen half of point 9 above, which described the opened row. What stays on the row itself: React, Mark read, Keep (Done on a kept row), and the reason line (D-020).
+
 ### Still the agent's proposal, shown in the mock-up, awaiting the user's word
 
-- **Context in an opened row:** the message before the new ones in a direct conversation; the start of the thread and the reply before in a thread; none for a mention in a channel.
-- **A long burst** shows its six newest messages by the reply box, with the earlier new ones one click above; opening reads the whole row (D-015). The number six is the agent's.
+- Lapsed with point 21: context above the new messages in an opened row, and how a long burst is shown there. The conversation shows the whole exchange with a "New" line at the first new message.
 - **The arrivals button is called "Show"**, and the control names how many arrived in Focus and Needs you.
 - **Which swipe is which:** the user set the pair; that right is read and left is keep is the agent's pick.
 - **On a phone the reply box is not given the cursor automatically**, since that opens the keyboard.
@@ -68,7 +69,7 @@ As listed under "Decided"; where the agent had built something else first, the r
 
 - Easier: one way to each thing, and a phone layout with two states, list and conversation.
 - Harder: two interaction models for a row, by width. The settings screen becomes a surface of its own that every later setting must fit into.
-- Committed to: the twenty points above.
+- Committed to: the points above, as narrowed by point 21.
 
 ## Follow-ups
 
