@@ -320,6 +320,10 @@ func TestStartingBuckets(t *testing.T) {
 			a, b := w.post("anna", "#b", to("channel")), w.post("anna", "#b", to("you"))
 			return []string{w.where("you", a), w.where("you", b)}, []string{"nothing", "Needs you"}
 		}},
+		{"a whole-channel mention inside a reply reaches nobody extra (R30)", func(w *W) (any, any) {
+			r := w.post("anna", "#a")
+			return w.where("you", w.post("marco", "#a", in(r), to("channel"))), "nothing"
+		}},
 		{"replies are one row with their thread", func(w *W) (any, any) {
 			r := w.post("anna", "#a", to("you"))
 			w.post("marco", "#a", in(r), to("you"))
@@ -817,6 +821,13 @@ func TestEditsAndDeletes(t *testing.T) {
 			w.edit(m, "now @you", to("you"))
 			return w.where("you", m), "Needs you"
 		}},
+		{"an edit that names you on a row you had read arrives as new, and notifies", func(w *W) (any, any) {
+			w.dial("you", "#a", nil, "all")
+			m := w.post("anna", "#a")
+			w.read("you", "#a", nil)
+			w.edit(m, "now @you", to("you"))
+			return []string{w.where("you", m), w.kinds("you")}, []string{"Needs you", "due"}
+		}},
 		{"a second edit that removes it before reading leaves no trace", func(w *W) (any, any) {
 			m := w.post("anna", "#a")
 			w.edit(m, "x", to("you"))
@@ -1247,6 +1258,17 @@ func TestHistoryTabs(t *testing.T) {
 			w.del(a)
 			w.edit(b, "x")
 			return w.tab("you", "mentions"), ""
+		}},
+		{"a deleted message leaves every tab", func(w *W) (any, any) {
+			id := w.dm("anna", "you")
+			d := w.post("anna", id)
+			t1 := w.post("you", "#a")
+			r := w.post("anna", "#a", in(t1))
+			w.react("anna", t1, "+1")
+			w.del(d)
+			w.del(r)
+			w.del(t1)
+			return []string{w.tab("you", "direct"), w.tab("you", "threads"), w.tab("you", "reactions")}, []string{"", "", ""}
 		}},
 		{"Direct messages lists the other person's messages", func(w *W) (any, any) {
 			id := w.dm("anna", "you")
