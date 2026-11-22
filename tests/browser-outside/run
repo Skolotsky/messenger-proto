@@ -16,5 +16,7 @@ for dir in web/control-panel web/notification-app; do
   CONTEXIA_TOOL_ENV="VITE_API=network" TOOL_DIR="$dir" ./scripts/tool npx vite build --outDir dist-network --emptyOutDir
 done
 
-exec docker run --rm --init --ipc=host -u "$(id -u):$(id -g)" -v "$root":/repo -w /repo/tests/browser-outside \
-  -e HOME=/tmp -e CI=1 -e "CONTEXIA_SHOTS=${CONTEXIA_SHOTS:-}" "$image" npx playwright test "$@"
+# CONTEXIA_REAL_URL runs real-system.spec.ts against a running system on this machine.
+network=(); [ -n "${CONTEXIA_REAL_URL:-}" ] && network=(--network host)
+exec docker run --rm --init --ipc=host "${network[@]}" -u "$(id -u):$(id -g)" -v "$root":/repo -w /repo/tests/browser-outside \
+  -e HOME=/tmp -e CI=1 -e "CONTEXIA_SHOTS=${CONTEXIA_SHOTS:-}" -e "CONTEXIA_REAL_URL=${CONTEXIA_REAL_URL:-}" "$image" npx playwright test "$@"

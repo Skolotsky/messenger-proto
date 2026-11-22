@@ -11,7 +11,7 @@ RUN CGO_ENABLED=0 go build -tags "$GO_TAGS" -trimpath -o /out/ ./cmd/...
 FROM node:22-alpine AS pages
 COPY --from=webpages . /web
 RUN set -e; for p in app control-panel notification-app; do \
-      cd /web/$p; npm ci --no-audit --no-fund; VITE_API=network npx vite build --outDir /out/$p --emptyOutDir; \
+      cd /web/$p; npm ci --no-audit --no-fund; VITE_API=network VITE_PERSON=maya npx vite build --outDir /out/$p --emptyOutDir; \
     done
 
 FROM alpine:3.21 AS part
