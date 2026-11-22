@@ -65,6 +65,9 @@ As listed under "Decided"; where the agent had built something else first, the r
 
 27. **The time sits at the far right of every feed row, and nothing is reserved for actions.** "I don't like how the alignment looks like, time jumps between rows, let's use the common layout." Chosen from three variants ("A, time far right"; `screenshots/rows-a.png`, `rows-b.png`, `rows-c.png`). On a wide screen the actions float over the row's corner on hover; Done and the row's state sit at the bottom right. On a phone the React button and Done sit at the bottom right.
 
+28. **Choosing another person is a real switch, one level down in the person's menu.** "It leaves me no choice, is it planned? Also picker of the user should be a different level of menu." The menu has one entry, Switch account; the people are under it. Choosing one asks, then switches, with a band across the top saying whose view it is and a way back. The mock-up holds only Maya's messages, so it switches the account and the band over her data; the product shows that person's own feed (D-002, D-010).
+29. **The line under a name is the person's own words, not a role.** "'Product', 'founder' are just labels people put for their accounts, not some role system." It is edited in Account, means nothing to the product, and is not shown in the account list.
+
 ### Still the agent's proposal, shown in the mock-up, awaiting the user's word
 
 - Lapsed with point 21: context above the new messages in an opened row, and how a long burst is shown there. The conversation shows the whole exchange with a "New" line at the first new message.

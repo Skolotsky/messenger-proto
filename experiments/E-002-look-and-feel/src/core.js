@@ -180,7 +180,7 @@ function seed() {
   const T = (row, mid, bucket) => ({ row, mid, bucket });
   return {
     msgs, convs, rows, view: 'feed', btab: 'focus', htab: 'dms', conv: null, exp: new Set(), open: new Set(), lock: {}, menu: null, modal: null,
-    enterSends: false, autoDone: true, newCh: [], stream: null, w: { side: 250, act: 500 }, pending: null, arrived: false, fyiSeen: false, level: '', focusOnly: false, demo: false, note: '', q: '', resort: false,
+    viewAs: null, meSub: false, myTitle: 'Product', enterSends: false, autoDone: true, newCh: [], stream: null, w: { side: 250, act: 500 }, pending: null, arrived: false, fyiSeen: false, level: '', focusOnly: false, demo: false, note: '', q: '', resort: false,
     dmAuto: true, dmPeople: ['anna', 'sam', 'marco', 'lena', 'tomas'], dmRemoved: [], dmAsk: false, off: {}, gone: [],
     rules: [{ id: 'flag', label: 'Flags that name you', n: 6, start: 1 }, { id: 'ch:incidents', label: 'Every new post in #incidents', n: 23, kind: 'channel', target: 'incidents' }],
     tray: [T('r-anna', 'a10', 'focus'), T('r-check', 'c5', 'needs'), T('r-export', 't1', 'needs'), T('r-sso', 'j1', 'needs'), T('r-inc', 'i6', 'focus'), T('r-rc', 'rc4', 'focus'), Object.assign(T('r-mig', 'mig1', 'needs'), { as: 'marco', lead: 'Reacted ✅ to your message: ', at: '10:16' }), T('r-comp', 'p3', 'needs'), T('r-triage', 'u2', 'needs'), T('r-go', 'l3', 'focus')],
@@ -423,7 +423,7 @@ function modalHTML() {
     h = `<h2>Add to Focus</h2><p class="sheet-note">Each rule shows what it would have pulled into Focus over the last 7 days, before you save it.</p>${opts.map(o => { const has = o[3] === 'thread' ? c.tdial === 'focus' : S.rules.some(r => r.id === o[0]); return `<div class="rule"><span><b>${esc(o[1])}</b><small class="rule-n">${o[2]} items in the last 7 days${o[2] > 30 ? `, about ${Math.round(o[2] / 7)} a day. That would make Focus a long list.` : ''}</small></span><button class="btn sm pri" ${has ? 'disabled' : ''} data-act="addRule" data-id="${o[0]}" data-label="${esc(o[1])}" data-n="${o[2]}" data-kind="${o[3]}" data-target="${o[4]}">${has ? 'Added' : o[3] === 'thread' ? 'Set thread to Focus' : 'Add rule'}</button></div>`; }).join('')}`;
   }
   if (m.type === 'rules') {
-    const acct = `<div class="rule person">${av(ME)}<span><b>${pn(ME)}</b><small>${P[ME][1]} · Larkspur</small></span></div><p class="sheet-note">You are looking at the product as ${first(ME)}. Switching to another person, and signing out, belong to the running product; the first version has a person switcher in place of sign-in.</p>`;
+    const acct = `<div class="rule person">${av(ME)}<span><b>${pn(ME)}</b><small>${esc(S.myTitle)}</small></span></div><label class="fld"><span>Name</span><input value="${pn(ME)}" aria-label="Name"></label><label class="fld"><span>What you do</span><input value="${esc(S.myTitle)}" data-mytitle="1" aria-label="What you do"></label><p class="sheet-note">Shown under your name. It is your own words and means nothing to the product: there are no roles or permissions in the first version.</p><p class="sheet-note">To see the team as someone else, use Switch account in your menu.</p>`;
     // Activity feed: the page keeps the general rules; what was added to Focus one by one lives in its own lists
     const cur = S.setSec || 'feed', ppl = S.dmPeople, has = id => S.rules.some(r => r.id === id), of = k => S.rules.filter(r => r.kind === k), goneOf = k => S.gone.filter(r => r.kind === k);
     const sw = (act, id, on, t, d) => `<label class="set-sw"><input type="checkbox" data-act="${act}"${id ? ` data-id="${id}"` : ''}${on ? ' checked' : ''}><span><b>${t}</b><small>${d}</small></span></label>`;
@@ -458,7 +458,8 @@ function modalHTML() {
       <p class="sheet-note">You are added automatically. There are no private channels in the first version: everyone on the team can find and join every channel.</p>
       <div class="dlg-acts"><button class="btn" data-act="closeModal">Cancel</button><button class="btn pri" id="nc-go" data-act="ncCreate" disabled>Create channel</button></div></div></div>`;
   }
-  if (m.type === 'switch') return `<div class="scrim center" data-act="closeModal"><div class="sheet dialog" role="dialog" aria-modal="true" data-stop="1"><button class="icon-btn close" data-act="closeModal" aria-label="Close">×</button><h2>View as ${pn(m.p)}</h2><p>In the product the whole window becomes ${first(m.p)}'s: their feed and its buckets, their unread marks, their Focus people and their settings, at the same moment of the demonstration. A band across the top says whose view it is, with a way back to your own.</p><p class="sheet-note">This prototype holds only Maya's view, so it stops here. Switching person is a demonstration feature and replaces sign-in in the first version.</p><div class="dlg-acts"><button class="btn pri" data-act="closeModal">Stay as Maya</button></div></div></div>`;
+  if (m.type === 'switch') return `<div class="scrim center" data-act="closeModal"><div class="sheet dialog" role="dialog" aria-modal="true" data-stop="1"><button class="icon-btn close" data-act="closeModal" aria-label="Close">×</button><h2>Switch to ${pn(m.p)}?</h2><p>The whole window becomes ${first(m.p)}'s: their feed and its buckets, their unread marks, their Focus people and their settings, at the same moment of the demonstration. A band across the top says whose view it is, with a way back.</p><p class="sheet-note">This prototype holds only Maya's messages, so after switching you see the band and the account change, over Maya's data.</p><div class="dlg-acts"><button class="btn" data-act="closeModal">Cancel</button><button class="btn pri" data-act="viewAs" data-p="${m.p}">Switch to ${first(m.p)}</button></div></div></div>`;
+  if (m.type === 'switch-old') return `<div class="scrim center" data-act="closeModal"><div class="sheet dialog" role="dialog" aria-modal="true" data-stop="1"><button class="icon-btn close" data-act="closeModal" aria-label="Close">×</button><h2>View as ${pn(m.p)}</h2><p>In the product the whole window becomes ${first(m.p)}'s: their feed and its buckets, their unread marks, their Focus people and their settings, at the same moment of the demonstration. A band across the top says whose view it is, with a way back to your own.</p><p class="sheet-note">This prototype holds only Maya's view, so it stops here. Switching person is a demonstration feature and replaces sign-in in the first version.</p><div class="dlg-acts"><button class="btn pri" data-act="closeModal">Stay as Maya</button></div></div></div>`;
   if (m.type === 'why') { const r = row(m.id); h = r ? `<h2>Why this is in ${BK[r.bucket][0]}</h2><p class="sheet-note">${esc(r.title || (conv(r.conv).kind === 'dm' ? pn(conv(r.conv).with) : conv(r.conv).title || '#' + conv(r.conv).name))} · ${r.t}. Every row is tested against the buckets from the top; the first that matches holds it.</p>${whyBody(r, true)}` : ''; }
   return `<div class="scrim${m.type === 'rule' ? ' center' : ''}" data-act="closeModal"><div class="sheet${m.type === 'rule' ? ' dialog' : ''}" role="dialog" aria-modal="true" data-stop="1"><button class="icon-btn close" data-act="closeModal" aria-label="Close">×</button>${h}</div></div>`;
 }
@@ -478,7 +479,12 @@ const h = {
   bell() { return ''; },
   bellOld() { const n = S.tray.filter(e => { const r = S.rows.find(x => x.id === e.row); return r && !r.read && (!S.focusOnly || e.bucket === 'focus'); }).length; return `<button class="icon-btn bell" data-act="modal" data-m="tray" aria-label="Notifications">${ic('bell')}${n ? `<span class="badge">${n}</span>` : ''}</button>`; },
   search() { return `<div class="search">${ic('search')}<input type="search" data-search="1" aria-label="Search messages" placeholder="Search messages" value="${esc(S.q)}"><div class="sr" id="sr"></div></div>`; },
-  me() { const open = S.menu === 'me'; return `<div class="me"><button class="me-btn" data-act="menu" data-key="me" aria-expanded="${open}" aria-label="Your account menu">${av(ME)}<span><b>${pn(ME)}</b><small>${P[ME][1]}</small></span>${ic('chev')}</button>${open ? `<div class="pop me-pop"><button class="opt" data-act="modal" data-m="rules" data-s="account"><b>Settings</b><span>Account, activity feed, notifications, channels</span></button><button class="opt" data-act="modal" data-m="rules" data-s="feed"><b>Activity feed settings</b><span>Focus people and rules</span></button><div class="pop-h">View as <span class="demo-tag">demonstration</span></div>${['maya', 'anna', 'tomas', 'sam'].map(x => `<button class="opt who${x === ME ? ' on' : ''}" data-act="${x === ME ? 'menu' : 'modal'}" data-key="me" data-m="switch" data-p="${x}"><b>${pn(x)}</b><span>${P[x][1]}</span></button>`).join('')}<div class="pop-f">There is no sign-in in the first version, so there is no Sign out. Viewing as someone else shows the same moment through their eyes.</div></div>` : ''}</div>`; },
+me() { // the person's own menu; switching account is a second level of it
+    const open = S.menu === 'me', who = S.viewAs || ME, label = who === ME ? S.myTitle : P[who][1];
+    const main = `<button class="opt" data-act="modal" data-m="rules" data-s="account"><b>Settings</b><span>Account, writing, activity feed, notifications</span></button><button class="opt" data-act="modal" data-m="rules" data-s="feed"><b>Activity feed settings</b><span>Focus people and rules</span></button><button class="opt nextlvl" data-act="meSub"><b>Switch account</b><span>View the team as someone else</span>${ic('chev')}</button>`;
+    const sub = `<button class="opt backlvl" data-act="meSub">${ic('back')}<b>Switch account</b><span class="demo-tag">demonstration</span></button>${['maya', 'anna', 'tomas', 'sam'].map(x => `<button class="opt who${x === who ? ' on' : ''}" data-act="${x === who ? 'menu' : 'modal'}" data-key="me" data-m="switch" data-p="${x}">${av(x, 'xs')}<b>${pn(x)}</b></button>`).join('')}<div class="pop-f">There is no sign-in in the first version, so accounts are switched here and there is no Sign out.</div>`;
+    return `<div class="me"><button class="me-btn" data-act="menu" data-key="me" aria-expanded="${open}" aria-label="Your account menu">${av(who)}<span><b>${pn(who)}</b><small>${esc(label)}</small></span>${ic('chev')}</button>${open ? `<div class="pop me-pop">${S.meSub ? sub : main}</div>` : ''}</div>`; },
+  whoLine() { const w = S.viewAs || ME; return esc(pn(w) + ' · ' + (w === ME ? S.myTitle : P[w][1])); },
   rz(k) { return `<div class="rz" data-rz="${k}" role="separator" aria-orientation="vertical" data-tip="Drag to resize. Double-click to reset"></div>`; },
   net() { return S.net === 'off' ? '<span class="netpill" role="status">Offline · showing 10:42</span>' : ''; },
   nav(v, label, icon, extra) { return `<button class="nav${S.view === v ? ' on' : ''}" data-act="view" data-v="${v}">${ic(icon)}<span>${label}</span>${extra || ''}</button>`; }
@@ -488,7 +494,8 @@ const h = {
 const root = () => document.getElementById('app');
 function render() {
   const keep = {}; document.querySelectorAll('[data-scroll]').forEach(e => keep[e.dataset.scroll] = e.scrollTop);
-  root().innerHTML = Skin.shell(h) + modalHTML() + pickerHTML() + demoHTML();
+  root().classList.toggle('viewing', !!S.viewAs);
+  root().innerHTML = (S.viewAs ? `<div class="viewband" role="status"><span class="demo-tag">demonstration</span><b>Viewing as ${pn(S.viewAs)}</b><span class="vb-note">This prototype still shows Maya's messages.</span><button class="btn sm" data-act="backToMe">Back to ${pn(ME)}</button></div>` : '') + Skin.shell(h) + modalHTML() + pickerHTML() + demoHTML();
   document.querySelectorAll('[data-scroll]').forEach(e => { if (keep[e.dataset.scroll]) e.scrollTop = keep[e.dataset.scroll]; });
   seeFyi();
 }
@@ -564,7 +571,10 @@ const A = {
   view(d) { if (S.view === 'feed' && d.v !== 'feed') settle(); S.view = d.v; S.menu = null; },
   btab(d) { S.btab = d.b; if (d.b === 'fyi') S.fyiSeen = true; },
   htab(d) { if (S.view === 'feed') settle(); S.view = 'history'; S.htab = d.t; },
-  menu(d) { S.menu = S.menu === d.key ? null : d.key; },
+  menu(d) { S.menu = S.menu === d.key ? null : d.key; S.meSub = false; },
+  meSub() { S.meSub = !S.meSub; },
+  viewAs(d) { S.viewAs = d.p === ME ? null : d.p; S.modal = null; S.menu = null; },
+  backToMe() { S.viewAs = null; },
   setDial(d) { setLevel(conv(d.c), d.l); S.menu = null; S.note = 'Dial changed. Unread rows are re-sorted the next time the feed is opened.'; },
   setT(d) { const c = conv(d.c); c.tdial = d.l; c.tset = true; S.menu = null; },
   follow(d) { const c = conv(d.c); c.tdial = c.tdial === 'off' ? 'fyi' : 'off'; c.tset = true; S.menu = null; },
@@ -738,6 +748,7 @@ function ncCheck(i) { const n = ncName(i.value), taken = CH.some(x => x[0] === n
 document.addEventListener('change', e => { if (e.target.dataset.dial) { setLevel(conv(e.target.dataset.dial), e.target.value); render(); } });
 document.addEventListener('submit', e => { e.preventDefault(); submit(e.target); });
 document.addEventListener('input', e => {
+  if (e.target.dataset.mytitle) S.myTitle = e.target.value;
   if (e.target.dataset.newch) ncCheck(e.target);
   if (e.target.matches('textarea[name="t"]')) grow(e.target);
   if (e.target.dataset.search) search(e.target.value);

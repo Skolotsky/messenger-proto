@@ -534,14 +534,42 @@
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "the person's menu offers View as, marked as a demonstration feature",
+  "check": "the person's menu has Switch account as its own entry, not a list of people",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "choosing someone explains what the product will show",
+  "check": "the people are one level down, marked as a demonstration feature",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "choosing someone asks, with a real choice",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "after switching, a band says whose view it is and the account shows it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "and there is a way back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the line under a name is the person's own words, changed in Account",
   "pass": true,
   "detail": ""
  },
