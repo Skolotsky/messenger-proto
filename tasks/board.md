@@ -2,7 +2,7 @@
 
 Work in flight. Order inside a section is priority. Finished work moves to `done.md`. Rules: CLAUDE.md, section "Tasks".
 
-**Where we are:** Accepted so far (2026-11-22): D-001, the three-bucket feed with dials, Flag and Info; D-009, the first version is the feed plus what makes it observable, with creating channels and a phone-sized layout. D-002 (how real the agents are) is proposed and waiting on the user. After it: D-010 the seeded team, D-003 feed detail, D-004 edits and deletes. Order set by the user: product decisions first; technical ones (D-005 to D-008) wait until the product scope is final and the experiments are agreed. Text rules judged by a model are in scope but built last, after an experiment.
+**Where we are:** Accepted so far (2026-11-22): D-001, the three-bucket feed with dials, Flag and Info; D-009, the first version is the feed plus what makes it observable, as a PWA, with creating channels; D-002, people and agents are scripted, and a coding agent can join as either for verification. D-010 (the seeded team) is proposed and waiting on the user. After it: D-003 feed detail, D-004 edits and deletes. Order set by the user: product decisions first; technical ones (D-005 to D-008) wait until the product scope is final and the experiments are agreed. Text rules judged by a model are in scope but built last, after an experiment.
 
 ## Now
 
@@ -10,7 +10,7 @@ _Nothing in progress._
 
 ## Waiting on user
 
-- **T-010** `decide` D-002: pick what drives the agents in the first version. Recommended: A, scripted agents through the real door, with one real assistant when the model arrives. Brief: `docs/visuals/D-002-agents-in-first-version.html`
+- **T-011** `decide` D-010: pick the size of the seeded team. Recommended: B, 12 people and 3 agents. Brief: `docs/visuals/D-010-seeded-team.html`
 
 ## Next
 

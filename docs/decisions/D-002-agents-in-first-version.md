@@ -1,6 +1,6 @@
 # D-002: How real the AI agents are in the first version
 
-- Status: proposed
+- Status: accepted
 - Level: product
 - Date: 2026-11-22
 - Decided by: user
@@ -58,11 +58,18 @@ No second opinion was sought: cheap to reverse.
 
 ## Decision
 
-_Open._
+Accepted by the user on 2026-11-22: **A, extended, and without the later assistant.**
+
+- "The core is A for sure. Agents themselves aren't part of the product." Someone looking at the product must be able to see it work with no real agent connected, so scripted demo agents are connected from the start.
+- The same holds for people: the seeded team's people are scripted too.
+- **A way in for a coding agent.** The user wants Claude Code to be able to take part from the early stages, both as an agent and on behalf of a person in the team, "to see from inside". Its purpose is verification: it lets the product be exercised as a participant would use it. It is a demonstration feature, not for production. The form is open ("MCP or something like that") and is the agent's to choose with the system shape.
+- The recommendation's second half is dropped: no real assistant is planned. "It's not about 'assistant' but about helping me to do proper verification." The model still arrives with the text rules (D-001), for that purpose only.
 
 ## Consequences
 
-_Filled in when accepted._
+- Easier: the first version runs with no model and no key. Checks can drive the product as a person or an agent would and observe what each participant receives, which is what the working agreement asks of verification.
+- Harder: acting on behalf of a person, with no access model (D-009), is a door that must not exist in a real deployment. It has to be visibly a demonstration feature, off unless switched on, and on the list of known shortcuts.
+- Committed to: scripted people and agents; agents entering through a door a real agent could use; the way in for a coding agent rides on the same doors as real participants (the agent door for agents, the same interface the web app uses for people), so what it verifies is the product and not a side path. It does not replace looking at the rendered page: layout, "nothing jumps" and the phone-sized screen still need a browser (T-004).
 
 ## Follow-ups
 
