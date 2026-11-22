@@ -1,6 +1,6 @@
 # D-004: What an edit or a delete does to what people already have
 
-- Status: proposed
+- Status: accepted
 - Level: product
 - Date: 2026-11-22
 - Decided by: user
@@ -74,11 +74,18 @@ No second opinion was sought: nothing is built yet. T-008 (looking at what Slack
 
 ## Decision
 
-_Open._
+Accepted by the user on 2026-11-22: **C in the activity feed, and a stricter rule in conversations**, in the user's words: "in the channels/threads it should leave no traces unless there's a need (thread behind, or someone mentioned it); in activity feed it will leave the tombstone."
+
+- **In channels and threads** a deleted message leaves nothing behind, unless something still depends on it: it has replies (the marker stays so the thread keeps its top), or another message refers to it. Referring to a message (a quote or a link) is not in the first version, so today only the thread case applies. This replaces the recommendation's "without replies, the marker holds the space and is gone afterwards" only in emphasis: people who have the conversation open at that moment still see the space held until they move on ("nothing jumps"), and nothing lasting remains.
+- **In the activity feed** a retracted row becomes a marker, by the cases of option C.
+- **Rows the person never saw leave no marker.** The agent asked this as a separate question and recommended it; the user answered "So decided?" and moved on. It is recorded as accepted on that basis and is the first thing to revisit if that reading was wrong.
+- The rules listed under the recommendation for the other cases (an edit that adds or removes a mention or flag, a text-only edit, reactions, search, notifications, the phone-sized screen) stand as written.
 
 ## Consequences
 
-_Filled in when accepted._
+- Easier: the two places have one sentence each. A conversation reads as if the message was never there; the feed explains itself wherever a person had already paid attention.
+- Harder: every feed row needs to know whether its reader had seen it, on any device, at the moment of the retraction. A marker in the feed can outlive every trace of the message in the conversation, so the feed must hold what it needs to show the marker (who, where, when) without the message.
+- Committed to: retracted and changed as separate states of a row, a tray entry and a search entry; markers for flagged and kept rows that stay until done.
 
 ## Follow-ups
 

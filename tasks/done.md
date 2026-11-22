@@ -2,6 +2,7 @@
 
 Finished work, newest first. One line each: what is now true and how it was verified. Commits carry the task ID, so `git log --grep T-nnn` finds the change.
 
+- 2026-11-22 · **T-013** `decide` D-004 is accepted: no trace of a deleted message in a conversation unless it has replies; in the feed a marker only where the person had seen it. Verified: the user's words recorded; the point about never-seen rows rests on "So decided?" and is marked as such in the record; `./scripts/check` passes.
 - 2026-11-22 · **T-012** `decide` D-003 is accepted in the user's shape: reading is enough for a row to leave; flags stay until closed; kept rows stay in Focus until done. Verified: agreed by the user in conversation; record and index updated; `./scripts/check` passes.
 - 2026-11-22 · **T-011** `decide` D-010 is accepted: a large seeded team (about 30 people, 6 agents, 20 channels) and a separate control panel for the demonstration; the user chose C over the recommended B. Verified: accepted by the user in conversation; record and index updated; `./scripts/check` passes.
 - 2026-11-22 · **T-010** `decide` D-002 is accepted: people and agents are scripted, no model is needed to run the first version, and a coding agent can join as an agent or a person for verification. Verified: accepted by the user in conversation; record and index updated; `./scripts/check` passes.
