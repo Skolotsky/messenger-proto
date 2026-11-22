@@ -8,15 +8,20 @@ Line format: `- **D-nnn** [status] The decision as a statement, and what it comm
 
 ## Product: what we build and for whom
 
-_None yet._
+- **D-001** [open] Scope and audience: who evaluates the prototype, how it is shown, and which surfaces exist (channels, threads, direct messages, switching person). Evidence: R-002. Absorbs T-002
+- **D-002** [open] The role of AI agents: whether they are full participants, how status and streamed replies appear, what agent activity reaches the feed, scripted or real model. Evidence: R-002
+- **D-003** [open] What the activity feed contains and how it is cleared: item types, grouping, read state, triage action. Evidence: R-002
+- **D-004** [open] What an edit or a delete does to feed items and notifications that already exist. Evidence: R-002
 
 ## System shape: components, boundaries, stack
 
-_None yet._
+- **D-005** [open] System shape and stack: one deployable or several, the source of truth, how live updates and catch-up reach the screen. Evidence: R-002
 
 ## Contracts and qualities: what services promise each other
 
-_None yet._
+- **D-006** [open] The delivery promise to each receiver: loss, repeats, order across create, edit and delete. Evidence: R-002
+- **D-007** [open] Quality targets: freshness, retry and give-up limits, what a person sees during an outage, how a receiver is rebuilt. Evidence: R-002
+- **D-008** [open] The contract for agents as receivers of message events: what they are told, what they may read, what stops agents triggering each other. Depends on D-002. Evidence: R-002
 
 ## Delegated: notable choices the agent made on internals
 

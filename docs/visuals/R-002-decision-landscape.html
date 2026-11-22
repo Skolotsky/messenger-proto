@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Existing products and first decisions</title>
+<style>
+/* Layout: one reading column. Diagrams, tables and code may run wider inside their own scroll box. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --sunken: #eceef2; --line: #d8dce4;
+  --ink: #17202b; --ink-2: #445063; --ink-3: #5f6b7d;
+  --agent: #2351c9; --agent-soft: #e5ecfc; /* the agent's work, links */
+  --you: #a64b08; --you-soft: #fcebd9;     /* where the user's attention is needed */
+  --ok: #1b7548; --ok-soft: #e1f3e8;       /* recommended, holds, verified */
+  --risk: #b3261e; --risk-soft: #fbe8e6;   /* risk, broken, not verified */
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Cascadia Code", "Cascadia Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+    --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+    --agent: #86a8ff; --agent-soft: #1b2a4c;
+    --you: #f2a766; --you-soft: #3b2814;
+    --ok: #62cf99; --ok-soft: #14301f;
+    --risk: #ff8f85; --risk-soft: #3d1815;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+  --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+  --agent: #86a8ff; --agent-soft: #1b2a4c;
+  --you: #f2a766; --you-soft: #3b2814;
+  --ok: #62cf99; --ok-soft: #14301f;
+  --risk: #ff8f85; --risk-soft: #3d1815;
+  color-scheme: dark;
+}
+
+/* Base */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--font); }
+.page {
+  max-width: 880px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 34px;
+}
+section, .stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+h1 { font: 650 27px/1.2 var(--display); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h2 { font: 650 18.5px/1.3 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 650 14.5px/1.35 var(--font); margin: 0; }
+p { margin: 0; max-width: 68ch; }
+ul, ol { margin: 0; padding-left: 1.25em; display: flex; flex-direction: column; gap: 5px; max-width: 68ch; }
+a { color: var(--agent); }
+strong { font-weight: 650; }
+code { font: 0.88em var(--mono); background: var(--sunken); border: 1px solid var(--line); border-radius: 4px; padding: 0.08em 0.36em; overflow-wrap: anywhere; }
+:focus-visible { outline: 2px solid var(--agent); outline-offset: 2px; }
+.label { font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.note { color: var(--ink-3); font-size: 13.5px; }
+
+/* Header */
+.top { display: flex; flex-direction: column; gap: 8px; }
+.lede { font-size: 16.5px; color: var(--ink-2); max-width: 62ch; }
+
+/* Needs you: the one thing the user has to decide or answer */
+.ask { background: var(--you-soft); border: 1px solid color-mix(in srgb, var(--you) 40%, transparent); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.ask .label { color: var(--you); }
+
+/* Chips */
+.chip { display: inline-flex; align-items: center; font: 600 12px/1 var(--font); padding: 4px 9px; border-radius: 999px; background: var(--sunken); color: var(--ink-2); white-space: nowrap; }
+.chip.you { background: var(--you-soft); color: var(--you); }
+.chip.agent { background: var(--agent-soft); color: var(--agent); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.risk { background: var(--risk-soft); color: var(--risk); }
+
+/* Panels side by side */
+.split { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.panel.you .label { color: var(--you); }
+.panel.agent .label { color: var(--agent); }
+.files { list-style: none; padding: 0; gap: 7px; }
+.files li { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.files span { color: var(--ink-2); font-size: 13.5px; }
+
+/* Lanes: who does what, phase by phase. Children in order: three .head cells, then .phase, .you, .agent per row */
+.lanes { display: grid; grid-template-columns: minmax(128px, 0.75fr) 1.25fr 1.5fr; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.lanes > * { padding: 12px 14px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin: -1px 0 0 -1px; min-width: 0; }
+.lanes > .head { background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.lanes > .head.you { color: var(--you); background: var(--sunken); }
+.lanes > .head.agent { color: var(--agent); }
+.lanes > .phase { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.lanes > .phase strong { font: 650 15px/1.3 var(--display); }
+.lanes > .phase .say { color: var(--ink-2); font-size: 13.5px; }
+.lanes > .you { background: color-mix(in srgb, var(--you-soft) 60%, var(--surface)); }
+.lanes > .you.idle { background: var(--surface); color: var(--ink-3); }
+@media (max-width: 600px) {
+  .lanes { grid-template-columns: 1fr 1.2fr; }
+  .lanes > .head.first { display: none; }
+  .lanes > .phase { grid-column: 1 / -1; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--sunken); padding-block: 8px; }
+}
+
+/* Options: a choice, side by side */
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.option { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.option.pick { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+.option header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.option dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; font-size: 14px; }
+.option dt { font-weight: 650; color: var(--ink-3); }
+.option dd { margin: 0; min-width: 0; }
+.brief { border: 1px dashed var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+/* Steps: what happens, in order */
+.steps { list-style: none; padding: 0; gap: 0; counter-reset: step; max-width: none; }
+.steps > li { counter-increment: step; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding-bottom: 16px; position: relative; }
+.steps > li::before { content: counter(step); width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; font: 600 13px var(--mono); color: var(--ink-2); position: relative; z-index: 1; }
+.steps > li:not(:last-child)::after { content: ""; position: absolute; left: 13.5px; top: 28px; bottom: 0; width: 1px; background: var(--line); }
+.steps > li:last-child { padding-bottom: 0; }
+.steps .body { display: flex; flex-direction: column; gap: 5px; padding-top: 3px; min-width: 0; }
+
+/* Figures: diagrams and snippets */
+figure { margin: 0; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+figcaption { font-size: 13px; color: var(--ink-3); max-width: 68ch; }
+.diagram .scroll { overflow-x: auto; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; }
+.diagram svg { display: block; min-width: 560px; width: 100%; height: auto; color: var(--ink-3); font-family: var(--font); }
+.diagram .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
+.diagram .box-you { fill: var(--you-soft); stroke: var(--you); stroke-width: 1.25; }
+.diagram .box-agent { fill: var(--agent-soft); stroke: var(--agent); stroke-width: 1.25; }
+.diagram .box-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.25; }
+.diagram .box-risk { fill: var(--risk-soft); stroke: var(--risk); stroke-width: 1.25; }
+.diagram .t { fill: var(--ink); font-size: 13px; font-weight: 650; }
+.diagram .t2 { fill: var(--ink-2); font-size: 11px; }
+.diagram .edge { stroke: currentColor; stroke-width: 1.5; fill: none; }
+.diagram .edge-label { fill: var(--ink-2); font-size: 11px; }
+.snippet pre { margin: 0; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; overflow-x: auto; font: 13px/1.5 var(--mono); }
+.snippet pre code { background: none; border: 0; padding: 0; font: inherit; overflow-wrap: normal; }
+.snippet mark { background: var(--you-soft); color: inherit; border-radius: 3px; padding: 0 2px; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+thead th { border-top: 0; background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Depth on demand */
+details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 0 16px; }
+details > summary { cursor: pointer; padding: 11px 0; font-weight: 650; }
+details[open] { padding-bottom: 14px; }
+details > .stack { gap: 10px; }
+
+/* Footer */
+.foot { border-top: 1px solid var(--line); padding-top: 14px; color: var(--ink-3); font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body>
+<main class="page">
+<header class="top">
+  <div class="label">Research · R-002 · 2026-11-22</div>
+  <h1>How existing products do it, and what you need to decide first</h1>
+  <p class="lede">The plumbing is the same in every product, so we borrow it. Your decisions are about what a person sees, what an edit or delete does, and how AI agents take part.</p>
+</header>
+
+<div class="ask">
+  <div class="label">Needs you</div>
+  <p><strong>Which decision do we open first?</strong> I recommend D-001 (scope and audience), then D-002 (the role of AI agents), because both change what every later decision has to cover.</p>
+</div>
+
+<section>
+  <h2>The shape every product shares</h2>
+  <p>Slack, Discord and Zulip all save the message first, record the change, and let the slow systems pick changes up on their own. Orange marks where the choices are yours.</p>
+  <figure class="diagram">
+    <div class="scroll">
+      <svg viewBox="0 0 730 372" role="img" aria-label="People and AI agents send changes to the messaging service, which saves each message together with a change record; search, notifications, the activity feed and AI agents each receive every change independently, with retries when one is slow or down">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+
+        <rect class="box" x="10" y="44" width="124" height="54" rx="6"/>
+        <text class="t" x="72" y="67" text-anchor="middle">People</text>
+        <text class="t2" x="72" y="84" text-anchor="middle">write, edit, delete, react</text>
+
+        <rect class="box-you" x="10" y="150" width="124" height="54" rx="6"/>
+        <text class="t" x="72" y="173" text-anchor="middle">AI agents</text>
+        <text class="t2" x="72" y="190" text-anchor="middle">a reply = many edits</text>
+
+        <rect class="box" x="214" y="88" width="150" height="72" rx="6"/>
+        <text class="t" x="289" y="113" text-anchor="middle">Messaging service</text>
+        <text class="t2" x="289" y="130" text-anchor="middle">saves the message and a</text>
+        <text class="t2" x="289" y="144" text-anchor="middle">change record together</text>
+
+        <line class="edge" x1="134" y1="76" x2="212" y2="108" marker-end="url(#arrow)"/>
+        <line class="edge" x1="134" y1="172" x2="212" y2="142" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="174" y="128" text-anchor="middle">changes</text>
+
+        <rect class="box" x="426" y="88" width="112" height="72" rx="6"/>
+        <text class="t" x="482" y="113" text-anchor="middle">Change log</text>
+        <text class="t2" x="482" y="130" text-anchor="middle">every change,</text>
+        <text class="t2" x="482" y="144" text-anchor="middle">numbered per message</text>
+
+        <line class="edge" x1="364" y1="124" x2="424" y2="124" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="394" y="116" text-anchor="middle">records</text>
+
+        <rect class="box" x="606" y="10" width="114" height="50" rx="6"/>
+        <text class="t" x="663" y="31" text-anchor="middle">Search index</text>
+        <text class="t2" x="663" y="47" text-anchor="middle">may lag seconds</text>
+
+        <rect class="box" x="606" y="74" width="114" height="50" rx="6"/>
+        <text class="t" x="663" y="95" text-anchor="middle">Notifications</text>
+        <text class="t2" x="663" y="111" text-anchor="middle">cannot be unsent</text>
+
+        <rect class="box-you" x="606" y="138" width="114" height="50" rx="6"/>
+        <text class="t" x="663" y="159" text-anchor="middle">Activity feed</text>
+        <text class="t2" x="663" y="175" text-anchor="middle">what needs you</text>
+
+        <rect class="box-you" x="606" y="202" width="114" height="50" rx="6"/>
+        <text class="t" x="663" y="223" text-anchor="middle">AI agents</text>
+        <text class="t2" x="663" y="239" text-anchor="middle">a fourth receiver</text>
+
+        <line class="edge" x1="538" y1="104" x2="604" y2="38" marker-end="url(#arrow)"/>
+        <line class="edge" x1="538" y1="116" x2="604" y2="100" marker-end="url(#arrow)"/>
+        <line class="edge" x1="538" y1="134" x2="604" y2="160" marker-end="url(#arrow)"/>
+        <line class="edge" x1="538" y1="148" x2="604" y2="222" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="548" y="72" text-anchor="middle">each change,</text>
+        <text class="edge-label" x="548" y="85" text-anchor="middle">at least once</text>
+
+        <rect class="box-risk" x="400" y="286" width="320" height="74" rx="6"/>
+        <text class="t" x="560" y="308" text-anchor="middle">When a receiver is slow or down</text>
+        <text class="t2" x="560" y="326" text-anchor="middle">its changes wait and are retried; the others carry on.</text>
+        <text class="t2" x="560" y="342" text-anchor="middle">Repeats and late arrivals are ignored by version number.</text>
+        <line class="edge" x1="482" y1="160" x2="482" y2="284" stroke-dasharray="4 4" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="490" y="270">failure path</text>
+
+        <rect class="box" x="10" y="286" width="354" height="74" rx="6"/>
+        <text class="t" x="187" y="308" text-anchor="middle">Live updates back to every screen</text>
+        <text class="t2" x="187" y="326" text-anchor="middle">Each update is numbered. After a dropped connection the</text>
+        <text class="t2" x="187" y="342" text-anchor="middle">screen asks for what it missed, or reloads if too far behind.</text>
+        <line class="edge" x1="289" y1="160" x2="289" y2="284" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="297" y="228">pushes</text>
+      </svg>
+    </div>
+    <figcaption>The brief's three independent systems are the standard design. An AI agent sits on both sides: it writes like a person, and it receives changes like the search index does.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>What we can borrow and what we must choose</h2>
+  <div class="split">
+    <div class="panel">
+      <div class="label">Same everywhere: borrow</div>
+      <ul>
+        <li>Save first, then tell the other systems from a change record written in the same step.</li>
+        <li>Deliver at least once; receivers ignore repeats.</li>
+        <li>One queue per receiver, so a slow one blocks nobody.</li>
+        <li>Feed items come from mentions, thread replies and reactions, filtered by type.</li>
+        <li>Slack's own boundary: answer in 3 seconds, 3 retries, a unique ID per event.</li>
+      </ul>
+    </div>
+    <div class="panel you">
+      <div class="label">Products disagree: you choose</div>
+      <ul>
+        <li>An edit adds a mention: Zulip notifies, Mattermost does not, Slack does not say.</li>
+        <li>A message is deleted: no product documents what its feed does.</li>
+        <li>Clearing the feed: Slack clears, Linear snoozes, GitHub has Done and Save.</li>
+        <li>How fresh search and the feed must be, and what a person sees while one is down.</li>
+      </ul>
+    </div>
+    <div class="panel you">
+      <div class="label">New with AI agents: you choose</div>
+      <ul>
+        <li>Agents now sit in ordinary conversations (Slack and Teams, mid-2026), not a side panel.</li>
+        <li>They add live status, streamed replies and a “waiting on you” state.</li>
+        <li>Teams keeps in-progress output silent: only the finished message notifies.</li>
+        <li>Salesforce says half of Slack messages come from apps and agents, so the feed needs a noise rule.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>The decisions, top-down</h2>
+  <p>Each one gets its own short brief with options when we open it. “Lean” is where the evidence points today, not a decision.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Decision</th><th>What the research says</th><th>Lean</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>D-001</strong><br><span class="chip you">First</span></td>
+          <td><strong>Scope and audience.</strong> Who looks at this, how it is shown, and which surfaces exist: channels, threads, direct messages, switching between people.</td>
+          <td>The brief asks for enough to exercise the feed, not a full product.</td>
+          <td>Channels and threads, a busy seeded team, switch person without login. Needs your context first.</td>
+        </tr>
+        <tr>
+          <td><strong>D-002</strong><br><span class="chip you">Second</span></td>
+          <td><strong>The role of AI agents.</strong> Are they full participants, how do status and streamed replies appear, and is the agent scripted or a real model?</td>
+          <td>Slack, Teams and Linear treat agents as members you can mention. In-progress output is silent in Teams.</td>
+          <td>Full participant with status, streamed replies and “waiting on you”; scripted so the demo is repeatable.</td>
+        </tr>
+        <tr>
+          <td><strong>D-003</strong></td>
+          <td><strong>What the feed contains and how it is cleared.</strong> Item types, grouping, read and unread, the triage action.</td>
+          <td>Mentions, thread replies, reactions; filters by type; one clear action; cleared threads return on new activity.</td>
+          <td>Slack's types plus “an agent is waiting on you”; grouped reactions; read state and clear.</td>
+        </tr>
+        <tr>
+          <td><strong>D-004</strong></td>
+          <td><strong>What an edit or delete does</strong> to feed items and notifications that already exist.</td>
+          <td>Products disagree or stay silent. A sent notification cannot be recalled; an unsent one can be cancelled.</td>
+          <td>The feed always shows the current truth; added mentions notify; a short send delay lets deletes cancel notifications.</td>
+        </tr>
+        <tr>
+          <td><strong>D-005</strong></td>
+          <td><strong>System shape and stack.</strong> One program or several, the database, how live updates reach the screen.</td>
+          <td>One source of truth, receivers behind real boundaries, numbered live updates with catch-up.</td>
+          <td>One deployable with network-style boundaries inside, as the brief allows. Stack to be proposed.</td>
+        </tr>
+        <tr>
+          <td><strong>D-006</strong></td>
+          <td><strong>The delivery promise.</strong> What each receiver is guaranteed about loss, repeats and order.</td>
+          <td>Nobody promises exactly-once across a network. At-least-once with repeat-safe receivers is standard.</td>
+          <td>Nothing lost, repeats harmless, order per message by version, deletes always win.</td>
+        </tr>
+        <tr>
+          <td><strong>D-007</strong></td>
+          <td><strong>Quality targets.</strong> How fresh, how long we retry, what a person sees during an outage, how a receiver is rebuilt.</td>
+          <td>Discord accepts a delay before search; Slack retries 3 times then gives up; GitHub does not retry.</td>
+          <td>Numbers to set together, each backed by a test that breaks the receiver.</td>
+        </tr>
+        <tr>
+          <td><strong>D-008</strong></td>
+          <td><strong>The contract for agents as receivers.</strong> What an agent is told, what it may read, and what stops agents triggering each other.</td>
+          <td>Slack: explicit permissions, 3-second answer, retries. No official loop rule anywhere.</td>
+          <td>Same contract as the other receivers, plus per-channel access. Depends on D-002.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<details>
+  <summary>How far to trust this</summary>
+  <div class="stack">
+    <p>Five research agents on a cheap model read the sources; a sixth re-fetched eight of the most important pages. Seven claims held. One was wrong and was dropped (a detail of how Slack migrated notification settings).</p>
+    <p><span class="chip risk">Not verified</span> What Slack's Activity really does on edit and delete (not documented anywhere), Discord's Inbox details (page blocked), and most other findings beyond the eight re-checked. Many sources are from 2026.</p>
+    <p class="note">Sources and the full findings: <code>docs/research/R-002-existing-products.md</code></p>
+  </div>
+</details>
+
+<footer class="foot">
+  <span>Belongs to T-005 · Evidence: R-002</span>
+  <span>Full findings and sources: <code>docs/research/R-002-existing-products.md</code></span>
+</footer>
+
+</main>
+</body>
+</html>
