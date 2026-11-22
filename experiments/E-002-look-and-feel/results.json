@@ -121,6 +121,13 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "a row marked Done can be kept again",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "agent result is in Needs you",
   "pass": true,
   "detail": ""
@@ -849,6 +856,13 @@
  {
   "page": "slack-like",
   "width": "phone",
+  "check": "a row marked Done can be kept again",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
   "check": "agent result is in Needs you",
   "pass": true,
   "detail": ""
@@ -1493,6 +1507,13 @@
  {
   "page": "telegram-like",
   "width": "desktop",
+  "check": "a row marked Done can be kept again",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
   "check": "agent result is in Needs you",
   "pass": true,
   "detail": ""
@@ -2068,6 +2089,13 @@
   "page": "telegram-like",
   "width": "phone",
   "check": "Done releases it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "a row marked Done can be kept again",
   "pass": true,
   "detail": ""
  },
@@ -2620,6 +2648,13 @@
  {
   "page": "own",
   "width": "desktop",
+  "check": "a row marked Done can be kept again",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
   "check": "agent result is in Needs you",
   "pass": true,
   "detail": ""
@@ -3195,6 +3230,13 @@
   "page": "own",
   "width": "phone",
   "check": "Done releases it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "a row marked Done can be kept again",
   "pass": true,
   "detail": ""
  },

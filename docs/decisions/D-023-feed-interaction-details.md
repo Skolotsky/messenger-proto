@@ -55,6 +55,8 @@ As listed under "Decided"; where the agent had built something else first, the r
 
 21. **A feed row has no opened state, at any width. A click opens the conversation.** "There is no need to have expanded state in the activity feed if clicking doesn't close activity feed but just opens it alongside. So both for desktop and for mobile we don't need it for different reasons." On a wide screen the conversation opens beside the feed, at the first new message, with the cursor in the message box; on a phone it opens over the feed. This supersedes D-003's expanding in place and replying from the row at every width, and with it points 4, 5, 6 and the wide-screen half of point 9 above, which described the opened row. What stays on the row itself: React, Mark read, Keep (Done on a kept row), and the reason line (D-020).
 
+22. **Done can be taken back.** "When it's done I should be able to click keep again, if I mistakenly clicked done." While a row marked Done is still in the feed (until the person leaves it, D-003), Keep is offered on it and puts it back as kept. On a phone the Keep swipe does the same.
+
 ### Still the agent's proposal, shown in the mock-up, awaiting the user's word
 
 - Lapsed with point 21: context above the new messages in an opened row, and how a long burst is shown there. The conversation shows the whole exchange with a "New" line at the first new message.

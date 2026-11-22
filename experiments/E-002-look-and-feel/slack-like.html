@@ -794,13 +794,13 @@ function rowHTML(r) {
       <form class="reply" data-form="reply" data-id="${r.id}"><input name="t" autocomplete="off" aria-label="Reply" placeholder="Reply ${c.kind === 'dm' ? 'to ' + first(c.with) : 'in ' + where}…"><button class="btn pri">Send</button></form></div>`;
   }
   return `<article class="row b-${r.bucket} ${r.read ? 'read' : 'unread'}${exp ? ' expanded' : ''}${r.fresh ? ' fresh' : ''}${r.sec === 'kept' ? ' kept' : ''}${r.done ? ' done' : ''}" data-row="${r.id}">
-    <div class="sw-under" aria-hidden="true"><span class="sw-l">${ic('check')} ${r.sec === 'kept' ? 'Done' : 'Mark read'}</span><span class="sw-k">${r.kept && !r.done ? 'Kept' : 'Keep'} ${ic('pin')}</span></div>
+    <div class="sw-under" aria-hidden="true"><span class="sw-l">${ic('check')} ${r.sec === 'kept' ? 'Done' : 'Mark read'}</span><span class="sw-k">${r.kept && !r.done ? 'Kept' : r.done ? 'Keep again' : 'Keep'} ${ic('pin')}</span></div>
     <div class="row-main" role="button" tabindex="0" data-act="toggle" data-id="${r.id}" aria-expanded="${exp}">${av(r.chan ? '#' : r.kind === 'rx' ? r.by : last.by)}
       <div class="row-text"><div class="row-head"><span class="row-title">${esc(title)}</span>${sub ? `<span class="row-sub">${sub}</span>` : ''}${marks}${cnt}<span class="row-time">${r.t}${last.edited ? ' · edited' : ''}</span></div>
         <div class="row-reason"><span class="why-dot"></span>${WHY === 'a' ? `<button class="why-btn" data-act="why" data-id="${r.id}" aria-expanded="${S.whyOpen === r.id}">${esc(r.reason)} ${ic('chev')}</button>` : esc(r.reason)}${r.note ? ` · <em>${r.note}</em>` : ''}${WHY === 'c' ? `<button class="why-btn c" data-act="whySheet" data-id="${r.id}">Why? Change…</button>` : ''}</div>
         <div class="row-preview" data-k="${k}"${lockS}>${r.replies.length ? `<b>You:</b> ${rich(S.msgs[r.replies[r.replies.length - 1]].text)}` : `<b>${last.by === ME ? 'You' : first(last.by)}:</b> ${rich(last.text)}`}</div>
         ${r.kind !== 'rx' && last.rx.length ? rxHTML(last) : ''}</div>
-      <div class="row-side">${state}${badge}<span class="row-btns"><button class="rx-pick" data-act="pick" data-m="${last.id}" aria-label="React without opening" title="React to the latest message without opening">${ic('smile')}</button>${!r.read ? `<button class="mark-read" data-act="read" data-id="${r.id}" aria-label="Mark read without opening" title="Mark read without opening">${ic('check')}</button>` : ''}${r.kept || r.done ? '' : `<button class="keep-btn" data-act="keep" data-id="${r.id}" aria-label="Keep" title="Keep until you press Done">${ic('pin')}</button>`}</span>${r.sec === 'kept' && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : ''}<span class="row-chev">${ic('chev')}</span></div></div>${WHY === 'a' && S.whyOpen === r.id ? `<div class="why-pop" data-stop="1"><h3>Why this is in ${BK[r.bucket][0]}</h3>${whyBody(r)}</div>` : ''}${x}</article>`;
+      <div class="row-side">${state}${badge}<span class="row-btns"><button class="rx-pick" data-act="pick" data-m="${last.id}" aria-label="React without opening" title="React to the latest message without opening">${ic('smile')}</button>${!r.read ? `<button class="mark-read" data-act="read" data-id="${r.id}" aria-label="Mark read without opening" title="Mark read without opening">${ic('check')}</button>` : ''}${r.kept && !r.done ? '' : `<button class="keep-btn" data-act="keep" data-id="${r.id}" aria-label="${r.done ? 'Keep again' : 'Keep'}" title="${r.done ? 'Keep again: undo Done' : 'Keep until you press Done'}">${ic('pin')}</button>`}</span>${r.sec === 'kept' && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : ''}<span class="row-chev">${ic('chev')}</span></div></div>${WHY === 'a' && S.whyOpen === r.id ? `<div class="why-pop" data-stop="1"><h3>Why this is in ${BK[r.bucket][0]}</h3>${whyBody(r)}</div>` : ''}${x}</article>`;
 }
 const SUN = '<svg class="ill" viewBox="0 0 120 64" aria-hidden="true"><path d="M8 52h104" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M36 52a24 24 0 0 1 48 0" fill="currentColor" opacity=".18"/><path d="M60 14v8M30 26l6 6M90 26l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 60h30M62 60h38" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".4"/></svg>';
 function bucketHTML(b) {
@@ -996,7 +996,7 @@ const A = {
   },
   closeConv() { S.conv = null; S.menu = null; },
   read(d) { row(d.id).read = true; },
-  keep(d) { const r = row(d.id); r.kept = r.kept || 'you'; r.read = true; r.keptNow = true; },
+  keep(d) { const r = row(d.id); r.kept = r.kept || 'you'; r.read = true; r.done = false; r.replied = false; r.keptNow = r.sec !== 'kept'; }, // also the way back from a Done pressed by mistake
   done(d) { const r = row(d.id); r.done = true; r.read = true; },
   react(d) { const r = row(d.id); toggleRx(S.msgs[r.items[r.items.length - 1]], d.e); act(r); },
   reactMsg(d) { toggleRx(S.msgs[d.m], d.e); S.pick = null; S.rows.forEach(r => { if (r.items.includes(d.m)) act(r); }); },
@@ -1095,7 +1095,7 @@ const swEnd = () => {
   if (!sw) return; const w = sw; sw = null; if (!w.on) return;
   swallow = true; setTimeout(() => { swallow = false; }, 60); const r = row(w.id); // eat only the click this drag itself produces
   if (r && w.dx > 70) { if (r.sec === 'kept') r.done = true; r.read = true; }        // to the right: read (Done on a kept row)
-  else if (r && w.dx < -70 && !r.done) { r.kept = r.kept || 'you'; r.read = true; if (r.sec !== 'kept') r.keptNow = true; } // to the left: keep
+  else if (r && w.dx < -70) A.keep({ id: r.id }); // to the left: keep
   render();
 };
 document.addEventListener('pointerup', swEnd); document.addEventListener('pointercancel', swEnd);

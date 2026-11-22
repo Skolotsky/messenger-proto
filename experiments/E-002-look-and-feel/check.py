@@ -87,6 +87,13 @@ def run(browser, slug, size, vp, scale):
     ok("the kept row shows the reaction on its message", "Marco" in pg.locator('[data-row="r-go"] .rxs').inner_text())
     click('[data-row="r-go"] .row-side [data-act="done"]')
     ok("Done releases it", "done" in r.get_attribute("class").split())
+    # Done pressed by mistake: Keep brings it back while the row is still there
+    if phone:
+        swipe("r-go", -110)
+    else:
+        pg.locator('article[data-row="r-go"] .row-main').hover(); click('article[data-row="r-go"] .keep-btn')
+    ok("a row marked Done can be kept again", "done" not in r.get_attribute("class").split() and pg.locator('article[data-row="r-go"] .row-side [data-act="done"]').count() == 1)
+    click('[data-row="r-go"] .row-side [data-act="done"]')
 
     # 4/5. agent result, Info progress, reaction as an answer, reactions on a row
     bucket("needs")
