@@ -56,6 +56,8 @@ def run(browser, slug, size, vp, scale):
         ok(f"{b}: every row gives its reason", len(reasons) == seen[b] and all(len(r.strip()) > 8 for r in reasons), reasons[:1])
     ok("three buckets hold rows", seen == {"focus": 5, "needs": 6, "fyi": 5}, seen)
     bucket("focus")
+    xs = pg.evaluate("[...document.querySelectorAll('.bucket.b-focus .row-time')].map(e => Math.round(e.getBoundingClientRect().right))")
+    ok("the time sits at the same place on every row", len(set(xs)) == 1 and len(xs) == 5, xs)
     ok("Focus has a Kept section with two rows", pg.locator(".kept-head").inner_text().startswith("Kept · 2") and pg.locator(".bucket.b-focus .row.kept").count() == 2)
     no_overflow("feed")
 

@@ -30,6 +30,13 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "the time sits at the same place on every row",
+  "pass": true,
+  "detail": "[734, 734, 734, 734, 734]"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "Focus has a Kept section with two rows",
   "pass": true,
   "detail": ""
@@ -1052,6 +1059,13 @@
  {
   "page": "slack-like",
   "width": "phone",
+  "check": "the time sits at the same place on every row",
+  "pass": true,
+  "detail": "[378, 378, 378, 378, 378]"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
   "check": "Focus has a Kept section with two rows",
   "pass": true,
   "detail": ""
@@ -1738,6 +1752,13 @@
  {
   "page": "telegram-like",
   "width": "desktop",
+  "check": "the time sits at the same place on every row",
+  "pass": true,
+  "detail": "[407, 407, 407, 407, 407]"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
   "check": "Focus has a Kept section with two rows",
   "pass": true,
   "detail": ""
@@ -2336,6 +2357,13 @@
   "check": "three buckets hold rows",
   "pass": true,
   "detail": "{'focus': 5, 'needs': 6, 'fyi': 5}"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "the time sits at the same place on every row",
+  "pass": true,
+  "detail": "[378, 378, 378, 378, 378]"
  },
  {
   "page": "telegram-like",
@@ -2907,6 +2935,13 @@
  {
   "page": "own",
   "width": "desktop",
+  "check": "the time sits at the same place on every row",
+  "pass": true,
+  "detail": "[1023, 1023, 1023, 1023, 1023]"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
   "check": "Focus has a Kept section with two rows",
   "pass": true,
   "detail": ""
@@ -3505,6 +3540,13 @@
   "check": "three buckets hold rows",
   "pass": true,
   "detail": "{'focus': 5, 'needs': 6, 'fyi': 5}"
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "the time sits at the same place on every row",
+  "pass": true,
+  "detail": "[361, 361, 361, 361, 361]"
  },
  {
   "page": "own",

@@ -259,8 +259,6 @@ function dialCtl(c, ctx) {
   return '';
 }
 /* ---- "why is this here, and I do not want it here": three ways to show it, picked with #why=a, b or c (E-002 follow-up) ---- */
-// row layout variants for the user to choose from: #row=a, b or c (E-002 follow-up)
-const ROWV = (location.hash.match(/row=([abc])/) || [])[1] || ''; if (ROWV) document.documentElement.dataset.rowv = ROWV;
 const WHY = (location.hash.match(/why=([abc])/) || [])[1] || 'a'; // the user chose a (D-020)
 const ruleOn = r => r.rule === 'dm' ? S.dmPeople.includes(conv(r.conv).with) : S.rules.some(x => x.id === r.rule);
 function explain(r) {

@@ -63,6 +63,8 @@ As listed under "Decided"; where the agent had built something else first, the r
 
 26. **A setting decides whether a reply or a reaction marks a kept row done.** "There should be a setting which lets you mark these done only by explicit done, so reaction or reply wouldn't do that." On, as D-003 and D-011 have it: replying or reacting releases a kept or flagged row. Off: only Done does. It sits with the general rules of the Activity feed settings; on is the start.
 
+27. **The time sits at the far right of every feed row, and nothing is reserved for actions.** "I don't like how the alignment looks like, time jumps between rows, let's use the common layout." Chosen from three variants ("A, time far right"; `screenshots/rows-a.png`, `rows-b.png`, `rows-c.png`). On a wide screen the actions float over the row's corner on hover; Done and the row's state sit at the bottom right. On a phone the React button and Done sit at the bottom right.
+
 ### Still the agent's proposal, shown in the mock-up, awaiting the user's word
 
 - Lapsed with point 21: context above the new messages in an opened row, and how a long burst is shown there. The conversation shows the whole exchange with a "New" line at the first new message.
