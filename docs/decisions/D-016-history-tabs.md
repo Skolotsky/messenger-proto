@@ -49,6 +49,10 @@ The agent's reading, to confirm when the mock-ups are reviewed:
 - The tabs take over the job of the single Earlier list from D-003. "Earlier" becomes "look in the tab for its type", and a row that has left a bucket is found there.
 - Threads lists threads whose dial is not Off for the person. Reactions lists reactions to the person's messages, including the answers from D-014.
 
+### Confirmed by the user, 2026-11-22 (added after acceptance; the decision is unchanged)
+
+The agent's reading is confirmed ("Yes, replace it"): the history tabs replace the single Earlier list of D-003. A read row is found in the tab for its type. Two kinds of row have no tab and are found in their channel: a flag that names nobody, and posts from a channel set to Focus or All activity. Undoing an accidental read still works as in D-015: a read row stays in place, dimmed, until the person leaves the feed.
+
 ## Consequences
 
 - Easier: the feed can be strict about letting rows go, because nothing is lost by it.
