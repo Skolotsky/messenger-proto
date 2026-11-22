@@ -410,11 +410,17 @@ func TestActingImpliesRead(t *testing.T) {
 	r2 := reply("msg_r2", "anna")
 	before = int64(len(f.log(t)))
 	f.ok(t, "react", "marco", map[string]any{"message": "msg_r1", "emoji": "eyes", "on": true})
+	// D-035: msg_r1 is already read, so reacting to it reads nothing newer.
+	if got := kindsAfter(f.log(t), before); strings.Join(got, ",") != "reaction.added" {
+		t.Errorf("a reaction to an already read message must leave the newer msg_r2 unread, wrote %v", got)
+	}
+	before = int64(len(f.log(t)))
+	f.ok(t, "react", "marco", map[string]any{"message": "msg_r2", "emoji": "tada", "on": true})
 	if got := kindsAfter(f.log(t), before); strings.Join(got, ",") != "reaction.added,reader.read" {
 		t.Errorf("react wrote %v", got)
 	}
 	if c := f.log(t)[before+1]; int64(c["up_to"].(float64)) != r2 || c["thread"] != root {
-		t.Errorf("a reaction must read its row up to the newest: %v", c)
+		t.Errorf("a reaction must read up to the message reacted to: %v", c)
 	}
 
 	// The same reaction again is already so: nothing is written.

@@ -605,7 +605,8 @@ func (s *Step) react(a contract.ActionReact) (outcome, error) {
 	if err != nil {
 		return outcome{}, err
 	}
-	if err := s.readWholeRow(a.As, m.Conversation, thread); err != nil {
+	// D-035: only up to this message. What is newer has not been seen.
+	if err := s.readUp(a.As, m.Conversation, thread, m.Number); err != nil {
 		return outcome{}, err
 	}
 	return saved(number)

@@ -34,7 +34,7 @@ answers: 200 applied · 200 already had it · 422 I refuse this one · anything 
 
 ## 4. Failure behaviour
 
-- Down (no answer in 3 s, a connection error, a server error): the worker waits and tries again after 1, 2, 4 … up to 60 s, each pause varied at random so retries do not arrive in step, without limit, and skips nothing.
+- Down (no answer in 3 s, a connection error, a server error): the worker waits and tries again after 1, 2, 4 … up to 20 s (D-035), each pause varied at random so retries do not arrive in step, without limit, and skips nothing.
 - "I refuse this one" three times: the change is parked for that organization, shown in the control panel with the reason and "try again", and the worker moves on. Three different changes of one organization refused in a row pause that organization only: the worker keeps its place, shows it, and carries on with the others.
 - While the index is unreachable a person sees "Search is unavailable right now. Your messages are safe."; while it is more than 10 s behind, results carry "the last N minutes may be missing".
 - A place is kept per organization; workers find work through an index of the organizations that have some, claim an organization for a few seconds and deliver outside any transaction, so any number can run (D-029). A claim that runs out is taken over, so a change can arrive twice; the version rule makes that harmless.

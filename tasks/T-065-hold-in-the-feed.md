@@ -17,6 +17,7 @@ The feed holds a notification for 5 s by the log's timestamps and the sender onl
 - [ ] G-029 uses 50 and 500 idle organizations and judges rows read. The lint protecting the database function runs in `./scripts/check`, seen failing.
 - [ ] Searches for `stopped_at`, the removed note kinds, G-028 and "100,000" show only history. Check: shown in Evidence.
 - [ ] Simulated figures appear nowhere as evidence. Check: search of the README, product and validation text.
+- [ ] The pause between retries is at most 20 s (D-035). Check: a test of the pause, seen failing at 60 s.
 - [ ] `./scripts/check` and `./scripts/verify` pass.
 
 ## Log

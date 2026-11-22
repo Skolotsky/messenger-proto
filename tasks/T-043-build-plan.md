@@ -111,6 +111,7 @@ Order on the board is priority. "Needs" is what must be merged first. Packages i
 **T-056 Web app: writing, going wrong, search, staying current.** Needs T-050. Mentions, edit in place, delete that asks; offline, waiting and failed actions with IDs and order; search results; the live client: numbered updates, resume, reload when too far behind.
 - Guardrails owned: the screen half of G-015; tests for D-024 and T-038 points 20 to 26.
 - Acceptance (D-033): a screen that receives `organization_gone` goes back to the entry address and loads the current organization.
+- Acceptance (D-035): the channel and thread level control inside a conversation, as D-001 and D-023 describe it.
 - Also (gap found in T-050): creating a channel and starting a new direct message (D-009, D-024).
 - Acceptance (architecture note, 2026-11-22): the reconnect pause (0.1 s doubling to 1 s) gets random variation, so a whole organization does not reconnect in the same instant when a copy dies. The varied pause never exceeds its step, so the contract's 1 s ceiling and the 2 s catch-up still hold. Test with a seeded random source.
 
