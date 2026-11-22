@@ -222,11 +222,12 @@ func (d *DB) SaveNote(ctx context.Context, org, kind string) (int64, error) {
 		note := map[string]any{"org": org, "number": number, "previous": number - 1, "edition": edition, "at": at, "kind": kind}
 		name := fmt.Sprintf("%s / marco / #launch:msg_1 / %d", org, number)
 		switch kind {
-		case "due":
-			note["name"], note["person"], note["bucket"], note["why"], note["text"] = name, "marco", "needs_you", "test", "text"
+		case "send":
+			note["name"], note["person"], note["bucket"], note["why"], note["text"], note["due_at"] = name, "marco", "needs_you", "test", "text", at
 			note["row"] = map[string]any{"conversation": "#launch", "thread": "msg_1"}
-		case "withdrawn":
-			note["name"], note["because"] = name, "read"
+		default: // any other kind the test names is a plain update: this rig's sender does not read it
+			kind = "update"
+			note["kind"], note["name"], note["now"] = kind, name, "read"
 		}
 		b, _ := json.Marshal(note)
 		if _, err := tx.Exec(ctx, `INSERT INTO note_log (org, edition, number, at, kind, body) VALUES ($1, $2, $3, now(), $4, $5)`,
@@ -406,6 +407,7 @@ func (r *Receiver) apply(raw []byte) (int, any) {
 		Number   int64  `json:"number"`
 		Previous int64  `json:"previous"`
 		Edition  int64  `json:"edition"`
+		Skip     bool   `json:"skip"`
 	}
 	if err := json.Unmarshal(raw, &h); err != nil {
 		return 400, map[string]string{"refused": "unreadable"}
@@ -453,6 +455,16 @@ func (r *Receiver) apply(raw []byte) (int, any) {
 				delete(r.first, s)
 			}
 		}
+	}
+	if h.Skip { // step over a parked note: the place moves, nothing is applied
+		switch {
+		case h.Number <= r.places[h.Org]:
+			return 200, map[string]any{"taken": true, "already": true}
+		case h.Previous != r.places[h.Org]:
+			return 409, map[string]int64{"i_am_at": r.places[h.Org], "edition": current}
+		}
+		r.places[h.Org] = h.Number
+		return 200, map[string]bool{"taken": true}
 	}
 	if r.refuse != nil && r.refuse(h.Org, h.Number) {
 		return 422, map[string]string{"refused": "test refusal"}

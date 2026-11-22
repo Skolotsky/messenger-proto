@@ -248,8 +248,8 @@ func (l *lane) claimQuestion(now time.Time, far bool, limit int) (string, []any)
 		sql = `WITH wanted AS (
 			SELECT d.org FROM feed.note_due d
 			CROSS JOIN LATERAL (SELECT head FROM feed.note_heads h WHERE h.org = d.org OFFSET 0) h
-			CROSS JOIN LATERAL (SELECT place, claimed_by, claimed_until, stopped_at FROM feed.note_places p WHERE p.org = d.org OFFSET 0) p
-			WHERE p.stopped_at IS NULL AND ` + free + ` AND h.head - p.place ` + cmp + ` $3
+			CROSS JOIN LATERAL (SELECT place, claimed_by, claimed_until FROM feed.note_places p WHERE p.org = d.org OFFSET 0) p
+			WHERE ` + free + ` AND h.head - p.place ` + cmp + ` $3
 			ORDER BY p.claimed_until NULLS FIRST LIMIT $4
 		), locked AS (
 			SELECT x.org FROM wanted w CROSS JOIN LATERAL (

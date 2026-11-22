@@ -755,6 +755,17 @@ type ReaderState struct {
 	History     map[contract.HistoryTab]contract.HistoryAnswer `json:"history"`
 	Settings    contract.SettingsAnswer                        `json:"settings"`
 	Feed        []contract.FeedRow                             `json:"feed"`
+	// Held is what is on hold for this reader, and what each entry speaks of:
+	// held entries are rebuilt from the log like everything else (D-034).
+	Held []HeldEntry `json:"held"`
+}
+
+// HeldEntry is one notification on hold.
+type HeldEntry struct {
+	Name string `json:"name"`
+	Msg  string `json:"msg"`
+	Item string `json:"item"`
+	At   string `json:"at"`
 }
 
 func keyString(cv *conv, k rowKey) string {
@@ -768,13 +779,21 @@ func keyString(cv *conv, k rowKey) string {
 func (e *Engine) State(person string) ReaderState {
 	out := ReaderState{Rows: []StateRow{}, ThreadDials: map[string]string{}, FocusPeople: []string{},
 		Counts: e.Counts(person), History: map[contract.HistoryTab]contract.HistoryAnswer{},
-		Settings: e.Settings(person), Feed: e.Rows(person)}
+		Settings: e.Settings(person), Feed: e.Rows(person), Held: []HeldEntry{}}
 	for _, tab := range historyTabs {
 		out.History[tab] = e.History(person, tab)
 	}
 	for _, fp := range out.Settings.FocusPeople {
 		out.FocusPeople = append(out.FocusPeople, fp.Person)
 	}
+	for _, cv := range e.allConvs() {
+		for d := range cv.holding {
+			if d.person == person {
+				out.Held = append(out.Held, HeldEntry{Name: d.name, Msg: d.item.msg, Item: d.item.kind, At: d.atText})
+			}
+		}
+	}
+	sort.Slice(out.Held, func(i, j int) bool { return out.Held[i].Name < out.Held[j].Name })
 	for _, cv := range e.allConvs() {
 		r := cv.readers[person]
 		if r == nil {

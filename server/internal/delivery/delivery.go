@@ -33,8 +33,8 @@ const (
 	batchSize   = 100
 	turnBudget  = 200
 	triesToPark = 3
-	refusalsTo  = 3 // different changes refused in a row that pause an organization
-	maxBackoff  = 60 * time.Second
+	refusalsTo  = 3                // different changes refused in a row that pause an organization
+	maxBackoff  = 20 * time.Second // D-035: a receiver back can be level within G-006's 30 s
 	probeFor    = call.Limit + time.Second
 )
 
@@ -124,12 +124,12 @@ func (s *Service) Run(ctx context.Context) {
 	wg.Wait()
 }
 
-// backoff is the wait before try number failures+1: 1, 2, 4 … 60 s, each varied
-// by up to a fifth either way so retries do not arrive in step.
+// backoff is the wait before try number failures+1: 1, 2, 4 … up to 20 s, each
+// varied by up to a fifth either way so retries do not arrive in step (D-035).
 func (s *Service) backoff(failures int) time.Duration {
 	d := maxBackoff
-	if failures <= 6 {
-		d = time.Second << max(failures-1, 0)
+	if failures <= 5 {
+		d = min(time.Second<<max(failures-1, 0), maxBackoff)
 	}
 	s.mu.Lock()
 	j := 0.8 + 0.4*s.rng.Float64()

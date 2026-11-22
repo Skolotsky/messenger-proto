@@ -12,7 +12,8 @@
       "Edit(/tests/guardrails/conversations-independent/**)",
       "Edit(/tests/guardrails/retire-and-delete/**)",
       "Edit(/tests/guardrails/retire-and-delete-copies/**)",
-      "Edit(/tests/guardrails/retire-and-delete-slow/**)"
+      "Edit(/tests/guardrails/retire-and-delete-slow/**)",
+      "Edit(/tests/guardrails/retire-and-delete-retry/**)"
     ]
   }
 }

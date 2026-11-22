@@ -6,12 +6,14 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	"contexia/internal/shared/contract"
 	"contexia/internal/shared/ids"
 	"contexia/internal/shared/orgdb"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // Routes answers the delivery operations of operations-and-control.md.
@@ -64,12 +66,10 @@ func (s *Service) status(w http.ResponseWriter, r *http.Request, org ids.Org) {
 		var head int64
 		var halted bool
 		if l.notes {
-			var stopped *int64
 			err = pool.QueryRow(ctx, `SELECT coalesce((SELECT head FROM feed.note_heads WHERE org = $1), 0),
-				coalesce(p.place, 0), p.stopped_at, (SELECT count(*) FROM feed.note_parked n WHERE n.org = $1 AND n.tries >= $2)
+				coalesce(p.place, 0), (SELECT count(*) FROM feed.note_parked n WHERE n.org = $1 AND n.tries >= $2)
 				FROM (SELECT 1) one LEFT JOIN feed.note_places p ON p.org = $1`, string(org), triesToPark).
-				Scan(&head, &rs.Place, &stopped, &rs.Parked)
-			halted = stopped != nil
+				Scan(&head, &rs.Place, &rs.Parked)
 		} else {
 			err = pool.QueryRow(ctx, `SELECT coalesce((SELECT head FROM org_log WHERE org = $1), 0),
 				coalesce(p.place, 0), coalesce(p.paused, false),
@@ -150,15 +150,22 @@ func (s *Service) retry(w http.ResponseWriter, r *http.Request, org ids.Org) {
 		refuse(w, http.StatusBadRequest, "no such receiver")
 		return
 	}
-	var halted bool
-	if err := orgdb.InOrg(r.Context(), s.cfg.DB, org, func(tx pgx.Tx) error {
-		return tx.QueryRow(r.Context(), haltedSQL, string(org)).Scan(&halted)
-	}); err != nil {
+	pool, err := s.cfg.DB.PoolFor(r.Context(), org)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if halted {
+	got, err := l.claimForRetry(r.Context(), pool, org)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	switch got {
+	case retryHalted:
 		refuse(w, http.StatusNotFound, "not parked") // a stopped organization is sent nothing more
+		return
+	case retryBusy: // a copy is delivering for it: not tried, and the list still shows it
+		answerJSON(w, struct{}{})
 		return
 	}
 	var found bool
@@ -167,6 +174,8 @@ func (s *Service) retry(w http.ResponseWriter, r *http.Request, org ids.Org) {
 	} else {
 		found, err = l.retryChange(r.Context(), org, number)
 	}
+	// With a context of its own: a caller that gave up must not leave the claim.
+	l.release(context.WithoutCancel(r.Context()), pool, org)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -176,6 +185,78 @@ func (s *Service) retry(w http.ResponseWriter, r *http.Request, org ids.Org) {
 		return
 	}
 	answerJSON(w, struct{}{})
+}
+
+type retryClaim int
+
+const (
+	retryClaimed retryClaim = iota
+	retryHalted
+	retryBusy
+)
+
+// claimForRetry takes the same claim a turn holds, in one statement that rereads
+// the row's halted flag, so Stop counts a retry in flight and a retry that comes
+// after Stop is refused (G-031). A turn in progress is waited for, for less than
+// the limit on a call.
+func (l *lane) claimForRetry(ctx context.Context, pool *pgxpool.Pool, org ids.Org) (retryClaim, error) {
+	limit := time.NewTimer(stopWait)
+	defer limit.Stop()
+	tick := time.NewTicker(pollEvery)
+	defer tick.Stop()
+	for {
+		var halted bool
+		if err := orgdb.InOrg(ctx, l.s.cfg.DB, org, func(tx pgx.Tx) error {
+			return tx.QueryRow(ctx, haltedSQL, string(org)).Scan(&halted)
+		}); err != nil {
+			return retryHalted, err
+		}
+		if halted {
+			return retryHalted, nil
+		}
+		if fault("retry-no-claim") { // the planted fault of G-031
+			return retryClaimed, nil
+		}
+		now := l.s.cfg.Clock.Now()
+		const free = ` AND (p.claimed_by IS NULL OR p.claimed_until < $3) AND NOT p.halted
+			AND NOT EXISTS (SELECT 1 FROM delivery_stopped x WHERE x.org = p.org)
+			AND EXISTS (SELECT 1 FROM org_log o WHERE o.org = p.org AND o.retired_at IS NULL)`
+		args := []any{string(org), l.s.me, now, now.Add(l.s.cfg.ClaimFor)}
+		var sql string
+		if l.notes {
+			sql = `UPDATE feed.note_places p SET claimed_by = $2, claimed_until = $4 WHERE p.org = $1` + free
+		} else {
+			sql = `UPDATE delivery_places p SET claimed_by = $2, claimed_until = $4 WHERE p.org = $1 AND p.receiver = $5` + free
+			args = append(args, l.name)
+		}
+		tag, err := pool.Exec(ctx, sql, args...)
+		if err != nil {
+			return retryHalted, err
+		}
+		if tag.RowsAffected() == 1 {
+			return retryClaimed, nil
+		}
+		var exists bool
+		table, cond := "feed.note_places", ""
+		qargs := []any{string(org)}
+		if !l.notes {
+			table, cond = "delivery_places", " AND receiver = $2"
+			qargs = append(qargs, l.name)
+		}
+		if err := pool.QueryRow(ctx, `SELECT EXISTS (SELECT 1 FROM `+table+` WHERE org = $1`+cond+`)`, qargs...).Scan(&exists); err != nil {
+			return retryHalted, err
+		}
+		if !exists {
+			return retryHalted, nil // nothing was ever delivered here, so nothing is parked
+		}
+		select {
+		case <-tick.C:
+		case <-limit.C:
+			return retryBusy, nil
+		case <-ctx.Done():
+			return retryBusy, ctx.Err()
+		}
+	}
 }
 
 func (l *lane) retryChange(ctx context.Context, org ids.Org, number int64) (bool, error) {
@@ -197,13 +278,18 @@ func (l *lane) retryChange(ctx context.Context, org ids.Org, number int64) (bool
 	if err != nil {
 		return true, err
 	}
-	o := outcome{answer: applied}
-	if send {
-		o = l.rc.post(ctx, "/changes", item)
-	}
 	pool, err := l.s.cfg.DB.PoolFor(ctx, org)
 	if err != nil {
 		return true, err
+	}
+	o := outcome{answer: applied}
+	if send {
+		if !fault("retry-no-claim") {
+			if held, err := l.holdsClaim(ctx, pool, org); !held || err != nil {
+				return true, err
+			}
+		}
+		o = l.rc.post(ctx, "/changes", item)
 	}
 	switch o.answer {
 	case applied:
@@ -214,8 +300,9 @@ func (l *lane) retryChange(ctx context.Context, org ids.Org, number int64) (bool
 			if _, err := tx.Exec(ctx, `UPDATE delivery_places SET refusals = 0, paused = false WHERE org = $1 AND receiver = $2`, string(org), l.name); err != nil {
 				return err
 			}
-			_, err := tx.Exec(ctx, `INSERT INTO delivery_due (receiver, org, since) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
-				l.name, string(org), l.s.cfg.Clock.Now())
+			_, err := tx.Exec(ctx, `INSERT INTO delivery_due (receiver, org, since)
+				SELECT $1, $2, $3 WHERE NOT EXISTS (SELECT 1 FROM delivery_stopped WHERE org = $2)
+				ON CONFLICT DO NOTHING`, l.name, string(org), l.s.cfg.Clock.Now())
 			return err
 		})
 	case refusedOne:
@@ -242,21 +329,25 @@ func (l *lane) retryNote(ctx context.Context, org ids.Org, number int64) (bool, 
 	if err != nil {
 		return false, err
 	}
-	o := l.rc.post(ctx, "/notes", json.RawMessage(body))
 	pool, err := l.s.cfg.DB.PoolFor(ctx, org)
 	if err != nil {
 		return true, err
 	}
+	if !fault("retry-no-claim") {
+		if held, err := l.holdsClaim(ctx, pool, org); !held || err != nil {
+			return true, err
+		}
+	}
+	o := l.rc.post(ctx, "/notes", json.RawMessage(body))
 	switch o.answer {
 	case applied:
 		return true, pgx.BeginFunc(ctx, pool, func(tx pgx.Tx) error {
 			if _, err := tx.Exec(ctx, `DELETE FROM feed.note_parked WHERE org = $1 AND edition = $2 AND number = $3`, string(org), edition, number); err != nil {
 				return err
 			}
-			if _, err := tx.Exec(ctx, `UPDATE feed.note_places SET stopped_at = NULL, place = greatest(place, $2) WHERE org = $1`, string(org), number); err != nil {
-				return err
-			}
-			_, err := tx.Exec(ctx, `INSERT INTO feed.note_due (org, since) VALUES ($1, $2) ON CONFLICT DO NOTHING`, string(org), l.s.cfg.Clock.Now())
+			_, err := tx.Exec(ctx, `INSERT INTO feed.note_due (org, since)
+				SELECT $1, $2 WHERE NOT EXISTS (SELECT 1 FROM delivery_stopped WHERE org = $1)
+				ON CONFLICT DO NOTHING`, string(org), l.s.cfg.Clock.Now())
 			return err
 		})
 	case refusedOne:
@@ -308,7 +399,7 @@ func (s *Service) restart(w http.ResponseWriter, r *http.Request, org ids.Org) {
 				edition = &current
 			}
 			if _, err := tx.Exec(ctx, `INSERT INTO feed.note_places (org, edition, place) VALUES ($1, $2, 0)
-				ON CONFLICT (org) DO UPDATE SET edition = $2, place = 0, stopped_at = NULL, claimed_by = NULL, claimed_until = NULL`,
+				ON CONFLICT (org) DO UPDATE SET edition = $2, place = 0, claimed_by = NULL, claimed_until = NULL`,
 				string(org), *edition); err != nil {
 				return err
 			}

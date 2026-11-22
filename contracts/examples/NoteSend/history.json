@@ -1,10 +1,10 @@
 {
- "kind": "due",
+ "kind": "send",
  "org": "acme",
- "number": 1286,
- "previous": 1285,
- "edition": 7,
- "at": "2026-11-22T10:14:03.120Z",
+ "number": 12,
+ "previous": 11,
+ "edition": 8,
+ "at": "2026-11-22T10:14:09.120Z",
  "name": "acme / marco / #launch:msg_7Q2 / 4812",
  "row": {
   "conversation": "#launch",
@@ -13,5 +13,7 @@
  "person": "marco",
  "bucket": "needs_you",
  "why": "Anna mentioned you in #launch",
- "text": "@Marco can you sign off the pricing page?"
+ "text": "@Marco can you sign off the pricing page?",
+ "due_at": "2026-11-22T10:14:03.120Z",
+ "history": true
 }

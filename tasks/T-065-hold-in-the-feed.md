@@ -23,7 +23,23 @@ The feed holds a notification for 5 s by the log's timestamps and the sender onl
 ## Log
 
 - 2026-11-22: D-034 and its five readings accepted by the user.
+- 2026-11-22: code half built. Notes are `send` and `update`; held entries live with the row in the rules; only a log tick releases; the sender delivers once per name. A parked note is stepped over (`skip`) and applied on retry. A parked retry holds a claim. Retries pause at most 20 s.
+- Open for others: the tick writer in `server/internal/conversations/save.go` still pushes `tick_due_at` forward on every save, so a busy organization would get no tick (T-053). The feed service must store held entries with its rows and call `Fence` (T-052). `scripts/lint-database-access` still has to be wired into `./scripts/check`.
+
+- 2026-11-22: Merged by the lead with G-010, G-011, G-014, G-023, G-029 and G-031 reworded as D-034 requires, and the database lint in `./scripts/check`. The hold through the running feed and the 8 s promise end to end wait for T-052 and T-053.
 
 ## Evidence
 
-_None yet._
+Each seen failing with its rule off, then passing:
+
+- G-011, hold counted from arrival: sent for something read within the hold (feed stopped, feed slower, clock stepped back).
+- G-011, any change releases: sent in "conversations out of step".
+- G-011, a read leaves the entry: sent in the feed-stopped, busy-organization, reaction and dial cases.
+- G-010, no list of names: a name sent 5 times. A sender that sends nothing: names sent 0 times.
+- G-014, a parked note holds the rest back (`notes-stop`): later notes never arrive.
+- G-029, `scan-all`: 1,070 to 2,090 rows read beside 500 idle organizations, against at most 80 allowed.
+- G-031, retry without a claim: stop answers 200 with the retry inside the receiver's call.
+- D-035, pause at 60 s: "a pause of 1m0s".
+- `scripts/lint-database-access`: fails on a planted `pgxpool.New` outside `orgdb`.
+
+G-030 passes unedited, and still fails with an organization-wide change moved.

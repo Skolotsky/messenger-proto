@@ -65,11 +65,9 @@ func (r *replay) apply(build func(n, prev int64, at string) any) {
 	if err != nil {
 		r.t.Fatalf("apply: %v", err)
 	}
-	for _, n := range fx.Notes {
-		if n.Kind == "due" {
-			b := map[contract.Bucket]float64{"focus": 3, "needs_you": 2, "fyi": 1}[n.Bucket]
-			r.dues[n.Person] = append(r.dues[n.Person], []any{n.Message, b, n.Item})
-		}
+	for _, n := range fx.Held {
+		b := map[contract.Bucket]float64{"focus": 3, "needs_you": 2, "fyi": 1}[n.Bucket]
+		r.dues[n.Person] = append(r.dues[n.Person], []any{n.Message, b, n.Item})
 	}
 }
 
