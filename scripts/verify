@@ -4,7 +4,7 @@
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 2
 project="contexia-verify-$$"
-compose=(docker compose -p "$project" -f deploy/compose.yaml)
+compose=(docker compose -p "$project" -f deploy/compose.yaml -f deploy/compose.test.yaml)
 cleanup() { "${compose[@]}" down -v --remove-orphans >/dev/null 2>&1; }
 trap cleanup EXIT
 
@@ -27,8 +27,9 @@ done
 
 echo; echo "Guardrail tests"
 export CONTEXIA_TOOL_NETWORK="${project}_default"
-export CONTEXIA_TOOL_ENV="CONTEXIA_PG_HOST=postgres"
-if ! TOOL_DIR=tests ./scripts/tool go test -count=1 ./... ; then
+docker build -q -t contexia-test-tools:1 -f deploy/test-tools.Dockerfile deploy >/dev/null
+export CONTEXIA_TOOL_ENV="CONTEXIA_PG_HOST=postgres CONTEXIA_PROJECT=$project"
+if ! CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 ./... ; then
   echo "verify: FAIL a guardrail test failed. A failing guardrail is a finding: fix the cause, never the test."; exit 1
 fi
 if ! TOOL_DIR=server ./scripts/tool go test -count=1 -tags integration ./... ; then

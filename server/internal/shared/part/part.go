@@ -12,6 +12,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"contexia/internal/shared/clock"
 )
 
 // Handler answers GET /alive with the part's name.
@@ -21,6 +23,9 @@ func Handler(name string) http.Handler {
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(map[string]string{"part": name, "status": "alive"})
 	})
+	if h := clock.ControlHandler(); h != nil {
+		mux.Handle("/test/clock", h)
+	}
 	return mux
 }
 

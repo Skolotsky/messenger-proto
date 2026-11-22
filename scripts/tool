@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Run Go or Node from their Docker images; neither is installed on the host.
 # Usage: ./scripts/tool go test ./...   |   ./scripts/tool gofmt -l .   |   ./scripts/tool npm ci
-# CONTEXIA_TOOL_NETWORK and CONTEXIA_TOOL_ENV (space-separated NAME=value) are for scripts/verify.
+# CONTEXIA_TOOL_NETWORK, _ENV (space-separated NAME=value), _IMAGE and _DOCKER are for scripts/verify.
 set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
 mkdir -p "$root/.cache/go" "$root/.cache/npm"
 case "${1:-}" in
-  go|gofmt) image=golang:1.24-alpine ;;
+  go|gofmt) image="${CONTEXIA_TOOL_IMAGE:-golang:1.24-alpine}" ;;
   node|npm|npx) image=node:22-alpine ;;
   *) echo "usage: scripts/tool go|gofmt|node|npm|npx ..." >&2; exit 2 ;;
 esac
@@ -15,4 +15,7 @@ args=(--rm -u "$(id -u):$(id -g)" -v "$root":/repo -w "/repo${TOOL_DIR:+/$TOOL_D
   -e GOFLAGS=-modcacherw -e npm_config_cache=/repo/.cache/npm)
 [ -n "${CONTEXIA_TOOL_NETWORK:-}" ] && args+=(--network "$CONTEXIA_TOOL_NETWORK")
 for kv in ${CONTEXIA_TOOL_ENV:-}; do args+=(-e "$kv"); done
+if [ -n "${CONTEXIA_TOOL_DOCKER:-}" ]; then
+  args+=(-v /var/run/docker.sock:/var/run/docker.sock --group-add "$(stat -c %g /var/run/docker.sock)")
+fi
 exec docker run "${args[@]}" "$image" "$@"

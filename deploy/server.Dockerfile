@@ -3,7 +3,8 @@ WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 go build -trimpath -o /out/ ./cmd/...
+ARG GO_TAGS=""
+RUN CGO_ENABLED=0 go build -tags "$GO_TAGS" -trimpath -o /out/ ./cmd/...
 
 FROM alpine:3.21
 RUN adduser -D -u 10001 part

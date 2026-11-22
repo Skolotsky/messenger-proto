@@ -1,0 +1,17 @@
+# The test build: same programs, with a clock the harness can move.
+services:
+  conversations:
+    image: contexia-server:test
+    build:
+      args:
+        GO_TAGS: testclock
+  delivery:
+    image: contexia-server:test
+  feed:
+    image: contexia-server:test
+  search:
+    image: contexia-server:test
+  sender:
+    image: contexia-server:test
+  demo:
+    image: contexia-server:test
