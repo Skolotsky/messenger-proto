@@ -313,6 +313,18 @@ func (s *Service) takeIn(ctx context.Context, tx pgx.Tx, m *mem, st *state, w *w
 				return 0, nil, err
 			}
 			*st = created
+			// Another copy may have created it first and taken this change:
+			// judge the change again against what is really there.
+			if c.number <= st.through {
+				fresh = true
+				continue
+			}
+			if st.stopped {
+				return http.StatusLocked, contract.OrganizationStopped{OrganizationStopped: string(m.org)}, nil
+			}
+			if c.previous != st.through && !fault(FaultAcceptNewer) {
+				return http.StatusConflict, contract.IAmAt{IAmAt: st.through}, nil
+			}
 		}
 		if !synced {
 			if err := s.sync(ctx, tx, m, *st, w.touched); err != nil {
