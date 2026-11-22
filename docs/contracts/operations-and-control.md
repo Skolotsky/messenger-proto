@@ -59,13 +59,13 @@ GET  conversations/orgs/acme/people                               → the people
 - The notification app shows only what the sender holds for that organization and person.
 - **Seeding** is the only way to write a past timestamp. A session opens only on an organization with an empty log, takes ordinary changes in batches, each stamped with its past time, never decreasing, and is sealed once. A seeded history begins with a `seed.opened` entry, and sealing it writes `seed.sealed` and answers with that entry's number as `through`. Afterwards the log continues from the seed's last number and time, and no seeded change causes a notification (D-032).
 - Reset never reuses a number: it seeds a new organization from the same seed under the same display name, and only the demo program knows which organization is current (D-033). If that is slow, the next one is prepared in the background.
-- A retired organization is stopped for every delivery worker on every copy, whether or not anyone called stop. `stop` answers only once no copy can still deliver for it.
+- A retired organization is stopped for every delivery worker on every copy, whether or not anyone called stop. `stop` answers 200 only once no copy can still deliver for it; until then it answers `503 { "not_available": … }`, and so does a delete that goes through it. The caller asks again, which is always safe. A copy renews its claim before every call to a receiver, for longer than a call can last, and ends its turn if the claim is gone, so a live claim covers any call in flight.
 - Delete runs in order: retire, stop delivery, then the receivers and the feed, the log and originals last. Each step can be repeated, so a crash halfway is repaired by deleting again. It touches no other organization. The current organization cannot be deleted.
 
 ## 4. Failure behaviour
 
 - A part that is off or unreachable: the control panel shows that part as down and how much is waiting; the other parts carry on.
-- Conversations refuses a delete with `409 { "refused": "not retired" }` or `409 { "refused": "delivery not deleted" }`, so its rows go last. Asking a part about a deleted organization creates nothing.
+- Conversations refuses a delete with `409 { "refused": "not retired" }` or `409 { "refused": "delivery not deleted" }`, so its rows go last. Asking a part about a deleted organization, or telling it to stop or restart, creates nothing; an operation on one answers 404.
 - Opening a seed session on an organization that already has changes, or writing to a sealed one: `409 { "refused": "not empty" }`.
 - Reset while the script is running: the script stops on the old organization and starts on the new one.
 
