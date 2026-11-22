@@ -28,7 +28,7 @@ POST {feed|search|sender}/orgs/acme/control/wipe                            → 
 POST demo/orgs/acme/rebuild              { "receiver": "feed", "rules_changed": false }     wipe, set its place to the start, refill
 POST demo/reset                                                             seed a fresh organization, wait until level, make it current, retire the previous one → { "org": "acme-8", "name": "Larkmere" }
 GET  demo/current                                                           the entry address's answer → { "org": "acme-8", "name": "Larkmere" }
-GET  demo/organizations                                                     → { "organizations": [ { "org": "acme-7", "name": "Larkmere", "state": "retired", "created_at": "…", "approx_changes": 7956 } ] }
+GET  demo/organizations                                                     → { "organizations": [ { "org": "acme-7", "name": "Larkmere", "state": "retired" (or "current", "preparing"), "created_at": "…", "approx_changes": 7956 } ] }
 DELETE demo/organizations/acme-7                                            refused for the current organization: 409 { "refused": "current" }
 POST demo/organizations/delete-retired
 

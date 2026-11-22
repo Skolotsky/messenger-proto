@@ -141,16 +141,16 @@ The nudge: T-047 sends, T-053 receives. Place and control (mode, wipe): T-048 fo
 
 ## Verification strategy
 
-**What "done" means for a package:** every acceptance point checked; its guardrail tests seen failing once and then passing; `./scripts/check` and its own tests pass, with the full `./scripts/verify` at the next milestone; evidence written in its task file; the real thing run and looked at.
+**What "done" means for a package:** every acceptance point checked; its guardrail tests seen failing once and then passing; `./scripts/check` and its own tests pass, with the full `./scripts/verify` once at the end (T-061); evidence written in its task file; the real thing run and looked at.
 
 | Level | What it proves | How | When it runs |
 |---|---|---|---|
 | 1. Rules | The feed sorts as decided | Table tests per rule citing the decision; E-001's cases replayed; properties (G-007, G-030) | `./scripts/check`, on every commit |
 | 2. One part against its contract | Each part keeps its side, also on the failure paths | The part alone, the other side played by the log writer, the mock door or a recording receiver; every schema example is a test | `./scripts/check` where fast, else `./scripts/verify` |
-| 3. Guardrails | The promises hold when things break | `tests/guardrails/<name>` against the composed system: programs killed, receivers stopped or slowed, deliveries repeated or late, the clock moved, two organizations with the same names. Each has a variant with its rule switched off that must fail | The package's own guardrails at merge; all of them in `./scripts/verify` at each milestone |
+| 3. Guardrails | The promises hold when things break | `tests/guardrails/<name>` against the composed system: programs killed, receivers stopped or slowed, deliveries repeated or late, the clock moved, two organizations with the same names. Each has a variant with its rule switched off that must fail | The package's own guardrails at merge; all of them in `./scripts/verify` once, in T-061 |
 | 4. Browser | A person sees what was decided, at two widths | Playwright: the flows of D-020 to D-024 and T-038; nothing moves that should not; notices appear when a part is behind | `./scripts/verify` |
 | 5. The real thing | It works when used | Start it; use it as a person in a browser and as an agent through the door; stop a receiver from the control panel and watch | By hand, at the end of each package that has something to see |
-| 6. Independent | The author is not fooling themselves | A fresh `verifier` agent with the scope and the yardsticks, not the reasoning | At the three milestones |
+| 6. Independent | The author is not fooling themselves | A fresh `verifier` agent with the scope and the yardsticks, not the reasoning | Once, at the end (T-061), covering D-033, D-034 and the whole system |
 
 Rules for every test: seeded randomness; time only through the clock; no sleeping and hoping; a failing test says what to do. Timed guardrails (G-012, G-013, G-026) run for about a minute at 50 actions a second with the seeded team's size, never at large sizes (CLAUDE.md, Verification). A guardrail test is never weakened to pass; a failing one is reported.
 
@@ -158,7 +158,7 @@ Guardrail to package: G-003, G-004, G-005: T-046 Â· G-006, G-010, G-011: T-048 Â
 
 ## Working in parallel
 
-- **One package, one subagent, one worktree.** Start each with the Agent tool on the main model, in its own git worktree. It commits there; the lead merges into `main` when the package's own checks pass. Between milestones a merge runs `./scripts/check` and the tests of what it touched; the full `./scripts/verify` runs only at the milestones T-057, T-058 and T-061 (user's instruction, 2026-11-23).
+- **One package, one subagent, one worktree.** Start each with the Agent tool on the main model, in its own git worktree. It commits there; the lead merges into `main` when the package's own checks pass. Between milestones a merge runs `./scripts/check` and the tests of what it touched; the full `./scripts/verify` and the independent verifier run once, at the end, in T-061 (user's instruction, 2026-11-23: "doing all the expensive verifications at the end").
 - **A package edits only what it owns** (table above). If it needs a change to a shared file (`server/internal/shared/`, `contracts/`, `tests/harness/`, Compose, Makefile, the check scripts), it writes the request in its task file and carries on against its own stand-in; the lead makes the shared change between waves.
 - **The brief for a subagent** holds: its section of this plan; the contracts and guardrails it touches, by path; the directories it owns; "write the guardrail tests first and see them fail"; "do not edit outside your directories"; what to report back (what is true now, how it was checked, what was not checked, requests for shared changes). A subagent does not see `CLAUDE.md` rules unless told, so the brief repeats the ones that matter. Each brief names the agent's own scratch folder: the session scratchpad is shared, and generic file names overwrote each other in Wave 1.
 - **Packages meet only through the contracts.** That is what makes the waves parallel: the log writer stands in for Conversations, the recording receiver for the feed and the stand-ins, the mock door for the whole server. Joining happens in T-057 and T-058, where differences show up as failing tests and are fixed against the contract, not by adjusting the other package.

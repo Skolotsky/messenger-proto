@@ -136,6 +136,10 @@ export function App({ api }: { api: Api }) {
       <div className="top">
         <h1>Notification app</h1>
         <span className="tag">OUTSIDE THE PRODUCT</span>
+        <nav className="pages" aria-label="The other pages">
+          <a href="/">Product</a>
+          <a href="/control/">Control panel</a>
+        </nav>
         <label>Delivered to{' '}
           <select value={person ?? ''} onChange={(e) => choose(e.target.value)} disabled={people.length === 0}>
             {people.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}

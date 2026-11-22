@@ -5806,7 +5806,8 @@
     "state": {
      "enum": [
       "current",
-      "retired"
+      "retired",
+      "preparing"
      ]
     },
     "created_at": {

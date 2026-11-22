@@ -2290,7 +2290,7 @@ export interface CurrentOrganization {
 export interface OrganizationEntry {
   org: string;
   name: string;
-  state: "current" | "retired";
+  state: "current" | "retired" | "preparing";
   created_at: string;
   approx_changes: number;
 }

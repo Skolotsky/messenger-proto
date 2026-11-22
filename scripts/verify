@@ -33,7 +33,7 @@ echo; echo "Guardrail tests"
 export CONTEXIA_TOOL_NETWORK="${project}_default"
 docker build -q -t contexia-test-tools:1 -f deploy/test-tools.Dockerfile deploy >/dev/null
 export CONTEXIA_TOOL_ENV="CONTEXIA_PG_HOST=postgres CONTEXIA_PROJECT=$project"
-others=$(CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 TOOL_DIR=tests ./scripts/tool go list ./... | grep -v -E 'guardrails/(receivers-independent|orgs-independent)(/|$)' | tr '\n' ' ')
+others=$(CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 TOOL_DIR=tests ./scripts/tool go list ./... | grep -v -E 'guardrails/(receivers-independent|orgs-independent|freshness|orgs-apart|two-copies)(/|$)|tests/e2e|harness/router' | tr '\n' ' ')
 [ -n "$others" ] || { echo "verify: FAIL could not list the test packages."; exit 1; }
 if ! CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 $others ; then
   echo "verify: FAIL a guardrail test failed. A failing guardrail is a finding: fix the cause, never the test."; exit 1
@@ -56,6 +56,9 @@ mustfail() { # module, tags, test name, package: must FAIL in a test, not merely
   fi
   echo "  ok    $4 fails with $2"
 }
+if ! CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 -tags demofaults -run 'Fails' ./guardrails/rebuild/ ; then
+  echo "verify: FAIL G-020 no longer fails with its rule switched off, so it cannot be trusted."; exit 1
+fi
 mustfail tests fault_hub_handed TestTwoSaves ./guardrails/live-order/
 mustfail tests fault_no_lease_check Frozen ./guardrails/watching-lapses/
 mustfail tests fault_no_watch_end Vanished ./guardrails/watching-lapses/
@@ -74,12 +77,20 @@ if [ "$quick" -eq 0 ]; then
   echo; echo "Timed guardrails (G-012, G-026), beside the browser tests"
   CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 -timeout 8m $timed > "$timed_log" 2>&1 &
   timed_pid=$!
+  # Milestone tests start their own programs on a private database (G-013, G-025, G-027).
+  e2e_log=$(mktemp)
+  env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV tests/e2e/run real -timeout 9m ./e2e/... ./harness/router/ ./guardrails/freshness/ ./guardrails/orgs-apart/ ./guardrails/two-copies/ > "$e2e_log" 2>&1 &
+  e2e_pid=$!
 fi
 finish_timed() {
   [ -n "$timed_pid" ] || return 0
   wait "$timed_pid"; local code=$?; timed_pid=""
   cat "$timed_log"; rm -f "$timed_log"
   if [ "$code" -ne 0 ]; then echo "verify: FAIL a timed guardrail failed. A failing guardrail is a finding: fix the cause, never the test."; exit 1; fi
+  wait "$e2e_pid"; code=$?
+  grep -E '^(ok|FAIL|--- FAIL)' "$e2e_log"
+  if [ "$code" -ne 0 ]; then tail -n 40 "$e2e_log"; rm -f "$e2e_log"; echo "verify: FAIL a Milestone test failed. A failing guardrail is a finding: fix the cause, never the test."; exit 1; fi
+  rm -f "$e2e_log"
 }
 echo; echo "Browser tests, at 1280 and 400 px"
 # The tests of one width share one mock door, so each width gets its own and they run side by side.
@@ -105,5 +116,12 @@ if ! env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV tests/browser-outside/run
 fi
 finish_timed
 rm -f "$timed_log"
+if [ "$quick" -eq 0 ]; then
+  echo; echo "Milestone tests must fail with their rule switched off"
+  if ! env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV tests/e2e/run real -timeout 8m -tags t057faults -run Fails ./guardrails/freshness/ ./guardrails/orgs-apart/ ./guardrails/two-copies/ \
+    || ! env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV tests/e2e/run standin -timeout 3m -tags t057faults -run Fails ./e2e/; then
+    echo "verify: FAIL a Milestone test no longer fails with its rule switched off, so it cannot be trusted."; exit 1
+  fi
+fi
 if [ "$quick" -eq 1 ]; then echo; echo "verify --quick: passed, WITHOUT the timed guardrails G-012 and G-026. Not a full verification."; exit 0; fi
 echo; echo "verify: all passed"
