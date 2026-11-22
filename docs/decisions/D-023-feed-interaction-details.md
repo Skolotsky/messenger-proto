@@ -49,6 +49,8 @@ As listed under "Decided"; where the agent had built something else first, the r
 17. **Channel levels belong to Activity feed** in settings, as one more page under it, listing every channel with its level, changed in place.
 18. **Whatever the reason panel on a row can change is also in settings**, and the panel links to that place. "Ensure the rule is in settings, not only here."
 
+19. **Threads put in Focus are not listed in settings.** "I'm not sure I want focus threads in settings, it would be polluted over time." A thread is put in Focus, and taken out, on the thread itself: it is the thread's own level (D-001's thread dial), not a rule kept in a list. History → Threads shows each thread's level. This narrows points 16 and 18: people and channel levels are lists in settings, threads are not.
+
 ### Still the agent's proposal, shown in the mock-up, awaiting the user's word
 
 - **Context in an opened row:** the message before the new ones in a direct conversation; the start of the thread and the reply before in a thread; none for a mention in a channel.
@@ -56,14 +58,14 @@ As listed under "Decided"; where the agent had built something else first, the r
 - **The arrivals button is called "Show"**, and the control names how many arrived in Focus and Needs you.
 - **Which swipe is which:** the user set the pair; that right is read and left is keep is the agent's pick.
 - **On a phone the reply box is not given the cursor automatically**, since that opens the keyboard.
-- **The settings sections** are Account, Activity feed (with Focus people, Focus threads, Channel levels under it) and Notifications. Sign out and switching person are named in the menu but not built: the first version has a person switcher in place of sign-in (D-009).
+- **The settings sections** are Account, Activity feed (with Focus people and Channel levels under it) and Notifications. Sign out and switching person are named in the menu but not built: the first version has a person switcher in place of sign-in (D-009).
 - **The Notifications page** asks one question, "What should send you a notification?", with two choices and their daily figures from E-001. The user disliked the first form and did not understand the first Channels page; both were redrawn and not yet reviewed.
 
 ## Consequences
 
 - Easier: one way to each thing, and a phone layout with two states, list and conversation.
 - Harder: two interaction models for a row, by width. The settings screen becomes a surface of its own that every later setting must fit into.
-- Committed to: the eighteen points above.
+- Committed to: the nineteen points above.
 
 ## Follow-ups
 

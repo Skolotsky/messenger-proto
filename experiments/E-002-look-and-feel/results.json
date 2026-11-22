@@ -310,6 +310,13 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "adding a thread to Focus sets the thread's own level",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "the rule is in its own list in settings",
   "pass": true,
   "detail": ""
@@ -429,6 +436,13 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "threads are not a list in settings; the page says where they are managed",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "a general rule is switched off and on in the same place",
   "pass": true,
   "detail": ""
@@ -458,13 +472,6 @@
   "page": "slack-like",
   "width": "desktop",
   "check": "adding the person back restores them",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "slack-like",
-  "width": "desktop",
-  "check": "Focus threads says how to add one when empty",
   "pass": true,
   "detail": ""
  },
@@ -1038,6 +1045,13 @@
  {
   "page": "slack-like",
   "width": "phone",
+  "check": "adding a thread to Focus sets the thread's own level",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
   "check": "the rule is in its own list in settings",
   "pass": true,
   "detail": ""
@@ -1150,6 +1164,13 @@
  {
   "page": "slack-like",
   "width": "phone",
+  "check": "threads are not a list in settings; the page says where they are managed",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
   "check": "a general rule is switched off and on in the same place",
   "pass": true,
   "detail": ""
@@ -1179,13 +1200,6 @@
   "page": "slack-like",
   "width": "phone",
   "check": "adding the person back restores them",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "slack-like",
-  "width": "phone",
-  "check": "Focus threads says how to add one when empty",
   "pass": true,
   "detail": ""
  },
@@ -1648,6 +1662,13 @@
   "page": "telegram-like",
   "width": "desktop",
   "check": "adding a Focus rule shows its count first",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "adding a thread to Focus sets the thread's own level",
   "pass": true,
   "detail": ""
  },
@@ -2235,6 +2256,13 @@
  {
   "page": "telegram-like",
   "width": "phone",
+  "check": "adding a thread to Focus sets the thread's own level",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
   "check": "the rule is in its own list in settings",
   "pass": true,
   "detail": ""
@@ -2747,6 +2775,13 @@
   "page": "own",
   "width": "desktop",
   "check": "adding a Focus rule shows its count first",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "adding a thread to Focus sets the thread's own level",
   "pass": true,
   "detail": ""
  },
@@ -3328,6 +3363,13 @@
   "page": "own",
   "width": "phone",
   "check": "adding a Focus rule shows its count first",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "adding a thread to Focus sets the thread's own level",
   "pass": true,
   "detail": ""
  },

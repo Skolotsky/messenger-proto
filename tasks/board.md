@@ -10,7 +10,7 @@ _Nothing in progress._
 
 ## Waiting on user
 
-- **T-025** `decide` Proposal points in D-023 need the user's yes or changes: context in an opened row; a long burst showing its six newest messages; the arrivals button called "Show"; which swipe direction is which; no automatic cursor in the reply box on a phone; the redrawn Notifications and Channel levels pages of settings. All are shown in `experiments/E-002-look-and-feel/slack-like.html`. The eighteen points the user stated are accepted in D-023
+- **T-025** `decide` Proposal points in D-023 need the user's yes or changes: context in an opened row; a long burst showing its six newest messages; the arrivals button called "Show"; which swipe direction is which; no automatic cursor in the reply box on a phone; the redrawn Notifications and Channel levels pages of settings. All are shown in `experiments/E-002-look-and-feel/slack-like.html`. The nineteen points the user stated are accepted in D-023
 - **T-022** `decide` The architecture proposal is ready for review: `docs/visuals/T-022-architecture-proposal.html` (system map, six technical decisions with options, payloads and failure tests) and `docs/visuals/T-022-walkthroughs.html` (seven walk-throughs). D-005 to D-008 are proposed; D-017 and D-018 are registered. First question to the user: the shape (D-005). Then D-017, D-018, D-006, D-007, D-008, one at a time. Detail: `tasks/T-022-architecture-draft.md`
 - **T-021** `decide` Nine small behaviours the E-001 model still chooses on its own (list in `experiments/E-001-feed-rules-model/README.md`, "Still open after this run"). None blocks the look-and-feel work. The notification default was confirmed by the user at about 29 a day
 
