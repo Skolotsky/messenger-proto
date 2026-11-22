@@ -433,7 +433,7 @@ details > .stack { gap: 10px; }
       <tbody>
         <tr><td><strong>Where the truth is stored</strong> <span class="chip ok">decided: PostgreSQL</span></td><td>PostgreSQL, run in Docker (confirmed). Each part has its own area and never reads another's.</td><td>SQLite files: nothing to run, but one writer at a time and no way to wake a worker the moment something is saved.</td><td>Several programs writing at once, and a save-and-log step the whole guarantee rests on. Expensive to change later.</td></tr>
         <tr><td><strong>How updates reach a screen</strong> <span class="chip ok">decided: WebSocket</span></td><td>A lasting two-way connection (WebSocket) carrying numbered updates, with "everything after number N" after a drop.</td><td>The browser's one-way stream (server-sent events): reconnects by itself, but a browser allows six per site on a local address, so the seventh tab hangs (browser documentation, re-checked today).</td><td>You will open many tabs as different people. Cheap to change: numbering and catch-up are the same either way.</td></tr>
-        <tr><td><strong>Language</strong> <span class="chip ok">decided: TypeScript</span></td><td>TypeScript on the server (your choice; I had proposed Python).</td><td>The web app's toolkit is still open, in TypeScript too.</td><td>One language on both sides, and the contracts can be shared as types. Node is not installed here yet; it runs in Docker or is installed with the first build task. The experiments stay as throwaway Python.</td></tr>
+        <tr><td><strong>Language</strong> <span class="chip ok">decided: Go</span></td><td>Go on the server, TypeScript in the web app (D-025). You first chose TypeScript for both, then Go for the server.</td><td>TypeScript on both sides: one toolchain, but a single-threaded runtime for a set of network programs with background workers.</td><td>Each part becomes one self-contained program, and the concurrency this design needs is what Go is built for. The contracts are the source the web app's types are generated from. Neither Go nor Node is installed here yet.</td></tr>
       </tbody>
     </table>
   </div>
@@ -750,7 +750,7 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
       </tbody>
     </table>
   </div>
-  <p><span class="chip risk">Not verified</span> The real screens on this design (the feed with held rows and the arrivals button). The fast path for a reply in progress on a screen. The full feed rules inside this design (a subset was used; E-001 is the evidence for the rules, and it does not yet have Focus people). Speeds in TypeScript with PostgreSQL. No independent verifier has looked at the test harnesses.</p>
+  <p><span class="chip risk">Not verified</span> The real screens on this design (the feed with held rows and the arrivals button). The fast path for a reply in progress on a screen. The full feed rules inside this design (a subset was used; E-001 is the evidence for the rules, and it does not yet have Focus people). Speeds in Go with PostgreSQL. No independent verifier has looked at the test harnesses.</p>
 </section>
 
 <section id="rest">
