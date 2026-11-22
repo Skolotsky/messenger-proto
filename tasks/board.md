@@ -8,7 +8,6 @@ Work in flight. Order inside a section is priority. Finished work moves to `done
 
 - **T-052** `implement` Wave 2 · The feed as a service (G-007, G-009, G-008). Needs T-049
 - **T-053** `implement` Wave 2 · Conversations: live connection, reading through the door, housekeeping (G-024; server half of G-015, G-019). Needs T-046
-- **T-054** `implement` Wave 2 · Conversations: the agent door (G-016, G-017, G-018). Needs T-046
 - **T-065** `implement` D-034: the hold moves into the feed; scope and claims narrowed. Started beside T-064's last delivery fix, at the user's request to remove bottlenecks; its delivery part follows that merge. Before T-052. Detail: `tasks/T-065-hold-in-the-feed.md`
 - **T-056** `implement` Wave 2 · Web app: writing, going wrong, search, staying current (screen half of G-015). First half merged (mentions, edit, delete, search, new conversations; `tasks/T-056-writing-and-search.md`); the live client, waiting and failed states and `organization_gone` remain. Needs T-050
 - **T-064** `implement` D-033: remove the Reset number from contracts and code; retire and delete organizations; G-031. Before T-052, T-053 and T-054. Detail: `tasks/T-064-reset-removal.md`

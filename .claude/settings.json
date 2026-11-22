@@ -13,7 +13,10 @@
       "Edit(/tests/guardrails/retire-and-delete/**)",
       "Edit(/tests/guardrails/retire-and-delete-copies/**)",
       "Edit(/tests/guardrails/retire-and-delete-slow/**)",
-      "Edit(/tests/guardrails/retire-and-delete-retry/**)"
+      "Edit(/tests/guardrails/retire-and-delete-retry/**)",
+      "Edit(/tests/guardrails/agent-events/**)",
+      "Edit(/tests/guardrails/reply-in-progress/**)",
+      "Edit(/tests/guardrails/agent-limits/**)"
     ]
   }
 }

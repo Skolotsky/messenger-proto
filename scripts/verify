@@ -45,6 +45,9 @@ fi
 if ! CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 -tags deletefaults -run 'Fails' ./guardrails/retire-and-delete/ ; then
   echo "verify: FAIL G-031 no longer fails for a delete that is broken, so it cannot be trusted."; exit 1
 fi
+if ! CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 -tags agentfaults -run 'Fails' ./guardrails/agent-events/ ./guardrails/reply-in-progress/ ./guardrails/agent-limits/ ./guardrails/idle-organizations-cost-nothing/ ; then
+  echo "verify: FAIL an agent-door guardrail no longer fails with its rule switched off, so it cannot be trusted."; exit 1
+fi
 if ! TOOL_DIR=server ./scripts/tool go test -count=1 -tags integration ./... ; then
   echo "verify: FAIL a server integration test failed."; exit 1
 fi
