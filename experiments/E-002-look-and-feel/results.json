@@ -422,6 +422,20 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "an opened row has its reply box on screen",
+  "pass": true,
+  "detail": "{'x': 312, 'y': 759.75, 'width': 358.203125, 'height': 39.75}"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "and the cursor is in it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "expanding shows the six newest messages, after the one before the burst",
   "pass": true,
   "detail": ""
@@ -458,6 +472,34 @@
   "page": "slack-like",
   "width": "desktop",
   "check": "clicking your reaction takes it back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the full emoji picker opens from a message, with a search box",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "searching the picker narrows it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "an emoji from the picker lands on that message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a collapsed row takes a reaction without being expanded",
   "pass": true,
   "detail": ""
  },
@@ -947,6 +989,13 @@
  {
   "page": "slack-like",
   "width": "phone",
+  "check": "an opened row has its reply box on screen",
+  "pass": true,
+  "detail": "{'x': 12, 'y': 753.5, 'width': 299.765625, 'height': 39.75}"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
   "check": "expanding shows the six newest messages, after the one before the burst",
   "pass": true,
   "detail": ""
@@ -983,6 +1032,34 @@
   "page": "slack-like",
   "width": "phone",
   "check": "clicking your reaction takes it back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "the full emoji picker opens from a message, with a search box",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "searching the picker narrows it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "an emoji from the picker lands on that message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "a collapsed row takes a reaction without being expanded",
   "pass": true,
   "detail": ""
  },
@@ -1472,6 +1549,20 @@
  {
   "page": "telegram-like",
   "width": "desktop",
+  "check": "an opened row has its reply box on screen",
+  "pass": true,
+  "detail": "{'x': 12, 'y': 692.765625, 'width': 328.765625, 'height': 45.1875}"
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "and the cursor is in it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
   "check": "expanding shows the six newest messages, after the one before the burst",
   "pass": true,
   "detail": ""
@@ -1508,6 +1599,34 @@
   "page": "telegram-like",
   "width": "desktop",
   "check": "clicking your reaction takes it back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "the full emoji picker opens from a message, with a search box",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "searching the picker narrows it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "an emoji from the picker lands on that message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "a collapsed row takes a reaction without being expanded",
   "pass": true,
   "detail": ""
  },
@@ -1997,6 +2116,13 @@
  {
   "page": "telegram-like",
   "width": "phone",
+  "check": "an opened row has its reply box on screen",
+  "pass": true,
+  "detail": "{'x': 12, 'y': 735.953125, 'width': 299.765625, 'height': 45.1875}"
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
   "check": "expanding shows the six newest messages, after the one before the burst",
   "pass": true,
   "detail": ""
@@ -2033,6 +2159,34 @@
   "page": "telegram-like",
   "width": "phone",
   "check": "clicking your reaction takes it back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "the full emoji picker opens from a message, with a search box",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "searching the picker narrows it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "an emoji from the picker lands on that message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "a collapsed row takes a reaction without being expanded",
   "pass": true,
   "detail": ""
  },
@@ -2522,6 +2676,20 @@
  {
   "page": "own",
   "width": "desktop",
+  "check": "an opened row has its reply box on screen",
+  "pass": true,
+  "detail": "{'x': 336, 'y': 760.21875, 'width': 620.765625, 'height': 39.75}"
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "and the cursor is in it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
   "check": "expanding shows the six newest messages, after the one before the burst",
   "pass": true,
   "detail": ""
@@ -2558,6 +2726,34 @@
   "page": "own",
   "width": "desktop",
   "check": "clicking your reaction takes it back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "the full emoji picker opens from a message, with a search box",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "searching the picker narrows it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "an emoji from the picker lands on that message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "a collapsed row takes a reaction without being expanded",
   "pass": true,
   "detail": ""
  },
@@ -3047,6 +3243,13 @@
  {
   "page": "own",
   "width": "phone",
+  "check": "an opened row has its reply box on screen",
+  "pass": true,
+  "detail": "{'x': 32, 'y': 751.453125, 'width': 262.765625, 'height': 39.75}"
+ },
+ {
+  "page": "own",
+  "width": "phone",
   "check": "expanding shows the six newest messages, after the one before the burst",
   "pass": true,
   "detail": ""
@@ -3083,6 +3286,34 @@
   "page": "own",
   "width": "phone",
   "check": "clicking your reaction takes it back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "the full emoji picker opens from a message, with a search box",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "searching the picker narrows it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "an emoji from the picker lands on that message",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "a collapsed row takes a reaction without being expanded",
   "pass": true,
   "detail": ""
  },

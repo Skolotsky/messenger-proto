@@ -274,5 +274,22 @@ button.rx{cursor:pointer}
 button.rx:hover{border-color:var(--accent)}
 .quick{align-items:center}
 .quick small{font-size:12px;color:var(--muted);margin-right:4px}
-@media (hover:hover) and (min-width:761px){.msg-tools{opacity:0}.msg-self:hover>.msg-tools,.msg-tools:focus-within{opacity:1}.msg-tools .rx-add{display:none}}
-@media (hover:none),(max-width:760px){.msg-tools:not(.open) .rx-btn{display:none}.msg-tools:not(.open){border-color:transparent;background:none;box-shadow:none}}
+@media (hover:hover) and (min-width:761px){.msg-tools{opacity:0}.msg-self:hover>.msg-tools,.msg-tools:focus-within{opacity:1}}
+/* full emoji picker, and reacting from a collapsed row */
+.picker{position:fixed;z-index:50;width:308px;max-height:360px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);color:var(--text)}
+.pk-head{padding:10px 10px 8px;border-bottom:1px solid var(--line);display:grid;gap:6px}
+.pk-head small{color:var(--muted);font-size:12px}
+.pk-head input{border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--panel2);width:100%}
+.pk-body{overflow-y:auto;padding:4px 8px 10px}
+.pk-sec h4{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:8px 2px 4px}
+.pk-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px}
+.pk-grid button{height:34px;border-radius:6px;font-size:20px;text-align:center}
+.pk-grid button:hover,.pk-grid button:focus-visible{background:var(--accent-soft)}
+.pk-none{color:var(--muted);font-size:13px;padding:12px 4px}
+.msg-tools .rx-pick,.row-btns .rx-pick{width:30px;height:26px;display:grid;place-items:center;color:var(--muted);border-left:1px solid var(--line)}
+.row-btns .rx-pick{width:32px;height:28px;border-left:0;border-right:1px solid var(--line)}
+.msg-tools .ic,.rx-btn.rx-pick .ic{width:16px;height:16px}
+.rx-btn.rx-pick{display:inline-grid;place-items:center;color:var(--muted)}
+.rx-pick:hover{background:var(--accent-soft);color:var(--accent)}
+@media (hover:none),(max-width:760px){.msg-tools .rx-btn{display:none}.msg-tools{border-color:transparent;background:none;box-shadow:none}.msg-tools .rx-pick{border:0;width:34px;height:30px}.row-btns .rx-pick{width:38px;height:34px}
+  .picker{left:0 !important;right:0;top:auto !important;bottom:0;width:auto;max-height:62dvh;border-radius:16px 16px 0 0}.pk-grid button{height:42px;font-size:24px}}
