@@ -38,7 +38,7 @@ Applying a batch stops at the first change that is not answered 200, and answers
 ## 4. Failure behaviour
 
 - Out of sequence, or asked while idle: the feed answers with its place and the worker continues from there.
-- The worker keeps a place per organization and takes the organizations in turn, so one organization's backlog does not delay another's.
+- A place is kept per organization. A worker finds the organizations that have work with one question and takes each under a lock that other workers skip, a share at a time, so one organization's backlog does not delay another's and any number of workers and of feed copies can run side by side (D-029). Workers are not woken through the database on each save; they ask every few tens of milliseconds.
 - Down: the worker waits and retries without limit. A person sees the rows the feed had, with "Catching up"; conversations, unread marks on channels and search are unaffected; notifications wait with the feed.
 - A change the feed cannot apply: it is set aside and a fence goes up around the one conversation, or the one reader, it touches. Later changes inside the fence are set aside too; those rows are marked "may be out of date" and nothing new notifies from them. Everything outside stays exact. More than five fences in one organization: the feed stops for that organization only and answers "organization stopped" for it; the worker keeps that organization's place, shows it, and carries on with the others. Repair: fix the fault, rebuild that organization's feed.
 
@@ -48,4 +48,4 @@ New kinds of change may be added; the feed applies what it knows and counts the 
 
 ## 6. Enforced by
 
-G-005, G-007, G-008, G-009, G-012, G-013, G-019, G-020, G-023, G-024, G-025, G-026.
+G-005, G-007, G-008, G-009, G-012, G-013, G-019, G-020, G-023, G-024, G-025, G-026, G-027, G-028.

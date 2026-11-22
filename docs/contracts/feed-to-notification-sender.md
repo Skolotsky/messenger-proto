@@ -47,4 +47,4 @@ Fields may be added to a note. A name never changes its meaning.
 
 ## 6. Enforced by
 
-G-010, G-011, G-020, G-023, G-025, G-026.
+G-010, G-011, G-020, G-023, G-025, G-026, G-027.

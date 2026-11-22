@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Growing by adding</title>
+<style>
+/* Layout: one reading column. Diagrams, tables and code may run wider inside their own scroll box. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --sunken: #eceef2; --line: #d8dce4;
+  --ink: #17202b; --ink-2: #445063; --ink-3: #5f6b7d;
+  --agent: #2351c9; --agent-soft: #e5ecfc; /* the agent's work, links */
+  --you: #a64b08; --you-soft: #fcebd9;     /* where the user's attention is needed */
+  --ok: #1b7548; --ok-soft: #e1f3e8;       /* recommended, holds, verified */
+  --risk: #b3261e; --risk-soft: #fbe8e6;   /* risk, broken, not verified */
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Cascadia Code", "Cascadia Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+    --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+    --agent: #86a8ff; --agent-soft: #1b2a4c;
+    --you: #f2a766; --you-soft: #3b2814;
+    --ok: #62cf99; --ok-soft: #14301f;
+    --risk: #ff8f85; --risk-soft: #3d1815;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+  --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+  --agent: #86a8ff; --agent-soft: #1b2a4c;
+  --you: #f2a766; --you-soft: #3b2814;
+  --ok: #62cf99; --ok-soft: #14301f;
+  --risk: #ff8f85; --risk-soft: #3d1815;
+  color-scheme: dark;
+}
+
+/* Base */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--font); }
+.page {
+  max-width: 880px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 34px;
+}
+section, .stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+h1 { font: 650 27px/1.2 var(--display); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h2 { font: 650 18.5px/1.3 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 650 14.5px/1.35 var(--font); margin: 0; }
+p { margin: 0; max-width: 68ch; }
+ul, ol { margin: 0; padding-left: 1.25em; display: flex; flex-direction: column; gap: 5px; max-width: 68ch; }
+a { color: var(--agent); }
+strong { font-weight: 650; }
+code { font: 0.88em var(--mono); background: var(--sunken); border: 1px solid var(--line); border-radius: 4px; padding: 0.08em 0.36em; overflow-wrap: anywhere; }
+:focus-visible { outline: 2px solid var(--agent); outline-offset: 2px; }
+.label { font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.note { color: var(--ink-3); font-size: 13.5px; }
+
+/* Header */
+.top { display: flex; flex-direction: column; gap: 8px; }
+.lede { font-size: 16.5px; color: var(--ink-2); max-width: 62ch; }
+
+/* Needs you: the one thing the user has to decide or answer */
+.ask { background: var(--you-soft); border: 1px solid color-mix(in srgb, var(--you) 40%, transparent); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.ask .label { color: var(--you); }
+
+/* Chips */
+.chip { display: inline-flex; align-items: center; font: 600 12px/1 var(--font); padding: 4px 9px; border-radius: 999px; background: var(--sunken); color: var(--ink-2); white-space: nowrap; }
+.chip.you { background: var(--you-soft); color: var(--you); }
+.chip.agent { background: var(--agent-soft); color: var(--agent); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.risk { background: var(--risk-soft); color: var(--risk); }
+
+/* Panels side by side */
+.split { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.panel.you .label { color: var(--you); }
+.panel.agent .label { color: var(--agent); }
+.files { list-style: none; padding: 0; gap: 7px; }
+.files li { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.files span { color: var(--ink-2); font-size: 13.5px; }
+
+/* Lanes: who does what, phase by phase. Children in order: three .head cells, then .phase, .you, .agent per row */
+.lanes { display: grid; grid-template-columns: minmax(128px, 0.75fr) 1.25fr 1.5fr; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.lanes > * { padding: 12px 14px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin: -1px 0 0 -1px; min-width: 0; }
+.lanes > .head { background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.lanes > .head.you { color: var(--you); background: var(--sunken); }
+.lanes > .head.agent { color: var(--agent); }
+.lanes > .phase { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.lanes > .phase strong { font: 650 15px/1.3 var(--display); }
+.lanes > .phase .say { color: var(--ink-2); font-size: 13.5px; }
+.lanes > .you { background: color-mix(in srgb, var(--you-soft) 60%, var(--surface)); }
+.lanes > .you.idle { background: var(--surface); color: var(--ink-3); }
+@media (max-width: 600px) {
+  .lanes { grid-template-columns: 1fr 1.2fr; }
+  .lanes > .head.first { display: none; }
+  .lanes > .phase { grid-column: 1 / -1; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--sunken); padding-block: 8px; }
+}
+
+/* Options: a choice, side by side */
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.option { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.option.pick { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+.option header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.option dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; font-size: 14px; }
+.option dt { font-weight: 650; color: var(--ink-3); }
+.option dd { margin: 0; min-width: 0; }
+.brief { border: 1px dashed var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+/* Steps: what happens, in order */
+.steps { list-style: none; padding: 0; gap: 0; counter-reset: step; max-width: none; }
+.steps > li { counter-increment: step; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding-bottom: 16px; position: relative; }
+.steps > li::before { content: counter(step); width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; font: 600 13px var(--mono); color: var(--ink-2); position: relative; z-index: 1; }
+.steps > li:not(:last-child)::after { content: ""; position: absolute; left: 13.5px; top: 28px; bottom: 0; width: 1px; background: var(--line); }
+.steps > li:last-child { padding-bottom: 0; }
+.steps .body { display: flex; flex-direction: column; gap: 5px; padding-top: 3px; min-width: 0; }
+
+/* Figures: diagrams and snippets */
+figure { margin: 0; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+figcaption { font-size: 13px; color: var(--ink-3); max-width: 68ch; }
+.diagram .scroll { overflow-x: auto; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; }
+.diagram svg { display: block; min-width: 680px; width: 100%; height: auto; color: var(--ink-3); font-family: var(--font); }
+.diagram .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
+.diagram .box-you { fill: var(--you-soft); stroke: var(--you); stroke-width: 1.25; }
+.diagram .box-agent { fill: var(--agent-soft); stroke: var(--agent); stroke-width: 1.25; }
+.diagram .box-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.25; }
+.diagram .box-risk { fill: var(--risk-soft); stroke: var(--risk); stroke-width: 1.25; }
+.diagram .t { fill: var(--ink); font-size: 13px; font-weight: 650; }
+.diagram .t2 { fill: var(--ink-2); font-size: 11px; }
+.diagram .edge { stroke: currentColor; stroke-width: 1.5; fill: none; }
+.diagram .edge-label { fill: var(--ink-2); font-size: 11px; }
+.snippet pre { margin: 0; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; overflow-x: auto; font: 13px/1.5 var(--mono); }
+.snippet pre code { background: none; border: 0; padding: 0; font: inherit; overflow-wrap: normal; }
+.snippet mark { background: var(--you-soft); color: inherit; border-radius: 3px; padding: 0 2px; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+thead th { border-top: 0; background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Depth on demand */
+details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 0 16px; }
+details > summary { cursor: pointer; padding: 11px 0; font-weight: 650; }
+details[open] { padding-bottom: 14px; }
+details > .stack { gap: 10px; }
+
+/* Footer */
+.foot { border-top: 1px solid var(--line); padding-top: 14px; color: var(--ink-3); font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body>
+<main class="page">
+<header class="top">
+  <div class="label">Architecture · scaling · D-029 · 2026-11-22</div>
+  <h1>Growing by adding: copies, databases, nothing else</h1>
+  <p class="lede">The question was not whether the design survives some number of organizations, but whether anything in it cannot be grown by adding more of the same. One rule answers it for every part, three things that broke the rule were removed, and the limits that remain are named.</p>
+</header>
+
+<section>
+  <h2>The rule</h2>
+  <p><strong>Every piece of state belongs to one organization, and every program either keeps its state in PostgreSQL or keeps only memory about the organizations routed to it.</strong> Nothing is shared between organizations except a small directory that says which database holds which organization. So more organizations never make any single thing bigger; they are spread.</p>
+  <figure class="diagram">
+    <div class="scroll">
+      <svg viewBox="0 0 900 440" role="img" aria-label="An entry point sends each organization to one copy of Conversations. A directory says which database holds an organization. Delivery workers and feed copies are multiplied freely and take any organization that has work.">
+        <defs>
+          <marker id="arrowS" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <rect class="box" x="20" y="16" width="860" height="46" rx="6"/>
+        <text class="t" x="450" y="36" text-anchor="middle">Entry point</text>
+        <text class="t2" x="450" y="52" text-anchor="middle">sends everything of one organization to the same copy, by the organization in the address</text>
+
+        <line class="edge" x1="155" y1="62" x2="155" y2="96" marker-end="url(#arrowS)"/>
+        <line class="edge" x1="450" y1="62" x2="450" y2="96" marker-end="url(#arrowS)"/>
+        <line class="edge" x1="745" y1="62" x2="745" y2="96" marker-end="url(#arrowS)"/>
+
+        <rect class="box-agent" x="20" y="96" width="270" height="74" rx="6"/>
+        <text class="t" x="155" y="118" text-anchor="middle">Conversations · copy 1</text>
+        <text class="t2" x="155" y="136" text-anchor="middle">screens and agents of organizations A, D</text>
+        <text class="t2" x="155" y="152" text-anchor="middle">memory: their open connections only</text>
+        <rect class="box-agent" x="315" y="96" width="270" height="74" rx="6"/>
+        <text class="t" x="450" y="118" text-anchor="middle">Conversations · copy 2</text>
+        <text class="t2" x="450" y="136" text-anchor="middle">organizations B, E</text>
+        <text class="t2" x="450" y="152" text-anchor="middle">add a copy: some organizations move</text>
+        <rect class="box-agent" x="610" y="96" width="270" height="74" rx="6"/>
+        <text class="t" x="745" y="118" text-anchor="middle">Conversations · copy 3</text>
+        <text class="t2" x="745" y="136" text-anchor="middle">organizations C, F</text>
+        <text class="t2" x="745" y="152" text-anchor="middle">their screens reconnect and catch up</text>
+
+        <line class="edge" x1="155" y1="170" x2="330" y2="214" marker-end="url(#arrowS)"/>
+        <line class="edge" x1="450" y1="170" x2="420" y2="214" marker-end="url(#arrowS)"/>
+        <line class="edge" x1="745" y1="170" x2="720" y2="214" marker-end="url(#arrowS)"/>
+        <line class="edge" x1="200" y1="170" x2="640" y2="214" stroke-dasharray="4 4" marker-end="url(#arrowS)"/>
+
+        <rect class="box" x="20" y="214" width="200" height="74" rx="6"/>
+        <text class="t" x="120" y="238" text-anchor="middle">Directory</text>
+        <text class="t2" x="120" y="256" text-anchor="middle">which database holds</text>
+        <text class="t2" x="120" y="272" text-anchor="middle">which organization</text>
+
+        <rect class="box-ok" x="250" y="214" width="300" height="74" rx="6"/>
+        <text class="t" x="400" y="238" text-anchor="middle">PostgreSQL · database 1</text>
+        <text class="t2" x="400" y="256" text-anchor="middle">organizations A, B, C: each its own log</text>
+        <text class="t2" x="400" y="272" text-anchor="middle">no question spans two organizations</text>
+        <rect class="box-ok" x="580" y="214" width="300" height="74" rx="6"/>
+        <text class="t" x="730" y="238" text-anchor="middle">PostgreSQL · database 2</text>
+        <text class="t2" x="730" y="256" text-anchor="middle">organizations D, E, F</text>
+        <text class="t2" x="730" y="272" text-anchor="middle">add a database: new organizations go there</text>
+
+        <line class="edge" x1="400" y1="288" x2="300" y2="336" marker-end="url(#arrowS)"/>
+        <line class="edge" x1="730" y1="288" x2="360" y2="336" marker-end="url(#arrowS)"/>
+
+        <rect class="box-agent" x="20" y="336" width="420" height="84" rx="6"/>
+        <text class="t" x="230" y="360" text-anchor="middle">Delivery workers · as many as needed</text>
+        <text class="t2" x="230" y="378" text-anchor="middle">ask "which organizations have work?", take one under</text>
+        <text class="t2" x="230" y="394" text-anchor="middle">a lock the others skip; no worker owns an organization</text>
+
+        <line class="edge" x1="440" y1="378" x2="470" y2="378" marker-end="url(#arrowS)"/>
+
+        <rect class="box" x="470" y="336" width="410" height="84" rx="6"/>
+        <text class="t" x="675" y="360" text-anchor="middle">Feed, search and notification connectors · as many as needed</text>
+        <text class="t2" x="675" y="378" text-anchor="middle">no memory of their own: state is in their databases,</text>
+        <text class="t2" x="675" y="394" text-anchor="middle">per organization, split the same way</text>
+      </svg>
+    </div>
+    <figcaption>Blue grows by adding copies. Green grows by adding databases. The dashed line is copy 1 reaching database 2 for organization D: a copy finds an organization's database through the directory.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Part by part: what you add, and what keeps the copies from colliding</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Part</th><th>To grow, add</th><th>What keeps copies apart</th><th>In the first version</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Conversations' database</strong></td><td>Databases. Organizations are spread over them.</td><td>The directory. No question spans two organizations, so none spans two databases.</td><td><span class="chip">one database</span> Every access already goes through "the database for this organization".</td></tr>
+        <tr><td><strong>Conversations: the doors, live connection, replies in progress</strong></td><td>Copies.</td><td>Everything of one organization goes to one copy, chosen from the organization in the address. That copy made the saves, so it knows what to push; copies never talk to each other.</td><td><span class="chip">one copy</span> The organization is already in every address.</td></tr>
+        <tr><td><strong>Delivery workers</strong></td><td>Workers.</td><td>A lock per receiver and organization that other workers skip. No worker owns an organization.</td><td><span class="chip ok">built this way, tested with two</span></td></tr>
+        <tr><td><strong>Activity feed</strong></td><td>Copies of the program; databases for its rows.</td><td>It has no memory. A change is applied only if it follows the organization's last one, so two copies cannot apply it twice.</td><td><span class="chip ok">built this way, tested with two</span></td></tr>
+        <tr><td><strong>Search and notification sender</strong></td><td>Their connectors are workers like the others. The engines behind them scale on their own side.</td><td>As for delivery workers. A notification's name starts with the organization.</td><td><span class="chip">stand-ins</span></td></tr>
+        <tr><td><strong>Housekeeping</strong> (the clock tick for a quiet organization, lapsed "watching", abandoned replies, old agent events)</td><td>Nothing: it runs once per database.</td><td>A lock per database that one copy holds at a time.</td><td><span class="chip ok">built this way</span></td></tr>
+        <tr><td><strong>The directory and the entry point</strong></td><td>Standard means: copies of a small, read-mostly table; an ordinary load balancer.</td><td>They hold no per-message state.</td><td><span class="chip">not built: one database needs neither</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Three things in the design that would not have grown, now removed</h2>
+  <div class="split">
+    <div class="panel"><div class="label"><span class="chip risk">removed</span> Waking workers through the database on every save</div><p>Convenient at small size, and a hidden queue everybody shares. Measured: saving dropped from 9,549 to 2,043 changes a second. Workers now ask one cheap question every few tens of milliseconds.</p></div>
+    <div class="panel"><div class="label"><span class="chip risk">removed</span> "I am still looking at this" written to the log every 20 seconds</div><p>Three log entries a minute for every person with a conversation open: more than all messages, reactions and reads together, and each one passed on to the feed. Now only the start and the end are written.</p></div>
+    <div class="panel"><div class="label"><span class="chip risk">removed</span> Asking every organization in turn whether it has work</div><p>The cost grows with the number of organizations even when nothing happens. Measured with 5,000: 719 ms a round, against 1 ms for the single question "which organizations have work?".</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Measured, with 5,000 organizations in one PostgreSQL (E-007)</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Question</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>Do several workers ever deliver a change twice, or miss one?</td><td>No: 120,000 changes, each delivered exactly once, with 1, 2, 4 and 8 workers.</td></tr>
+        <tr><td>Does adding workers add capacity?</td><td>Yes. At 600 saves a second with 1 ms of work per change, one worker fell behind (25 s for 19 in 20); four kept up (9 ms median, 17 ms for 19 in 20).</td></tr>
+        <tr><td>Does one organization's backlog delay the others?</td><td>No: with 50,000 changes waiting in one, the others were served in 8 ms (worst 35 ms).</td></tr>
+        <tr><td>How fast can one database save?</td><td>About 9,500 changes a second on this laptop. <span class="note">I had quoted about 1,000 before; that was the limit of the earlier test program, not of PostgreSQL.</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">This shows the mechanism grows. It was run with 5,000 organizations on one laptop, not 300,000 on real hardware; the claim for more rests on nothing in the design depending on the total number.</p>
+</section>
+
+<section>
+  <h2>What does not grow this way</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Limit</th><th>Why</th><th>What would be done</th></tr></thead>
+      <tbody>
+        <tr><td><strong>One very large organization</strong></td><td>Its log is applied by one worker at a time, to keep its order: 50,000 waiting changes took about 50 seconds. It lives in one database.</td><td>Split that organization's log by channel. A real change of design, not built.</td></tr>
+        <tr><td><strong>Old data</strong></td><td>The change log, handled action IDs, agents' events and sent notifications grow without end.</td><td>Trim per organization once a saved copy of each receiver exists; rebuild from the copy. Designed, not built.</td></tr>
+        <tr><td><strong>Moving an organization to another database</strong></td><td>Needed to rebalance.</td><td>Copy its rows, switch its directory entry. Not built.</td></tr>
+        <tr><td><strong>The directory and the entry point</strong></td><td>Everything passes them.</td><td>Kept available by ordinary means; they hold almost nothing.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>So: a cache, with many organizations?</h2>
+  <p>Still none, and now for a stated reason. A shared in-memory store such as Redis is needed when copies of a program must share something: who is connected where, how many messages an agent sent this minute, a wake-up for everyone. Here each organization is served by one copy, so that copy's own memory is enough, and workers are not woken at all. Inside the feed program, keeping readers' settings in memory while it works is an ordinary optimisation and not a second source of truth. If screens of one organization ever had to be served by several copies, that would be the moment for a shared store.</p>
+</section>
+
+<footer class="foot">
+  <span>Belongs to D-029 · Evidence: E-007, E-006, E-004 · Guardrails G-027 (two copies), G-028 (two databases), G-026 (one organization cannot delay another)</span>
+  <span>Full reasoning: <code>docs/decisions/D-029-scaling-by-adding.md</code> · The whole design: <a href="T-022-architecture-proposal.html">architecture review</a></span>
+</footer>
+</main>
+</body>
+</html>

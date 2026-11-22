@@ -1,0 +1,22 @@
+5000 organizations in one PostgreSQL 17, every writer and worker its own process.
+
+1 · How fast can changes be saved? 16 writers flat out for 15 s, spread over all organizations:
+    without waking anybody                                             |   9549 saves a second
+    waking the workers through the database on every save (NOTIFY)     |   2043 saves a second
+
+2 · How fast can they be delivered? 120,000 waiting changes spread over all organizations, nothing else going on:
+    1 worker  |  16929 changes a second | delivered 120000 of 120000, each exactly once
+    2 workers |  17565 changes a second | delivered 120000 of 120000, each exactly once
+    4 workers |  16944 changes a second | delivered 120000 of 120000, each exactly once
+    8 workers |  18976 changes a second | delivered 120000 of 120000, each exactly once
+
+3 · Steady traffic: 600 saves a second for 30 s over all organizations, each change costing a worker 1 ms to apply:
+    1 worker  | saved 17704 (590 a second), delivered 17704 | save to delivered: median 1202 ms, 19 in 20 within 25618 ms, worst 34784 ms
+    4 workers | saved 17749 (592 a second), delivered 17749 | save to delivered: median 9 ms, 19 in 20 within 17 ms, worst 45 ms
+
+4 · One organization gets 50,000 changes at once while the others carry on at 400 saves a second (1 ms per change, 4 workers):
+    the other organizations, save to delivered: median 8 ms, 19 in 20 within 16 ms, worst 35 ms
+    in the end delivered 61442 of 61882
+
+5 · What looking for work costs when nothing is happening:
+    one question "which organizations have work?": 1.0 ms    asking each of 5000 organizations in turn: 719 ms a round

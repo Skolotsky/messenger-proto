@@ -1,6 +1,6 @@
 # D-026: The architecture is ready for many organizations in one installation (multi-tenant), and scales by organization
 
-- Status: accepted
+- Status: accepted; point 7 (how it scales) is worked out in D-029
 - Level: system shape
 - Date: 2026-11-22
 - Decided by: user (the direction); the scope below is the agent's reading, open to objection

@@ -18,7 +18,7 @@ GET feed/orgs/acme/people/marco/history?tab=mentions     → entries with an unr
 GET feed/orgs/acme/people/marco/settings                 → Focus people, removed people, each thread's and channel's level as it is in effect
 GET feed/orgs/acme/people/marco/preview?change=…         → what the change would have moved in the last 7 days
 GET feed/orgs/acme/people/marco/updates?after=97&edition=feed-7c1&wait=25   → row changes after 97, each with the number before it; or { "new_edition": "feed-9d4" }
-GET search/orgs/acme/query?q=pricing&as=marco            → { "through": 4855, "results": [ { "message": "msg_7Q2", "version": 2, "text": "…" } ] }
+GET search/orgs/acme/query?q=pricing&as=marco&after=…     → { "through": 4855, "total": 37, "next": "…", "results": [ { "message": "msg_7Q2", "version": 2, "conversation": "#launch", "thread": null, "author": "anna", "edited": true, "text": "…", "match": [[31, 38]] } ] }
 ```
 
 `through` is the number of the last change the answering part has applied. The door compares it with the head of the log to know how far behind the answer is.
@@ -26,6 +26,7 @@ GET search/orgs/acme/query?q=pricing&as=marco            → { "through": 4855, 
 ## 3. Guarantees
 
 - An answer reflects the log up to `through`, exactly.
+- A search answer gives the true total, not the number shown, marks where the text matched, says whether a message was edited, and names the thread of a reply so the screen can open it there (D-024; T-038, points 20 to 22).
 - The feed's row updates are numbered by its own log and carry its edition; after a rebuild the edition changes and the door tells screens to load the feed fresh.
 - The door adds nothing and remembers nothing: what it shows is what the part answered, or a notice.
 

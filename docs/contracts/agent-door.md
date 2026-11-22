@@ -35,7 +35,7 @@ An agent is told what addresses it: a mention, a direct message, a reply in a th
 - A reply with no new piece for 60 seconds, or older than 10 minutes, is closed as "stopped" with the text so far.
 - A piece that repeats text already received adds nothing.
 - An agent is not told about another agent's message unless it is named in it. Each message counts the agents in a row behind it; after three, no further agent is told until a person writes.
-- At most 20 messages a minute per agent.
+- At most 20 messages a minute per agent. An organization's agents are served by one copy of Conversations (D-029), which keeps that count in memory; it starts fresh if the copy restarts.
 - An agent may read any channel (the first version has no access model, D-009) and only its own direct conversations.
 
 ## 4. Failure behaviour

@@ -167,7 +167,7 @@ details > .stack { gap: 10px; }
 <div class="ask">
   <div class="label">Where it stands</div>
   <p><strong>All technical decisions are taken.</strong> You decided the shape, the database and the live connection (D-005; a message broker was tried and dropped again, D-027 and D-028), Go for the server (D-025), who owns what a reader did (D-017), who decides a notification (D-018), and that the architecture is ready for many organizations (D-026, section 11). On your delegation I decided the delivery promise (D-006), the numbers (D-007) and the agent door (D-008). Any of them can be overturned.</p>
-  <p class="note">An organization is the tenant; the seeded team lives inside one. There is no organization switcher in this scope: the second organization exists only for the tests.</p>
+  <p class="note">An organization is the tenant; the seeded team lives inside one. There is no organization switcher in this scope: the second organization exists only for the tests. How the system grows to many organizations by adding copies and databases: <a href="D-029-scaling-by-adding.html">D-029</a>.</p>
 </div>
 
 <section>
@@ -710,20 +710,9 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
     </div>
     <figcaption>Nothing crosses from one organization to another, so every part can later be split by organization without changing what it does.</figcaption>
   </figure>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>How it grows</th><th>What is done</th><th>State</th></tr></thead>
-      <tbody>
-        <tr><td><strong>More organizations, one machine</strong></td><td>Nothing, up to what one database carries (about 850 to 1,030 saves a second in the test, shared by all). An organization is data: its own log, its own rows, its own places.</td><td><span class="chip ok">in the design from the start</span></td></tr>
-        <tr><td><strong>More load than one copy of a program carries</strong></td><td>Several copies of Conversations, of the workers and of the feed, each taking a share of the organizations. Needs each organization assigned to exactly one copy; that assignment is not designed.</td><td><span class="chip">prepared, needs more design</span></td></tr>
-        <tr><td><strong>More data than one database carries</strong></td><td>Organizations are spread over several databases. Possible because no question ever spans two organizations; needs a directory of which database holds which.</td><td><span class="chip">prepared, needs more design</span></td></tr>
-        <tr><td><strong>So many organizations that assigning and balancing them is the work</strong></td><td>A message broker takes over the layer between the logs and the receivers, and with it the assignment and balancing above.</td><td><span class="chip">later, if needed</span></td></tr>
-        <tr><td><strong>One very large organization</strong></td><td>Not helped by any of this: it still has one log and one feed. Its log would be split by channel.</td><td><span class="chip risk">a known limit</span></td></tr>
-      </tbody>
-    </table>
-  </div>
+  <p><strong>How it grows is worked out on its own page (D-029): <a href="D-029-scaling-by-adding.html">growing by adding</a>.</strong> In short: organizations are spread over databases through a small directory; programs without memory (workers, the feed) are multiplied freely; programs with memory (the live connection, the agent door) each serve the organizations routed to them; one very large organization is the limit that remains.</p>
   <div class="split">
-    <div class="panel"><div class="label">Tried on PostgreSQL (E-004, second part)</div><p>Eight organizations, two writers each (the test code calls them teams). One organization keeps every save open for 300 ms. With one log for everybody, a save in the <em>other</em> organizations took up to <strong>2.6 s</strong>; with a log per organization, at most <strong>34 ms</strong>. Nothing was stepped over (0 of 3,200). A log per organization buys independence, not more speed from one database: both forms saved about 850 to 1,030 changes a second.</p></div>
+    <div class="panel"><div class="label">Tried on PostgreSQL (E-004, second part)</div><p>Eight organizations, two writers each (the test code calls them teams). One organization keeps every save open for 300 ms. With one log for everybody, a save in the <em>other</em> organizations took up to <strong>2.6 s</strong>; with a log per organization, at most <strong>34 ms</strong>. Nothing was stepped over (0 of 3,200). A log per organization buys independence, not more speed from one database. (That test saved about 1,000 changes a second, which was the limit of its test program; with separate writer programs the same database saved about 9,500, E-007.)</p></div>
     <div class="panel"><div class="label">What a failure now touches</div><p>A receiver that is down is down for every organization. Everything else is per organization: a change that is parked, three refusals that pause delivery, a fence, a feed that stops after five fences, a rebuild, a reset. A receiver has its own answer for "this organization is stopped", so the others carry on.</p></div>
     <div class="panel"><div class="label">Not built</div><p>Creating or administering organizations, sign-in, limits per organization, one identity across organizations, several copies of a program actually running. The first version runs one organization with the seeded team in it, and has no organization switcher; a second small organization exists only so the tests can prove separation.</p></div>
   </div>
@@ -804,7 +793,7 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
     <div class="panel"><div class="label">E-005 · the screen's side, in a real browser</div><p>A page that follows the numbered-update contract, with its connection cut five times, refused for two seconds, losing one update in twenty, and away past the limit: <strong>always equal to a fresh load</strong>. Two screens broken on purpose ended wrong. Twelve tabs at once all connected over WebSocket; the alternative stopped at six.</p></div>
     <div class="panel"><div class="label">E-003, extended · the agent door, with scripted agents only</div><p>Three scripted agents, one away for three seconds, all crashing now and then: <strong>no event missed, every repeated reply saved once</strong>, text in progress never seen by a receiver, abandoned replies closed as "stopped", an agent loop stopped after three, a too-fast agent slowed down.</p></div>
   </div>
-  <h3>Checked against the look-and-feel decisions (D-019 to D-023)</h3>
+  <h3>Checked against the look-and-feel decisions (D-019 to D-024, design closed)</h3>
   <p>Nothing in them changes the shape. Four things were added to the contracts, and two things turn out to live on the screen only.</p>
   <div class="table-wrap">
     <table>
@@ -818,7 +807,12 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
         <tr><td>Unread counts on history tabs, on buckets and on channels (D-019)</td><td>Three counts from two parts.</td><td><span class="chip ok">fits</span> All from the same read position. The feed's two may trail the channel marks by a few milliseconds.</td></tr>
         <tr><td>A message with replies shows who replied, how many, when last (D-023)</td><td>A channel view changes when a reply arrives in a thread.</td><td><span class="chip ok">fits</span> One more kind of live update from Conversations.</td></tr>
         <tr><td>Reactions on any message and from a row; Mark read; Keep after Done; Undo (D-023, D-020)</td><td>More actions through the door.</td><td><span class="chip ok">fits</span> Each is an action with an ID, saved as a fact.</td></tr>
-        <tr><td>Offline and failed-send states in the mock-up</td><td>A message that could not be sent waits and is retried.</td><td><span class="chip ok">fits</span> The same ID is sent again and saved once (E-003).</td></tr>
+        <tr><td>Offline and failed-send states (D-024)</td><td>A message written offline waits in its place and is sent later; a failed send offers "Try again" and "Discard"; edits and reactions made offline need a waiting state too.</td><td><span class="chip ok">fits, contract extended</span> Every action waits with its ID and is sent in order. The door now tells "no answer" (try again helps) from "refused" (it does not).</td></tr>
+        <tr><td>Creating a channel with a name and people; any message can start a thread (D-024)</td><td>New actions, and membership as a fact the feed needs.</td><td><span class="chip ok">added to the contract</span></td></tr>
+        <tr><td>Search results: the true total, the match marked, "edited", a reply opening its thread (D-024)</td><td>The search answer must carry more than text.</td><td><span class="chip ok">added to the contract</span></td></tr>
+        <tr><td>"Enter" or "Ctrl+Enter" to send, chosen in settings (D-024)</td><td>A setting that follows the person to every screen but that no receiver acts on.</td><td><span class="chip ok">added to the contract</span> as a preference.</td></tr>
+        <tr><td>Control panel: Running, Slow, Off for search, the sender and the feed, with how much is waiting (D-024)</td><td>A switch that works the same for all three, and a count of what waits.</td><td><span class="chip ok">fits</span> The switch acts on the delivery worker of that receiver; "how much is waiting" is the distance between the log and that receiver's place.</td></tr>
+        <tr><td>Day lines, tooltips, the robot on an agent's avatar, resizable panels, drafts that survive a redraw</td><td>Nothing: these live on the screen.</td><td><span class="chip">screen only</span></td></tr>
       </tbody>
     </table>
   </div>
