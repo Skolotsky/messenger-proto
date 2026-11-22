@@ -769,7 +769,8 @@
   "query": {},
   "request": null,
   "answers": {
-   "Empty": 200
+   "Empty": 200,
+   "Refusal": 409
   },
   "also": []
  },
