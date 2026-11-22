@@ -23,7 +23,8 @@
 .nav .badge { position: absolute; top: 2px; left: calc(50% + 6px); }
 .h-count { font-size: 11px; font-weight: 700; color: var(--muted); background: var(--panel2); border-radius: 99px; min-width: 18px; padding: 0 5px; line-height: 18px; text-align: center; }
 .tab.on .h-count { color: var(--text); }
-.feed-problem { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 16px; background: var(--flag-soft); color: var(--flag); font-size: 13px; flex: none; }
+/* over the list, so that saying something went wrong moves nothing */
+.feed-problem { position: absolute; top: 0; left: 0; right: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 16px; background: var(--flag-soft); color: var(--flag); font-size: 13px; box-shadow: var(--shadow); }
 .link { color: var(--accent); font-size: 12px; font-weight: 600; white-space: nowrap; flex: none; }
 .link:hover { text-decoration: underline; }
 
@@ -46,7 +47,7 @@
 .suggest > p:first-child { margin-bottom: 6px; }
 
 /* rows. Whole-pixel lines: a scroll position is whole pixels, so holding a row in place is then exact. */
-.feed-scroll { line-height: 22px; }
+.feed-scroll { line-height: 22px; overflow-anchor: none; }
 .row-reason { line-height: 18px; }
 .row-head { line-height: 22px; }
 .row { position: relative; border-bottom: 1px solid var(--line); }
@@ -125,6 +126,7 @@ button.rx:hover { border-color: var(--accent); }
   .row-preview { padding-right: 44px; }
   .row.has-side .row-preview { padding-right: 116px; }
   .hrow .row-preview { padding-right: 74px; }
+  .hrow .row-main { min-height: 80px; }
   .row-btns { border: 0; background: none; overflow: visible; }
   .row-btns .mark-read, .row-btns .keep-btn { display: none; }
   .row-btns .rx-pick { width: 36px; height: 34px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }

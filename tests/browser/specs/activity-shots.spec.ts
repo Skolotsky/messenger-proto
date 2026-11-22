@@ -23,6 +23,7 @@ for (const theme of ['light', 'dark'] as const) {
       threads: [entry({ message: 'msg_h3', conversation: '#general', thread: 'msg_h3', level: 'fyi', author: 'lena', preview: 'Trying 1.75 for the tab bar only.' })],
     };
     await start(page);
+    await page.waitForLoadState('load');
     await expect(page.locator(`[data-row="${KEY('dm:anna:marco')}"]`)).toBeVisible();
     await shot('1-feed');
 

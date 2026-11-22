@@ -113,12 +113,25 @@ test('Keep and Mark read change the row in place', async ({ page, door }, info) 
   const before = await topOf(watched);
   await watched.hover();
   await watched.getByRole('button', { name: 'Mark read' }).click();
-  await expect(watched).toHaveClass(/read/);
+  await expect(watched).toHaveClass(/(^|\s)read(\s|$)/);
   await expectStill(page, watched, before, 'Mark read');
   await watched.hover();
   await watched.getByRole('button', { name: 'Keep', exact: true }).click();
   await expect(watched.locator('.state')).toHaveText('Kept');
   await expectStill(page, watched, before, 'Keep');
+});
+
+test('a refused Keep says so, goes back, and moves nothing', async ({ page, door }, info) => {
+  test.skip(isPhone(info), 'the same path as the swipe');
+  const { watched } = await reading(page, door);
+  const before = await topOf(watched);
+  door.refuseNext = true;
+  await watched.hover();
+  await watched.getByRole('button', { name: 'Keep', exact: true }).click();
+  await expect(page.locator('.feed-problem')).toContainText('Not saved');
+  await expect(watched.locator('.state'), 'it does not claim to be kept').toHaveCount(0);
+  await expect(watched).toHaveClass(/unread/);
+  await expectStill(page, watched, before, 'a refused Keep');
 });
 
 test('hovering a row moves nothing and takes no room', async ({ page, door }, info) => {

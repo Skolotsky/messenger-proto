@@ -370,15 +370,15 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
           );
         })}
       </nav>
-      {feed.problem && (
-        <div className="feed-problem" role="alert">
-          <span>{feed.problem}</span>
-          <button className="link" onClick={feed.clearProblem}>
-            Dismiss
-          </button>
-        </div>
-      )}
       <div className="feed-wrap">
+        {feed.problem && (
+          <div className="feed-problem" role="alert">
+            <span>{feed.problem}</span>
+            <button className="link" onClick={feed.clearProblem}>
+              Dismiss
+            </button>
+          </div>
+        )}
         <div className="feed-scroll" ref={scroller} onScroll={capture} data-testid="feed">
           {view === 'feed' ? (
             model.phase === 'loading' ? (

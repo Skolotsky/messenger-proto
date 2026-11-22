@@ -103,7 +103,7 @@ test('a row read elsewhere dims in place and does not move', async ({ page, door
   const before = await topOf(target);
   const current = door.rows.find((r) => r.message === 'msg_n1')!;
   door.push([{ kind: 'row.changed', row: { ...current, unread: false } }]);
-  await expect(target).toHaveClass(/read/);
+  await expect(target).toHaveClass(/(^|\s)read(\s|$)/);
   await settled(page);
   expect(Math.abs((await topOf(target)) - before)).toBeLessThan(0.5);
   await expect(pill(page), 'reading elsewhere is not an arrival').toHaveCount(0);

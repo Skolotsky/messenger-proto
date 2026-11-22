@@ -59,7 +59,7 @@ test('a read row stays in place, quiet, until the person moves on (D-003)', asyn
   await start(page);
   const target = page.locator(`[data-row="${KEY('#launch', id)}"]`);
   await target.locator('.row-hit').click({ position: { x: 24, y: 24 } });
-  await expect(target).toHaveClass(/read/);
+  await expect(target).toHaveClass(/(^|\s)read(\s|$)/);
   await expect(target).toBeVisible();
 });
 

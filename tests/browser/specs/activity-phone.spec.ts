@@ -39,7 +39,7 @@ test('swiping right marks read and the row stays in place', async ({ page, door 
   const target = page.locator(`[data-row="${key}"]`);
   const before = await topOf(target);
   await swipe(page, sel, 110);
-  await expect(target).toHaveClass(/read/);
+  await expect(target).toHaveClass(/(^|\s)read(\s|$)/);
   await expect.poll(() => door.sent('read').length).toBe(1);
   expect(door.sent('read')[0]).toMatchObject({ conversation: '#launch', thread: 'msg_n1' });
   expect(door.sent('keep')).toEqual([]);

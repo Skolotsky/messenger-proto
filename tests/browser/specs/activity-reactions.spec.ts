@@ -30,7 +30,7 @@ test('a row takes a reaction without being opened (D-023 points 3, 13), and that
   await expect.poll(() => door.sent('react').length).toBe(1);
   expect(door.sent('react')[0]).toMatchObject({ message: 'msg_n1', emoji: '🚀', on: true });
   await expect(target.locator('.rx', { hasText: '🚀' })).toBeVisible();
-  await expect(target).toHaveClass(/read/);
+  await expect(target).toHaveClass(/(^|\s)read(\s|$)/);
   if (!isPhone(info)) await expect(page.getByRole('region', { name: 'Conversation' }).locator('.conv.none'), 'it did not open').toBeVisible();
 });
 

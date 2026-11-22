@@ -98,6 +98,7 @@ function applyChanged(model: FeedModel, next: FeedRow): FeedModel {
       reactions: reactionsFit(old.row, next) ? next.reactions : old.row.reactions,
     },
     done: old.done && !next.kept,
+    keptNow: old.keptNow && next.kept !== null,
   };
   return { ...model, live, waiting, shown };
 }
