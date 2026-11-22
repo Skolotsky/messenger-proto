@@ -52,7 +52,7 @@ func fillBacklog(t *testing.T, b *rig.Bench) {
 	ctx := context.Background()
 	err := orgdb.InOrg(ctx, orgdb.Single{Pool: b.DB.Conversations}, ids.Org(loud), func(tx pgx.Tx) error {
 		if _, err := tx.Exec(ctx, `INSERT INTO change_log (org, number, at, kind, body)
-			SELECT $1, n, now(), 'tick', jsonb_build_object('kind', 'tick', 'org', $1::text, 'reset', 1, 'number', n, 'previous', n - 1,
+			SELECT $1, n, now(), 'tick', jsonb_build_object('kind', 'tick', 'org', $1::text, 'number', n, 'previous', n - 1,
 				'at', '2026-11-22T10:00:00.000Z')
 			FROM generate_series(1, $2::bigint) n`, loud, backlog); err != nil {
 			return err

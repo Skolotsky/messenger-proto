@@ -90,7 +90,7 @@ func TestSameSeedSameBytes(t *testing.T) {
 }
 
 // pinnedHistory is the SHA-256 of the default history's JSONL.
-const pinnedHistory = "1205cb0d3141aa93b44de1f059e15532fad0a64bb0eac9b16e8ae98e21eae90c"
+const pinnedHistory = "094626e315e3bc94787d40e633aed4d23c946b881cf09bf05d59e17d5341a17d"
 
 func TestHistoryIsAValidLog(t *testing.T) {
 	c := load(t)

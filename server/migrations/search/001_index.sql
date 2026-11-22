@@ -4,7 +4,6 @@
 -- One row per organization: numbers only (G-025).
 CREATE TABLE state (
   org         text PRIMARY KEY,
-  reset       bigint NOT NULL DEFAULT 1,
   through     bigint NOT NULL DEFAULT 0,
   wipe        bigint NOT NULL DEFAULT 0,
   refill_high bigint                       -- while refilling after a wipe: the place it had

@@ -9,6 +9,7 @@ import (
 
 	"contexia/internal/shared/contract"
 	"contexia/internal/shared/ids"
+	"contexia/internal/shared/orgdb"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -20,6 +21,8 @@ func (s *Service) Routes() http.Handler {
 	mux.HandleFunc("GET /orgs/{org}/parked", s.withOrg(s.parked))
 	mux.HandleFunc("POST /orgs/{org}/parked/{number}/retry", s.withOrg(s.retry))
 	mux.HandleFunc("POST /orgs/{org}/receivers/{receiver}/restart", s.withOrg(s.restart))
+	mux.HandleFunc("POST /orgs/{org}/stop", s.withOrg(s.handleStop))
+	mux.HandleFunc("DELETE /orgs/{org}", s.withOrg(s.handleDelete))
 	return mux
 }
 
@@ -147,6 +150,17 @@ func (s *Service) retry(w http.ResponseWriter, r *http.Request, org ids.Org) {
 		refuse(w, http.StatusBadRequest, "no such receiver")
 		return
 	}
+	var halted bool
+	if err := orgdb.InOrg(r.Context(), s.cfg.DB, org, func(tx pgx.Tx) error {
+		return tx.QueryRow(r.Context(), `SELECT EXISTS (SELECT 1 FROM delivery_stopped WHERE org = $1)`, string(org)).Scan(&halted)
+	}); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if halted {
+		refuse(w, http.StatusNotFound, "not parked") // a stopped organization is sent nothing more
+		return
+	}
 	var found bool
 	if l.notes {
 		found, err = l.retryNote(r.Context(), org, number)
@@ -166,15 +180,12 @@ func (s *Service) retry(w http.ResponseWriter, r *http.Request, org ids.Org) {
 
 func (l *lane) retryChange(ctx context.Context, org ids.Org, number int64) (bool, error) {
 	var kind, body string
-	var reset, wipe int64
 	err := l.inOrg(ctx, org, func(tx pgx.Tx) error {
-		return tx.QueryRow(ctx, `SELECT c.kind, c.body::text, l.reset, p.wipe
+		return tx.QueryRow(ctx, `SELECT c.kind, c.body::text
 			FROM delivery_parked n
 			JOIN change_log c ON c.org = n.org AND c.number = n.number
-			JOIN org_log l ON l.org = n.org
-			JOIN delivery_places p ON p.org = n.org AND p.receiver = n.receiver
 			WHERE n.org = $1 AND n.receiver = $2 AND n.number = $3 AND n.tries >= $4`,
-			string(org), l.name, number, triesToPark).Scan(&kind, &body, &reset, &wipe)
+			string(org), l.name, number, triesToPark).Scan(&kind, &body)
 	})
 	if errors.Is(err, pgx.ErrNoRows) {
 		return false, nil
@@ -182,7 +193,7 @@ func (l *lane) retryChange(ctx context.Context, org ids.Org, number int64) (bool
 	if err != nil {
 		return false, err
 	}
-	item, send, err := forSearch(org, reset, number, kind, []byte(body))
+	item, send, err := forSearch(org, number, kind, []byte(body))
 	if err != nil {
 		return true, err
 	}
@@ -217,13 +228,13 @@ func (l *lane) retryChange(ctx context.Context, org ids.Org, number int64) (bool
 
 func (l *lane) retryNote(ctx context.Context, org ids.Org, number int64) (bool, error) {
 	var body string
-	var reset, edition int64
+	var edition int64
 	err := l.inOrg(ctx, org, func(tx pgx.Tx) error {
-		return tx.QueryRow(ctx, `SELECT c.body::text, h.reset, h.edition
+		return tx.QueryRow(ctx, `SELECT c.body::text, h.edition
 			FROM feed.note_parked n
 			JOIN feed.note_heads h ON h.org = n.org AND h.edition = n.edition
 			JOIN feed.note_log c ON c.org = n.org AND c.edition = n.edition AND c.number = n.number
-			WHERE n.org = $1 AND n.number = $2 AND n.tries >= $3`, string(org), number, triesToPark).Scan(&body, &reset, &edition)
+			WHERE n.org = $1 AND n.number = $2 AND n.tries >= $3`, string(org), number, triesToPark).Scan(&body, &edition)
 	})
 	if errors.Is(err, pgx.ErrNoRows) {
 		return false, nil
@@ -231,11 +242,7 @@ func (l *lane) retryNote(ctx context.Context, org ids.Org, number int64) (bool, 
 	if err != nil {
 		return false, err
 	}
-	item, err := stamped([]byte(body), reset)
-	if err != nil {
-		return true, err
-	}
-	o := l.rc.post(ctx, "/notes", item)
+	o := l.rc.post(ctx, "/notes", json.RawMessage(body))
 	pool, err := l.s.cfg.DB.PoolFor(ctx, org)
 	if err != nil {
 		return true, err

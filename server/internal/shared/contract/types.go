@@ -163,7 +163,6 @@ type ConversationSummary struct {
 type ChangeMessageCreated struct {
 	Kind     string  `json:"kind"`
 	Org      string  `json:"org"`
-	Reset    int64   `json:"reset"`
 	Number   int64   `json:"number"`
 	Previous int64   `json:"previous"`
 	At       string  `json:"at"`
@@ -174,7 +173,6 @@ type ChangeMessageCreated struct {
 type ChangeMessageChanged struct {
 	Kind     string  `json:"kind"`
 	Org      string  `json:"org"`
-	Reset    int64   `json:"reset"`
 	Number   int64   `json:"number"`
 	Previous int64   `json:"previous"`
 	At       string  `json:"at"`
@@ -185,7 +183,6 @@ type ChangeMessageChanged struct {
 type ChangeMessageDeleted struct {
 	Kind     string         `json:"kind"`
 	Org      string         `json:"org"`
-	Reset    int64          `json:"reset"`
 	Number   int64          `json:"number"`
 	Previous int64          `json:"previous"`
 	At       string         `json:"at"`
@@ -196,7 +193,6 @@ type ChangeMessageDeleted struct {
 type ChangeReplyStarted struct {
 	Kind         string  `json:"kind"`
 	Org          string  `json:"org"`
-	Reset        int64   `json:"reset"`
 	Number       int64   `json:"number"`
 	Previous     int64   `json:"previous"`
 	At           string  `json:"at"`
@@ -210,7 +206,6 @@ type ChangeReplyStarted struct {
 type ChangeReplyAbandoned struct {
 	Kind         string  `json:"kind"`
 	Org          string  `json:"org"`
-	Reset        int64   `json:"reset"`
 	Number       int64   `json:"number"`
 	Previous     int64   `json:"previous"`
 	At           string  `json:"at"`
@@ -223,7 +218,6 @@ type ChangeReplyAbandoned struct {
 type ChangeReactionAdded struct {
 	Kind         string  `json:"kind"`
 	Org          string  `json:"org"`
-	Reset        int64   `json:"reset"`
 	Number       int64   `json:"number"`
 	Previous     int64   `json:"previous"`
 	At           string  `json:"at"`
@@ -238,7 +232,6 @@ type ChangeReactionAdded struct {
 type ChangeReactionRemoved struct {
 	Kind         string  `json:"kind"`
 	Org          string  `json:"org"`
-	Reset        int64   `json:"reset"`
 	Number       int64   `json:"number"`
 	Previous     int64   `json:"previous"`
 	At           string  `json:"at"`
@@ -253,7 +246,6 @@ type ChangeReactionRemoved struct {
 type ChangePersonJoined struct {
 	Kind     string `json:"kind"`
 	Org      string `json:"org"`
-	Reset    int64  `json:"reset"`
 	Number   int64  `json:"number"`
 	Previous int64  `json:"previous"`
 	At       string `json:"at"`
@@ -266,7 +258,6 @@ type ChangePersonJoined struct {
 type ChangeChannelCreated struct {
 	Kind         string   `json:"kind"`
 	Org          string   `json:"org"`
-	Reset        int64    `json:"reset"`
 	Number       int64    `json:"number"`
 	Previous     int64    `json:"previous"`
 	At           string   `json:"at"`
@@ -279,7 +270,6 @@ type ChangeChannelCreated struct {
 type ChangeChannelPeopleAdded struct {
 	Kind         string   `json:"kind"`
 	Org          string   `json:"org"`
-	Reset        int64    `json:"reset"`
 	Number       int64    `json:"number"`
 	Previous     int64    `json:"previous"`
 	At           string   `json:"at"`
@@ -291,7 +281,6 @@ type ChangeChannelPeopleAdded struct {
 type ChangeDirectCreated struct {
 	Kind         string   `json:"kind"`
 	Org          string   `json:"org"`
-	Reset        int64    `json:"reset"`
 	Number       int64    `json:"number"`
 	Previous     int64    `json:"previous"`
 	At           string   `json:"at"`
@@ -303,7 +292,6 @@ type ChangeDirectCreated struct {
 type ChangeReaderRead struct {
 	Kind         string  `json:"kind"`
 	Org          string  `json:"org"`
-	Reset        int64   `json:"reset"`
 	Number       int64   `json:"number"`
 	Previous     int64   `json:"previous"`
 	At           string  `json:"at"`
@@ -317,7 +305,6 @@ type ChangeReaderRead struct {
 type ChangeReaderWatchingStarted struct {
 	Kind         string  `json:"kind"`
 	Org          string  `json:"org"`
-	Reset        int64   `json:"reset"`
 	Number       int64   `json:"number"`
 	Previous     int64   `json:"previous"`
 	At           string  `json:"at"`
@@ -331,7 +318,6 @@ type ChangeReaderWatchingStarted struct {
 type ChangeReaderWatchingEnded struct {
 	Kind         string  `json:"kind"`
 	Org          string  `json:"org"`
-	Reset        int64   `json:"reset"`
 	Number       int64   `json:"number"`
 	Previous     int64   `json:"previous"`
 	At           string  `json:"at"`
@@ -345,7 +331,6 @@ type ChangeReaderWatchingEnded struct {
 type ChangeReaderKeep struct {
 	Kind         string  `json:"kind"`
 	Org          string  `json:"org"`
-	Reset        int64   `json:"reset"`
 	Number       int64   `json:"number"`
 	Previous     int64   `json:"previous"`
 	At           string  `json:"at"`
@@ -358,7 +343,6 @@ type ChangeReaderKeep struct {
 type ChangeReaderDone struct {
 	Kind         string  `json:"kind"`
 	Org          string  `json:"org"`
-	Reset        int64   `json:"reset"`
 	Number       int64   `json:"number"`
 	Previous     int64   `json:"previous"`
 	At           string  `json:"at"`
@@ -371,7 +355,6 @@ type ChangeReaderDone struct {
 type ChangeReaderDial struct {
 	Kind         string    `json:"kind"`
 	Org          string    `json:"org"`
-	Reset        int64     `json:"reset"`
 	Number       int64     `json:"number"`
 	Previous     int64     `json:"previous"`
 	At           string    `json:"at"`
@@ -385,7 +368,6 @@ type ChangeReaderDial struct {
 type ChangeReaderFocusRule struct {
 	Kind     string    `json:"kind"`
 	Org      string    `json:"org"`
-	Reset    int64     `json:"reset"`
 	Number   int64     `json:"number"`
 	Previous int64     `json:"previous"`
 	At       string    `json:"at"`
@@ -398,7 +380,6 @@ type ChangeReaderFocusRule struct {
 type ChangeReaderFocusPerson struct {
 	Kind     string `json:"kind"`
 	Org      string `json:"org"`
-	Reset    int64  `json:"reset"`
 	Number   int64  `json:"number"`
 	Previous int64  `json:"previous"`
 	At       string `json:"at"`
@@ -411,7 +392,6 @@ type ChangeReaderFocusPerson struct {
 type ChangeReaderFocusAutoAdd struct {
 	Kind     string `json:"kind"`
 	Org      string `json:"org"`
-	Reset    int64  `json:"reset"`
 	Number   int64  `json:"number"`
 	Previous int64  `json:"previous"`
 	At       string `json:"at"`
@@ -423,7 +403,6 @@ type ChangeReaderFocusAutoAdd struct {
 type ChangeReaderFocusOnly struct {
 	Kind     string `json:"kind"`
 	Org      string `json:"org"`
-	Reset    int64  `json:"reset"`
 	Number   int64  `json:"number"`
 	Previous int64  `json:"previous"`
 	At       string `json:"at"`
@@ -435,7 +414,6 @@ type ChangeReaderFocusOnly struct {
 type ChangeReaderReleaseSetting struct {
 	Kind     string `json:"kind"`
 	Org      string `json:"org"`
-	Reset    int64  `json:"reset"`
 	Number   int64  `json:"number"`
 	Previous int64  `json:"previous"`
 	At       string `json:"at"`
@@ -447,7 +425,6 @@ type ChangeReaderReleaseSetting struct {
 type ChangeReaderPreference struct {
 	Kind     string `json:"kind"`
 	Org      string `json:"org"`
-	Reset    int64  `json:"reset"`
 	Number   int64  `json:"number"`
 	Previous int64  `json:"previous"`
 	At       string `json:"at"`
@@ -460,7 +437,6 @@ type ChangeReaderPreference struct {
 type ChangeReaderProfileLine struct {
 	Kind     string `json:"kind"`
 	Org      string `json:"org"`
-	Reset    int64  `json:"reset"`
 	Number   int64  `json:"number"`
 	Previous int64  `json:"previous"`
 	At       string `json:"at"`
@@ -472,7 +448,24 @@ type ChangeReaderProfileLine struct {
 type ChangeTick struct {
 	Kind     string `json:"kind"`
 	Org      string `json:"org"`
-	Reset    int64  `json:"reset"`
+	Number   int64  `json:"number"`
+	Previous int64  `json:"previous"`
+	At       string `json:"at"`
+}
+
+// ChangeSeedOpened is the contract type of the same name.
+type ChangeSeedOpened struct {
+	Kind     string `json:"kind"`
+	Org      string `json:"org"`
+	Number   int64  `json:"number"`
+	Previous int64  `json:"previous"`
+	At       string `json:"at"`
+}
+
+// ChangeSeedSealed is the contract type of the same name.
+type ChangeSeedSealed struct {
+	Kind     string `json:"kind"`
+	Org      string `json:"org"`
 	Number   int64  `json:"number"`
 	Previous int64  `json:"previous"`
 	At       string `json:"at"`
@@ -591,6 +584,14 @@ func (u *Change) UnmarshalJSON(b []byte) error {
 		v, err := decode[ChangeTick](b)
 		u.Value = v
 		return err
+	case "seed.opened":
+		v, err := decode[ChangeSeedOpened](b)
+		u.Value = v
+		return err
+	case "seed.sealed":
+		v, err := decode[ChangeSeedSealed](b)
+		u.Value = v
+		return err
 	}
 	return fmt.Errorf("Change: unknown kind %q", k.Kind)
 }
@@ -612,9 +613,10 @@ type IAmAt struct {
 	IAmAt int64 `json:"i_am_at"`
 }
 
-// StaleReset is the contract type of the same name.
-type StaleReset struct {
-	StaleReset int64 `json:"stale_reset"`
+// OrganizationGone is the contract type of the same name: a retired
+// organization's answer on every door and its last live message (D-033).
+type OrganizationGone struct {
+	OrganizationGone bool `json:"organization_gone"`
 }
 
 // OrganizationStopped is the contract type of the same name.
@@ -901,7 +903,6 @@ type StartAnswer struct {
 	People        []PersonView          `json:"people"`
 	Preferences   []Preference          `json:"preferences"`
 	Conversations []ConversationSummary `json:"conversations"`
-	Reset         int64                 `json:"reset"`
 	Number        int64                 `json:"number"`
 }
 
@@ -1045,7 +1046,6 @@ type FeedCounts struct {
 
 // FeedRowsAnswer is the contract type of the same name.
 type FeedRowsAnswer struct {
-	Reset   int64      `json:"reset"`
 	Edition int64      `json:"edition"`
 	Through int64      `json:"through"`
 	Number  int64      `json:"number"`
@@ -1055,7 +1055,6 @@ type FeedRowsAnswer struct {
 
 // ScreenFeedAnswer is the contract type of the same name.
 type ScreenFeedAnswer struct {
-	Reset   int64       `json:"reset"`
 	Edition *int64      `json:"edition"`
 	Through *int64      `json:"through"`
 	Number  *int64      `json:"number"`
@@ -1177,7 +1176,6 @@ type ReplyText struct {
 
 // ResumeNumbers is the contract type of the same name.
 type ResumeNumbers struct {
-	Reset         int64  `json:"reset"`
 	Conversations int64  `json:"conversations"`
 	Feed          *int64 `json:"feed"`
 	FeedEdition   *int64 `json:"feed_edition"`
@@ -1500,11 +1498,6 @@ type LiveTooFarBehind struct {
 	TooFarBehind Stream `json:"too_far_behind"`
 }
 
-// LiveReset is the contract type of the same name.
-type LiveReset struct {
-	Reset int64 `json:"reset"`
-}
-
 // PieceBody is the contract type of the same name.
 type PieceBody struct {
 	Message string `json:"message"`
@@ -1559,8 +1552,8 @@ func (u *LiveOut) UnmarshalJSON(b []byte) error {
 		u.Value = v
 		return err
 	}
-	if _, ok := keys["reset"]; ok {
-		v, err := decode[LiveReset](b)
+	if _, ok := keys["organization_gone"]; ok {
+		v, err := decode[OrganizationGone](b)
 		u.Value = v
 		return err
 	}
@@ -1587,7 +1580,6 @@ type RowUpdate struct {
 
 // RowUpdatesPage is the contract type of the same name.
 type RowUpdatesPage struct {
-	Reset   int64       `json:"reset"`
 	Updates []RowUpdate `json:"updates"`
 	Next    *int64      `json:"next"`
 }
@@ -1623,7 +1615,6 @@ type SearchDeleted struct {
 type SearchCreated struct {
 	Kind    string        `json:"kind"`
 	Org     string        `json:"org"`
-	Reset   int64         `json:"reset"`
 	Number  int64         `json:"number"`
 	Message SearchMessage `json:"message"`
 }
@@ -1632,7 +1623,6 @@ type SearchCreated struct {
 type SearchChanged struct {
 	Kind    string        `json:"kind"`
 	Org     string        `json:"org"`
-	Reset   int64         `json:"reset"`
 	Number  int64         `json:"number"`
 	Message SearchMessage `json:"message"`
 }
@@ -1641,7 +1631,6 @@ type SearchChanged struct {
 type SearchDeletedChange struct {
 	Kind    string        `json:"kind"`
 	Org     string        `json:"org"`
-	Reset   int64         `json:"reset"`
 	Number  int64         `json:"number"`
 	Message SearchDeleted `json:"message"`
 }
@@ -1692,7 +1681,6 @@ type SearchRefusal struct {
 type NoteDue struct {
 	Kind     string `json:"kind"`
 	Org      string `json:"org"`
-	Reset    int64  `json:"reset"`
 	Number   int64  `json:"number"`
 	Previous int64  `json:"previous"`
 	Edition  int64  `json:"edition"`
@@ -1709,7 +1697,6 @@ type NoteDue struct {
 type NoteChanged struct {
 	Kind     string `json:"kind"`
 	Org      string `json:"org"`
-	Reset    int64  `json:"reset"`
 	Number   int64  `json:"number"`
 	Previous int64  `json:"previous"`
 	Edition  int64  `json:"edition"`
@@ -1722,7 +1709,6 @@ type NoteChanged struct {
 type NoteWithdrawn struct {
 	Kind     string         `json:"kind"`
 	Org      string         `json:"org"`
-	Reset    int64          `json:"reset"`
 	Number   int64          `json:"number"`
 	Previous int64          `json:"previous"`
 	Edition  int64          `json:"edition"`
@@ -1735,7 +1721,6 @@ type NoteWithdrawn struct {
 type NoteClock struct {
 	Kind     string `json:"kind"`
 	Org      string `json:"org"`
-	Reset    int64  `json:"reset"`
 	Number   int64  `json:"number"`
 	Previous int64  `json:"previous"`
 	Edition  int64  `json:"edition"`
@@ -1804,7 +1789,6 @@ type AgentEventMentioned struct {
 	Kind       string  `json:"kind"`
 	Org        string  `json:"org"`
 	Number     int64   `json:"number"`
-	Reset      int64   `json:"reset"`
 	AgentChain int64   `json:"agent_chain"`
 	Message    Message `json:"message"`
 }
@@ -1814,7 +1798,6 @@ type AgentEventDirectMessage struct {
 	Kind       string  `json:"kind"`
 	Org        string  `json:"org"`
 	Number     int64   `json:"number"`
-	Reset      int64   `json:"reset"`
 	AgentChain int64   `json:"agent_chain"`
 	Message    Message `json:"message"`
 }
@@ -1824,7 +1807,6 @@ type AgentEventReply struct {
 	Kind       string  `json:"kind"`
 	Org        string  `json:"org"`
 	Number     int64   `json:"number"`
-	Reset      int64   `json:"reset"`
 	AgentChain int64   `json:"agent_chain"`
 	Message    Message `json:"message"`
 }
@@ -1834,7 +1816,6 @@ type AgentEventChanged struct {
 	Kind       string  `json:"kind"`
 	Org        string  `json:"org"`
 	Number     int64   `json:"number"`
-	Reset      int64   `json:"reset"`
 	AgentChain int64   `json:"agent_chain"`
 	Message    Message `json:"message"`
 }
@@ -1844,7 +1825,6 @@ type AgentEventDeleted struct {
 	Kind       string  `json:"kind"`
 	Org        string  `json:"org"`
 	Number     int64   `json:"number"`
-	Reset      int64   `json:"reset"`
 	AgentChain int64   `json:"agent_chain"`
 	Message    Message `json:"message"`
 }
@@ -1854,7 +1834,6 @@ type AgentEventReaction struct {
 	Kind       string  `json:"kind"`
 	Org        string  `json:"org"`
 	Number     int64   `json:"number"`
-	Reset      int64   `json:"reset"`
 	AgentChain int64   `json:"agent_chain"`
 	Message    Message `json:"message"`
 	By         string  `json:"by"`
@@ -1905,7 +1884,6 @@ func (u *AgentEvent) UnmarshalJSON(b []byte) error {
 
 // AgentEvents is the contract type of the same name.
 type AgentEvents struct {
-	Reset        int64        `json:"reset"`
 	ContinueFrom *int64       `json:"continue_from"`
 	Events       []AgentEvent `json:"events"`
 }
@@ -1985,21 +1963,18 @@ type AgentDirectAnswer struct {
 
 // FeedPlace is the contract type of the same name.
 type FeedPlace struct {
-	Reset   int64 `json:"reset"`
 	Through int64 `json:"through"`
 	Edition int64 `json:"edition"`
 }
 
 // SearchPlace is the contract type of the same name.
 type SearchPlace struct {
-	Reset   int64 `json:"reset"`
 	Through int64 `json:"through"`
 	Wipe    int64 `json:"wipe"`
 }
 
 // SenderPlace is the contract type of the same name.
 type SenderPlace struct {
-	Reset   int64 `json:"reset"`
 	Through int64 `json:"through"`
 	Edition int64 `json:"edition"`
 }
@@ -2093,6 +2068,31 @@ type SeedOpened struct {
 	Session string `json:"session"`
 }
 
+// SeedOpenRequest is the contract type of the same name.
+type SeedOpenRequest struct {
+	Name *string `json:"name,omitempty"`
+}
+
+// CurrentOrganization is the contract type of the same name.
+type CurrentOrganization struct {
+	Org  string `json:"org"`
+	Name string `json:"name"`
+}
+
+// OrganizationEntry is the contract type of the same name.
+type OrganizationEntry struct {
+	Org           string `json:"org"`
+	Name          string `json:"name"`
+	State         string `json:"state"`
+	CreatedAt     string `json:"created_at"`
+	ApproxChanges int64  `json:"approx_changes"`
+}
+
+// OrganizationList is the contract type of the same name.
+type OrganizationList struct {
+	Organizations []OrganizationEntry `json:"organizations"`
+}
+
 // SeedBatch is the contract type of the same name.
 type SeedBatch struct {
 	Changes []Change `json:"changes"`
@@ -2153,10 +2153,16 @@ var Types = map[string]func([]byte) (any, error){
 	"ChangeReaderPreference":      func(b []byte) (any, error) { return decode[ChangeReaderPreference](b) },
 	"ChangeReaderProfileLine":     func(b []byte) (any, error) { return decode[ChangeReaderProfileLine](b) },
 	"ChangeTick":                  func(b []byte) (any, error) { return decode[ChangeTick](b) },
+	"ChangeSeedOpened":            func(b []byte) (any, error) { return decode[ChangeSeedOpened](b) },
+	"ChangeSeedSealed":            func(b []byte) (any, error) { return decode[ChangeSeedSealed](b) },
+	"SeedOpenRequest":             func(b []byte) (any, error) { return decode[SeedOpenRequest](b) },
+	"CurrentOrganization":         func(b []byte) (any, error) { return decode[CurrentOrganization](b) },
+	"OrganizationEntry":           func(b []byte) (any, error) { return decode[OrganizationEntry](b) },
+	"OrganizationList":            func(b []byte) (any, error) { return decode[OrganizationList](b) },
 	"ChangeBatch":                 func(b []byte) (any, error) { return decode[ChangeBatch](b) },
 	"ChangeApplied":               func(b []byte) (any, error) { return decode[ChangeApplied](b) },
 	"IAmAt":                       func(b []byte) (any, error) { return decode[IAmAt](b) },
-	"StaleReset":                  func(b []byte) (any, error) { return decode[StaleReset](b) },
+	"OrganizationGone":            func(b []byte) (any, error) { return decode[OrganizationGone](b) },
 	"OrganizationStopped":         func(b []byte) (any, error) { return decode[OrganizationStopped](b) },
 	"NewMessage":                  func(b []byte) (any, error) { return decode[NewMessage](b) },
 	"ActionSend":                  func(b []byte) (any, error) { return decode[ActionSend](b) },
@@ -2234,7 +2240,6 @@ var Types = map[string]func([]byte) (any, error){
 	"LastSentNumbers":             func(b []byte) (any, error) { return decode[LastSentNumbers](b) },
 	"LiveLastSent":                func(b []byte) (any, error) { return decode[LiveLastSent](b) },
 	"LiveTooFarBehind":            func(b []byte) (any, error) { return decode[LiveTooFarBehind](b) },
-	"LiveReset":                   func(b []byte) (any, error) { return decode[LiveReset](b) },
 	"PieceBody":                   func(b []byte) (any, error) { return decode[PieceBody](b) },
 	"LivePiece":                   func(b []byte) (any, error) { return decode[LivePiece](b) },
 	"AgentStatusBody":             func(b []byte) (any, error) { return decode[AgentStatusBody](b) },

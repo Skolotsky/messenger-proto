@@ -37,7 +37,7 @@ func changeSchema(t *testing.T) *jsonschema.Schema {
 
 func TestEveryEntryIsAValidChangeInOrder(t *testing.T) {
 	s := changeSchema(t)
-	log := Write(Config{Orgs: []string{"acme"}, Seed: 7, Changes: 3000, Reset: 2})["acme"]
+	log := Write(Config{Orgs: []string{"acme"}, Seed: 7, Changes: 3000})["acme"]
 	if len(log) < 3000 {
 		t.Fatalf("wrote %d", len(log))
 	}
@@ -57,12 +57,12 @@ func TestEveryEntryIsAValidChangeInOrder(t *testing.T) {
 			t.Fatalf("entry %d does not decode: %v", i, err)
 		}
 		var head struct {
-			Number, Previous, Reset int64
-			At                      string
-			Message                 json.RawMessage
+			Number, Previous int64
+			At               string
+			Message          json.RawMessage
 		}
 		_ = json.Unmarshal(e.JSON, &head)
-		if head.Number != int64(i+1) || head.Previous != int64(i) || head.Reset != 2 {
+		if head.Number != int64(i+1) || head.Previous != int64(i) {
 			t.Fatalf("entry %d is numbered %d after %d", i, head.Number, head.Previous)
 		}
 		if head.At < last {
@@ -108,7 +108,7 @@ func TestEveryKindAppears(t *testing.T) {
 				Ref string `json:"$ref"`
 			} `json:"oneOf"`
 			Properties map[string]struct {
-				Const string `json:"const"`
+				Const any `json:"const"` // not always text: organization_gone is the constant true
 			} `json:"properties"`
 		} `json:"$defs"`
 	}
@@ -116,7 +116,7 @@ func TestEveryKindAppears(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, m := range doc.Defs["Change"].OneOf {
-		kind := doc.Defs[strings.TrimPrefix(m.Ref, "#/$defs/")].Properties["kind"].Const
+		kind, _ := doc.Defs[strings.TrimPrefix(m.Ref, "#/$defs/")].Properties["kind"].Const.(string)
 		if !seen[kind] {
 			t.Errorf("the log writer never writes %s", kind)
 		}

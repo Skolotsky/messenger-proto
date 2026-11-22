@@ -7,11 +7,11 @@
 -- commit in order and a reader never steps over one (G-005).
 CREATE TABLE org_log (
   org            text PRIMARY KEY,
-  reset          bigint NOT NULL DEFAULT 1,
   head           bigint NOT NULL DEFAULT 0,
   head_at        timestamptz,
   last_change_at timestamptz,          -- newest entry that is not a tick
-  tick_due_at    timestamptz           -- null when no tick is due
+  tick_due_at    timestamptz,          -- null when no tick is due
+  retired_at     timestamptz           -- set once: accepts nothing more (D-033)
 );
 CREATE INDEX org_log_tick_due ON org_log (tick_due_at) WHERE tick_due_at IS NOT NULL;
 
@@ -44,7 +44,6 @@ CREATE TABLE delivery_places (
   org           text NOT NULL REFERENCES org_log (org),
   receiver      text NOT NULL CHECK (receiver IN ('search', 'feed')),
   place         bigint NOT NULL DEFAULT 0,
-  reset         bigint NOT NULL DEFAULT 1,
   wipe          bigint NOT NULL DEFAULT 0,
   claimed_by    text,
   claimed_until timestamptz,
@@ -71,5 +70,11 @@ CREATE TABLE delivery_receivers (
   failures      int NOT NULL DEFAULT 0
 );
 
+-- Organizations delivery has been told to stop for (D-033). Read per
+-- organization at the start of a pass, never scanned (G-029).
+CREATE TABLE delivery_stopped (
+  org text PRIMARY KEY
+);
+
 GRANT SELECT ON org_log, change_log TO delivery;
-GRANT SELECT, INSERT, UPDATE, DELETE ON delivery_due, delivery_places, delivery_parked, delivery_receivers TO delivery;
+GRANT SELECT, INSERT, UPDATE, DELETE ON delivery_due, delivery_places, delivery_parked, delivery_receivers, delivery_stopped TO delivery;

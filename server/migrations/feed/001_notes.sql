@@ -4,7 +4,6 @@
 
 CREATE TABLE note_heads (
   org     text PRIMARY KEY,
-  reset   bigint NOT NULL DEFAULT 1,
   edition bigint NOT NULL DEFAULT 1,
   head    bigint NOT NULL DEFAULT 0
 );
@@ -34,7 +33,6 @@ CREATE TABLE note_places (
   org           text PRIMARY KEY,
   edition       bigint NOT NULL DEFAULT 1,
   place         bigint NOT NULL DEFAULT 0,
-  reset         bigint NOT NULL DEFAULT 1,
   claimed_by    text,
   claimed_until timestamptz,
   stopped_at    bigint                   -- a refused note holds this organization's notes here

@@ -163,13 +163,13 @@ func message(org string, n, version int64, id, text string, thread *string, part
 	if version > 1 {
 		kind, edited = "message.changed", true
 	}
-	return map[string]any{"kind": kind, "org": org, "reset": 1, "number": n + version - 1, "message": map[string]any{
+	return map[string]any{"kind": kind, "org": org, "number": n + version - 1, "message": map[string]any{
 		"id": id, "number": n, "created_at": "2026-11-22T09:00:00.000Z", "version": version, "conversation": "#launch", "thread": thread,
 		"edited": edited, "participants": participants, "author": "anna", "text": text, "mentions": []string{}, "level": nil}}
 }
 
 func remove(org string, n, version int64, id string) map[string]any {
-	return map[string]any{"kind": "message.deleted", "org": org, "reset": 1, "number": n, "message": map[string]any{"id": id, "version": version}}
+	return map[string]any{"kind": "message.deleted", "org": org, "number": n, "message": map[string]any{"id": id, "version": version}}
 }
 
 func search(r *rig.Rig, org, q, as, after string) contract.SearchAnswer {
@@ -250,20 +250,8 @@ func TestSearchContract(t *testing.T) {
 			t.Fatalf("second page: total %d, %d shown", two.Total, len(two.Results))
 		}
 	})
-	t.Run("a stale reset is answered with the current one", func(t *testing.T) {
-		newer := message(org, 200, 1, "r1", "after reset", nil, nil)
-		newer["reset"] = 3
-		mustApply(newer)
-		a := post(message(org, 201, 1, "r2", "before reset", nil, nil))
-		var ans contract.StaleReset
-		_ = json.Unmarshal(a.Body, &ans)
-		if a.Status != http.StatusConflict || ans.StaleReset != 3 {
-			t.Errorf("status %d: %s", a.Status, a.Body)
-		}
-	})
 	t.Run("a refusal carries the wipe number", func(t *testing.T) {
 		bad := message(org, 300, 1, "x", "text", nil, nil)
-		bad["reset"] = 3
 		bad["kind"] = "message.unknown"
 		a := post(bad)
 		var ans contract.SearchRefusal

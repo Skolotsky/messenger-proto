@@ -38,7 +38,6 @@ type Step struct {
 	ctx     context.Context
 	Tx      pgx.Tx
 	org     ids.Org
-	reset   int64
 	head    int64
 	headAt  *time.Time
 	at      time.Time
@@ -66,16 +65,24 @@ func (s *Store) open(ctx context.Context, tx pgx.Tx, org ids.Org) (*Step, error)
 	step := &Step{ctx: ctx, Tx: tx, org: org}
 	if plainSequence {
 		// Test-only fault for G-005: no lock, so numbers can commit out of order.
-		if err := tx.QueryRow(ctx, `SELECT reset FROM org_log WHERE org = $1`, string(org)).Scan(&step.reset); err != nil {
+		var retired *time.Time
+		if err := tx.QueryRow(ctx, `SELECT retired_at FROM org_log WHERE org = $1`, string(org)).Scan(&retired); err != nil {
 			return nil, unknownOrg(err)
+		}
+		if retired != nil {
+			return nil, ErrOrganizationGone
 		}
 		step.at = s.Clock.Now().UTC().Truncate(time.Millisecond)
 		return step, nil
 	}
-	err := tx.QueryRow(ctx, `SELECT reset, head, head_at FROM org_log WHERE org = $1 FOR UPDATE`, string(org)).
-		Scan(&step.reset, &step.head, &step.headAt)
+	var retired *time.Time
+	err := tx.QueryRow(ctx, `SELECT head, head_at, retired_at FROM org_log WHERE org = $1 FOR UPDATE`, string(org)).
+		Scan(&step.head, &step.headAt, &retired)
 	if err != nil {
 		return nil, unknownOrg(err)
+	}
+	if retired != nil {
+		return nil, ErrOrganizationGone // under the lock Retire takes, so no save slips past it
 	}
 	step.at = s.Clock.Now().UTC().Truncate(time.Millisecond)
 	if step.headAt != nil && step.headAt.After(step.at) {
@@ -120,7 +127,7 @@ func (s *Step) Append(change any) (int64, error) {
 		previous = number - 1
 	}
 	stamp := s.At()
-	for k, v := range map[string]any{"org": string(s.org), "reset": s.reset, "number": number, "previous": previous, "at": stamp} {
+	for k, v := range map[string]any{"org": string(s.org), "number": number, "previous": previous, "at": stamp} {
 		b, _ := json.Marshal(v)
 		fields[k] = b
 	}

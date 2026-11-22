@@ -156,7 +156,8 @@ CREATE TABLE action_answers (
 CREATE TABLE seed_sessions (
   org     text PRIMARY KEY,
   session text NOT NULL,
-  sealed  boolean NOT NULL DEFAULT false
+  sealed  boolean NOT NULL DEFAULT false,
+  name    text                           -- the display name; without one, the organization's ID
 );
 
 -- G-004: a fact changes only in a transaction that also wrote the log entry.
@@ -168,6 +169,11 @@ DECLARE
   o text;
 BEGIN
   IF TG_OP = 'DELETE' THEN o := OLD.org; ELSE o := NEW.org; END IF;
+  -- Deleting a retired organization (D-033) is the one change with no log entry:
+  -- the log goes with it. Its row is retired, or already gone in this transaction.
+  IF TG_OP = 'DELETE' AND NOT EXISTS (SELECT 1 FROM org_log l WHERE l.org = o AND l.retired_at IS NULL) THEN
+    RETURN NULL;
+  END IF;
   IF NOT EXISTS (
     SELECT 1 FROM org_log l
     JOIN change_log c ON c.org = l.org AND c.number = l.head

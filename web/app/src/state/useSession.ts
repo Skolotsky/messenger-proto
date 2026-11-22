@@ -102,9 +102,8 @@ export function useSession(person: string): Session {
       .then((start) => {
         if (cancelled) return;
         dispatch({ type: 'started', start });
-        live = connectLive(person, start.reset, start.number, {
+        live = connectLive(person, start.number, {
           onParts: (parts) => dispatch({ type: 'parts', parts, me: person, open: openRef.current }),
-          onReset: () => dispatch({ type: 'reload' }),
           onConnected: (connected) => dispatch({ type: 'connected', connected }),
         });
       })

@@ -22,7 +22,6 @@ type Config struct {
 	Orgs    []string // the same content for each: same names, IDs and numbers
 	Seed    int64
 	Changes int // at least the opening script, which uses every kind once
-	Reset   int64
 	Start   time.Time
 }
 
@@ -43,7 +42,6 @@ type message struct {
 
 type writer struct {
 	org    string
-	reset  int64
 	rng    *rand.Rand
 	now    time.Time
 	number int64
@@ -73,7 +71,7 @@ func Write(c Config) map[string][]Entry {
 	}
 	out := map[string][]Entry{}
 	for _, org := range c.Orgs {
-		w := &writer{org: org, reset: c.Reset, rng: rand.New(rand.NewSource(c.Seed)), now: c.Start}
+		w := &writer{org: org, rng: rand.New(rand.NewSource(c.Seed)), now: c.Start}
 		w.opening()
 		for len(w.out) < c.Changes {
 			w.step()
@@ -92,7 +90,6 @@ func (w *writer) emitAtNow(kind string, fields map[string]any) int64 {
 	w.number++
 	fields["kind"] = kind
 	fields["org"] = w.org
-	fields["reset"] = w.reset
 	fields["number"] = w.number
 	fields["previous"] = w.number - 1
 	fields["at"] = w.stamp()
@@ -157,6 +154,7 @@ func isAgent(p string) bool {
 }
 
 func (w *writer) opening() {
+	w.emitAtNow("seed.opened", map[string]any{})
 	for _, p := range people {
 		w.emit("person.joined", map[string]any{"person": p, "name": p, "is_agent": false})
 	}
@@ -197,6 +195,9 @@ func (w *writer) opening() {
 	w.emit("reader.preference", map[string]any{"person": "marco", "key": "send_key", "value": "enter"})
 	w.emit("reader.profile_line", map[string]any{"person": "marco", "text": "Pricing and launch"})
 	w.emit("tick", map[string]any{})
+	// The opening stands for the seeded start: it ends the way a seed session does.
+	// At the same time as the entry before it, so the times that follow do not move.
+	w.emitAtNow("seed.sealed", map[string]any{})
 }
 
 func merge(a, b map[string]any) map[string]any {

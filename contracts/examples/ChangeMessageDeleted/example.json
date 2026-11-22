@@ -1,7 +1,6 @@
 {
  "kind": "message.deleted",
  "org": "acme",
- "reset": 2,
  "number": 4855,
  "previous": 4854,
  "at": "2026-11-22T10:14:03.120Z",

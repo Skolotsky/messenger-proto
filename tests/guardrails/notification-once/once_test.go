@@ -139,7 +139,7 @@ func TestEditions(t *testing.T) {
 	}
 }
 
-func TestGapStaleResetRefusalAndOrganizations(t *testing.T) {
+func TestGapRefusalAndOrganizations(t *testing.T) {
 	r := rig.New(t, "sender", 3)
 	org, other := rig.NewOrg("gaps"), rig.NewOrg("gaps")
 	b := &rig.Builder{Org: org, Edition: 1}
@@ -166,20 +166,6 @@ func TestGapStaleResetRefusalAndOrganizations(t *testing.T) {
 	_ = json.Unmarshal(repeat.Body, &taken)
 	if repeat.Status != http.StatusOK || taken.Already == nil || !*taken.Already {
 		t.Errorf("a repeat: status %d: %s", repeat.Status, repeat.Body)
-	}
-
-	stale := map[string]any{}
-	for k, v := range b.Notes[0].Body {
-		stale[k] = v
-	}
-	newer := &rig.Builder{Org: org, Edition: 1, Notes: b.Notes}
-	newer.Add("clock", "", rig.Start.Add(3*time.Second), map[string]any{"reset": 5})
-	rig.DeliverNotes(t, r.Direct, newer.Notes[3:])
-	a = rig.Do(r.Direct, "POST", "/notes", stale, time.Second)
-	var sr contract.StaleReset
-	_ = json.Unmarshal(a.Body, &sr)
-	if a.Status != http.StatusConflict || sr.StaleReset != 5 {
-		t.Errorf("a stale reset: status %d: %s", a.Status, a.Body)
 	}
 
 	foreign := map[string]any{}

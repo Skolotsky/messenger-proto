@@ -92,14 +92,14 @@ func loadReactions(ctx context.Context, tx pgx.Tx, org ids.Org, messages []strin
 // question runs fn while saves of this organization wait, so what it reads and
 // the log number it answers with belong together. Saves commit in number order
 // under this same row, so nothing can fall between the two.
-func (s *Store) question(ctx context.Context, org ids.Org, fn func(tx pgx.Tx, reset, head int64) error) error {
+func (s *Store) question(ctx context.Context, org ids.Org, fn func(tx pgx.Tx, head int64) error) error {
 	return orgdb.InOrg(ctx, s.Dir, org, func(tx pgx.Tx) error {
-		var reset, head int64
-		err := tx.QueryRow(ctx, `SELECT reset, head FROM org_log WHERE org = $1 FOR SHARE`, string(org)).Scan(&reset, &head)
+		var head int64
+		err := tx.QueryRow(ctx, `SELECT head FROM org_log WHERE org = $1 FOR SHARE`, string(org)).Scan(&head)
 		if err != nil {
 			return unknownOrg(err)
 		}
-		return fn(tx, reset, head)
+		return fn(tx, head)
 	})
 }
 
@@ -124,7 +124,7 @@ func loadPeople(ctx context.Context, tx pgx.Tx, org ids.Org, where string, args 
 // People is the operators' list of everyone in the organization.
 func (s *Store) People(ctx context.Context, org ids.Org) (contract.PeopleList, error) {
 	var out contract.PeopleList
-	err := s.question(ctx, org, func(tx pgx.Tx, _, _ int64) error {
+	err := s.question(ctx, org, func(tx pgx.Tx, _ int64) error {
 		var err error
 		out.People, err = loadPeople(ctx, tx, org, `ORDER BY name, id`)
 		return err
@@ -135,9 +135,15 @@ func (s *Store) People(ctx context.Context, org ids.Org) (contract.PeopleList, e
 // Start is a screen's first full load for the conversations stream.
 func (s *Store) Start(ctx context.Context, org ids.Org, person string) (contract.StartAnswer, error) {
 	out := contract.StartAnswer{Org: string(org), OrgName: string(org)}
-	err := s.question(ctx, org, func(tx pgx.Tx, reset, _ int64) error {
-		out.Reset = reset
-		var err error
+	err := s.question(ctx, org, func(tx pgx.Tx, _ int64) error {
+		var display *string
+		err := tx.QueryRow(ctx, `SELECT name FROM seed_sessions WHERE org = $1`, string(org)).Scan(&display)
+		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+			return err
+		}
+		if display != nil {
+			out.OrgName = *display
+		}
 		if out.People, err = loadPeople(ctx, tx, org, `ORDER BY name, id`); err != nil {
 			return err
 		}
@@ -264,7 +270,7 @@ func (s *Store) Messages(ctx context.Context, org ids.Org, q MessagesQuery) (con
 		q.Limit = defaultMessages
 	}
 	q.Limit = min(q.Limit, maxMessages)
-	err := s.question(ctx, org, func(tx pgx.Tx, _, head int64) error {
+	err := s.question(ctx, org, func(tx pgx.Tx, head int64) error {
 		out.Number = head
 		var exists bool
 		if err := tx.QueryRow(ctx, `SELECT EXISTS (SELECT 1 FROM conversations WHERE org = $1 AND id = $2)`, string(org), q.Conversation).Scan(&exists); err != nil {
@@ -471,7 +477,7 @@ func (s *Store) Suggest(ctx context.Context, org ids.Org, q, as string) (contrac
 	text := strings.ToLower(strings.TrimSpace(q))
 	out := contract.SuggestAnswer{Everyone: strings.HasPrefix("channel", text)}
 	like := strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`).Replace(text) + "%"
-	err := s.question(ctx, org, func(tx pgx.Tx, _, _ int64) error {
+	err := s.question(ctx, org, func(tx pgx.Tx, _ int64) error {
 		var err error
 		out.People, err = loadPeople(ctx, tx, org,
 			`AND id <> $2 AND (lower(name) LIKE $3 OR lower(id) LIKE $3 OR lower(name) LIKE '% ' || $3) ORDER BY name, id LIMIT `+strconv.Itoa(maxSuggestions),

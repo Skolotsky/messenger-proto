@@ -104,16 +104,16 @@ type NoteDraft struct {
 }
 
 // Contract gives the note its place in the feed's numbered log.
-func (n NoteDraft) Contract(org string, reset, number, previous, edition int64) contract.Note {
+func (n NoteDraft) Contract(org string, number, previous, edition int64) contract.Note {
 	switch n.Kind {
 	case "due":
-		return contract.Note{Value: contract.NoteDue{Kind: "due", Org: org, Reset: reset, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name, Row: n.Row, Person: n.Person, Bucket: n.Bucket, Why: n.Why, Text: n.Text}}
+		return contract.Note{Value: contract.NoteDue{Kind: "due", Org: org, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name, Row: n.Row, Person: n.Person, Bucket: n.Bucket, Why: n.Why, Text: n.Text}}
 	case "changed":
-		return contract.Note{Value: contract.NoteChanged{Kind: "changed", Org: org, Reset: reset, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name, Text: n.Text}}
+		return contract.Note{Value: contract.NoteChanged{Kind: "changed", Org: org, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name, Text: n.Text}}
 	case "withdrawn":
-		return contract.Note{Value: contract.NoteWithdrawn{Kind: "withdrawn", Org: org, Reset: reset, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name, Because: n.Because}}
+		return contract.Note{Value: contract.NoteWithdrawn{Kind: "withdrawn", Org: org, Number: number, Previous: previous, Edition: edition, At: n.At, Name: n.Name, Because: n.Because}}
 	}
-	return contract.Note{Value: contract.NoteClock{Kind: "clock", Org: org, Reset: reset, Number: number, Previous: previous, Edition: edition, At: n.At}}
+	return contract.Note{Value: contract.NoteClock{Kind: "clock", Org: org, Number: number, Previous: previous, Edition: edition, At: n.At}}
 }
 
 // Engine is the rules' state for one organization.
@@ -123,6 +123,10 @@ type Engine struct {
 	convs   map[string]*conv
 	people  map[string]*person
 	readers []string // people who are not agents, sorted
+	// seeding: between the log's seed.opened and seed.sealed no notes are written
+	// (D-033). Written only by those organization-wide changes, which nothing
+	// else is applied beside.
+	seeding bool
 }
 
 // New gives an empty organization.
@@ -393,6 +397,10 @@ func header(c contract.Change) (number int64, at string, err error) {
 		return v.Number, v.At, nil
 	case contract.ChangeTick:
 		return v.Number, v.At, nil
+	case contract.ChangeSeedOpened:
+		return v.Number, v.At, nil
+	case contract.ChangeSeedSealed:
+		return v.Number, v.At, nil
 	}
 	return 0, "", cannot("unknown change %T", c.Value)
 }
@@ -402,7 +410,8 @@ func header(c contract.Change) (number int64, at string, err error) {
 func IsOrgWide(c contract.Change) bool {
 	switch c.Value.(type) {
 	case contract.ChangeReaderFocusRule, contract.ChangeReaderFocusPerson, contract.ChangeReaderFocusAutoAdd,
-		contract.ChangeReaderFocusOnly, contract.ChangeReaderReleaseSetting, contract.ChangePersonJoined, contract.ChangeTick:
+		contract.ChangeReaderFocusOnly, contract.ChangeReaderReleaseSetting, contract.ChangePersonJoined, contract.ChangeTick,
+		contract.ChangeSeedOpened, contract.ChangeSeedSealed:
 		return true
 	}
 	return false
@@ -418,7 +427,7 @@ func (e *Engine) Apply(c contract.Change, opt Options) (Effects, error) {
 	if err != nil {
 		return Effects{}, cannot("change %d has a bad time %q", number, atText)
 	}
-	f := &fx{number: number, atText: atText, at: at, noNotes: opt.NoNotes,
+	f := &fx{number: number, atText: atText, at: at, noNotes: opt.NoNotes || e.seeding,
 		touched: map[string]map[string]map[rowKey]bool{}, readers: map[string]bool{}}
 	known, err := e.dispatch(c, f)
 	if err != nil {
@@ -527,6 +536,12 @@ func (e *Engine) dispatch(c contract.Change, f *fx) (bool, error) {
 		if !f.noNotes {
 			f.notes = append(f.notes, NoteDraft{Kind: "clock", At: f.atText})
 		}
+		return true, nil
+	case contract.ChangeSeedOpened:
+		e.seeding = true
+		return true, nil
+	case contract.ChangeSeedSealed:
+		e.seeding = false
 		return true, nil
 	}
 	return false, nil // reply.started, reply.abandoned, reader.preference, reader.profile_line: counted, no effect

@@ -14,10 +14,10 @@ import (
 
 // spot is what a turn knows of one organization for this receiver.
 type spot struct {
-	head, orgReset, orgEdition  int64
-	place, reset, wipe, edition int64
-	refusals                    int
-	paused                      bool
+	head, orgEdition     int64
+	place, wipe, edition int64
+	refusals             int
+	paused               bool
 }
 
 type entry struct {
@@ -38,6 +38,14 @@ const (
 // turn serves one claimed organization until it is level, its budget is spent
 // or half its claim has passed.
 func (l *lane) turn(ctx context.Context, pool *pgxpool.Pool, org ids.Org, failures int) {
+	if !l.s.enter(org) {
+		if err := l.dropDue(ctx, pool, org); err != nil && ctx.Err() == nil {
+			slog.Warn("delivery cannot drop a stopped organization", "receiver", l.name, "org", org, "err", err)
+		}
+		l.release(ctx, pool, org)
+		return
+	}
+	defer l.s.leave(org)
 	start := l.s.cfg.Clock.Now()
 	result := again
 	for spent := 0; result == again && spent < turnBudget; spent += batchSize {
@@ -61,9 +69,12 @@ func (l *lane) turn(ctx context.Context, pool *pgxpool.Pool, org ids.Org, failur
 func (l *lane) pass(ctx context.Context, pool *pgxpool.Pool, org ids.Org, failures *int) (after, error) {
 	var s spot
 	var items []entry
-	found := true
+	found, stopped := true, false
 	err := l.inOrg(ctx, org, func(tx pgx.Tx) error {
-		var err error
+		err := tx.QueryRow(ctx, `SELECT EXISTS (SELECT 1 FROM delivery_stopped WHERE org = $1)`, string(org)).Scan(&stopped)
+		if err != nil || stopped {
+			return err
+		}
 		s, err = l.load(ctx, tx, org)
 		if errors.Is(err, pgx.ErrNoRows) {
 			found = false
@@ -72,7 +83,7 @@ func (l *lane) pass(ctx context.Context, pool *pgxpool.Pool, org ids.Org, failur
 		if err != nil {
 			return err
 		}
-		if s.reset != s.orgReset || (l.notes && s.edition != s.orgEdition) || s.paused || s.place >= s.head {
+		if (l.notes && s.edition != s.orgEdition) || s.paused || s.place >= s.head {
 			return nil
 		}
 		items, err = l.read(ctx, tx, org, s)
@@ -82,10 +93,10 @@ func (l *lane) pass(ctx context.Context, pool *pgxpool.Pool, org ids.Org, failur
 		return holdOff, err
 	}
 	switch {
+	case stopped:
+		return finish, l.dropDue(ctx, pool, org)
 	case !found || s.paused:
 		return finish, nil
-	case s.reset != s.orgReset:
-		return l.resync(ctx, pool, org, s)
 	case l.notes && s.edition != s.orgEdition:
 		return again, l.newEdition(ctx, pool, org, s)
 	case s.place >= s.head:
@@ -111,15 +122,15 @@ func (l *lane) load(ctx context.Context, tx pgx.Tx, org ids.Org) (spot, error) {
 	var s spot
 	if l.notes {
 		var stopped *int64
-		err := tx.QueryRow(ctx, `SELECT h.head, h.reset, h.edition, p.place, p.reset, p.edition, p.stopped_at
+		err := tx.QueryRow(ctx, `SELECT h.head, h.edition, p.place, p.edition, p.stopped_at
 			FROM feed.note_heads h JOIN feed.note_places p ON p.org = h.org WHERE h.org = $1`, string(org)).
-			Scan(&s.head, &s.orgReset, &s.orgEdition, &s.place, &s.reset, &s.edition, &stopped)
+			Scan(&s.head, &s.orgEdition, &s.place, &s.edition, &stopped)
 		s.paused = stopped != nil
 		return s, err
 	}
-	err := tx.QueryRow(ctx, `SELECT l.head, l.reset, p.place, p.reset, p.wipe, p.refusals, p.paused
+	err := tx.QueryRow(ctx, `SELECT l.head, p.place, p.wipe, p.refusals, p.paused
 		FROM org_log l JOIN delivery_places p ON p.org = l.org AND p.receiver = $2 WHERE l.org = $1`, string(org), l.name).
-		Scan(&s.head, &s.orgReset, &s.place, &s.reset, &s.wipe, &s.refusals, &s.paused)
+		Scan(&s.head, &s.place, &s.wipe, &s.refusals, &s.paused)
 	return s, err
 }
 
@@ -161,11 +172,10 @@ func (l *lane) cameBack(ctx context.Context, pool *pgxpool.Pool, failures *int) 
 func (l *lane) deliverFeed(ctx context.Context, pool *pgxpool.Pool, org ids.Org, s spot, items []entry, failures *int) (after, error) {
 	bodies := make([]json.RawMessage, len(items))
 	for i, e := range items {
-		b, err := stamped(e.body, s.reset)
-		if err != nil {
-			return holdOff, err
-		}
-		bodies[i] = b
+		bodies[i] = e.body
+	}
+	if l.s.isStopped(org) {
+		return finish, nil
 	}
 	var o outcome
 	if len(bodies) == 1 {
@@ -190,8 +200,6 @@ func (l *lane) deliverFeed(ctx context.Context, pool *pgxpool.Pool, org ids.Org,
 			return holdOff, nil // the receiver claims more than the log holds: rest, skip nothing
 		}
 		return again, l.note(ctx, pool, org, o.iAmAt, 0, nil)
-	case staleReset:
-		return l.resync(ctx, pool, org, s)
 	case orgStopped:
 		return finish, l.setPaused(ctx, pool, org)
 	}
@@ -207,7 +215,10 @@ func (l *lane) deliverSearch(ctx context.Context, pool *pgxpool.Pool, org ids.Or
 		return l.note(ctx, pool, org, progress, refusals, nil)
 	}
 	for _, e := range items {
-		body, send, err := forSearch(org, s.reset, e.number, e.kind, e.body)
+		if l.s.isStopped(org) {
+			return finish, save()
+		}
+		body, send, err := forSearch(org, e.number, e.kind, e.body)
 		if err != nil {
 			return holdOff, err
 		}
@@ -229,11 +240,6 @@ func (l *lane) deliverSearch(ctx context.Context, pool *pgxpool.Pool, org ids.Or
 		switch o.answer {
 		case applied:
 			progress, refusals = e.number, 0
-		case staleReset:
-			if err := save(); err != nil {
-				return holdOff, err
-			}
-			return l.resync(ctx, pool, org, s)
 		case refusedOne:
 			tries, err := l.refused(ctx, pool, org, s, e.number, o.reason)
 			if err != nil {
@@ -268,11 +274,10 @@ func (l *lane) deliverNotes(ctx context.Context, pool *pgxpool.Pool, org ids.Org
 		return l.note(ctx, pool, org, progress, 0, nil)
 	}
 	for _, e := range items {
-		body, err := stamped(e.body, s.reset)
-		if err != nil {
-			return holdOff, err
+		if l.s.isStopped(org) {
+			return finish, save()
 		}
-		o := l.rc.post(ctx, "/notes", body)
+		o := l.rc.post(ctx, "/notes", json.RawMessage(e.body))
 		if o.answer == down {
 			if err := save(); err != nil {
 				return holdOff, err
@@ -294,11 +299,6 @@ func (l *lane) deliverNotes(ctx context.Context, pool *pgxpool.Pool, org ids.Org
 				return holdOff, nil
 			}
 			return again, l.note(ctx, pool, org, o.iAmAt, 0, nil)
-		case staleReset:
-			if err := save(); err != nil {
-				return holdOff, err
-			}
-			return l.resync(ctx, pool, org, s)
 		case refusedOne:
 			if err := save(); err != nil {
 				return holdOff, err
@@ -396,52 +396,6 @@ func (l *lane) newEdition(ctx context.Context, pool *pgxpool.Pool, org ids.Org, 
 		_, err := tx.Exec(ctx, `DELETE FROM feed.note_parked WHERE org = $1 AND edition < $2`, string(org), s.orgEdition)
 		return err
 	})
-}
-
-// resync takes the place the receiver reports after a Reset. A receiver not yet
-// on the log's reset number is waited for.
-func (l *lane) resync(ctx context.Context, pool *pgxpool.Pool, org ids.Org, s spot) (after, error) {
-	var orgReset, orgEdition, head int64
-	err := l.inOrg(ctx, org, func(tx pgx.Tx) error {
-		if l.notes {
-			return tx.QueryRow(ctx, `SELECT reset, edition, head FROM feed.note_heads WHERE org = $1`, string(org)).Scan(&orgReset, &orgEdition, &head)
-		}
-		return tx.QueryRow(ctx, `SELECT reset, head FROM org_log WHERE org = $1`, string(org)).Scan(&orgReset, &head)
-	})
-	if err != nil {
-		return holdOff, err
-	}
-	p, err := l.rc.place(ctx, org)
-	if err != nil {
-		return holdOff, nil // the next turn asks again
-	}
-	if p.Reset != orgReset {
-		return holdOff, nil
-	}
-	to := min(p.Through, head)
-	err = pgx.BeginFunc(ctx, pool, func(tx pgx.Tx) error {
-		if l.notes {
-			if p.Edition != orgEdition {
-				to = 0
-			}
-			if _, err := tx.Exec(ctx, `UPDATE feed.note_places SET reset = $2, edition = $3, place = $4, stopped_at = NULL
-				WHERE org = $1 AND claimed_by = $5`, string(org), orgReset, orgEdition, to, l.s.me); err != nil {
-				return err
-			}
-			_, err := tx.Exec(ctx, `DELETE FROM feed.note_parked WHERE org = $1`, string(org))
-			return err
-		}
-		if _, err := tx.Exec(ctx, `UPDATE delivery_places SET reset = $3, place = $4, wipe = $5, refusals = 0, paused = false
-			WHERE org = $1 AND receiver = $2 AND claimed_by = $6`, string(org), l.name, orgReset, to, p.Wipe, l.s.me); err != nil {
-			return err
-		}
-		_, err := tx.Exec(ctx, `DELETE FROM delivery_parked WHERE org = $1 AND receiver = $2`, string(org), l.name)
-		return err
-	})
-	if err != nil {
-		return holdOff, err
-	}
-	return again, nil
 }
 
 // release gives the claim back. The time stays, as "served then", for turns.

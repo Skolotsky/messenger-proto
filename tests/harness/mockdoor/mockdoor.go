@@ -38,7 +38,6 @@ type Door struct {
 	mu       sync.Mutex
 	number   int64
 	feedNum  int64
-	reset    int64
 	edition  int64
 	people   []map[string]any
 	convs    map[string]map[string]any
@@ -64,10 +63,10 @@ type answer struct {
 
 // New returns a door filled from a seeded log.
 func New(seed int64, changes int) *Door {
-	d := &Door{reset: 1, edition: 1, convs: map[string]map[string]any{}, byID: map[string]msg{}, reads: map[string]int64{},
+	d := &Door{edition: 1, convs: map[string]map[string]any{}, byID: map[string]msg{}, reads: map[string]int64{},
 		kept: map[string]bool{}, answers: map[string]answer{}, feedLog: map[string][]update{},
 		rows: map[string]map[string]map[string]any{}, clients: map[*client]bool{}}
-	for _, e := range logwriter.Write(logwriter.Config{Orgs: []string{org}, Seed: seed, Changes: changes, Reset: 1})[org] {
+	for _, e := range logwriter.Write(logwriter.Config{Orgs: []string{org}, Seed: seed, Changes: changes})[org] {
 		var c map[string]any
 		if err := json.Unmarshal(e.JSON, &c); err != nil {
 			panic(err)
@@ -340,7 +339,6 @@ func (d *Door) control(w http.ResponseWriter, r *http.Request) {
 	var in struct {
 		Down, FeedDown *bool
 		Refuse         *string
-		Reset          bool
 	}
 	if err := json.NewDecoder(r.Body).Decode(&in); err != nil {
 		http.Error(w, err.Error(), 400)
@@ -362,10 +360,6 @@ func (d *Door) control(w http.ResponseWriter, r *http.Request) {
 	}
 	if in.Refuse != nil {
 		d.refuse = *in.Refuse
-	}
-	if in.Reset {
-		d.reset++
-		d.broadcast(map[string]any{"reset": d.reset})
 	}
 	send(w, 200, map[string]any{})
 }
@@ -408,7 +402,7 @@ func (d *Door) start(w http.ResponseWriter, r *http.Request) {
 		convs = append(convs, s)
 	}
 	send(w, 200, map[string]any{"org": org, "org_name": "Acme", "person": me, "people": d.people, "preferences": []any{},
-		"conversations": convs, "reset": d.reset, "number": d.number})
+		"conversations": convs, "number": d.number})
 }
 
 func (d *Door) unread(person, conv string) bool {
@@ -482,12 +476,12 @@ func (d *Door) feed(w http.ResponseWriter, r *http.Request) {
 	defer d.mu.Unlock()
 	person := r.PathValue("person")
 	if d.feedDown {
-		send(w, 200, map[string]any{"reset": d.reset, "edition": nil, "through": nil, "number": nil, "rows": []any{}, "counts": nil, "notice": "Catching up"})
+		send(w, 200, map[string]any{"edition": nil, "through": nil, "number": nil, "rows": []any{}, "counts": nil, "notice": "Catching up"})
 		return
 	}
 	rows := d.rowsFor(person)
 	d.rows[person] = rows
-	send(w, 200, map[string]any{"reset": d.reset, "edition": d.edition, "through": d.number, "number": d.lastFeed(person),
+	send(w, 200, map[string]any{"edition": d.edition, "through": d.number, "number": d.lastFeed(person),
 		"rows": sortedRows(rows), "counts": counts(rows), "notice": nil})
 }
 
@@ -770,13 +764,12 @@ func (d *Door) live(w http.ResponseWriter, r *http.Request) {
 			}
 			var in struct {
 				Resume *struct {
-					Reset         int64
 					Conversations int64
 					Feed          *int64
 				}
 			}
 			if json.Unmarshal(b, &in) == nil && in.Resume != nil {
-				d.replay(c, in.Resume.Reset, in.Resume.Conversations, in.Resume.Feed)
+				d.replay(c, in.Resume.Conversations, in.Resume.Feed)
 			}
 		}
 	}()
@@ -808,7 +801,7 @@ func (d *Door) live(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (d *Door) replay(c *client, reset, conversations int64, feed *int64) {
+func (d *Door) replay(c *client, conversations int64, feed *int64) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	push := func(v any) {
@@ -817,10 +810,6 @@ func (d *Door) replay(c *client, reset, conversations int64, feed *int64) {
 		case c.out <- b:
 		default:
 		}
-	}
-	if reset != d.reset {
-		push(map[string]any{"reset": d.reset})
-		return
 	}
 	prev := conversations
 	for _, u := range d.convLog {

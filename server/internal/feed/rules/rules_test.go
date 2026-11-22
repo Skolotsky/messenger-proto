@@ -1244,6 +1244,82 @@ func TestSeededHistoryWritesNoNotes(t *testing.T) {
 	}
 }
 
+// D-033: the log itself says where seeded history starts and ends. Nothing from
+// seed.opened up to seed.sealed writes a note, with no option from the caller;
+// the first change after it does, and a log without the opener is as before.
+func TestNoNotesUpToTheSeal(t *testing.T) {
+	const at = "2026-11-22T10:00:00.000Z"
+	e := New("acme")
+	n := int64(0)
+	apply := func(build func(n, prev int64) any) Effects {
+		t.Helper()
+		n++
+		fx, err := e.Apply(contract.Change{Value: build(n, n-1)}, Options{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return fx
+	}
+	opened := contract.ChangeSeedOpened{Kind: "seed.opened", Org: "acme", Number: 1, Previous: 0, At: at}
+	if !IsOrgWide(contract.Change{Value: opened}) {
+		t.Fatal("seed.opened must be applied as an organization-wide change")
+	}
+	if fx := apply(func(int64, int64) any { return opened }); !fx.Known || len(fx.Notes) != 0 {
+		t.Fatalf("the opener: known %v, notes %v", fx.Known, fx.Notes)
+	}
+	mention := func(id string) func(n, prev int64) any {
+		return func(n, prev int64) any {
+			return contract.ChangeMessageCreated{Kind: "message.created", Org: "acme", Number: n, Previous: prev, At: at,
+				Message: contract.Message{Id: id, Number: n, Version: 1, Conversation: "#a", Author: "anna", Text: "@you", Mentions: []string{"you"}, Reactions: []contract.Reaction{}, CreatedAt: at}}
+		}
+	}
+	for _, p := range []string{"anna", "you"} {
+		apply(func(n, prev int64) any {
+			return contract.ChangePersonJoined{Kind: "person.joined", Org: "acme", Number: n, Previous: prev, At: at, Person: p, Name: p}
+		})
+	}
+	apply(func(n, prev int64) any {
+		return contract.ChangeChannelCreated{Kind: "channel.created", Org: "acme", Number: n, Previous: prev, At: at, Conversation: "#a", Name: "a", People: []string{"anna", "you"}}
+	})
+	if fx := apply(mention("seeded")); len(fx.Notes) != 0 {
+		t.Fatalf("a seeded mention wrote notes: %v", fx.Notes)
+	}
+	if fx := apply(func(n, prev int64) any {
+		return contract.ChangeTick{Kind: "tick", Org: "acme", Number: n, Previous: prev, At: at}
+	}); len(fx.Notes) != 0 {
+		t.Fatalf("a tick before the seal wrote notes: %v", fx.Notes)
+	}
+	sealed := contract.Change{Value: contract.ChangeSeedSealed{Kind: "seed.sealed", Org: "acme", Number: n + 1, Previous: n, At: at}}
+	if !IsOrgWide(sealed) {
+		t.Fatal("seed.sealed must be applied as an organization-wide change")
+	}
+	fx := apply(func(n, prev int64) any { return sealed.Value })
+	if !fx.Known || len(fx.Notes) != 0 {
+		t.Fatalf("the seal: known %v, notes %v", fx.Known, fx.Notes)
+	}
+	if fx := apply(mention("live")); len(fx.Notes) == 0 {
+		t.Fatal("the first mention after the seal wrote no note")
+	}
+
+	plain := New("acme")
+	for i, c := range []any{
+		contract.ChangePersonJoined{Kind: "person.joined", Org: "acme", Number: 1, Previous: 0, At: at, Person: "anna", Name: "anna"},
+		contract.ChangePersonJoined{Kind: "person.joined", Org: "acme", Number: 2, Previous: 1, At: at, Person: "you", Name: "you"},
+		contract.ChangeChannelCreated{Kind: "channel.created", Org: "acme", Number: 3, Previous: 2, At: at, Conversation: "#a", Name: "a", People: []string{"anna", "you"}},
+	} {
+		if _, err := plain.Apply(contract.Change{Value: c}, Options{}); err != nil {
+			t.Fatalf("change %d: %v", i, err)
+		}
+	}
+	fx, err := plain.Apply(contract.Change{Value: mention("no-opener")(4, 3)}, Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(fx.Notes) == 0 {
+		t.Fatal("a log without the opener wrote no note for a mention")
+	}
+}
+
 func TestHistoryTabs(t *testing.T) {
 	runCases(t, "D-016, D-014, D-004, T-038 point 14", []ruleCase{
 		{"Mentions holds read and unread, from any channel, newest first", func(w *W) (any, any) {
@@ -1503,15 +1579,15 @@ func TestKindsWithNoEffectAreCounted(t *testing.T) {
 
 func TestNoteContractForm(t *testing.T) {
 	// The drafts become the contract's notes with the feed's own numbers.
-	due := NoteDraft{Kind: "due", At: "t", Name: "n", Person: "you", Bucket: "focus", Why: "w", Text: "x"}.Contract("acme", 2, 10, 9, 7)
+	due := NoteDraft{Kind: "due", At: "t", Name: "n", Person: "you", Bucket: "focus", Why: "w", Text: "x"}.Contract("acme", 10, 9, 7)
 	v, ok := due.Value.(contract.NoteDue)
-	if !ok || v.Number != 10 || v.Previous != 9 || v.Edition != 7 || v.Reset != 2 || v.Org != "acme" || v.Name != "n" {
+	if !ok || v.Number != 10 || v.Previous != 9 || v.Edition != 7 || v.Org != "acme" || v.Name != "n" {
 		t.Errorf("due note: %+v", due.Value)
 	}
-	if _, ok := (NoteDraft{Kind: "clock", At: "t"}).Contract("acme", 2, 11, 10, 7).Value.(contract.NoteClock); !ok {
+	if _, ok := (NoteDraft{Kind: "clock", At: "t"}).Contract("acme", 11, 10, 7).Value.(contract.NoteClock); !ok {
 		t.Error("clock note has the wrong form")
 	}
-	if w, ok := (NoteDraft{Kind: "withdrawn", Name: "n", Because: "read"}).Contract("acme", 2, 12, 11, 7).Value.(contract.NoteWithdrawn); !ok || w.Because != "read" {
+	if w, ok := (NoteDraft{Kind: "withdrawn", Name: "n", Because: "read"}).Contract("acme", 12, 11, 7).Value.(contract.NoteWithdrawn); !ok || w.Because != "read" {
 		t.Error("withdrawn note has the wrong form")
 	}
 }
