@@ -57,7 +57,7 @@ GET  conversations/orgs/acme/people                               → the people
 - Wipe and Rebuild touch only the organization named, unless the call says "all". Reset and Delete touch no organization but their own.
 - `slow` answers after 10 s; `off` does not answer: both are the failures the guardrails inject.
 - The notification app shows only what the sender holds for that organization and person.
-- **Seeding** is the only way to write a past timestamp. A session opens only on an organization with an empty log, takes ordinary changes in batches, each stamped with its past time, never decreasing, and is sealed once. Afterwards the log continues from the seed's last number and time, and no seeded change causes a notification (D-032).
+- **Seeding** is the only way to write a past timestamp. A session opens only on an organization with an empty log, takes ordinary changes in batches, each stamped with its past time, never decreasing, and is sealed once. A seeded history begins with a `seed.opened` entry, and sealing it writes `seed.sealed` and answers with that entry's number as `through`. Afterwards the log continues from the seed's last number and time, and no seeded change causes a notification (D-032).
 - Reset never reuses a number: it seeds a new organization from the same seed under the same display name, and only the demo program knows which organization is current (D-033). If that is slow, the next one is prepared in the background.
 - Delete runs in order: retire, stop delivery, then the receivers and the feed, the log and originals last. Each step can be repeated, so a crash halfway is repaired by deleting again. It touches no other organization. The current organization cannot be deleted.
 

@@ -58,7 +58,7 @@ Order on the board is priority. "Needs" is what must be merged first. Packages i
 
 ### Wave 0, in sequence, by the lead session
 
-**T-044 Foundation.** Outcome: `make up` starts PostgreSQL and six empty programs that answer "alive"; `make test` and `make verify` run. Includes: the layout above; Docker images for Go and Node; Compose file; one database login and schema per part (G-008); the shared pieces: the clock, the one client for calls between parts with its 3 s limit (G-023), "the database for this organization" with the organization bound to the session (G-025, G-028), IDs; `./scripts/check` stays fast (format, vet, unit tests, generated files up to date, the existing repository checks) and `./scripts/verify` runs the full suite (Compose, guardrail tests, browser tests).
+**T-044 Foundation.** Outcome: `make up` starts PostgreSQL and six empty programs that answer "alive"; `make test` and `make verify` run. Includes: the layout above; Docker images for Go and Node; Compose file; one database login and schema per part (G-008); the shared pieces: the clock, the one client for calls between parts with its 3 s limit (G-023), "the database for this organization" with the organization bound to the session (G-025), IDs; `./scripts/check` stays fast (format, vet, unit tests, generated files up to date, the existing repository checks) and `./scripts/verify` runs the full suite (Compose, guardrail tests, browser tests).
 - Acceptance: a fresh clone runs `make up` and `make verify` with nothing installed but Docker and make; each part's login is refused on the other parts' schemas (first half of G-008's test, seen failing with one shared login).
 
 **T-045 Contracts in machine form, and the stand-ins the packages build against.** Needs T-044. Outcome: every operation and event of the eight contracts has a schema and at least one example; TypeScript types are generated; Go types pass every example; and three tools exist so that packages can work without each other:
@@ -116,7 +116,7 @@ Order on the board is priority. "Needs" is what must be merged first. Packages i
 
 ### Wave 3, joining up
 
-**T-057 Milestone 1: the spine runs end to end.** Needs T-046, T-047, T-048, T-052. Everything composed; a message, an edit and a delete travel to search, the feed and the sender. Run every guardrail test owned so far against the composed system, with two copies of the workers and the feed (G-027) and two organizations on two databases (G-028).
+**T-057 Milestone 1: the spine runs end to end.** Needs T-046, T-047, T-048, T-052. Everything composed; a message, an edit and a delete travel to search, the feed and the sender. Run every guardrail test owned so far against the composed system, with two copies of the workers and the feed (G-027) and two organizations (G-025).
 - Then: independent verifier on the delivery guarantees.
 
 **T-058 Milestone 2: a person can use it.** Needs T-053, T-055, T-056, T-057. The web app on the real programs at both widths; G-015 and G-019 in a browser; all of T-038.
@@ -126,13 +126,13 @@ Order on the board is priority. "Needs" is what must be merged first. Packages i
 - Guardrails owned: G-020.
 - Acceptance (D-033): Reset seeds a fresh organization, waits until search and the feed are level, makes it current and retires the previous one; the entry address gives the current organization; with a screen open, pressing Reset lands it on the fresh one; the control panel lists organizations and deletes one or all retired, asking first; a fresh verifier checks this against D-033.
 
-**T-060 A coding agent can join.** Needs T-054. A small connector over the agent door; acting as a person only when switched on at start, with a banner (D-002).
+**T-060 A coding agent can join.** Not planned (D-034): moved to Backlog.
 
 ### Wave 4
 
 **T-061 Milestone 3: validation.** Needs all above. A fresh verifier checks the running product against the brief, every contract and every guardrail; findings become tasks. The known-shortcuts list is brought up to date; a short "how to run and what to look at" is written.
 
-**T-062 Text rules judged by a model.** Last (D-001): an experiment first, then the build, with the guardrail for a slow or failing model.
+**T-062 Text rules judged by a model.** Not planned (D-034): moved to Backlog. Text rules do not appear in the product's interface.
 
 ## Who builds `operations-and-control.md` (D-032)
 
@@ -153,7 +153,7 @@ The nudge: T-047 sends, T-053 receives. Place and control (mode, wipe): T-048 fo
 
 Rules for every test: seeded randomness; time only through the clock; no sleeping and hoping; a failing test says what to do. Timed guardrails (G-012, G-013, G-026) run for about a minute at 50 actions a second with the seeded team's size, never at large sizes (CLAUDE.md, Verification). A guardrail test is never weakened to pass; a failing one is reported.
 
-Guardrail to package: G-003, G-004, G-005: T-046 · G-006, G-010, G-011: T-048 · G-007, G-009: T-052 · G-008: T-044 and T-052 · G-012, G-014, G-023, G-026, G-029: T-047 · G-013: T-057 · G-015, G-019: T-053 and T-056, proven in T-058 · G-016, G-017, G-018: T-054 · G-020: T-059 · G-024: T-053 · G-025: T-046, proven for every door in T-057 · G-027, G-028: T-057 · G-030: T-049.
+Guardrail to package: G-003, G-004, G-005: T-046 · G-006, G-010, G-011: T-048 · G-007, G-009: T-052 · G-008: T-044 and T-052 · G-012, G-014, G-023, G-026, G-029: T-047 · G-013: T-057 · G-015, G-019: T-053 and T-056, proven in T-058 · G-016, G-017, G-018: T-054 · G-020: T-059 · G-024: T-053 · G-025: T-046, proven for every door in T-057 · G-027: T-057 · G-030: T-049.
 
 ## Working in parallel
 
@@ -168,7 +168,7 @@ Guardrail to package: G-003, G-004, G-005: T-046 · G-006, G-010, G-011: T-048 �
 - **The feed's rules are the largest single piece (T-049)** and everything visible depends on them. It starts in wave 1 with nothing in its way; if it is late, T-052 and T-055 still proceed against fixtures.
 - **Guardrail tests are protected once they have passed** (user's decision, 2026-11-22). Writing one the first time is free. When a package has seen its guardrail test fail and then pass, the lead sets that guardrail to `enforced` in `docs/guardrails.md` and adds `Edit(/tests/guardrails/<name>/**)` to `permissions.ask` in `.claude/settings.json`; `./scripts/check` fails if an enforced guardrail's folder is unprotected. From then on, changing that test asks the user.
 - **Two packages disagreeing about a contract.** The schemas and examples of T-045 are the tie-breaker; if they are unclear, fix them there, with the words in `docs/contracts/` as authority.
-- **Scope.** The three measures of D-030, a second copy of Conversations in production form, trimming, and an entry point that routes by organization are not built. The tests for G-027 and G-028 use the harness's small router and two databases.
+- **Scope.** The three measures of D-030, a second copy of Conversations in production form, trimming, and an entry point that routes by organization are not built. The tests for G-027 use the harness's small router. Capacity is settled by the written analysis in D-029 and D-034: nothing tests scale inside the product.
 
 ## Out of this plan
 

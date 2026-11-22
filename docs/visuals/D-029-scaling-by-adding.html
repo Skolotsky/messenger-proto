@@ -293,7 +293,7 @@ details > .stack { gap: 10px; }
   </div>
   <div class="split">
     <div class="panel"><div class="label">Today</div><p><strong>About 5,000 people</strong> in one organization comfortably. Up to 10,000 to 25,000 with delays after large announcements.</p></div>
-    <div class="panel"><div class="label">With the three measures</div><p><strong>About 100,000 people.</strong> Decided as the path (D-030); none is built in the first version, where the seeded team has 36. This is also where one copy of Conversations holding all of one organization's connections ends.</p></div>
+    <div class="panel"><div class="label">For larger organizations</div><p><strong>A path, with no number (D-034).</strong> Conversations applied in parallel, grouped saves, big-channel items stored once, and batched calls to search. None is built in the first version, where the seeded team has 36. This is also where one copy of Conversations holding all of one organization's connections ends.</p></div>
     <div class="panel"><div class="label">Beyond that</div><p>A numbered log per conversation instead of per organization. Possible, and a real redesign: every contract's numbers and the screen's catch-up change. Not adopted.</p></div>
   </div>
   <p><strong>Held from the first version, so that all of this stays possible (G-030):</strong> the feed's result for a conversation depends only on that conversation's changes, in their order, and on reader-wide changes at their place. Checked in a small simulation on a subset of the rules (E-008): 200 different interleavings of conversations gave the same feed every time; with the reader-wide changes moved, never. The real proof is this guardrail's test on the product's own rules.</p>
@@ -325,7 +325,7 @@ details > .stack { gap: 10px; }
     <table>
       <thead><tr><th>Limit</th><th>Why</th><th>What would be done</th></tr></thead>
       <tbody>
-        <tr><td><strong>One organization above about 100,000 people</strong></td><td>After the three measures above, its log is still one, and it lives in one database.</td><td>A log per conversation. A real change of design, not adopted (D-030).</td></tr>
+        <tr><td><strong>One organization beyond those measures</strong></td><td>After the three measures above, its log is still one, and it lives in one database.</td><td>A log per conversation. A real change of design, not adopted (D-030).</td></tr>
         <tr><td><strong>Old data</strong></td><td>The change log, handled action IDs, agents' events and sent notifications grow without end.</td><td>Trim per organization once a saved copy of each receiver exists; rebuild from the copy. Designed, not built.</td></tr>
         <tr><td><strong>Moving an organization to another database</strong></td><td>Needed to rebalance.</td><td>Copy its rows, switch its directory entry. Not built.</td></tr>
         <tr><td><strong>The directory and the entry point</strong></td><td>Everything passes them.</td><td>Kept available by ordinary means; they hold almost nothing.</td></tr>

@@ -4,7 +4,7 @@ From D-008, D-002, D-001. Accepted 2026-11-22. Tried in E-003 with scripted agen
 
 ## 1. Parties
 
-An agent (scripted, a team's own, or a coding agent through a small connector) calls Conversations' door for agents. Conversations never calls an agent.
+An agent (scripted, or a team's own) calls Conversations' door for agents. Conversations never calls an agent.
 
 ## 2. Operations
 
@@ -48,7 +48,6 @@ An agent is told what addresses it: a mention, a direct message, a reply in a th
 
 - An agent that is away, or never reads at all, reads on from its place when it returns. It cannot hold up people or other agents: nothing waits for an agent.
 - "Slow down": the agent waits and sends the same thing again.
-- Acting as a person is not part of this door: the coding-agent connector uses the door for people for that, off unless switched on when the system starts, with a banner while on.
 
 ## 5. Evolution
 
