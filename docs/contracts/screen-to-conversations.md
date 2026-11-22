@@ -34,7 +34,7 @@ Questions, which change nothing. The first full load (`start` for the `conversat
 | Question | Answers with |
 |---|---|
 | `GET /orgs/acme/people/marco/start` | the person, their preferences and profile line, channels and direct conversations with unread marks, `number` for the `conversations` stream |
-| `GET /orgs/acme/conversations/%23launch/messages?around=4812` (also `&thread=msg_7Q2`) | messages around a position, each with its thread summary (D-023), `number` |
+| `GET /orgs/acme/conversations/%23launch/messages?around=4812` (also `&thread=msg_7Q2`) | messages around a position, each with its thread summary (D-023), `number`. A thread's page always includes its root |
 | `GET /orgs/acme/people/marco/feed` | the feed's rows and counts, `edition`, `number` for the `feed` stream, or a notice |
 | `GET /orgs/acme/people/marco/history?tab=mentions` | history entries with unread marks and the tab's count (D-016) |
 | `GET /orgs/acme/people/marco/settings` | Focus people, removed people, levels in effect |

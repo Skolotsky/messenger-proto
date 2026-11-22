@@ -4,7 +4,10 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // The app calls the door on its own address, so the same build works behind any host.
 const door = process.env.CONTEXIA_DOOR ?? 'http://127.0.0.1:8090';
-const proxy = { '/orgs': { target: door, ws: true, changeOrigin: true } };
+const proxy = {
+  '/orgs': { target: door, ws: true, changeOrigin: true },
+  '/demo': { target: door, changeOrigin: true },
+};
 
 export default defineConfig({
   plugins: [
@@ -30,7 +33,7 @@ export default defineConfig({
       workbox: {
         // Installable, not offline (D-009): only the app's own files are cached, never an answer from the door.
         globPatterns: ['**/*.{js,css,html,svg,png}'],
-        navigateFallbackDenylist: [/^\/orgs/],
+        navigateFallbackDenylist: [/^\/orgs/, /^\/demo/],
         runtimeCaching: [],
       },
     }),

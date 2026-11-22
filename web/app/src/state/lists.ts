@@ -1,4 +1,13 @@
-import type { ChatMessage, ConversationPart, ConversationSummary, MessageRow, ThreadSummary } from '../api/types';
+import type {
+  ChatMessage,
+  ConversationPart,
+  ConversationSummary,
+  MessageRow,
+  PersonView,
+  ReplyInProgress,
+  StartAnswer,
+  ThreadSummary,
+} from '../api/types';
 
 export type Lists = Record<string, MessageRow[]>;
 
@@ -90,38 +99,83 @@ export function applyToLists(lists: Lists, part: ConversationPart): Lists {
           unread: row.thread_summary?.unread ?? false,
         },
       }));
+    case 'unread':
+      return part.thread === null
+        ? lists
+        : mapMessage(lists, part.thread, (row) =>
+            row.thread_summary ? { ...row, thread_summary: { ...row.thread_summary, unread: part.unread } } : row,
+          );
     default:
       return lists;
   }
 }
 
-/**
- * The sidebar's unread marks. The contract's `unread` part is the truth. The mock door does not
- * send it, so a top-level arrival from someone else also marks a conversation not being looked at.
- */
+/** The sidebar. The door's `unread` part is the truth about a mark. */
 export function applyToConversations(
   conversations: ConversationSummary[],
   part: ConversationPart,
   me: string,
-  open: string | null,
 ): ConversationSummary[] {
-  const mark = (id: string, unread: boolean) =>
-    conversations.map((c) => (c.conversation === id && c.unread !== unread ? { ...c, unread } : c));
   switch (part.kind) {
     case 'unread':
-      return part.thread === null ? mark(part.conversation, part.unread) : conversations;
-    case 'message.created': {
-      const m = part.message as unknown as ChatMessage;
-      return m.thread === null && m.author !== me && m.conversation !== open
-        ? mark(m.conversation, true)
+      return part.thread === null
+        ? conversations.map((c) => (c.conversation === part.conversation && c.unread !== part.unread ? { ...c, unread: part.unread } : c))
         : conversations;
-    }
     case 'conversation.added': {
       const summary = part.conversation_summary;
       const known = conversations.some((c) => c.conversation === summary.conversation);
       return known || !summary.people.includes(me) ? conversations : [...conversations, summary];
     }
+    case 'people.added':
+      return conversations.map((c) =>
+        c.conversation === part.conversation ? { ...c, people: [...new Set([...c.people, ...part.people])] } : c,
+      );
     default:
       return conversations;
+  }
+}
+
+/** What a part changes about the person, their preferences and the people known. */
+export function applyToStart(start: StartAnswer, part: ConversationPart): StartAnswer {
+  switch (part.kind) {
+    case 'person.added':
+      return start.people.some((p) => p.id === part.person_view.id)
+        ? start
+        : { ...start, people: [...start.people, part.person_view] };
+    case 'preference':
+      return {
+        ...start,
+        preferences: [...start.preferences.filter((p) => p.key !== part.key), { key: part.key, value: part.value }],
+      };
+    case 'profile_line': {
+      const line = (p: PersonView) => (p.id === part.person ? { ...p, line: part.text } : p);
+      return { ...start, person: line(start.person), people: start.people.map(line) };
+    }
+    default:
+      return start;
+  }
+}
+
+export type RepliesInProgress = Record<string, ReplyInProgress>;
+
+/** Replies being written: they come and go outside the messages, and close with the message or abandoned. */
+export function applyToReplies(replies: RepliesInProgress, part: ConversationPart): RepliesInProgress {
+  const without = (id: string) => {
+    if (!replies[id]) return replies;
+    const next = { ...replies };
+    delete next[id];
+    return next;
+  };
+  switch (part.kind) {
+    case 'reply.started':
+      return replies[part.message]
+        ? replies
+        : { ...replies, [part.message]: { message: part.message, conversation: part.conversation, thread: part.thread, author: part.author, at: 0, text: '' } };
+    case 'reply.abandoned':
+      return without(part.message);
+    case 'message.created':
+      return without((part.message as unknown as ChatMessage).id);
+    default:
+      return replies;
   }
 }

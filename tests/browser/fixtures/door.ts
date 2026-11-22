@@ -126,6 +126,7 @@ export class FixtureDoor {
       const res = await route.fetch();
       const body = await res.json();
       body.people = [...body.people, ...this.extraPeople];
+      body.number = this.conversationNumber;
       await route.fulfill({ response: res, json: body });
     });
     await page.route(/\/orgs\/acme\/people\/[^/]+\/feed$/, (route) => {

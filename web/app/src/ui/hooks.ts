@@ -1,5 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
-import { PHONE_MAX } from '../config';
+import { NOTICE_AFTER_MS, PHONE_MAX } from '../config';
 
 const phoneQuery = `(max-width:${PHONE_MAX}px)`;
 
@@ -63,3 +63,15 @@ export const stored = {
     }
   },
 };
+
+/** Since when the connection is lost, once that is long enough to say so (D-007, G-019). */
+export function useOfflineNotice(since: number | null): number | null {
+  const [due, setDue] = useState(false);
+  useEffect(() => {
+    setDue(false);
+    if (since === null) return;
+    const timer = setTimeout(() => setDue(true), Math.max(0, since + NOTICE_AFTER_MS - Date.now()));
+    return () => clearTimeout(timer);
+  }, [since]);
+  return due ? since : null;
+}

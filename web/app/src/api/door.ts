@@ -1,4 +1,5 @@
 import { ORG } from '../config';
+import { goToEntry } from './entry';
 import type {
   ActionSaved,
   HistoryAnswer,
@@ -6,6 +7,7 @@ import type {
   MessagesPage,
   PeopleAction,
   PreviewAnswer,
+  ReplyInProgress,
   RowAct,
   ScreenFeedAnswer,
   SettingsAnswer,
@@ -33,7 +35,12 @@ export async function call<T>(path: string, init?: RequestInit): Promise<T> {
   }
   if (res.ok) return (await res.json()) as T;
   if (res.status >= 400 && res.status < 500) {
-    const body = (await res.json().catch(() => null)) as { refused?: string } | null;
+    const body = (await res.json().catch(() => null)) as { refused?: string; organization_gone?: boolean } | null;
+    // A retired organization answers 410, a deleted one 404 naming the organization (D-033).
+    if (body?.organization_gone || (res.status === 404 && /organi[sz]ation/i.test(body?.refused ?? ''))) {
+      void goToEntry();
+      throw new DoorError('refused', 'This organization is no longer here');
+    }
     throw new DoorError('refused', body?.refused ?? `Refused (${res.status}).`);
   }
   throw new DoorError('unreachable', `Server error (${res.status}).`);
@@ -41,12 +48,11 @@ export async function call<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const loadStart = (person: string) => call<StartAnswer>(`/people/${encodeURIComponent(person)}/start`);
 
-export function loadMessages(conversation: string, thread: string | null, around?: number) {
-  const params = new URLSearchParams();
+export function loadMessages(conversation: string, thread: string | null, around: number | undefined, as: string) {
+  const params = new URLSearchParams({ as });
   if (thread) params.set('thread', thread);
   if (around !== undefined) params.set('around', String(around));
-  const query = params.size ? `?${params}` : '';
-  return call<MessagesPage>(`/conversations/${encodeURIComponent(conversation)}/messages${query}`);
+  return call<MessagesPage>(`/conversations/${encodeURIComponent(conversation)}/messages?${params}`);
 }
 
 const personPath = (person: string) => `/people/${encodeURIComponent(person)}`;
@@ -61,6 +67,8 @@ export const loadSettings = (person: string) => call<SettingsAnswer>(`${personPa
 /** What a change would have moved in the last 7 days. May be unavailable; the action never waits for it. */
 export const loadPreview = (person: string, change: RowAct) =>
   call<PreviewAnswer>(`${personPath(person)}/preview?change=${encodeURIComponent(JSON.stringify(change))}`);
+
+export const loadReplyText = (message: string) => call<ReplyInProgress>(`/replies/${encodeURIComponent(message)}`);
 
 export const act = (action: PeopleAction) =>
   call<ActionSaved>('/people/actions', {
