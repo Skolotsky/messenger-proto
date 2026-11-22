@@ -2,7 +2,8 @@
 # Serve the mock door on http://127.0.0.1:8090, for building the web app without the server.
 set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
-mkdir -p "$root/.cache/go"
-exec docker run --rm --name "${CONTEXIA_MOCK_NAME:-contexia-mock-door}" -p "127.0.0.1:${CONTEXIA_MOCK_PORT:-8090}:8090" -u "$(id -u):$(id -g)" -v "$root":/repo -w /repo/tests \
-  -e HOME=/tmp -e CGO_ENABLED=0 -e GOPATH=/repo/.cache/go/path -e GOCACHE=/repo/.cache/go/build -e GOFLAGS=-modcacherw \
+cache="$(dirname "$(git -C "$root" rev-parse --path-format=absolute --git-common-dir)")/.cache"
+mkdir -p "$cache/go"
+exec docker run --rm --name "${CONTEXIA_MOCK_NAME:-contexia-mock-door}" -p "127.0.0.1:${CONTEXIA_MOCK_PORT:-8090}:8090" -u "$(id -u):$(id -g)" -v "$root":/repo -v "$cache":/cache -w /repo/tests \
+  -e HOME=/tmp -e CGO_ENABLED=0 -e GOPATH=/cache/go/path -e GOCACHE=/cache/go/build -e GOFLAGS=-modcacherw \
   golang:1.24-alpine go run ./harness/cmd/mockdoor

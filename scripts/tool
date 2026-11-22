@@ -4,15 +4,17 @@
 # CONTEXIA_TOOL_NETWORK, _ENV (space-separated NAME=value), _IMAGE and _DOCKER are for scripts/verify.
 set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
-mkdir -p "$root/.cache/go" "$root/.cache/npm"
+# One cache for all git worktrees, so a new worktree does not rebuild everything.
+cache="$(dirname "$(git -C "$root" rev-parse --path-format=absolute --git-common-dir)")/.cache"
+mkdir -p "$cache/go" "$cache/npm"
 case "${1:-}" in
   go|gofmt) image="${CONTEXIA_TOOL_IMAGE:-golang:1.24-alpine}" ;;
   node|npm|npx) image=node:22-alpine ;;
   *) echo "usage: scripts/tool go|gofmt|node|npm|npx ..." >&2; exit 2 ;;
 esac
-args=(--rm -u "$(id -u):$(id -g)" -v "$root":/repo -w "/repo${TOOL_DIR:+/$TOOL_DIR}"
-  -e HOME=/tmp -e CGO_ENABLED=0 -e GOPATH=/repo/.cache/go/path -e GOCACHE=/repo/.cache/go/build
-  -e GOFLAGS=-modcacherw -e npm_config_cache=/repo/.cache/npm)
+args=(--rm -u "$(id -u):$(id -g)" -v "$root":/repo -v "$cache":/cache -w "/repo${TOOL_DIR:+/$TOOL_DIR}"
+  -e HOME=/tmp -e CGO_ENABLED=0 -e GOPATH=/cache/go/path -e GOCACHE=/cache/go/build
+  -e GOFLAGS=-modcacherw -e npm_config_cache=/cache/npm)
 [ -n "${CONTEXIA_TOOL_NETWORK:-}" ] && args+=(--network "$CONTEXIA_TOOL_NETWORK")
 for kv in ${CONTEXIA_TOOL_ENV:-}; do args+=(-e "$kv"); done
 if [ -n "${CONTEXIA_TOOL_DOCKER:-}" ]; then

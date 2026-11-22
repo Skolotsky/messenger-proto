@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 # The full suite: starts the composed system in its own throwaway project,
 # checks every part is alive, and runs the guardrail tests against it.
+# --quick leaves out the two guardrails that run for a minute (G-012, G-026), for use
+# while working. It is not a full verification and must not be reported as one.
 set -uo pipefail
+quick=0; [ "${1:-}" = "--quick" ] && quick=1
+timed="./guardrails/receivers-independent ./guardrails/orgs-independent"
 cd "$(dirname "$0")/.." || exit 2
 project="contexia-verify-$$"
 compose=(docker compose -p "$project" -f deploy/compose.yaml -f deploy/compose.test.yaml)
@@ -29,7 +33,9 @@ echo; echo "Guardrail tests"
 export CONTEXIA_TOOL_NETWORK="${project}_default"
 docker build -q -t contexia-test-tools:1 -f deploy/test-tools.Dockerfile deploy >/dev/null
 export CONTEXIA_TOOL_ENV="CONTEXIA_PG_HOST=postgres CONTEXIA_PROJECT=$project"
-if ! CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 ./... ; then
+others=$(CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 TOOL_DIR=tests ./scripts/tool go list ./... | grep -v -E 'guardrails/(receivers-independent|orgs-independent)(/|$)' | tr '\n' ' ')
+[ -n "$others" ] || { echo "verify: FAIL could not list the test packages."; exit 1; }
+if ! CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 $others ; then
   echo "verify: FAIL a guardrail test failed. A failing guardrail is a finding: fix the cause, never the test."; exit 1
 fi
 echo; echo "Guardrail tests must fail with their rule switched off"
@@ -42,12 +48,29 @@ fi
 if ! TOOL_DIR=server ./scripts/tool go test -count=1 -tags integration ./... ; then
   echo "verify: FAIL a server integration test failed."; exit 1
 fi
+# The minute-long guardrails mostly wait, and the browser suites do not use this
+# system's database, so they run side by side. Both results are required.
+timed_log=$(mktemp); timed_pid=""
+if [ "$quick" -eq 0 ]; then
+  echo; echo "Timed guardrails (G-012, G-026), beside the browser tests"
+  CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 -timeout 8m $timed > "$timed_log" 2>&1 &
+  timed_pid=$!
+fi
+finish_timed() {
+  [ -n "$timed_pid" ] || return 0
+  wait "$timed_pid"; local code=$?; timed_pid=""
+  cat "$timed_log"; rm -f "$timed_log"
+  if [ "$code" -ne 0 ]; then echo "verify: FAIL a timed guardrail failed. A failing guardrail is a finding: fix the cause, never the test."; exit 1; fi
+}
 echo; echo "Browser tests, at 1280 and 400 px"
 if ! env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV web/app/scripts/browser-tests --reporter=line; then
-  echo "verify: FAIL a browser test failed. See the output above."; exit 1
+  finish_timed; echo "verify: FAIL a browser test failed. See the output above."; exit 1
 fi
 echo; echo "Control panel and notification app, at 1280 and 400 px"
 if ! env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV tests/browser-outside/run --reporter=line; then
-  echo "verify: FAIL a browser test of the outside pages failed. See the output above."; exit 1
+  finish_timed; echo "verify: FAIL a browser test of the outside pages failed. See the output above."; exit 1
 fi
+finish_timed
+rm -f "$timed_log"
+if [ "$quick" -eq 1 ]; then echo; echo "verify --quick: passed, WITHOUT the timed guardrails G-012 and G-026. Not a full verification."; exit 0; fi
 echo; echo "verify: all passed"
