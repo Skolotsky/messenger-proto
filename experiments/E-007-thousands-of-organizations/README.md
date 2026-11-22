@@ -33,6 +33,21 @@ Raw output: `results.txt`.
 | One organization gets 50,000 changes at once, the others at 400 saves a second, four workers | the others: 8 ms median, 16 ms for 19 in 20, worst 35 ms. The large one is applied by one worker at a time and needs about 50 s for its own backlog |
 | Finding work when idle | one question: 1.0 ms. Asking each of 5,000 organizations: 719 ms a round |
 
+### Second part: the redesign after the independent check (`test2.py`)
+
+The independent check found that the "one question" reads every organization's row, so its cost grows with the number of organizations in a database (it measured 1 ms at 5,000, 8.8 ms at 50,000, 52 ms at 300,000), and that organizations were not really taken in turn. The redesign: one row per organization holds the newest number, the receiver's place, since when work waits and a short claim; an index covers only organizations with work; a worker claims a few for a few seconds, delivers outside any transaction, and notes the place.
+
+Measured on the first run of `test2.py`, before the user asked that no large sizes be run on this machine (the raw output of that run was overwritten by a later, interrupted one; `results-redesign-partial.txt` holds what the interrupted run printed):
+
+| Question | Result |
+|---|---|
+| Finding work when idle, with 5,000 / 50,000 / 300,000 organizations | through the index: 0.13 to 0.14 ms at every size; reading every row: 0.3 / 2.0 / 11.4 ms |
+| 600 saves a second over 300,000 organizations, 1 ms of work per change | one worker falls behind; four keep up (11 ms median, 31 ms for 19 in 20) |
+| Two of four workers killed mid-way | nothing lost; their claims ran out and were taken over; 1 change of 17,733 was delivered twice and ignored by the receiver |
+| Serving strictly "whoever has waited longest" while 2,000 organizations catch up | fresh traffic waited about 22 s: the reason for the two-line rule, which was then modelled in E-008 and not measured here |
+
+The run with 300,000 organizations is not to be repeated on this machine (user's instruction, 2026-11-22). `test2.py` takes `ORGS=…` to run small.
+
 ## Conclusion
 
 **Delivery grows by adding workers, safely.** Several workers never deliver a change twice, capacity rises with workers as soon as applying costs something, one organization's backlog stays its own, and looking for work costs a millisecond however many organizations are idle. **NOTIFY on every save must not be used**: it cut saving to a fifth.

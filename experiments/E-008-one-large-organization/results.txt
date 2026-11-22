@@ -1,0 +1,11 @@
+A · Applying one organization's conversations side by side
+    reader-wide changes kept in place: 0 of 200 interleavings gave a different feed (20 logs of 1,500 changes, about 38 conversations each, 10 interleavings per log)
+    reader-wide changes shuffled too (broken on purpose): 200 of 200 interleavings gave a different feed (20 logs of 1,500 changes, about 38 conversations each, 10 interleavings per log)
+
+B · A wave of catching up, and fresh traffic arriving meanwhile (a queue model)
+    whoever has waited longest                           | 2 workers | a fresh change waits: median    3901 ms, 19 in 20 within    4339 ms | the whole backlog is done after  11.0 s
+    whoever has waited longest                           | 4 workers | a fresh change waits: median     166 ms, 19 in 20 within    2054 ms | the whole backlog is done after  10.0 s
+    whoever has waited longest                           | 8 workers | a fresh change waits: median       1 ms, 19 in 20 within     996 ms | the whole backlog is done after  10.0 s
+    fresh traffic first, some of the backlog every round | 2 workers | a fresh change waits: median    1788 ms, 19 in 20 within    2583 ms | the whole backlog is done after  11.0 s
+    fresh traffic first, some of the backlog every round | 4 workers | a fresh change waits: median       2 ms, 19 in 20 within      30 ms | the whole backlog is done after  10.0 s
+    fresh traffic first, some of the backlog every round | 8 workers | a fresh change waits: median       1 ms, 19 in 20 within      29 ms | the whole backlog is done after  10.0 s

@@ -1,0 +1,17 @@
+E-007, second part: the redesign, measured.
+
+1 · What looking for work costs when nothing is happening, by number of organizations in the database:
+       5000 organizations | first design (reads every row):    0.3 ms | with an index of organizations that have work:  0.13 ms | "who needs a clock tick":  0.14 ms
+      50000 organizations | first design (reads every row):    2.0 ms | with an index of organizations that have work:  0.14 ms | "who needs a clock tick":  0.13 ms
+     300000 organizations | first design (reads every row):   11.4 ms | with an index of organizations that have work:  0.14 ms | "who needs a clock tick":  0.12 ms
+
+2 · 300000 organizations, 600 saves a second for 30 s spread over all of them, 1 ms of work per change:
+    1 worker  | saved 17701, applied 13153, delivery attempts 13153 | save to applied: median 11399 ms, 19 in 20 within 20966 ms, worst 22571 ms
+    4 workers | saved 17731, applied 17731, delivery attempts 17731 | save to applied: median 11 ms, 19 in 20 within 31 ms, worst 71 ms
+
+3 · The same with four workers, two of them killed mid-way (their claims run out after 5 s and are taken over):
+    saved 17733, applied 17733 (each once: the receiver ignores a repeat), delivery attempts 17734, so 1 repeats | level 3 s after the last save
+
+4 · Taking organizations in turn: 2,000 organizations each have 100 changes waiting, one more has 50,000, and 400 saves a second go on elsewhere (4 workers):
+    organizations with ordinary traffic, save to applied: median 21713 ms, 19 in 20 within 22844 ms, worst 23031 ms
+    the 2,000 with 100 waiting each were all done after 64 s; everything, the 50,000 included, after 123 s | saved 261841, applied 261841

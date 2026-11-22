@@ -58,6 +58,7 @@ The `board` skill shows where things stand and manages tasks, for example when t
 - Agree what done looks like before building: acceptance criteria, and how each one will be checked.
 - Check the real thing first: run the system and use it as a person or a neighbouring service would. Then test at the boundaries the user cares about (contracts, guarantees, what a person sees), not internals.
 - Every reliability claim gets a test that injects the failure it claims to survive.
+- Scalability is settled by analysis: what is shared, what happens one at a time, what grows with the total. Small experiments and simulations that check the dynamics and validate an approach are welcome; runs with real large sizes or numbers on the user's machine are not, and any run that would load it for minutes is asked for first (user's instructions, 2026-11-22: "I need your analytical decisions"; "you still are allowed to make experiments and simulations, just not with real big orgs sizes or number").
 - See every new check fail once, so you know it can.
 - A check is not weakened, skipped or deleted to get a pass. A failing guardrail is a finding to report.
 - Significant work (a contract, a guarantee, a user-facing flow, a milestone) is validated by a fresh `verifier` agent that has not seen the implementation reasoning.

@@ -10,7 +10,7 @@ Conversations' live connection sends; an open screen receives. One connection pe
 
 Every call is made for one organization (D-026). It is in the address of every call a screen, an agent or the door makes (`/orgs/acme/…`) and in every item a worker delivers; a live connection is opened for one organization. All numbers, places and logs count within that organization. Nothing of another organization is ever sent or accepted.
 
-A connection is opened at `/orgs/acme/live` for one person of one organization. Everything of one organization (its screens' calls and connections, its agents) is served by one copy of Conversations, chosen from the organization in the address (D-029); if that changes, the connection is closed and the screen reconnects and resumes by number. Updates for what the screen shows, in two streams: `conversations` (messages, reactions, thread summaries, unread marks; numbered by the change log) and `feed` (the person's rows and counts; numbered by the feed's own log, with the feed's edition). A screen is sent only what concerns it, so the numbers it sees have gaps. Each update therefore also says which number was sent to this screen before it (`after`). Text of a reply being written arrives as pieces outside the numbering.
+A connection is opened at `/orgs/acme/live` for one person of one organization. Everything of one organization (every call of its screens, their connections, its agents) is served by one copy of Conversations, chosen from the organization in the address (D-029); if that changes, the connection is closed and the screen reconnects and resumes by number. Updates for what the screen shows, in two streams: `conversations` (messages, reactions, thread summaries, unread marks; numbered by the change log) and `feed` (the person's rows and counts; numbered by the feed's own log, with the feed's edition). A screen is sent only what concerns it, so the numbers it sees have gaps. Each update therefore also says which number was sent to this screen before it (`after`). Text of a reply being written arrives as pieces outside the numbering.
 
 ```json
 screen → { "resume": { "conversations": 4855, "feed": 97, "feed_edition": "feed-7c1" } }
@@ -35,6 +35,7 @@ server → { "piece": { "message": "msg_9A1", "at": 120, "text": "ready. " } }
 - Connection lost or refused: the screen shows "Reconnecting", keeps what it shows, tries again after 0.1 s, doubling up to 1 s, and on success sends its numbers.
 - An update lost on a live connection: noticed by the next update's `after`, or by the `last_sent` message sent every 10 s, and asked for again.
 - Nothing here can lose data: the connection only forwards what is saved elsewhere.
+- What the copy did not save itself (a row the feed changed, a clock tick or an ended "watching" written by housekeeping, a save finished by the copy that served the organization before a move) reaches it by a nudge sent through the same address, which may be lost, and by a check every 10 seconds of the organizations it has open screens for. So the 20-second promise above holds without any nudge.
 
 ## 5. Evolution
 
@@ -42,6 +43,6 @@ New kinds of update may be added; a screen ignores a kind it does not know but s
 
 ## 6. Enforced by
 
-G-015, G-019, G-025, G-026.
+G-015, G-019, G-025, G-026, G-029, G-027.
 
 Note: E-005 tried this contract with numbers that had no gaps; the `after` field was added on the verifier's finding that a filtered stream always has gaps, and is tried with G-015's test.

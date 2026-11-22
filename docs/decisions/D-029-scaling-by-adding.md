@@ -58,6 +58,25 @@ Evidence (E-007, 5,000 organizations in one PostgreSQL 17, every writer and work
 - One organization with 50,000 waiting changes did not delay the others (8 ms median, 35 ms worst).
 - Finding work: one question took 1 ms; asking each of 5,000 organizations took 719 ms a round.
 
+### Corrections after the independent check, 2026-11-22 (the decision stands; these mechanisms replace the ones above where they differ)
+
+A fresh verifier tried to break the claim and did, in four places. The answers, by analysis, with the small evidence named:
+
+1. **Finding work no longer reads idle organizations.** As first written, "which organizations have work?" read every organization's row (the verifier measured 1 ms at 5,000 organizations, 52 ms at 300,000, asked many times a second). Now one row per organization holds the newest number, each receiver's place, since when work waits and a short claim, and an index covers only the organizations that have work. Cost is independent of the idle ones (E-007, second part: 0.13 ms at 5,000, 50,000 and 300,000).
+2. **Workers claim, deliver outside any transaction, then note the place.** A claim lasts a few seconds; one that runs out is taken over. A change can therefore be delivered twice. Delivery stays correct because receivers ignore repeats (D-006), not because of the claim; point 2 above overstated the lock.
+3. **Turns.** Organizations that one turn will clear are served first; every round also takes some that are far behind. Strictly "whoever has waited longest" made fresh traffic wait behind a wave of catching up (seen in E-007; the two-line rule is modelled in E-008).
+4. **Everything of an organization goes to its one copy of Conversations, plain calls included.** Point 2 above wrongly listed the door for people's plain calls among the programs multiplied freely.
+5. **What a copy did not save itself reaches it by a nudge and a regular check.** A row the feed changed, a tick or an ended "watching" written by housekeeping, a save finished by the copy that served the organization before a move: the writer sends a nudge through the organization's address, which may be lost, and every copy checks every 10 seconds the organizations it has open screens for. The cost follows organizations with open screens. No call is held open per person at the feed.
+6. **"Watching" lasts as long as the connection it was said on.** The connection is checked every 20 s; start and end are logged; nothing is written in between. Each copy holds a short lease in the database; housekeeping ends the watchings of a copy whose lease ran out. This replaces point 6 above (a time noted per report).
+7. **Housekeeping asks through indexes too** (who needs a clock tick: 0.12 ms at every size), and its lock passes to another copy within seconds if the holder dies.
+8. **The pause before retrying a receiver that is down is kept once per receiver**, so more workers do not mean more retries; how often a change was refused is kept with the organization's place.
+9. **A program that asks the wrong database** is told "not here" and looks the organization up again.
+10. Guardrails: G-027 now covers two copies of Conversations and an organization moved mid-burst, and counts repeats; G-029 holds every timer question to a cost that does not rise with idle organizations.
+
+Withdrawn: "looking for work costs a millisecond however many organizations are idle" (measured at one size only); "can therefore never deliver the same change at the same time"; "about 50 s" for the large organization's backlog (that run had not finished). Not measured, and not to be measured on the user's machine: 300,000 organizations under load. The claim that the design grows by adding rests on the analysis: after these corrections no question, lock, timer or table in it depends on the total number of organizations.
+
+One organization growing large is decided separately in D-030.
+
 ## Consequences
 
 - Easier: capacity is added by adding copies and databases; no new kind of system (a cache, a broker) is needed for it.

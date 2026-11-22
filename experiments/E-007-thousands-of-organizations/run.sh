@@ -8,4 +8,4 @@ docker network create e007-net >/dev/null 2>&1 || true
 docker rm -f e007-pg >/dev/null 2>&1 || true
 docker run -d --name e007-pg --network e007-net -e POSTGRES_PASSWORD=e007 --shm-size=1g postgres:17-alpine -c max_connections=300 >/dev/null
 trap 'docker rm -f e007-pg >/dev/null 2>&1; docker network rm e007-net >/dev/null 2>&1' EXIT
-docker run --rm --network e007-net -u "$(id -u):$(id -g)" -v "$PWD":/exp -w /exp contexia-e004 python3 -u test.py "$@"
+docker run --rm --network e007-net -u "$(id -u):$(id -g)" -v "$PWD":/exp -w /exp contexia-e004 python3 -u "${E007_TEST:-test.py}" "$@"

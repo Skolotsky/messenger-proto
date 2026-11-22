@@ -161,7 +161,7 @@ details > .stack { gap: 10px; }
 <header class="top">
   <div class="label">Guardrails · T-034 · 2026-11-22</div>
   <h1>What must stay true while we build</h1>
-  <p class="lede">The technical decisions are now written as seven contracts and twenty-six guardrails. Each guardrail is one sentence you can check against what you decided, and each names the test that will fail if the sentence stops being true.</p>
+  <p class="lede">The technical decisions are now written as seven contracts and twenty-eight guardrails. Each guardrail is one sentence you can check against what you decided, and each names the test that will fail if the sentence stops being true.</p>
 </header>
 
 <div class="ask">
@@ -261,6 +261,8 @@ details > .stack { gap: 10px; }
         <tr><td>G&#8209;026</td><td>What happens in one organization does not delay another: a slow save, a burst, a long backlog, repeated refusals or a fenced feed in one leaves another's saves under 100 ms and its search and feed within 2 s.</td><td>A test with two organizations that must fail with one log for everybody, and with a worker that serves them in order of arrival.</td><td><span class="chip">pending</span></td></tr>
         <tr><td>G&#8209;027</td><td>Two copies of every program without memory (delivery workers, the feed, the connectors) can run side by side: nothing is lost, nothing is delivered or applied twice.</td><td>The fault tests are run with two copies of each.</td><td><span class="chip">pending</span></td></tr>
         <tr><td>G&#8209;028</td><td>With organizations spread over two databases everything still holds.</td><td>A test with two organizations on two databases; plus a rule that every database access goes through "the database for this organization".</td><td><span class="chip">pending</span></td></tr>
+        <tr><td>G&#8209;029</td><td>Nothing a program asks on a timer gets slower because idle organizations exist.</td><td>Each such question is timed beside 1,000 and beside 100,000 idle organizations; it may not read the idle ones.</td><td><span class="chip">pending</span></td></tr>
+        <tr><td>G&#8209;030</td><td>The feed's result for a conversation depends only on that conversation's changes and on reader-wide changes at their place. (This is what lets a large organization be worked on by many workers.)</td><td>A test that replays generated logs with the conversations interleaved differently and compares the feed.</td><td><span class="chip">pending</span></td></tr>
         <tr><td>G&#8209;023</td><td>Every call from one part to another gives up after at most 3 s and has a stated answer for failure.</td><td>One shared way of calling, with the limit built in; plus a test with a part that accepts a call and never answers.</td><td><span class="chip">pending</span></td></tr>
         <tr><td>G&#8209;021</td><td>Every contract names guardrails that exist, and every guardrail comes from an accepted decision.</td><td>The repository check; seen failing before the guardrails were registered.</td><td><span class="chip ok">enforced</span></td></tr>
         <tr><td>G&#8209;022</td><td>A guardrail test is not edited without your approval.</td><td>The project settings ask you before any edit under the guardrail tests folder. It covers the edit tools only, and is not yet seen working: no such file exists yet.</td><td><span class="chip">pending</span></td></tr>
@@ -290,7 +292,7 @@ details > .stack { gap: 10px; }
 </section>
 
 <footer class="foot">
-  <span>Belongs to T-034 · From D-005, D-006, D-007, D-008, D-015, D-017, D-018, D-026, D-029 · Behaviour already shown in experiments E-003, E-004, E-005 · An independent verifier found four blockers and six larger gaps; all are answered here, and the corrections were not re-checked</span>
+  <span>Belongs to T-034 · From D-005, D-006, D-007, D-008, D-015, D-017, D-018, D-026, D-029, D-030 · Behaviour already shown in experiments E-003, E-004, E-005 · An independent verifier found four blockers and six larger gaps; all are answered here, and the corrections were not re-checked</span>
   <span>Full list: <code>docs/guardrails.md</code> · Architecture: <a href="T-022-architecture-proposal.html">review page</a></span>
 </footer>
 </main>

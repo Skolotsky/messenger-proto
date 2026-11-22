@@ -19,7 +19,7 @@ Every action is one call carrying an ID the caller chose. Conversations saves it
 | create channel, add people | a new channel with a name and people; more people later (D-009, D-024) |
 | react | add or remove one emoji on a message |
 | read | "I have read this conversation up to here" (opening a conversation, or Mark read on a row) |
-| watching | "this conversation is open in front of me", reported again every 20 s while it is true, and "no longer" when it stops. Only the start and the end are saved as changes; a repeated report just renews it |
+| watching | "this conversation is open in front of me", and "no longer" when it stops. Said over the screen's live connection; only the start and the end are saved as changes |
 | keep, done | Keep a row; release it |
 | dial | the level of a channel or of a thread |
 | focus rule, focus person | add or remove a rule; remove a person from Focus or add them back; switch the option that adds everyone who writes directly |
@@ -49,7 +49,7 @@ GET /orgs/acme/people/marco/preview?change=dial&channel=%23incidents&level=muted
 - "Saved" is answered only after the action and its log entry are saved together.
 - The same ID again changes nothing and gets the same answer.
 - A read position only moves forward.
-- Watching lapses by itself: when 60 seconds pass without a report, Conversations writes "no longer watching" to the log. A screen that vanishes therefore cannot leave a conversation "watched", and after a restart Conversations ends every watching it has no fresh report for before it accepts new messages (D-015: nothing is read while the person is not looking). Reports are not log entries (D-029).
+- Watching lasts only as long as the connection it was said on. The connection is checked every 20 seconds and counts as gone after 40 without an answer; Conversations then writes "no longer watching" to the log. Each copy of Conversations also holds a short lease in the database; if a copy dies, housekeeping ends every watching that copy had started. Either way a vanished screen is "no longer watching" within 60 seconds (D-015: nothing is read while the person is not looking), and keeping it alive writes nothing per screen (D-029).
 - Actions of one screen are saved in the order they were sent; an answer comes within 3 seconds or the screen treats the action as not sent.
 - Undo is the opposite action with its own ID.
 

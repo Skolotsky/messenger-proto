@@ -35,7 +35,8 @@ answers: 200 applied · 200 already had it · 422 I refuse this one · anything 
 - Down (no answer in 3 s, a connection error, a server error): the worker waits and tries again after 1, 2, 4 … up to 60 s, each pause varied at random so retries do not arrive in step, without limit, and skips nothing.
 - "I refuse this one" three times: the change is parked for that organization, shown in the control panel with the reason and "try again", and the worker moves on. Three different changes of one organization refused in a row pause that organization only: the worker keeps its place, shows it, and carries on with the others.
 - While the index is unreachable a person sees "Search is unavailable right now. Your messages are safe."; while it is more than 10 s behind, results carry "the last N minutes may be missing".
-- A place is kept per organization; workers find organizations with work with one question and take each under a lock other workers skip, so any number can run (D-029).
+- A place is kept per organization; workers find work through an index of the organizations that have some, claim an organization for a few seconds and deliver outside any transaction, so any number can run (D-029). A claim that runs out is taken over, so a change can arrive twice; the version rule makes that harmless.
+- How long to wait before the next try at an index that is down is kept once per receiver and shared by all workers, so more workers do not mean more retries. How often a change was refused is kept with the organization's place.
 - Wiped, for one organization or for all: the place of each wiped organization is set back to the start and its entries refill.
 
 ## 5. Evolution
@@ -44,4 +45,4 @@ Fields may be added to a message. The version rule and the meaning of a delete d
 
 ## 6. Enforced by
 
-G-006, G-012, G-013, G-014, G-019, G-020, G-023, G-025, G-026, G-027, G-028.
+G-006, G-012, G-013, G-014, G-019, G-020, G-023, G-025, G-026, G-027, G-028, G-029.
