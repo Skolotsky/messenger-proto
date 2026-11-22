@@ -305,6 +305,12 @@ button.rx:hover{border-color:var(--accent)}
 .acts .quick{flex:0 0 100%;margin:0 0 2px}
 .row.fresh{background:color-mix(in srgb,var(--accent) 7%,transparent)}
 .row.fresh .row-time::after{content:" · just in";color:var(--accent);font-weight:600}
+/* arrivals: a bar that says what came in, and a button that brings it in */
+.newpill{display:flex;align-items:center;gap:10px;padding:5px 5px 5px 14px;white-space:nowrap;max-width:calc(100% - 24px)}
+.newpill span{display:flex;align-items:baseline;gap:8px;min-width:0;overflow:hidden}
+.newpill small{font-weight:400;opacity:.85;overflow:hidden;text-overflow:ellipsis}
+.newpill button{background:var(--on-accent);color:var(--accent);border-radius:99px;padding:4px 14px;font-weight:700;font-size:13px}
+.newpill button:hover{opacity:.9}
 
 /* Telegram-like: one list, round avatars, big targets, folders for buckets, bubbles. Own colours. */
 :root{--accent:#6a4fd0;--accent-soft:#ebe6fb;--r:14px;--wall:#eeebe4}
@@ -715,7 +721,8 @@ function bucketHTML(b) {
 const counts = () => ({ focus: S.rows.filter(r => r.bucket === 'focus' && r.sec !== 'kept' && !r.read).length, needs: S.rows.filter(r => r.bucket === 'needs' && !r.read).length, fyi: S.rows.filter(r => r.bucket === 'fyi' && !r.read).length });
 function feed() {
   const bs = Skin.buckets === 'tabs' ? [S.btab] : ['focus', 'needs', 'fyi'];
-  const pill = S.pending ? `<button class="newpill" data-act="applyNew">${S.pending.length} new</button>` : '';
+  const pb = b => S.pending.filter(x => x.row.bucket === b).length;
+  const pill = S.pending ? `<div class="newpill" role="status"><span><b>${S.pending.length} new</b>${pb('focus') || pb('needs') ? `<small>${[pb('focus') ? pb('focus') + ' in Focus' : '', pb('needs') ? pb('needs') + ' need you' : ''].filter(Boolean).join(' · ')}</small>` : ''}</span><button data-act="applyNew">Show</button></div>` : '';
   return `<div class="feed-wrap">${pill}<div class="feed-scroll" data-scroll="feed">${bs.map(bucketHTML).join('')}</div></div>`;
 }
 function bucketTabs() {

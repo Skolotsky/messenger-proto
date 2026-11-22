@@ -328,7 +328,8 @@ function bucketHTML(b) {
 const counts = () => ({ focus: S.rows.filter(r => r.bucket === 'focus' && r.sec !== 'kept' && !r.read).length, needs: S.rows.filter(r => r.bucket === 'needs' && !r.read).length, fyi: S.rows.filter(r => r.bucket === 'fyi' && !r.read).length });
 function feed() {
   const bs = Skin.buckets === 'tabs' ? [S.btab] : ['focus', 'needs', 'fyi'];
-  const pill = S.pending ? `<button class="newpill" data-act="applyNew">${S.pending.length} new</button>` : '';
+  const pb = b => S.pending.filter(x => x.row.bucket === b).length;
+  const pill = S.pending ? `<div class="newpill" role="status"><span><b>${S.pending.length} new</b>${pb('focus') || pb('needs') ? `<small>${[pb('focus') ? pb('focus') + ' in Focus' : '', pb('needs') ? pb('needs') + ' need you' : ''].filter(Boolean).join(' · ')}</small>` : ''}</span><button data-act="applyNew">Show</button></div>` : '';
   return `<div class="feed-wrap">${pill}<div class="feed-scroll" data-scroll="feed">${bs.map(bucketHTML).join('')}</div></div>`;
 }
 function bucketTabs() {

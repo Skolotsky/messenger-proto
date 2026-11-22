@@ -126,9 +126,9 @@ def run(browser, slug, size, vp, scale):
     feed(); bucket("focus")
     n = pg.locator(".row").count(); y = top(".row")
     demo("playNew")
-    ok('"3 new" appears and nothing in the list moves', vis(".newpill").inner_text() == "3 new" and pg.locator(".row").count() == n and abs(top(".row") - y) < 0.5)
+    ok('"3 new" appears and nothing in the list moves', vis(".newpill b").inner_text() == "3 new" and "1 in Focus" in vis(".newpill").inner_text() and vis(".newpill button").inner_text() == "Show" and pg.locator(".row").count() == n and abs(top(".row") - y) < 0.5)
     shot("05-three-new")
-    click(".newpill")
+    click(".newpill button")
     shot("05b-new-applied")
     ok("the new rows come in when asked", pg.locator('[data-row="r-sam"]').count() == 1 and pg.locator(".newpill").count() == 0)
 
@@ -272,7 +272,7 @@ def why_and_people(browser, slug, size, vp, scale):
     pg.locator(".demo-btn").click(); pg.locator('.demo [data-act="playNew"]').click(); pg.locator('.demo [data-act="leave"]').click(); pg.locator(".demo-btn").click()
     if slug == "telegram-like": needs()
     ok("after leaving the feed, Anna's message is in Needs you", pg.locator('.bucket.b-needs [data-row="r-anna"]').count() == 1)
-    vis(".newpill").first.click()
+    vis(".newpill button").first.click()
     ok("a removed person is not added back when they write again", pg.locator('.bucket.b-needs [data-row="r-sam"]').count() == 1)
     ctx.close()
 
