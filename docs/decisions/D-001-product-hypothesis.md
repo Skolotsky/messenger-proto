@@ -1,8 +1,8 @@
 # D-001: The product hypothesis the early access programme tests
 
-- Status: proposed
+- Status: accepted
 - Level: product
-- Date: 2026-11-22 (revised the same day after discussion with the user)
+- Date: 2026-11-22 (proposed, shaped in discussion and accepted the same day)
 - Decided by: user
 - Depends on: none
 - Evidence: R-002
@@ -122,11 +122,24 @@ No second opinion was sought: nothing is built yet, so changing course costs lit
 
 ## Decision
 
-_Open._ Settled in discussion so far (user, 2026-11-22): option A; Focus as a third, top bucket defined by the person's rules; one item in one place with Focus winning; a count before a rule is saved; text rules judged by a model stay in scope, promote-only and after the item is shown, with experiment and build postponed until the rest is done; nothing jumps on edit or delete; the sender's mark is called a flag, is for whoever the message mentions, and for everyone in scope when it mentions nobody. the starting rules are good as defaults, with one dial per channel to tune them (Focus, All activity, Default, Muted); a channel or thread in Focus brings every new post or reply, shown as one row per conversation; senders can also mark a message Info. each thread has a dial whose levels are the buckets plus Off, with Follow and Unfollow as shortcuts. Set aside for now, to keep it simple: an end date on a Focus rule. Noted by the user as a later surface, not in the first version because channels are enough: ad-hoc topics (see Follow-ups). Still to confirm: the record as a whole.
+Accepted by the user on 2026-11-22: **option A as described above.**
+
+The user's own shaping, beyond the agent's first proposal:
+- A third bucket, Focus, on top: "a way for the user to form what's really important for their attention", by exact rules that are easy to add and, optionally, by text rules judged by a language model.
+- Text rules stay in scope against the agent's advice to decide after an experiment: "everyone wants some smart filtering and llm is the smartest way currently... gains are bigger than risks, at least from the product perspective". Their experiment and build come after everything else. Promote-only and after the item is shown were agreed.
+- No content jumping on edit or delete: expander for a changed size, a marker for a deleted message, emptied space filled with care.
+- Senders set a level on a message. The agent proposed a mark naming a person; the user simplified it to a flag that reaches whoever the message mentions, or everyone in scope when it mentions nobody, chose the term "flag" ("not everything that needs attention means request"), and added Info so a person, like an agent, can post without disturbing anyone.
+- The fixed rules are "good as defaults", tuned by a dial per channel and per thread. The thread dial came from the user's point that a person must be able to follow a thread that is not theirs and leave one that is.
+
+Agreed from the agent's side: direct mentions start in Needs you, not Focus; a flag that mentions nobody lands a bucket lower and closes at the first response; what names you gets through any dial level; one row per conversation; a count before a Focus rule is saved.
+
+Set aside: an end date on a Focus rule ("let's not overcomplicate yet"). Out of scope for the first version: ad-hoc topics.
 
 ## Consequences
 
-_Filled in when accepted._
+- Easier: every later product decision has a yardstick (does it help a person trust the three buckets?). "What deserves attention" has an explicit, explainable answer in the product.
+- Harder: the feed is no longer a list of events. An item's bucket depends on the reader's rules, two dials, the sender's level and the state of a flag, and it can change after it appeared. Edits, deletes, a closed flag and a late promotion all have to update an item in place without jumping.
+- Committed to: three buckets; Focus owned by the person; fixed, explained rules for the other two; Flag and Info; channel and thread dials; one row per conversation; agents as participants; text rules judged by a model built last after an experiment.
 
 ## Follow-ups
 

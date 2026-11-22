@@ -2,7 +2,7 @@
 
 Work in flight. Order inside a section is priority. Finished work moves to `done.md`. Rules: CLAUDE.md, section "Tasks".
 
-**Where we are:** Research is done (R-002). Audience set by the user: small to mid-size startup teams, mixed roles, heavy AI use; the PoC exists to launch a closed early access programme. D-001 (the product hypothesis) is proposed: option A with a third bucket, Focus, added by the user; flags and the starting rules are written in; it waits for the user to accept it. Order set by the user: product decisions first (D-001 to D-004, D-009); technical ones (D-005 to D-008) wait until the product scope is final and the experiments are agreed. Text rules judged by a model are in scope but built last, after an experiment.
+**Where we are:** D-001 is accepted (2026-11-22): the feed sorts what deserves attention into three buckets, tuned by dials and by the sender's Flag or Info. D-009 (which surfaces the first version includes) is proposed and waiting on the user. After it: D-010 the seeded team, then D-002 agents, D-003 feed detail, D-004 edits and deletes. Order set by the user: product decisions first; technical ones (D-005 to D-008) wait until the product scope is final and the experiments are agreed. Text rules judged by a model are in scope but built last, after an experiment.
 
 ## Now
 
@@ -10,7 +10,7 @@ _Nothing in progress._
 
 ## Waiting on user
 
-- **T-007** `decide` D-001: accept the record as it now stands (three buckets, starting rules, channel and thread dials, Focus for channels and threads, Flag and Info). Brief: `docs/visuals/D-001-product-hypothesis.html`
+- **T-009** `decide` D-009: pick the scope of the first version. Recommended: B, the feed plus what makes it observable. Brief: `docs/visuals/D-009-first-version-surfaces.html`
 
 ## Next
 
