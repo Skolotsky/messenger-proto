@@ -594,6 +594,13 @@ body.resizing{cursor:col-resize;user-select:none}
 .me-org>span:last-child{display:flex;flex-direction:column;line-height:1.25}
 .me-org small{color:var(--muted);font-size:12px}
 .rule>.org-mark{flex:none;display:grid}
+/* verifier round: the Activity header holds its title; phone tools leave room for the name */
+.top{container-type:inline-size}
+.top h1{flex:1 0 auto}
+@container (max-width:420px){.top .newpill small,.np-x{display:none}}
+.top:has(.netpill) .newpill small,.top:has(.newpill) .np-x{display:none}
+@media (max-width:760px){.msg-head{padding-right:76px}.msg.mine .msg-head{padding-right:140px}}
+.row.gone .row-main{position:relative}
 
 /* Telegram-like: one list, round avatars, big targets, folders for buckets, bubbles. Own colours. */
 :root{--accent:#6a4fd0;--accent-soft:#ebe6fb;--r:14px;--wall:#eeebe4}
@@ -853,7 +860,7 @@ function seed() {
   const T = (row, mid, bucket) => ({ row, mid, bucket });
   return {
     msgs, convs, rows, view: 'feed', btab: 'focus', htab: 'dms', conv: null, open: new Set(), lock: {}, menu: null, modal: null,
-    viewAs: null, meSub: false, myTitle: 'Product', enterSends: false, autoDone: true, newCh: [], stream: null, w: { side: 250, act: 500 }, pending: null, arrived: false, fyiSeen: false, level: '', focusOnly: false, demo: false, note: '', q: '', resort: false,
+    drafts: {}, levels: {}, undo: {}, back: null, viewAs: null, meSub: false, myTitle: 'Product', enterSends: false, autoDone: true, newCh: [], stream: null, w: { side: 250, act: 500 }, pending: null, arrived: false, fyiSeen: false, level: '', focusOnly: false, demo: false, note: '', q: '', resort: false,
     dmAuto: true, dmPeople: ['anna', 'sam', 'marco', 'lena', 'tomas'], dmRemoved: [], dmAsk: false, off: {}, gone: [],
     rules: [{ id: 'flag', label: 'Flags that name you', n: 6, start: 1 }, { id: 'ch:incidents', label: 'Every new post in #incidents', n: 23, kind: 'channel', target: 'incidents' }],
     tray: [T('r-anna', 'a10', 'focus'), T('r-check', 'c5', 'needs'), T('r-export', 't1', 'needs'), T('r-sso', 'j1', 'needs'), T('r-inc', 'i6', 'focus'), T('r-rc', 'rc4', 'focus'), Object.assign(T('r-mig', 'mig1', 'needs'), { as: 'marco', lead: 'Reacted ✅ to your message: ', at: '10:16' }), T('r-comp', 'p3', 'needs'), T('r-triage', 'u2', 'needs'), T('r-go', 'l3', 'focus')],
@@ -908,7 +915,7 @@ function rxHTML(m) {
 function msgHTML(id, ctx) {
   const m = S.msgs[id], k = ctx + ':' + id, L = S.lock[k] || {};
   // replies are never shown inline: a message with replies carries a link that opens its thread (the habit people know)
-  const tid = m.thread || 'th-' + id, rs = m.thread ? conv(m.thread).msgs.slice(1) : (m.replies || []), replies = rs.length, inThread = ctx === 'thr' || S.conv === tid, lastR = replies && S.msgs[rs[rs.length - 1]];
+  const tid = m.thread || 'th-' + id, rs = (m.thread ? conv(m.thread).msgs.slice(1) : (m.replies || [])).filter(x => S.msgs[x] && !S.msgs[x].deleted), replies = rs.length, inThread = ctx === 'thr' || S.conv === tid, lastR = replies && S.msgs[rs[rs.length - 1]];
   const rep = replies && !inThread ? `<button class="thread-link${S.thread === tid ? ' open' : ''}" data-act="openThread" data-m="${id}">${[...new Set(rs.map(x => S.msgs[x].by))].slice(0, 3).map(x => av(x, 'xs')).join('')}<b>${replies} ${replies === 1 ? 'reply' : 'replies'}</b><small>Last reply ${lastR.t}</small><span class="tl-go">View thread ›</span></button>` : '';
   if (m.deleted) {
     if (!replies && !L.self) return '';
@@ -917,7 +924,7 @@ function msgHTML(id, ctx) {
   const locked = m.edited && L.body && !S.open.has(k);
   const tags = '' + (m.flag ? '<span class="tag flag">⚑ Flag</span>' : '') + (m.info ? '<span class="tag info">Info</span>' : '');
   const ed = m.edited ? `<span class="edited">edited</span>` + (locked ? `<button class="link" data-act="openMsg" data-k="${k}">Show all</button>` : '') : '';
-  const tools = `<span class="msg-tools">${EMO.map(e => `<button class="rx-btn" data-act="reactMsg" data-m="${id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}<button class="rx-pick" data-act="pick" data-m="${id}" aria-label="More reactions" data-tip="More reactions">${ic('smile')}</button>${m.by === ME ? `${m.flag ? `<button class="own-tool" data-act="unflag" data-m="${id}" aria-label="Remove the flag" data-tip="Remove the flag">${ic('unflag')}</button>` : ''}<button class="own-tool" data-act="editMsg" data-mk="${k}" aria-label="Edit" data-tip="Edit">${ic('pencil')}</button><button class="own-tool" data-act="askDel" data-mk="${k}" aria-label="Delete" data-tip="Delete">${ic('trash')}</button>` : ''}</span>`;
+  const tools = `<span class="msg-tools">${EMO.map(e => `<button class="rx-btn" data-act="reactMsg" data-m="${id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}<button class="rx-pick" data-act="pick" data-m="${id}" aria-label="More reactions" data-tip="More reactions">${ic('smile')}</button>${ctx !== 'thr' && !inThread && conv(m.conv).kind === 'channel' ? `<button class="own-tool" data-act="openThread" data-m="${id}" aria-label="Reply in thread" data-tip="Reply in thread">${ic('chat')}</button>` : ''}${m.by === ME ? `${m.flag ? `<button class="own-tool" data-act="unflag" data-m="${id}" aria-label="Remove the flag" data-tip="Remove the flag">${ic('unflag')}</button>` : ''}<button class="own-tool" data-act="editMsg" data-mk="${k}" aria-label="Edit" data-tip="Edit">${ic('pencil')}</button><button class="own-tool" data-act="askDel" data-mk="${k}" aria-label="Delete" data-tip="Delete">${ic('trash')}</button>` : ''}</span>`;
   return `<div class="msg${m.streaming ? ' is-streaming' : ''}${m.failed ? ' is-failed' : ''}${m.pending ? ' is-pending' : ''}${m.by === ME ? ' mine' : ''}${m.flag ? ' is-flag' : ''}${m.info ? ' is-info' : ''}" data-k="${k}"><div class="msg-self">${tools}${av(m.by)}<div class="msg-main"><div class="msg-head"><b>${pn(m.by)}</b>${tags}<time>${timeOf(m.t)}</time>${ed}</div>${S.editing === k ? `<form class="edit" data-form="edit" data-m="${id}"><div class="mp"></div><textarea name="t" rows="1" aria-label="Edit your message" autocomplete="off">${esc(m.text)}</textarea><button class="btn sm pri" data-tip="${S.enterSends ? 'Enter' : 'Ctrl+Enter'}">Save</button><button type="button" class="btn sm" data-act="cancelEdit" data-tip="Esc">Cancel</button></form>` : S.delAsk === k ? `<div class="del-ask"><span>Delete this message? It disappears for everyone${replies ? '; its replies stay' : ''}. This cannot be undone.</span><button class="btn sm danger" data-act="delMsg" data-m="${id}">Delete</button><button class="btn sm" data-act="cancelEdit">Cancel</button></div>` : `<div class="msg-body${locked ? ' locked' : ''}"${locked ? ` style="max-height:${L.body}px"` : ''}>${rich(m.text)}</div>`}${m.failed ? `<div class="send-state fail">Not sent. <button class="link" data-act="retry" data-m="${id}">Try again</button> · <button class="link" data-act="discard" data-m="${id}">Discard</button></div>` : m.pending ? '<div class="send-state">Waiting for the connection. It will be sent when you are back online.</div>' : ''}${rxHTML(m)}${m.streaming ? '<div class="send-state">Still being written. It reaches feeds and notifications only when it is finished.</div>' : ''}${m.status ? `<div class="status${m.streaming ? ' live' : ''}"><span class="st-dot"></span>${m.status}</div>` : ''}</div></div>${rep}</div>`;
 }
 function dialCtl(c, ctx) {
@@ -939,24 +946,24 @@ function explain(r) {
   const c = conv(r.conv), rule = id => S.rules.find(x => x.id === id), acts = [];
   const off = S.off[r.id];
   let what = r.why, by = r.reason, alt = '';
-  if (r.kept === 'you') { what = 'You pressed Keep on this row.'; by = 'Kept by you'; alt = 'It stays until you press Done, reply or react.'; }
+  if (r.kept === 'you') { what = 'You pressed Keep on this row.'; by = 'Kept by you'; alt = S.autoDone ? 'It stays until you press Done, reply or react.' : 'It stays until you press Done.'; }
   else if (r.rule === 'flag') {
-    const x = rule('flag'); what = `${pn(r.by)} flagged this message and named you.`; by = 'Your rule "Flags that name you"'; alt = 'Without the rule it would be in Needs you, as a direct mention.';
+    const x = rule('flag'); what = `${pn(r.by)} flagged this message and named you.`; by = x ? 'Your rule "Flags that name you"' : `${first(r.by)} flagged it for you`; alt = 'Without the rule it would be in Needs you, as a direct mention.';
     if (x) acts.push({ label: 'Stop putting flags in Focus', act: 'rmRuleId', d: `data-id="flag" data-rid="${r.id}" data-to="Needs you"`, note: `Removes the rule. ${x.n} items in the last 7 days would have gone to Needs you instead.` });
   } else if (r.rule === 'dm') { // Focus people: one entry per person who wrote to you directly (D-021)
-    const p = c.with; what = `A direct message from ${pn(p)}, a person.`; by = `${first(p)} is one of your Focus people${S.dmAuto ? ', added the first time they wrote to you' : ''}`; alt = 'A direct message from someone who is not one of them lands in Needs you.';
+    const p = c.with; what = `A direct message from ${pn(p)}, a person.`; const inF = S.dmPeople.includes(p); by = inF ? `${first(p)} is one of your Focus people${S.dmAuto ? ', added the first time they wrote to you' : ''}` : `${first(p)} is not one of your Focus people`; alt = inF ? 'A direct message from someone who is not one of them lands in Needs you.' : 'Add them back under Focus people and their direct messages land in Focus.';
     if (S.dmPeople.includes(p)) acts.push({ label: `Remove ${first(p)} from Focus`, act: 'rmPerson', d: `data-p="${p}" data-rid="${r.id}"`, note: `Only ${first(p)}; everyone else stays. ${RCOUNT[p] || 5} items in the last 7 days would have gone to Needs you instead.` });
   } else if (r.drive === 'channel') {
-    what = `${r.items.length} new posts in #${c.name}. None of them names you.`; by = `You set #${c.name} to Focus`; alt = 'At Default they would not be in your feed at all.';
-    acts.push({ label: `Set #${c.name} to All activity`, act: 'dialFrom', d: `data-c="${c.id}" data-l="all" data-rid="${r.id}" data-to="For your information"`, note: `${CVOL[c.name] || 20} posts in the last 7 days would have gone to For your information.` });
-    acts.push({ label: `Set #${c.name} to Default`, act: 'dialFrom', d: `data-c="${c.id}" data-l="default" data-rid="${r.id}" data-to="nowhere in your feed"`, note: 'Only what names you, and your own threads, would reach you from it.' });
+    what = `${r.items.length} new posts in #${c.name}. None of them names you.`; by = `#${c.name} is set to ${DIAL[c.dial][0]}`; alt = c.dial === 'default' ? '' : 'At Default they would not be in your feed at all.';
+    if (c.dial !== 'all') acts.push({ label: `Set #${c.name} to All activity`, act: 'dialFrom', d: `data-c="${c.id}" data-l="all" data-rid="${r.id}" data-to="For your information"`, note: `${CVOL[c.name] || 20} posts in the last 7 days would have gone to For your information.` });
+    if (c.dial !== 'default') acts.push({ label: `Set #${c.name} to Default`, act: 'dialFrom', d: `data-c="${c.id}" data-l="default" data-rid="${r.id}" data-to="nowhere in your feed"`, note: 'Only what names you, and your own threads, would reach you from it.' });
   }
   if (r.kept && !r.done) acts.unshift({ label: 'Done with this one', act: 'done', d: `data-id="${r.id}"`, note: 'Releases this row only. The rule stays.' });
   return { what, by, alt, acts, off, sec: r.rule === 'dm' ? 'people' : r.drive === 'channel' ? 'channels' : 'feed' };
 }
 function whyBody(r) {
   const e = explain(r), b = BK[r.bucket][0];
-  const done = e.off ? `<p class="why-off">${e.off.msg ? esc(e.off.msg) + ` <button class="link" data-act="undoPerson" data-p="${e.off.p}" data-rid="${r.id}">Undo</button> · ` : `Changed. From the next time you open the feed, rows like this land in ${esc(e.off)}. `}<button class="link" data-act="modal" data-m="rules">Feed settings</button></p>` : '';
+  const done = e.off ? `<p class="why-off">${e.off.msg ? esc(e.off.msg) + ` <button class="link" data-act="undoPerson" data-p="${e.off.p}" data-rid="${r.id}">Undo</button> · ` : `Changed. From the next time you open the feed, rows like this land in ${esc(e.off)}. ${S.undo[r.id] ? `<button class="link" data-act="undoChange" data-rid="${r.id}">Undo</button> · ` : ''}`}<button class="link" data-act="modal" data-m="rules">Feed settings</button></p>` : '';
   const acts = e.off ? '' : e.acts.map(a => `<div class="why-act"><button class="btn sm" data-act="${a.act}" ${a.d}>${esc(a.label)}</button><small>${esc(a.note)}</small></div>`).join('');
   return `<div class="why-steps"><div><i>1</i><span><b>What it is</b>${esc(e.what)}</span></div><div><i>2</i><span><b>What put it in ${b}</b>${esc(e.by)}</span></div>${e.alt ? `<div><i>3</i><span><b>Otherwise</b>${esc(e.alt)}</span></div>` : ''}</div>${acts || done ? `<div class="why-acts"><b class="why-q">Not what you want in ${b}?</b>${acts}${done}${e.off ? '' : `<button class="link" data-act="modal" data-m="rules" data-s="${e.sec}">Manage this in settings</button>`}</div>` : ''}`;
 }
@@ -966,7 +973,7 @@ function rowHTML(r) {
   const c = conv(r.conv), ms = r.items.map(i => S.msgs[i]), last = ms[ms.length - 1];
   const k = 'row:' + last.id, L = S.lock[k] || {};
   const where = c.kind === 'dm' ? 'Direct message' : c.kind === 'channel' ? '#' + c.name : '#' + c.where;
-  if (ms.every(m => m.deleted)) return `<article class="row gone b-${r.bucket}" data-row="${r.id}"><div class="row-main" style="height:${L.self || 64}px"><span class="tomb">${first(last.by)} deleted this message</span><small>${where} · it was here because ${first(last.by)} mentioned you</small></div></article>`;
+  if (ms.every(m => m.deleted)) return `<article class="row gone b-${r.bucket}" data-row="${r.id}"><div class="row-main" style="height:${L.self || 64}px"><span class="tomb">${last.by === ME ? 'You' : first(last.by)} deleted this message</span><small>${where}${r.kept === 'you' ? ' · you had kept it' : last.by === ME ? '' : ` · it was here because ${first(last.by)} mentioned you`}</small>${r.kept === 'you' && !r.done ? `<span class="row-side"><button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button></span>` : ''}</div></article>`;
   const title = r.title || (c.kind === 'dm' ? pn(c.with) : c.kind === 'channel' ? (r.chan ? '#' + c.name : pn(last.by)) : c.title);
   const sub = r.sub || (c.kind === 'dm' ? '' : c.kind === 'channel' ? (r.chan ? '' : '#' + c.name) : '#' + c.where);
   const n = left(r), cnt = n > 1 ? `<span class="row-count">${n} new</span>` : '';
@@ -974,14 +981,14 @@ function rowHTML(r) {
   const state = r.done ? '<span class="state">Done</span>' : r.keptNow ? '<span class="state">Kept</span>' : '';
   const badge = r.read ? '' : `<span class="row-badge">${n > 1 ? n : ''}</span>`;
   const lockS = last.edited && L.body ? ` style="max-height:${L.body}px"` : '';
-  return `<article class="row b-${r.bucket} ${r.read ? 'read' : 'unread'}${state || (r.sec === 'kept' && !r.done) ? ' has-side' : ''}${r.fresh ? ' fresh' : ''}${r.sec === 'kept' ? ' kept' : ''}${r.done ? ' done' : ''}" data-row="${r.id}">
+  return `<article class="row b-${r.bucket} ${r.read ? 'read' : 'unread'}${state || (r.kept && !r.done) ? ' has-side' : ''}${r.fresh ? ' fresh' : ''}${r.sec === 'kept' ? ' kept' : ''}${r.done ? ' done' : ''}" data-row="${r.id}">
     <div class="sw-under" aria-hidden="true"><span class="sw-l">${ic('check')} ${r.sec === 'kept' ? 'Done' : 'Mark read'}</span><span class="sw-k">${r.kept && !r.done ? 'Kept' : r.done ? 'Keep again' : 'Keep'} ${ic('pin')}</span></div>
     <div class="row-main" role="button" tabindex="0" data-act="toggle" data-id="${r.id}">${av(r.chan ? '#' : r.kind === 'rx' ? r.by : last.by)}
       <div class="row-text"><div class="row-head"><span class="row-title">${esc(title)}</span>${sub ? `<span class="row-sub">${sub}</span>` : ''}${marks}${cnt}<span class="row-time">${r.t}${last.edited ? ' · edited' : ''}</span></div>
-        <div class="row-reason"><span class="why-dot"></span><button class="why-btn" data-act="why" data-id="${r.id}" aria-expanded="${S.whyOpen === r.id}">${esc(r.reason)} ${ic('chev')}</button>${r.note ? ` · <em>${r.note}</em>` : ''}</div>
+        <div class="row-reason"><span class="why-dot"></span><button class="why-btn" data-tip="Why is this here?" data-act="why" data-id="${r.id}" aria-expanded="${S.whyOpen === r.id}">${esc(r.reason)} ${ic('chev')}</button>${r.note ? ` · <em>${r.note}</em>` : ''}</div>
         <div class="row-preview" data-k="${k}"${lockS}><b>${last.by === ME ? 'You' : first(last.by)}:</b> ${rich(last.text)}</div>
         ${r.kind !== 'rx' && last.rx.length ? rxHTML(last) : ''}</div>
-      <div class="row-side">${state}${badge}<span class="row-btns"><button class="rx-pick" data-act="pick" data-m="${last.id}" aria-label="React without opening" data-tip="React to the latest message without opening">${ic('smile')}</button>${!r.read ? `<button class="mark-read" data-act="read" data-id="${r.id}" aria-label="Mark read without opening" data-tip="Mark read without opening">${ic('check')}</button>` : ''}${r.kept && !r.done ? '' : `<button class="keep-btn" data-act="keep" data-id="${r.id}" aria-label="${r.done ? 'Keep again' : 'Keep'}" data-tip="${r.done ? 'Keep again: undo Done' : 'Keep until you press Done'}">${ic('pin')}</button>`}</span>${r.sec === 'kept' && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : ''}</div></div>${S.whyOpen === r.id ? `<div class="why-pop" data-stop="1"><h3>Why this is in ${BK[r.bucket][0]}</h3>${whyBody(r)}</div>` : ''}</article>`;
+      <div class="row-side">${state}${badge}<span class="row-btns"><button class="rx-pick" data-act="pick" data-m="${last.id}" aria-label="React without opening" data-tip="React to the latest message without opening">${ic('smile')}</button>${!r.read ? `<button class="mark-read" data-act="read" data-id="${r.id}" aria-label="Mark read without opening" data-tip="Mark read without opening">${ic('check')}</button>` : ''}${r.kept && !r.done ? '' : `<button class="keep-btn" data-act="keep" data-id="${r.id}" aria-label="${r.done ? 'Keep again' : 'Keep'}" data-tip="${r.done ? 'Keep again: undo Done' : 'Keep until you press Done'}">${ic('pin')}</button>`}</span>${r.kept && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}" data-tip="Done: release this row">Done</button>` : ''}</div></div>${S.whyOpen === r.id ? `<div class="why-pop" data-stop="1"><h3>Why this is in ${BK[r.bucket][0]}</h3>${whyBody(r)}</div>` : ''}</article>`;
 }
 const SUN = '<svg class="ill" viewBox="0 0 120 64" aria-hidden="true"><path d="M8 52h104" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M36 52a24 24 0 0 1 48 0" fill="currentColor" opacity=".18"/><path d="M60 14v8M30 26l6 6M90 26l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 60h30M62 60h38" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".4"/></svg>';
 function bucketHTML(b) {
@@ -992,7 +999,7 @@ function bucketHTML(b) {
   const sug = (act, id, t, d) => `<div class="rule"><span><b>${t}</b><small>${d}</small></span><button class="btn sm pri" data-act="${act}"${id ? ` data-id="${id}"` : ''}>Add</button></div>`;
   let body = nw.length ? nw.map(rowHTML).join('') : noRules ? `<div class="suggest"><p><b>Focus is yours to fill.</b> Nothing lands here until you say what should. Three rules most people start with:</p>${sug('dmAuto', '', 'Direct messages from people', 'Everyone who writes to you directly. 31 items in the last 7 days.')}${sug('ruleToggle', 'flag', 'Flags that name you', 'When someone, or an agent, flags a message for you. 6 items in the last 7 days.')}${sug('ruleToggle', 'mention', 'Any direct mention', 'They are in Needs you today. 23 items in the last 7 days.')}<p class="sheet-note">You can also add one person, channel or thread from "Add to Focus…" wherever you see it.</p></div>` : `<div class="empty">${SUN}<p>${EMPTY[b]}</p></div>`;
   if (kp.length) body += `<div class="kept-head"><b>Kept · ${kp.length}</b><small>${S.autoDone ? 'Stays until you press Done, reply or react' : 'Stays until you press Done'}</small></div>` + kp.map(rowHTML).join('');
-  return `<section class="bucket b-${b}" data-b="${b}"><header class="bk-head"><h2 data-tip="${BK[b][2]}">${BK[b][0]}</h2>${cnt}<span class="bk-acts"><button class="btn sm" data-act="markAll" data-b="${b}">Mark all read</button></span></header>${body}</section>`;
+  return `<section class="bucket b-${b}" data-b="${b}"><header class="bk-head"><h2 data-tip="${BK[b][2]}">${BK[b][0]}</h2>${cnt}<span class="bk-acts"><button class="btn sm" data-act="markAll" data-b="${b}" data-tip="Mark every new row here as read. Kept rows stay.">Mark all read</button></span></header>${body}</section>`;
 }
 const counts = () => ({ focus: S.rows.filter(r => r.bucket === 'focus' && r.sec !== 'kept' && !r.read).length, needs: S.rows.filter(r => r.bucket === 'needs' && !r.read).length, fyi: S.rows.filter(r => r.bucket === 'fyi' && !r.read).length });
 function pillHTML() {
@@ -1012,7 +1019,7 @@ function bucketTabs() {
 const HT = { dms: 'Direct messages', mentions: 'Mentions', threads: 'Threads', reactions: 'Reactions' };
 const hUnread = e => !!e[2] && !S.msgs[e[2]].deleted && S.rows.some(r => !r.read && r.items.includes(e[2]));
 function histTabs(short) { // each tab counts its unread entries; the count is quiet, so the feed's badge stays the one that calls
-  return Object.keys(HT).map(t => { const n = HIST[t].filter(hUnread).length; return `<button class="tab${S.view === 'history' && S.htab === t ? ' on' : ''}" data-act="htab" data-t="${t}" aria-label="${HT[t]}${n ? ', ' + n + ' unread' : ''}">${short && t === 'dms' ? 'DMs' : HT[t]}${n ? `<span class="h-count">${n}</span>` : ''}</button>`; }).join('');
+  return Object.keys(HT).map(t => { const n = HIST[t].filter(hUnread).length; return `<button class="tab${S.view === 'history' && S.htab === t ? ' on' : ''}" data-act="htab" data-t="${t}" data-tip="History of your ${HT[t].toLowerCase()}. Nothing leaves it by being read." aria-label="${HT[t]}${n ? ', ' + n + ' unread' : ''}">${short && t === 'dms' ? 'DMs' : HT[t]}${n ? `<span class="h-count">${n}</span>` : ''}</button>`; }).join('');
 }
 function history() {
   const list = HIST[S.htab].filter(e => !e[2] || !S.msgs[e[2]].deleted).map(e => {
@@ -1037,17 +1044,17 @@ const dayOf = t => DAYS[t.split(' ')[0]] || 'Today', timeOf = t => t.replace(/^(
 function convView(cid, side) {
   const ctx = side ? 'thr' : 'conv';
   if (!cid) return `<div class="conv none"><div class="empty">${SUN}<p>${S.actOpen === false ? 'Choose a channel or a person on the left. Activity is closed; its count stays in the sidebar.' : 'Open a row to read the conversation here, next to the feed.'}</p></div></div>`;
-  const c = conv(cid);
+  const c = conv(cid), curL = S.levels[cid] || '';
   const title = c.kind === 'dm' ? pn(c.with) : c.kind === 'channel' ? '#' + c.name : c.title;
   const sub = c.kind === 'dm' ? P[c.with][1] + (isAgent(c.with) ? ' · agent' : '') : c.kind === 'channel' ? `Channel · ${c.people} people` : side ? `Thread in #${c.where}` : `<button class="link to-chan" data-act="openConv" data-c="ch-${c.where}">‹ #${c.where}</button> · Thread`;
   let seenNew = false;
   let lastDay = null; // a line between days, so today's messages stand apart from older ones
   const body = c.msgs.map(id => { const m = S.msgs[id], html = msgHTML(id, ctx); let d = ''; const day = dayOf(m.t); if (html && day !== lastDay) { lastDay = day; d += `<div class="dayline"><span>${day}</span></div>`; } if (m.isNew && !seenNew) { seenNew = true; d += '<div class="newline"><span>New</span></div>'; } return d + html; }).join(''); // the divider goes with the first message that is really shown, so a delete cannot move it
-  const lv = l => `<button type="button" class="btn sm lv-${l}${S.level === l ? ' on' : ''}" data-act="level" data-l="${l}" data-tip="${l === 'flag' ? 'Flag: this needs attention. It stays in the feed of whoever you mention until they deal with it.' : 'Info: for the record. It notifies nobody and never lands above For your information.'}">${l === 'flag' ? '⚑ Flag' : 'Info'}</button>`;
+  const lv = l => `<button type="button" class="btn sm lv-${l}${curL === l ? ' on' : ''}" data-act="level" data-l="${l}" data-fc="${c.id}" data-tip="${l === 'flag' ? 'Flag: this needs attention. It stays in the feed of whoever you mention until they deal with it.' : 'Info: for the record. It notifies nobody and never lands above For your information.'}">${l === 'flag' ? '⚑ Flag' : 'Info'}</button>`;
   const by = c.kind === 'dm' ? c.with : c.msgs.length ? S.msgs[c.msgs[c.msgs.length - 1]].by : ME;
   return `<div class="conv k-${c.kind}${side ? ' side-thread' : ''}"><header class="conv-head">${side ? '' : `<button class="icon-btn back" data-act="closeConv" aria-label="Back to the feed">${ic('back')}</button>`}<div class="conv-title"><b>${esc(title)}</b><small>${sub}</small></div>${side ? '<button class="icon-btn th-close" data-act="closeThread" aria-label="Close the thread" data-tip="Close the thread">×</button>' : ''}<div class="conv-acts">${dialCtl(c, ctx)}<button class="btn sm" data-act="ruleFor" data-c="${c.id}" data-by="${c.kind === 'dm' ? c.with : ''}">Add to Focus…</button></div></header>
     <div class="conv-body" data-scroll="${ctx}">${body || `<div class="empty start">${SUN}<p><b>This is the start of #${esc(c.name || '')}.</b><br>You created it today with ${c.people - 1} ${c.people - 1 === 1 ? 'person' : 'people'}. Everyone on the team can find and join it.</p></div>`}</div>
-    <form class="composer" data-form="send" data-c="${c.id}"><div class="mp"></div><div class="cbox"><div class="reply"><textarea name="t" rows="1" autocomplete="off" aria-label="Message" placeholder="${c.kind === 'thread' ? 'Reply in thread' : 'Message ' + esc(title)}…"></textarea></div><div class="cbar"><div class="levels">${lv('flag')}${lv('info')}<small>${S.net === 'off' ? 'You are offline. What you write is sent when the connection is back.' : S.level === 'flag' ? 'Needs attention. Stays with whoever you mention until they deal with it.' : S.level === 'info' ? 'For the record. Notifies nobody.' : ''}</small></div><button type="button" class="send-hint" data-act="modal" data-m="rules" data-s="writing" data-tip="Change which key sends, in settings">${S.enterSends ? 'Enter to send' : 'Ctrl+Enter to send'}</button><button class="btn pri send" aria-label="Send" data-tip="${S.enterSends ? 'Enter sends. Shift+Enter starts a new line' : 'Ctrl+Enter sends. Enter starts a new line'}">Send</button></div></div></form></div>`;
+    <form class="composer" data-form="send" data-c="${c.id}"><div class="mp"></div><div class="cbox"><div class="reply"><textarea name="t" rows="1" autocomplete="off" aria-label="Message" placeholder="${c.kind === 'thread' ? 'Reply in thread' : 'Message ' + esc(title)}…"></textarea></div><div class="cbar"><div class="levels">${lv('flag')}${lv('info')}<small>${S.net === 'off' ? 'You are offline. What you write is sent when the connection is back.' : curL === 'flag' ? 'Needs attention. Stays with whoever you mention until they deal with it.' : curL === 'info' ? 'For the record. Notifies nobody.' : ''}</small></div><button type="button" class="send-hint" data-act="modal" data-m="rules" data-s="writing" data-tip="Change which key sends, in settings">${S.enterSends ? 'Enter to send' : 'Ctrl+Enter to send'}</button><button class="btn pri send" aria-label="Send" data-tip="${S.enterSends ? 'Enter sends. Shift+Enter starts a new line' : 'Ctrl+Enter sends. Enter starts a new line'}">Send</button></div></div></form></div>`;
 }
 const convPane = () => convView(S.conv), threadPane = () => S.thread ? convView(S.thread, true) : '';
 function modalHTML() {
@@ -1079,7 +1086,7 @@ function modalHTML() {
     h = `<h2>Add to Focus</h2><p class="sheet-note">Each rule shows what it would have pulled into Focus over the last 7 days, before you save it.</p>${opts.map(o => { const has = o[3] === 'thread' ? c.tdial === 'focus' : S.rules.some(r => r.id === o[0]); return `<div class="rule"><span><b>${esc(o[1])}</b><small class="rule-n">${o[2]} items in the last 7 days${o[2] > 30 ? `, about ${Math.round(o[2] / 7)} a day. That would make Focus a long list.` : ''}</small></span><button class="btn sm pri" ${has ? 'disabled' : ''} data-act="addRule" data-id="${o[0]}" data-label="${esc(o[1])}" data-n="${o[2]}" data-kind="${o[3]}" data-target="${o[4]}">${has ? 'Added' : o[3] === 'thread' ? 'Set thread to Focus' : 'Add rule'}</button></div>`; }).join('')}`;
   }
   if (m.type === 'rules') {
-    const acct = `<div class="rule person">${av(ME)}<span><b>${pn(ME)}</b><small>${esc(S.myTitle)}</small></span></div><div class="rule org-rule"><span class="org-mark">${ORG.name[0]}</span><span><b>${ORG.name}</b><small>Your organization · ${ORG.members} members</small></span></div><label class="fld"><span>Name</span><input value="${pn(ME)}" aria-label="Name"></label><label class="fld"><span>What you do</span><input value="${esc(S.myTitle)}" data-mytitle="1" aria-label="What you do"></label><p class="sheet-note">Shown under your name. It is your own words and means nothing to the product: there are no roles or permissions in the first version.</p><p class="sheet-note">To see the team as someone else, use Switch account in your menu.</p>`;
+    const acct = `<div class="rule person">${av(ME)}<span><b>${pn(ME)}</b><small>${esc(S.myTitle)}</small></span></div><div class="rule org-rule"><span class="org-mark">${ORG.name[0]}</span><span><b>${ORG.name}</b><small>Your organization · ${ORG.members} members</small></span></div><label class="fld"><span>Name</span><input value="${pn(ME)}" data-myname="1" aria-label="Name"></label><label class="fld"><span>What you do</span><input value="${esc(S.myTitle)}" data-mytitle="1" aria-label="What you do"></label><p class="sheet-note">Shown under your name. It is your own words and means nothing to the product: there are no roles or permissions in the first version.</p><p class="sheet-note">To see the team as someone else, use Switch account in your menu.</p>`;
     // Activity feed: the page keeps the general rules; what was added to Focus one by one lives in its own lists
     const cur = S.setSec || 'feed', ppl = S.dmPeople, has = id => S.rules.some(r => r.id === id), of = k => S.rules.filter(r => r.kind === k), goneOf = k => S.gone.filter(r => r.kind === k);
     const sw = (act, id, on, t, d) => `<label class="set-sw"><input type="checkbox" data-act="${act}"${id ? ` data-id="${id}"` : ''}${on ? ' checked' : ''}><span><b>${t}</b><small>${d}</small></span></label>`;
@@ -1123,7 +1130,7 @@ const OTHER = { 'slack-like': 'Slack-like', 'telegram-like': 'Telegram-like', 'o
 function demoHTML() {
   const b = (a, t) => `<button class="btn sm" data-act="${a}">${t}</button>`;
   const panel = S.demo ? `<div class="demo" data-stop="1"><h2>Demo controls</h2><p>Not part of the product. They stand in for the team acting while you watch.</p>
-    ${b('playEdit', 'Tomás edits his message, longer')}${b('playDelete', 'Jonas deletes his message')}${b('playNew', 'Three new things arrive')}${b('leave', 'Leave the feed and come back')}<h2>More to see</h2>${b('playAgent', 'An agent writes an answer, live')}${b('playNoRules', 'Focus with no rules at all')}<h2>When things go wrong</h2>${b('netToggle', S.net === 'off' ? 'Connection returns' : 'Connection drops')}${b('failToggle', S.failNext ? 'Sending works again' : 'The next message fails to send')}${b('lagToggle', S.searchLag ? 'Search catches up' : 'Search falls behind')}<button class="btn sm" data-act="modal" data-m="tray">Open the notification app (outside the product)</button>${b('reset', 'Reset')}
+    ${b('playEdit', 'Tomás edits his message, longer')}${b('playDelete', 'Jonas deletes his message')}${b('playNew', 'Three new things arrive')}${b('leave', 'Leave the feed and come back')}<h2>More to see</h2>${b('playAgent', 'An agent writes an answer, live')}${b('playNoRules', 'Focus with no rules at all')}<h2>When things go wrong</h2>${b('netToggle', S.net === 'off' ? 'Connection returns' : 'Connection drops')}${b('failToggle', S.failNext ? 'Sending works again' : 'The next message fails to send')}${b('lagToggle', S.searchLag ? 'Search catches up' : 'Search falls behind')}<button class="btn sm" data-act="modal" data-m="tray">What the notification sender delivered</button>${b('reset', 'Reset')}
     <p class="demo-note">${esc(S.note) || 'Tomás and Jonas are in Needs you.'}</p>
     
     <div class="demo-row">Version ${Object.keys(OTHER).map(k => k === Skin.file ? `<b>${OTHER[k]}</b>` : `<a href="${k}.html">${OTHER[k]}</a>`).join(' · ')}</div></div>` : '';
@@ -1140,17 +1147,28 @@ me() { // the person's own menu; switching account is a second level of it
     return `<div class="me"><button class="me-btn" data-act="menu" data-key="me" aria-expanded="${open}" aria-label="Your account menu">${av(who)}<span><b>${pn(who)}</b><small>${esc(label)}</small></span>${ic('chev')}</button>${open ? `<div class="pop me-pop">${S.meSub ? sub : main}</div>` : ''}</div>`; },
   org() { return ORG; },
   rz(k) { return `<div class="rz" data-rz="${k}" role="separator" aria-orientation="vertical" data-tip="Drag to resize. Double-click to reset"></div>`; },
-  net() { return S.net === 'off' ? '<span class="netpill" role="status">Offline · showing 10:42</span>' : ''; },
+  net() { return S.net === 'off' ? '<span class="netpill" role="status">Offline<span class="np-x"> · showing 10:42</span></span>' : ''; },
   nav(v, label, icon, extra) { return `<button class="nav${S.view === v ? ' on' : ''}" data-act="view" data-v="${v}">${ic(icon)}<span>${label}</span>${extra || ''}</button>`; }
 };
 
 /* ---------- behaviour ---------- */
 const root = () => document.getElementById('app');
+let editVals = {};
+function saveDrafts() {
+  const a = document.activeElement, out = { key: null }; editVals = {};
+  document.querySelectorAll('form textarea[name="t"]').forEach(t => { const f = t.form, k = f.dataset.form === 'edit' ? 'edit:' + f.dataset.m : f.dataset.c; if (f.dataset.form === 'edit') editVals[k] = t.value; else S.drafts[k] = t.value; if (t === a) { out.key = k; out.s = t.selectionStart; out.e = t.selectionEnd; } });
+  return out;
+}
+function restoreDrafts(st) {
+  document.querySelectorAll('form textarea[name="t"]').forEach(t => { const f = t.form, k = f.dataset.form === 'edit' ? 'edit:' + f.dataset.m : f.dataset.c, v = f.dataset.form === 'edit' ? editVals[k] : S.drafts[k]; if (v !== undefined && v !== t.value) t.value = v; if (t.value) grow(t); if (st.key === k) { t.focus({ preventScroll: true }); t.setSelectionRange(st.s, st.e); } });
+}
 function render() {
+  const draftState = saveDrafts();
   const keep = {}; document.querySelectorAll('[data-scroll]').forEach(e => keep[e.dataset.scroll] = e.scrollTop);
   root().classList.toggle('viewing', !!S.viewAs);
   root().innerHTML = (S.viewAs ? `<div class="viewband" role="status"><span class="demo-tag">demonstration</span><b>Viewing as ${pn(S.viewAs)}</b><span class="vb-note">This prototype still shows Maya's messages.</span><button class="btn sm" data-act="backToMe">Back to ${pn(ME)}</button></div>` : '') + Skin.shell(h) + modalHTML() + pickerHTML() + demoHTML();
   document.querySelectorAll('[data-scroll]').forEach(e => { if (keep[e.dataset.scroll]) e.scrollTop = keep[e.dataset.scroll]; });
+  restoreDrafts(draftState);
   seeFyi();
 }
 function seeFyi() {
@@ -1159,12 +1177,15 @@ function seeFyi() {
   if (b && sc && b.getBoundingClientRect().top < sc.getBoundingClientRect().bottom - 60) S.fyiSeen = true;
 }
 const row = id => S.rows.find(r => r.id === id);
-function act(r) { r.read = true; if (r.kept && S.autoDone) r.done = true; // by setting, a reply or a reaction releases a kept row, or only Done does
-  const m = S.msgs[r.items[r.items.length - 1]]; if (m.status === 'Waiting on Maya') m.status = 'Continuing'; }
+function act(r) { r.read = true; if (r.kept && S.autoDone) r.done = true; } // by setting, a reply or a reaction releases a kept row, or only Done does
+function answered(cid) { // a message really sent in a direct conversation or a thread answers the row it belongs to; a post in a channel answers nothing
+  const c = conv(cid); if (c.kind === 'channel') return;
+  S.rows.forEach(r => { if (r.conv === cid || (c.kind === 'thread' && r.items.includes(c.msgs[0]))) { act(r); r.items.forEach(i => { if (S.msgs[i].status === 'Waiting on Maya') S.msgs[i].status = 'Continuing'; }); } });
+}
 function settle() { // the person leaves the feed: read rows go, kept rows move to Kept, rule and dial changes apply
   if (S.fyiSeen) S.rows.forEach(r => { if (r.bucket === 'fyi') r.read = true; });
   S.rows = S.rows.filter(r => {
-    if (r.items.every(i => S.msgs[i].deleted)) return false;
+    if (r.items.every(i => S.msgs[i].deleted) && (r.kept !== 'you' || r.done)) return false;
     if (r.done) return false;
     if (r.read && r.kept) { r.bucket = 'focus'; r.sec = 'kept'; r.keptNow = false; if (r.kept === 'you') r.reason = 'Kept by you'; else r.reason = 'Flagged by ' + first(r.by); return true; }
     return !r.read;
@@ -1176,7 +1197,7 @@ function settle() { // the person leaves the feed: read rows go, kept rows move 
     if (r.drive === 'thread' && !info) { if (c.tdial === 'off') return false; if (c.tset) { r.bucket = c.tdial; r.reason = `${BK[c.tdial][0]}: you set this thread to ${TDIAL[c.tdial][0]}`; } }
     if (r.rule && !ruleOn(r) && r.bucket === 'focus' && !r.kept) { r.bucket = 'needs'; r.reason = 'Needs you: ' + r.reason.replace('In Focus: ', '') + (r.rule === 'dm' ? '' : ' (your Focus rule for it is off)'); r.why = r.rule === 'dm' ? `${first(r.by)} is not one of your Focus people, so a direct message lands in Needs you.` : r.why; }
     if (r.rule === 'dm' && ruleOn(r) && r.bucket === 'needs') { r.bucket = 'focus'; r.reason = 'In Focus: direct message from ' + first(r.by); }
-    if (!info) { const hit = S.rules.find(x => (x.kind === 'person' && x.target === r.by) || (x.kind === 'channel' && (c.name === x.target) && r.bucket !== 'focus') || (x.kind === 'thread' && x.target === c.id) || (x.id === 'mention' && /mentioned you/.test(r.reason))); if (hit && r.bucket !== 'focus') { r.bucket = 'focus'; r.reason = `In Focus: your rule "${hit.label}"`; r.why = 'Your own Focus rule matched. You can remove it under Rules.'; } }
+    if (!info) { const hit = S.rules.find(x => (x.kind === 'person' && x.target === r.by) || (x.kind === 'channel' && (c.name === x.target) && r.bucket !== 'focus') || (x.kind === 'thread' && x.target === c.id) || (x.id === 'mention' && /mentioned you/.test(r.reason))); if (hit && r.bucket !== 'focus') { r.bucket = 'focus'; r.reason = `In Focus: your rule "${hit.label}"`; r.why = 'Your own Focus rule matched. You can change it in Settings.'; } }
     return true;
   });
   S.lock = {}; S.open.clear(); S.fyiSeen = false; S.rows.forEach(r => { r.fresh = false; });
@@ -1186,6 +1207,7 @@ function snap(mid) { // remember the size of everything showing this message, so
   document.querySelectorAll(`[data-k$=":${mid}"]`).forEach(el => {
     const isRow = el.classList.contains('row-preview');
     const body = isRow ? el : el.querySelector('.msg-body'), self = isRow ? el.closest('.row-main') : el.querySelector('.msg-self');
+    if (!body || !self) return; // a message showing its delete question has no text to measure
     S.lock[el.dataset.k] = { body: body.getBoundingClientRect().height, self: self.getBoundingClientRect().height };
   });
 }
@@ -1194,29 +1216,30 @@ function onScreen(rid) { const el = document.querySelector(`[data-row="${rid}"]`
 function measured(rid, fn, what) { const a = below(rid); fn(); render(); const b = below(rid); S.note = a === null || b === null ? what + ' The row was not on screen.' : `${what} The row below moved by ${Math.abs(b - a).toFixed(1)} px.`; render(); }
 function setLevel(c, v) { c.dial = v; const id = 'ch:' + c.name; S.rules = S.rules.filter(r => r.id !== id); S.gone = S.gone.filter(r => r.id !== id); if (v === 'focus') S.rules.push({ id, label: `Every new post in #${c.name}`, n: CVOL[c.name] || 20, kind: 'channel', target: c.name }); }
 const A = {
-  openConv(d) { S.thread = null; if (S.conv !== d.c) S.lock = Object.fromEntries(Object.entries(S.lock).filter(([k]) => !k.startsWith('conv:'))); S.conv = d.c; conv(d.c); S.menu = null; S.modal = null; S.rows.forEach(r => { if (r.conv === d.c && (!d.id || r.id === d.id || conv(d.c).kind !== 'channel')) r.read = true; }); const sr = document.getElementById('sr'); if (sr) sr.innerHTML = ''; S.q = ''; },
+  openConv(d) { S.back = null; S.thread = null; if (S.conv !== d.c) S.lock = Object.fromEntries(Object.entries(S.lock).filter(([k]) => !k.startsWith('conv:'))); S.conv = d.c; conv(d.c); S.menu = null; S.modal = null; S.rows.forEach(r => { if (r.conv === d.c && (!d.id || r.id === d.id || conv(d.c).kind !== 'channel')) r.read = true; }); const sr = document.getElementById('sr'); if (sr) sr.innerHTML = ''; S.q = ''; },
   openThread(d) { // a thread opens as its own conversation, in place of the channel, with a way back
     const m = S.msgs[d.m], id = m.thread || 'th-' + d.m, par = conv(m.conv);
-    if (!S.convs[id]) S.convs[id] = { id, kind: 'thread', title: 'Thread', where: par.name || par.where, tdial: 'off', tauto: 'you are not part of it', msgs: [d.m, ...m.replies] };
-    if (Skin.threadBeside && !isPhone()) { S.thread = S.thread === id ? null : id; S.menu = null; } else A.openConv({ c: id }); // beside the channel where there is room, in its place on a phone
+    if (!S.convs[id]) S.convs[id] = { id, kind: 'thread', title: 'Thread', where: par.name || par.where, tdial: 'off', tauto: 'you are not part of it', msgs: [d.m, ...(m.replies || [])] };
+    m.thread = id;
+    if (Skin.threadBeside && !isPhone()) { S.thread = S.thread === id ? null : id; S.menu = null; } else { const from = S.conv; A.openConv({ c: id }); S.back = from; } // beside the channel where there is room, in its place on a phone
   },
   closeThread() { S.thread = null; },
   editMsg(d) { S.editing = d.mk; S.delAsk = null; },
   askDel(d) { S.delAsk = d.mk; S.editing = null; },
   cancelEdit() { S.editing = null; S.delAsk = null; },
-  delMsg(d) { S.msgs[d.m].deleted = 1; S.delAsk = null; S.rows = S.rows.filter(r => !r.items.every(i => S.msgs[i].deleted)); }, // your own delete: nothing is left unless it has replies (D-004)
+  delMsg(d) { snap(d.m); Object.keys(S.lock).forEach(k => { if (!k.startsWith('row:')) delete S.lock[k]; }); S.msgs[d.m].deleted = 1; S.delAsk = null; }, // the feed keeps the space until you leave it; the conversation shows nothing unless it has replies (D-004)
   unflag(d) { S.msgs[d.m].flag = 0; },
-  retry(d) { S.msgs[d.m].failed = 0; },
+  retry(d) { const m = S.msgs[d.m]; m.failed = 0; if (S.net === 'off') m.pending = 1; else answered(m.conv); },
   discard(d) { const m = S.msgs[d.m], c = conv(m.conv); c.msgs = c.msgs.filter(x => x !== d.m); delete S.msgs[d.m]; },
   mention(d) { const i = window._mi; i.value = i.value.replace(/@([\wÀ-ÿ]*)$/, '@' + d.n + ' '); i.closest('form').querySelector('.mp').innerHTML = ''; grow(i); i.focus(); return true; },
-  netToggle() { if (S.net === 'off') { S.net = 'ok'; Object.values(S.msgs).forEach(m => { m.pending = 0; }); if (!S.arrived) A.playNew(); S.note = 'Back online. What you wrote was sent; what arrived meanwhile waits behind Show.'; } else { S.net = 'off'; S.note = 'The connection is lost. Nothing on screen moved; a notice says since when.'; } },
+  netToggle() { if (S.net === 'off') { S.net = 'ok'; Object.values(S.msgs).forEach(m => { if (m.pending) { m.pending = 0; answered(m.conv); } }); if (!S.arrived) A.playNew(); S.note = 'Back online. What you wrote was sent; what arrived meanwhile waits behind Show.'; } else { S.net = 'off'; S.note = 'The connection is lost. Nothing on screen moved; a notice says since when.'; } },
   lagToggle() { S.searchLag = !S.searchLag; S.note = S.searchLag ? 'The search index is behind. Search says so.' : 'Search has caught up.'; },
   failToggle() { S.failNext = !S.failNext; S.note = S.failNext ? 'The next message you send will fail.' : 'Sending works again.'; },
-  closeConv() { S.thread = null; S.conv = null; S.menu = null; },
+  closeConv() { if (S.back) { const c = S.back; A.openConv({ c }); return; } S.thread = null; S.conv = null; S.menu = null; },
   read(d) { row(d.id).read = true; },
   keep(d) { const r = row(d.id); r.kept = r.kept || 'you'; r.read = true; r.done = false; r.keptNow = r.sec !== 'kept'; }, // also the way back from a Done pressed by mistake
   done(d) { const r = row(d.id); r.done = true; r.read = true; },
-  reactMsg(d) { toggleRx(S.msgs[d.m], d.e); S.pick = null; S.rows.forEach(r => { if (r.items.includes(d.m)) act(r); }); },
+  reactMsg(d) { const m = S.msgs[d.m]; toggleRx(m, d.e); S.pick = null; const added = m.rx.some(x => x[0] === d.e && x[1].includes(ME)); S.rows.forEach(r => { if (r.items.includes(d.m)) { if (added) act(r); else r.read = true; } }); },
   pick(d, ev) { S.pick = S.pick && S.pick.m === d.m ? null : { m: d.m, x: ev.clientX, y: ev.clientY }; },
   markAll(d) { S.rows.forEach(r => { if (r.bucket === d.b && r.sec !== 'kept') r.read = true; }); },
   view(d) { if (S.view === 'feed' && d.v !== 'feed') settle(); S.view = d.v; S.menu = null; },
@@ -1238,10 +1261,11 @@ const A = {
     S.msgs[id] = { id, by: 'field', t: 'now', text: '', rx: [], conv: cid, status: 'Writing…', streaming: 1 }; conv(cid).msgs.push(id); S.stream = { id, cid, words: full.split(' '), i: 0 };
     S.note = 'Researcher is writing in "Competitor pricing scan". Open it to watch. Nothing reaches the feed until it is finished.';
     const step = () => { const st = S.stream; if (!st || !S.msgs[st.id]) return; st.i++; const m = S.msgs[st.id]; m.text = st.words.slice(0, st.i).join(' ');
-      document.querySelectorAll(`[data-k$=":${st.id}"] .msg-body`).forEach(el => { el.textContent = m.text; const b = el.closest('.conv-body'); if (b) b.scrollTop = b.scrollHeight; });
+      document.querySelectorAll(`[data-k$=":${st.id}"] .msg-body`).forEach(el => { el.textContent = m.text; const b = el.closest('.conv-body'); if (b && b.scrollHeight - b.scrollTop - b.clientHeight < 90) b.scrollTop = b.scrollHeight; });
       if (st.i < st.words.length) return setTimeout(step, 90);
       m.streaming = 0; m.status = 'Done'; S.stream = null;
-      if (S.conv === st.cid || S.thread === st.cid) S.note = 'Finished while you were watching the conversation: it is read at once, with no feed row and no notification.';
+      const lastEl = document.querySelector(`[data-k$=":${st.id}"]`), body = lastEl && lastEl.closest('.conv-body'), seen = body && lastEl.getBoundingClientRect().top < body.getBoundingClientRect().bottom;
+      if (seen) S.note = 'Finished while you were watching the conversation: it is read at once, with no feed row and no notification.';
       else { m.isNew = 1; S.pending = (S.pending || []).concat([{ into: 'r-comp', items: [st.id], t: 'now', by: 'field', row: { id: 'r-comp2', conv: st.cid, bucket: 'needs', items: [st.id], by: 'field', t: 'now', reason: 'Needs you: reply in a thread you started', why: 'An agent\'s result is sorted like anyone\'s reply: you started this thread.', drive: 'thread', sec: 'new', read: false, kept: null, done: false, replies: [] } }]); S.note = 'Finished. Now it is a finished message, so it arrives like any other: behind Show.'; }
       render(); };
     setTimeout(step, 300);
@@ -1258,17 +1282,25 @@ const A = {
   closeModal() { S.modal = null; },
   why(d) { S.whyOpen = S.whyOpen === d.id ? null : d.id; },
   ruleToggle(d) { const DEF = { flag: ['Flags that name you', 6, 1], mention: ['Any direct mention', 23, 0] }; if (S.rules.some(r => r.id === d.id)) S.rules = S.rules.filter(r => r.id !== d.id); else S.rules.push({ id: d.id, label: DEF[d.id][0], n: DEF[d.id][1], start: DEF[d.id][2] }); },
-  rmRuleId(d) { S.gone.push(...S.rules.filter(x => x.id === d.id)); S.rules.filter(x => x.id === d.id && x.kind === 'channel').forEach(x => { const c = conv('ch-' + x.target); if (c) c.dial = 'default'; }); S.rules = S.rules.filter(x => x.id !== d.id); if (d.rid) S.off[d.rid] = d.to; },
+  undoChange(d) { const u = S.undo[d.rid]; if (u.rule) { S.rules.push(u.rule); S.gone = S.gone.filter(x => x.id !== u.rule.id); } if (u.dial) setLevel(conv(u.c), u.dial); delete S.undo[d.rid]; delete S.off[d.rid]; },
+  rmRuleId(d) { const was = S.rules.find(x => x.id === d.id); if (d.rid && was) S.undo[d.rid] = { rule: was }; S.gone.push(...S.rules.filter(x => x.id === d.id)); S.rules.filter(x => x.id === d.id && x.kind === 'channel').forEach(x => { const c = conv('ch-' + x.target); if (c) c.dial = 'default'; }); S.rules = S.rules.filter(x => x.id !== d.id); if (d.rid) S.off[d.rid] = d.to; },
   rmPerson(d) { S.dmPeople = S.dmPeople.filter(x => x !== d.p); if (!S.dmRemoved.includes(d.p)) S.dmRemoved.push(d.p); if (d.rid) S.off[d.rid] = { p: d.p, msg: `${first(d.p)} is removed from Focus. Direct messages from ${first(d.p)} land in Needs you, starting the next time you open the feed.` }; },
-  undoPerson(d) { if (!S.dmPeople.includes(d.p)) S.dmPeople.push(d.p); S.dmRemoved = S.dmRemoved.filter(x => x !== d.p); delete S.off[d.rid]; },
+  undoPerson(d) { Object.keys(S.off).forEach(k => { if (S.off[k] && S.off[k].p === d.p) delete S.off[k]; }); if (!S.dmPeople.includes(d.p)) S.dmPeople.push(d.p); S.dmRemoved = S.dmRemoved.filter(x => x !== d.p); delete S.off[d.rid]; },
   dmAuto() { S.dmAuto = !S.dmAuto; S.dmAsk = !S.dmAuto && S.dmPeople.length > 0; },
   keepPeople() { S.dmAsk = false; },
   rmAllPeople() { S.dmRemoved.push(...S.dmPeople.filter(x => !S.dmRemoved.includes(x))); S.dmPeople = []; S.dmAsk = false; },
-  dialFrom(d) { setLevel(conv(d.c), d.l); S.off[d.rid] = d.to; },
+  dialFrom(d) { S.undo[d.rid] = { c: d.c, dial: conv(d.c).dial }; setLevel(conv(d.c), d.l); S.off[d.rid] = d.to; },
   focusOnly() { S.focusOnly = !S.focusOnly; },
   openMsg(d) { S.open.add(d.k); },
-  keepH(d) { if (S.kept.has(d.k)) S.kept.delete(d.k); else S.kept.add(d.k); },
-  level(d) { S.level = S.level === d.l ? '' : d.l; },
+  keepH(d) {
+    const mid = d.k.slice(d.k.indexOf(':') + 1), m = S.msgs[mid], on = S.kept.has(d.k);
+    if (on) S.kept.delete(d.k); else S.kept.add(d.k);
+    if (!m) return;
+    const r = S.rows.find(x => x.items.includes(mid));
+    if (on) { if (r && r.kept === 'you') { if (r.fromHistory) S.rows = S.rows.filter(x => x !== r); else { r.kept = null; r.keptNow = false; } } return; }
+    if (r) A.keep({ id: r.id }); else S.rows.push({ id: 'r-h-' + mid, conv: d.k.slice(0, d.k.indexOf(':')), bucket: 'focus', sec: 'kept', items: [mid], by: m.by, t: m.t.replace(/^.* /, ''), reason: 'Kept by you', why: 'You kept this from History.', read: true, kept: 'you', done: false, replies: [], fromHistory: 1 });
+  },
+  level(d) { S.levels[d.fc] = S.levels[d.fc] === d.l ? '' : d.l; },
   applyNew() {
     S.pending.forEach(p => { if (p.into) { const r = row(p.into); if (r) { r.items.push(...p.items); r.read = false; r.t = p.t; r.by = p.by; r.fresh = true; S.rows = [r, ...S.rows.filter(x => x !== r)]; return; } } p.row.fresh = true; S.rows.unshift(p.row); });
     const order = { focus: 0, needs: 1, fyi: 2 }; S.rows.sort((a, b) => (order[a.bucket] - order[b.bucket]) || ((a.sec === 'kept') - (b.sec === 'kept'))); S.pending = null;
@@ -1298,14 +1330,14 @@ const A = {
     S.note = 'Three arrived. Nothing in the list moved; they wait behind "3 new".';
   },
   leave() { settle(); S.note = 'You left and came back: read rows are in History, kept rows are under Kept, rule and dial changes are applied.'; },
-  reset() { const t = S.demo, w = S.w, es = S.enterSends, ad = S.autoDone; S.newCh.forEach(n => { const i = CH.findIndex(x => x[0] === n); if (i >= 0) CH.splice(i, 1); }); S = seed(); S.demo = t; S.w = w; S.enterSends = es; S.autoDone = ad; },
+  reset() { document.querySelectorAll('form textarea').forEach(t => { t.value = ''; }); P[ME][0] = 'Maya Okafor'; const t = S.demo, w = S.w, es = S.enterSends, ad = S.autoDone; S.newCh.forEach(n => { const i = CH.findIndex(x => x[0] === n); if (i >= 0) CH.splice(i, 1); }); S = seed(); S.demo = t; S.w = w; S.enterSends = es; S.autoDone = ad; },
   theme(d) { window.Theme.set(d.t); return true; },
 };
 function submit(f) {
   const text = f.elements.t.value.trim(); if (!text) return;
   if (f.dataset.form === 'edit') { const m = S.msgs[f.dataset.m]; if (m.text !== text) { m.text = text; m.edited = 'now'; } S.editing = null; render(); return; }
   const id = 'me' + (++S.nid);
-  { const c = conv(f.dataset.c || S.conv); S.msgs[id] = { id, by: ME, t: 'now', text, rx: [], conv: c.id, flag: S.level === 'flag' ? 1 : 0, info: S.level === 'info' ? 1 : 0 }; if (S.net === 'off') S.msgs[id].pending = 1; else if (S.failNext) { S.msgs[id].failed = 1; S.failNext = false; } c.msgs.push(id); S.level = ''; S.rows.forEach(r => { if (r.conv === c.id && r.read) act(r); }); }
+  { const c = conv(f.dataset.c || S.conv); S.msgs[id] = { id, by: ME, t: 'now', text, rx: [], conv: c.id, flag: S.levels[c.id] === 'flag' ? 1 : 0, info: S.levels[c.id] === 'info' ? 1 : 0 }; if (S.net === 'off') S.msgs[id].pending = 1; else if (S.failNext) { S.msgs[id].failed = 1; S.failNext = false; } c.msgs.push(id); S.levels[c.id] = ''; S.drafts[c.id] = ''; f.elements.t.value = ''; if (c.kind === 'thread' && c.tdial === 'off') { c.tdial = 'needs'; c.tset = true; } if (!S.msgs[id].failed && !S.msgs[id].pending) answered(c.id); }
   render();
   if (f.dataset.form === 'send') document.querySelectorAll('.conv-body').forEach(b => { if (b.closest('.conv').querySelector(`form[data-c="${f.dataset.c}"]`)) b.scrollTop = b.scrollHeight; });
 }
@@ -1366,6 +1398,7 @@ document.addEventListener('click', e => {
   if (!skip) render();
   if (el.dataset.act === 'pick' && S.pick && matchMedia('(hover:hover)').matches) { const pi = document.querySelector('.picker input'); if (pi) pi.focus(); }
   if (el.dataset.act === 'applyNew') { const sc = document.querySelector('.feed-scroll'); if (sc) sc.scrollTop = 0; } // you asked for them: go to where they are
+  if (an === 'level') { const lt = document.querySelector(`form[data-c="${ad.fc}"] textarea`); if (lt) lt.focus(); }
   if (an === 'editMsg') { const ei = document.querySelector('.edit textarea'); if (ei) { grow(ei); ei.focus(); ei.setSelectionRange(ei.value.length, ei.value.length); } }
   if (an === 'openConv' && matchMedia('(hover:hover)').matches) { const ci = document.querySelector('.composer textarea'); if (ci) ci.focus({ preventScroll: true }); } // ready to answer
   if (an === 'openConv') { const nl = document.querySelector('.conv .newline'); if (nl) nl.scrollIntoView({ block: 'start' }); }
@@ -1382,6 +1415,7 @@ document.addEventListener('keydown', e => { // Enter and Ctrl+Enter in the messa
   }
   if (e.key === 'Escape' && ta.closest('.edit')) { e.preventDefault(); S.editing = null; render(); return; }
   if (e.key !== 'Enter' || e.isComposing) return;
+  if (isPhone() && !(e.ctrlKey || e.metaKey)) return; // a phone's Enter is a new line; the Send button sends
   const mod = e.ctrlKey || e.metaKey, sends = S.enterSends ? !e.shiftKey && !mod || mod : mod;
   if (sends) { e.preventDefault(); submit(ta.closest('form')); }
 });
@@ -1392,6 +1426,7 @@ document.addEventListener('change', e => { if (e.target.dataset.dial) { setLevel
 document.addEventListener('submit', e => { e.preventDefault(); submit(e.target); });
 document.addEventListener('input', e => {
   if (e.target.dataset.mytitle) S.myTitle = e.target.value;
+  if (e.target.dataset.myname && e.target.value.trim()) P[ME][0] = e.target.value.trim();
   if (e.target.dataset.newch) ncCheck(e.target);
   if (e.target.matches('textarea[name="t"]')) grow(e.target);
   if (e.target.dataset.search) search(e.target.value);

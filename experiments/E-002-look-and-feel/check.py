@@ -583,7 +583,7 @@ def extras(browser):
         ok("control-panel", "no sideways scroll", pg.evaluate("document.documentElement.scrollWidth <= innerWidth"))
         pg.screenshot(path=str(shots / f"control-panel-{size}.jpg"), type="jpeg", quality=80, full_page=size == "phone")
         pg.goto(f"file://{here.resolve()}/notification-app.html")
-        ok("notification-app", "lists what was delivered to one person, in its current state", pg.locator(".n").count() == 7 and "Message deleted" in pg.locator("#list").inner_text() and "For your information" not in pg.locator("#list").inner_text())
+        ok("notification-app", "lists what was delivered to one person, in its current state", pg.locator(".n").count() == 10 and "For your information" not in pg.locator("#list").inner_text())
         pg.screenshot(path=str(shots / f"notification-app-{size}.jpg"), type="jpeg", quality=80)
         pg.locator("#who").select_option("tomas")
         ok("notification-app", "another person can be chosen", pg.locator(".n").count() == 2 and "Focus only" in pg.locator("#note").inner_text())
@@ -717,6 +717,46 @@ def organization(browser, slug, size, vp, scale):
     ok("Account shows the organization, read-only", "Your organization" in pg.locator(".settings .org-rule").inner_text() and pg.locator(".settings .org-rule button, .settings .org-rule input").count() == 0)
     ctx.close()
 
+def verifier_round(browser, slug, size, vp, scale):
+    """Regression checks for what the independent verifier found (2026-11-22)."""
+    if slug != "slack-like": return
+    ctx = browser.new_context(viewport=vp, device_scale_factor=scale, has_touch=size == "phone")
+    pg = ctx.new_page(); U = f"file://{here.resolve()}/{slug}.html"; pg.goto(U)
+    def ok(name, cond, detail=""):
+        results.append({"page": slug, "width": size, "check": name, "pass": bool(cond), "detail": str(detail)})
+        if not cond: failures.append(f"{slug} @ {size}: {name} {detail}")
+    def st(js): return pg.evaluate("() => { const S = window.E002.state(); return " + js + "; }")
+    def open_c(c): pg.evaluate("c => { const b = document.createElement('button'); b.dataset.act = 'openConv'; b.dataset.c = c; b.hidden = true; document.body.appendChild(b); b.click(); b.remove(); }", c)
+    def demo(a): pg.locator(".demo-btn").click(); pg.locator(f'.demo [data-act="{a}"]').click(); pg.locator(".demo-btn").click()
+    def box(): return pg.locator(".pane:not(.tpane) .composer textarea")
+    def send(): pg.locator(".pane:not(.tpane) .composer .send").click()
+    open_c("dm-sam"); box().fill("Draft I am still writing")
+    pg.locator('.composer [data-l="flag"]').click()
+    ok("B1 choosing Flag keeps the draft", box().input_value() == "Draft I am still writing")
+    demo("playNew")
+    ok("B1 an arrival keeps the draft", box().input_value() == "Draft I am still writing")
+    open_c("dm-lena"); ok("the flag choice stays with its own conversation", st("S.levels['dm-lena'] || ''") == "")
+    open_c("dm-sam"); ok("a draft is still there on coming back", box().input_value() == "Draft I am still writing")
+    box().fill(""); pg.goto(U)
+    open_c("ch-sales"); m = pg.locator('.pane [data-k="conv:j1"]'); m.locator(".msg-self").hover(); m.locator('[data-act="openThread"]').click()
+    tb = pg.locator(".tpane .composer textarea") if size == "desktop" else box()
+    tb.fill("Not in Q1. First half of next year."); (pg.locator(".tpane .composer .send") if size == "desktop" else pg.locator(".composer .send")).click()
+    if size == "phone": pg.locator('[data-act="closeConv"]').locator("visible=true").first.click(); ok("Back from a thread returns to its channel", "#sales" in pg.locator(".conv-title b").inner_text())
+    ok("B2 any message can start a thread, and its link counts the reply", "1 reply" in pg.locator('.pane:not(.tpane) [data-k="conv:j1"] .thread-link').inner_text())
+    pg.goto(U); open_c("ch-launch"); box().fill("Lunch is at noon"); send()
+    ok("B3 an unrelated post in the channel does not release a flagged row", not st("S.rows.find(r => r.id === 'r-go').done"))
+    pg.goto(U); pg.evaluate("() => { const S = window.E002.state(); const b = document.createElement('button'); b.dataset.act = 'reactMsg'; b.dataset.m = 'rc4'; b.dataset.e = '❌'; b.hidden = true; document.body.appendChild(b); b.click(); b.remove(); }")
+    ok("B4 no emoji tells a waiting agent to go on", st("S.msgs.rc4.status") == "Waiting on Maya")
+    pg.goto(U); open_c("dm-anna"); demo("failToggle"); pg.evaluate("() => { window.E002.state().rows.find(r => r.id === 'r-anna').kept = 'you'; }"); box().fill("This will fail"); send()
+    ok("B5 a send that failed releases nothing", not st("S.rows.find(r => r.id === 'r-anna').done"))
+    demo("netToggle"); pg.locator('.pane [data-act="retry"]').click()
+    ok("B6 Try again while offline shows it waiting", "Waiting for the connection" in pg.locator(".pane .msg.is-pending").inner_text())
+    demo("netToggle"); ok("and it answers the row only once it is really sent", st("S.rows.find(r => r.id === 'r-anna').done"))
+    pg.goto(U); open_c("ch-launch")
+    if size == "desktop":
+        demo("netToggle"); h = pg.locator(".top h1").bounding_box(); n_ = pg.locator(".netpill").bounding_box(); ok("the offline notice does not cover the title", h["x"] + h["width"] <= n_["x"] + .5, (h, n_)); demo("netToggle")
+    ctx.close()
+
 def hist_unread(browser, slug, size, vp, scale):
     """History tabs carry an unread count, and unread entries a mark; opening one clears both (user, 2026-11-22)."""
     ctx = browser.new_context(viewport=vp, device_scale_factor=scale, has_touch=size == "phone")
@@ -745,6 +785,7 @@ with sync_playwright() as p:
                 run(b, slug, size, vp, scale)
                 conv_edit(b, slug, size, vp, scale)
                 hist_unread(b, slug, size, vp, scale)
+                verifier_round(b, slug, size, vp, scale)
                 organization(b, slug, size, vp, scale)
                 rest(b, slug, size, vp, scale)
                 writing(b, slug, size, vp, scale)

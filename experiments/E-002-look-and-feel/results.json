@@ -485,6 +485,83 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "B1 choosing Flag keeps the draft",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "B1 an arrival keeps the draft",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the flag choice stays with its own conversation",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a draft is still there on coming back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "B2 any message can start a thread, and its link counts the reply",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "B3 an unrelated post in the channel does not release a flagged row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "B4 no emoji tells a waiting agent to go on",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "B5 a send that failed releases nothing",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "B6 Try again while offline shows it waiting",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "and it answers the row only once it is really sent",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the offline notice does not cover the title",
+  "pass": true,
+  "detail": "({'x': 266, 'y': 20.953125, 'width': 203.15625, 'height': 26.09375}, {'x': 479.15625, 'y': 20.9375, 'width': 162.84375, 'height': 26.125})"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "the sidebar names the organization, and not the person",
   "pass": true,
   "detail": ""
@@ -1622,6 +1699,83 @@
   "check": "opening an entry clears its mark and lowers the count; the entry stays",
   "pass": true,
   "detail": "7"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "B1 choosing Flag keeps the draft",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "B1 an arrival keeps the draft",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "the flag choice stays with its own conversation",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "a draft is still there on coming back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "Back from a thread returns to its channel",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "B2 any message can start a thread, and its link counts the reply",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "B3 an unrelated post in the channel does not release a flagged row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "B4 no emoji tells a waiting agent to go on",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "B5 a send that failed releases nothing",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "B6 Try again while offline shows it waiting",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "and it answers the row only once it is really sent",
+  "pass": true,
+  "detail": ""
  },
  {
   "page": "slack-like",

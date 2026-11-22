@@ -566,3 +566,10 @@ body.resizing{cursor:col-resize;user-select:none}
 .me-org>span:last-child{display:flex;flex-direction:column;line-height:1.25}
 .me-org small{color:var(--muted);font-size:12px}
 .rule>.org-mark{flex:none;display:grid}
+/* verifier round: the Activity header holds its title; phone tools leave room for the name */
+.top{container-type:inline-size}
+.top h1{flex:1 0 auto}
+@container (max-width:420px){.top .newpill small,.np-x{display:none}}
+.top:has(.netpill) .newpill small,.top:has(.newpill) .np-x{display:none}
+@media (max-width:760px){.msg-head{padding-right:76px}.msg.mine .msg-head{padding-right:140px}}
+.row.gone .row-main{position:relative}
