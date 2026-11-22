@@ -587,3 +587,8 @@ body.resizing{cursor:col-resize;user-select:none}
 .seg-ctl button+button{border-left:1px solid var(--line)}
 .seg-ctl button:hover{background:var(--hover)}
 .seg-ctl button.on{background:var(--accent);color:var(--on-accent);font-weight:600}
+.org-mark{width:34px;height:34px;flex:none;border-radius:8px;display:grid;place-items:center;background:#e8f3f0;color:#0f4f47;font-weight:800;font-size:17px}
+.me-org{display:flex;align-items:center;gap:10px;padding:6px 8px 10px;margin-bottom:4px;border-bottom:1px solid var(--line)}
+.me-org>span:last-child{display:flex;flex-direction:column;line-height:1.25}
+.me-org small{color:var(--muted);font-size:12px}
+.rule>.org-mark{flex:none;display:grid}

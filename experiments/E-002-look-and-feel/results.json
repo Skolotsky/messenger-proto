@@ -485,6 +485,34 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "the sidebar names the organization, and not the person",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "it is not a control: there is no switching between organizations",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "your menu says which organization you are in",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Account shows the organization, read-only",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "an agent's answer appears as it is written, marked as not finished",
   "pass": true,
   "detail": ""
@@ -1594,6 +1622,41 @@
   "check": "opening an entry clears its mark and lowers the count; the entry stays",
   "pass": true,
   "detail": "7"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "on a phone the organization is named on the first screen",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "the sidebar names the organization, and not the person",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "it is not a control: there is no switching between organizations",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "your menu says which organization you are in",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "Account shows the organization, read-only",
+  "pass": true,
+  "detail": ""
  },
  {
   "page": "slack-like",

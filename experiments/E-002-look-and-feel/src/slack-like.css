@@ -53,3 +53,9 @@
 }
 .thread-link.open{border-color:var(--accent);background:var(--accent-soft)}
 .sk .ws small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* the organization you are in: named at the top of the sidebar, and above the title on a phone. Not a control: there is no switching */
+.sk .ws{flex-direction:row;align-items:center;gap:10px}
+.sk .ws-t{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.sk .ws-t b{font-size:16px}
+.org-line{display:none}
+@media (max-width:760px){.org-line{display:block;font-size:12px;font-weight:600;color:var(--muted);line-height:1.2}.sk .top h1{line-height:1.2}}

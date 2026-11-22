@@ -70,6 +70,8 @@ As listed under "Decided"; where the agent had built something else first, the r
 
 30. **Theme: System, Light or Dark.** The user asked that it match the system, have a switcher and follow best practice. System is the default and follows the device live. The switcher is in the person's menu and under Settings → Appearance. As built by the agent to that practice: the choice is remembered per device, applied before the first paint so nothing flashes, shared with the control panel and the notification app, and text meets 4.5:1 contrast in both themes. The sidebar stays dark in both, as in the messenger people know.
 
+31. **The organization you are in is always shown; there is no switcher between organizations.** "Organization should be shown as well, cause such systems are always multi-tenant, so it matters in which organization I am. We'll not build the switcher between organizations, it's out of scope." It is named at the top of the sidebar, above the title on a phone's first screen, in the person's menu and on the Account page. It is a label, not a control. This answers the question D-026 left open: the product shows no second organization.
+
 ### Still the agent's proposal, shown in the mock-up, awaiting the user's word
 
 - Lapsed with point 21: context above the new messages in an opened row, and how a long burst is shown there. The conversation shows the whole exchange with a "New" line at the first new message.
@@ -88,3 +90,4 @@ As listed under "Decided"; where the agent had built something else first, the r
 ## Follow-ups
 
 - The proposal points need a yes or changes; then they move up.
+- One word for one thing: the interface and the user say "organization", D-026 and the architecture say "team". To settle when the architecture is reviewed.

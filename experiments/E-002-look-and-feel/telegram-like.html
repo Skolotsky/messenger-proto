@@ -615,6 +615,11 @@ body.resizing{cursor:col-resize;user-select:none}
 .seg-ctl button+button{border-left:1px solid var(--line)}
 .seg-ctl button:hover{background:var(--hover)}
 .seg-ctl button.on{background:var(--accent);color:var(--on-accent);font-weight:600}
+.org-mark{width:34px;height:34px;flex:none;border-radius:8px;display:grid;place-items:center;background:#e8f3f0;color:#0f4f47;font-weight:800;font-size:17px}
+.me-org{display:flex;align-items:center;gap:10px;padding:6px 8px 10px;margin-bottom:4px;border-bottom:1px solid var(--line)}
+.me-org>span:last-child{display:flex;flex-direction:column;line-height:1.25}
+.me-org small{color:var(--muted);font-size:12px}
+.rule>.org-mark{flex:none;display:grid}
 
 /* Telegram-like: one list, round avatars, big targets, folders for buckets, bubbles. Own colours. */
 :root{--accent:#6a4fd0;--accent-soft:#ebe6fb;--r:14px;--wall:#eeebe4}
@@ -699,7 +704,7 @@ window.Skin = { file: 'telegram-like', title: 'Telegram-like', buckets: 'tabs', 
    A mock-up: no server, no stack choice. Everything resets on reload. */
 (function () {
 'use strict';
-const ME = 'maya';
+const ME = 'maya', ORG = { name: 'Larkspur', members: 36 }; // one organization is shown; switching between organizations is out of scope
 const P = {
   maya: ['Maya Okafor', 'Product'], anna: ['Anna Lindqvist', 'Founder'], marco: ['Marco Bianchi', 'Engineering lead'],
   lena: ['Lena Fischer', 'Design'], tomas: ['Tomás Rivera', 'Backend'], priya: ['Priya Nair', 'Marketing'],
@@ -1122,7 +1127,7 @@ function modalHTML() {
     h = `<h2>Add to Focus</h2><p class="sheet-note">Each rule shows what it would have pulled into Focus over the last 7 days, before you save it.</p>${opts.map(o => { const has = o[3] === 'thread' ? c.tdial === 'focus' : S.rules.some(r => r.id === o[0]); return `<div class="rule"><span><b>${esc(o[1])}</b><small class="rule-n">${o[2]} items in the last 7 days${o[2] > 30 ? `, about ${Math.round(o[2] / 7)} a day. That would make Focus a long list.` : ''}</small></span><button class="btn sm pri" ${has ? 'disabled' : ''} data-act="addRule" data-id="${o[0]}" data-label="${esc(o[1])}" data-n="${o[2]}" data-kind="${o[3]}" data-target="${o[4]}">${has ? 'Added' : o[3] === 'thread' ? 'Set thread to Focus' : 'Add rule'}</button></div>`; }).join('')}`;
   }
   if (m.type === 'rules') {
-    const acct = `<div class="rule person">${av(ME)}<span><b>${pn(ME)}</b><small>${esc(S.myTitle)}</small></span></div><label class="fld"><span>Name</span><input value="${pn(ME)}" aria-label="Name"></label><label class="fld"><span>What you do</span><input value="${esc(S.myTitle)}" data-mytitle="1" aria-label="What you do"></label><p class="sheet-note">Shown under your name. It is your own words and means nothing to the product: there are no roles or permissions in the first version.</p><p class="sheet-note">To see the team as someone else, use Switch account in your menu.</p>`;
+    const acct = `<div class="rule person">${av(ME)}<span><b>${pn(ME)}</b><small>${esc(S.myTitle)}</small></span></div><div class="rule org-rule"><span class="org-mark">${ORG.name[0]}</span><span><b>${ORG.name}</b><small>Your organization · ${ORG.members} members</small></span></div><label class="fld"><span>Name</span><input value="${pn(ME)}" aria-label="Name"></label><label class="fld"><span>What you do</span><input value="${esc(S.myTitle)}" data-mytitle="1" aria-label="What you do"></label><p class="sheet-note">Shown under your name. It is your own words and means nothing to the product: there are no roles or permissions in the first version.</p><p class="sheet-note">To see the team as someone else, use Switch account in your menu.</p>`;
     // Activity feed: the page keeps the general rules; what was added to Focus one by one lives in its own lists
     const cur = S.setSec || 'feed', ppl = S.dmPeople, has = id => S.rules.some(r => r.id === id), of = k => S.rules.filter(r => r.kind === k), goneOf = k => S.gone.filter(r => r.kind === k);
     const sw = (act, id, on, t, d) => `<label class="set-sw"><input type="checkbox" data-act="${act}"${id ? ` data-id="${id}"` : ''}${on ? ' checked' : ''}><span><b>${t}</b><small>${d}</small></span></label>`;
@@ -1182,10 +1187,10 @@ const h = {
   search() { return `<div class="search">${ic('search')}<input type="search" data-search="1" aria-label="Search messages" placeholder="Search messages" value="${esc(S.q)}"><div class="sr" id="sr"></div></div>`; },
 me() { // the person's own menu; switching account is a second level of it
     const open = S.menu === 'me', who = S.viewAs || ME, label = who === ME ? S.myTitle : P[who][1];
-    const main = `<button class="opt" data-act="modal" data-m="rules" data-s="account"><b>Settings</b><span>Account, writing, activity feed, notifications</span></button><button class="opt" data-act="modal" data-m="rules" data-s="feed"><b>Activity feed settings</b><span>Focus people and rules</span></button><div class="theme-row"><span>Theme</span>${themeSeg()}</div><button class="opt nextlvl" data-act="meSub"><b>Switch account</b><span>View the team as someone else</span>${ic('chev')}</button>`;
+    const main = `<div class="me-org"><span class="org-mark">${ORG.name[0]}</span><span><b>${ORG.name}</b><small>${ORG.members} members</small></span></div><button class="opt" data-act="modal" data-m="rules" data-s="account"><b>Settings</b><span>Account, writing, activity feed, notifications</span></button><button class="opt" data-act="modal" data-m="rules" data-s="feed"><b>Activity feed settings</b><span>Focus people and rules</span></button><div class="theme-row"><span>Theme</span>${themeSeg()}</div><button class="opt nextlvl" data-act="meSub"><b>Switch account</b><span>View the team as someone else</span>${ic('chev')}</button>`;
     const sub = `<button class="opt backlvl" data-act="meSub">${ic('back')}<b>Switch account</b><span class="demo-tag">demonstration</span></button>${['maya', 'anna', 'tomas', 'sam'].map(x => `<button class="opt who${x === who ? ' on' : ''}" data-act="${x === who ? 'menu' : 'modal'}" data-key="me" data-m="switch" data-p="${x}">${av(x, 'xs')}<b>${pn(x)}</b></button>`).join('')}<div class="pop-f">There is no sign-in in the first version, so accounts are switched here and there is no Sign out.</div>`;
     return `<div class="me"><button class="me-btn" data-act="menu" data-key="me" aria-expanded="${open}" aria-label="Your account menu">${av(who)}<span><b>${pn(who)}</b><small>${esc(label)}</small></span>${ic('chev')}</button>${open ? `<div class="pop me-pop">${S.meSub ? sub : main}</div>` : ''}</div>`; },
-  whoLine() { const w = S.viewAs || ME; return esc(pn(w) + ' · ' + (w === ME ? S.myTitle : P[w][1])); },
+  org() { return ORG; },
   rz(k) { return `<div class="rz" data-rz="${k}" role="separator" aria-orientation="vertical" data-tip="Drag to resize. Double-click to reset"></div>`; },
   net() { return S.net === 'off' ? '<span class="netpill" role="status">Offline · showing 10:42</span>' : ''; },
   nav(v, label, icon, extra) { return `<button class="nav${S.view === v ? ' on' : ''}" data-act="view" data-v="${v}">${ic(icon)}<span>${label}</span>${extra || ''}</button>`; }

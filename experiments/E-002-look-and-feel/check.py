@@ -642,7 +642,7 @@ def rest(browser, slug, size, vp, scale):
     ok("and there is a way back", pg.locator(".viewband").count() == 0 and "Maya Okafor" in pg.locator(".me-btn").inner_text())
     pg.locator('.top [data-act="modal"][data-m="rules"]').click(); pg.locator('.settings .set-nav [data-s="account"]').click()
     pg.locator('.settings [data-mytitle]').fill("Product, mostly"); pg.locator('.settings [data-act="closeModal"]').click()
-    ok("the line under a name is the person's own words, changed in Account", "Product, mostly" in pg.locator(".me-btn").inner_text() and "Product, mostly" in pg.locator(".ws").inner_text())
+    ok("the line under a name is the person's own words, changed in Account", "Product, mostly" in pg.locator(".me-btn").inner_text())
     # an empty Focus with no rules
     demo("playNoRules")
     ok("a Focus with no rules offers three to start with, each with its count", pg.locator(".bucket.b-focus .suggest .rule").count() == 3 and "23 items" in pg.locator(".suggest").inner_text())
@@ -695,6 +695,28 @@ def themes(browser):
         ok(f"text meets 4.5:1 contrast in {t}", not low, low)
     ctx.close()
 
+def organization(browser, slug, size, vp, scale):
+    """The organization you are in is always named; it is not a control, since switching is out of scope (user, 2026-11-22)."""
+    if slug != "slack-like": return
+    ctx = browser.new_context(viewport=vp, device_scale_factor=scale, has_touch=size == "phone")
+    pg = ctx.new_page(); pg.goto(f"file://{here.resolve()}/{slug}.html")
+    def ok(name, cond, detail=""):
+        results.append({"page": slug, "width": size, "check": name, "pass": bool(cond), "detail": str(detail)})
+        if not cond: failures.append(f"{slug} @ {size}: {name} {detail}")
+    if size == "phone":
+        ok("on a phone the organization is named on the first screen", pg.locator(".org-line").is_visible() and pg.locator(".org-line").inner_text() == "Larkspur")
+        pg.screenshot(path=str(shots / f"{slug}-{size}-46-organization.jpg"), type="jpeg", quality=85, clip={"x": 0, "y": 0, "width": 390, "height": 220})
+        pg.locator('[data-act="view"][data-v="chats"]').locator("visible=true").first.click()
+    ws = pg.locator(".ws")
+    ok("the sidebar names the organization, and not the person", "Larkspur" in ws.inner_text() and "36 members" in ws.inner_text() and "Maya" not in ws.inner_text())
+    ok("it is not a control: there is no switching between organizations", ws.locator("button, a, [data-act]").count() == 0 and ws.evaluate("e => !e.closest('button')"))
+    pg.locator(".me-btn").click()
+    ok("your menu says which organization you are in", "Larkspur" in pg.locator(".me-org").inner_text())
+    if size == "desktop": pg.screenshot(path=str(shots / f"{slug}-{size}-46-organization.jpg"), type="jpeg", quality=85, clip={"x": 0, "y": 0, "width": 340, "height": 800})
+    pg.locator('.me-pop [data-s="account"]').click()
+    ok("Account shows the organization, read-only", "Your organization" in pg.locator(".settings .org-rule").inner_text() and pg.locator(".settings .org-rule button, .settings .org-rule input").count() == 0)
+    ctx.close()
+
 def hist_unread(browser, slug, size, vp, scale):
     """History tabs carry an unread count, and unread entries a mark; opening one clears both (user, 2026-11-22)."""
     ctx = browser.new_context(viewport=vp, device_scale_factor=scale, has_touch=size == "phone")
@@ -723,6 +745,7 @@ with sync_playwright() as p:
                 run(b, slug, size, vp, scale)
                 conv_edit(b, slug, size, vp, scale)
                 hist_unread(b, slug, size, vp, scale)
+                organization(b, slug, size, vp, scale)
                 rest(b, slug, size, vp, scale)
                 writing(b, slug, size, vp, scale)
                 chrome(b, slug, size, vp, scale)
