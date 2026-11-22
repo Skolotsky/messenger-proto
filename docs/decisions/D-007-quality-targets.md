@@ -22,7 +22,7 @@ The numbers are proposals; each is a dial the user can turn. Measured on one loc
 | No change is stepped over under concurrent writers | 0 skipped | many writers, one commit held open while later ones finish |
 | Other open screens show a message | 1 s | none; measured at fast pace |
 | Search and the feed reflect a change when healthy | 2 s, 19 times in 20 | a burst at ten times normal pace |
-| Hold before a notification is sent | 5 s | delete, or read, inside the hold: nothing is sent |
+| Hold before a notification is sent; none goes out for something read or deleted within it | 5 s, measured by the log's own clock (clock ticks in the log; stamps never decrease) | read or delete 0.3 s after a mention while the feed is stopped or slower than the traffic; a backward step of the machine clock (E-003: 0 of 160 wrongly sent; 147 of 160 when counted from arrival) |
 | A slow receiver delays nobody else | feed stays within 2 s | search answers after 10 s, or is stopped |
 | A receiver that was down ends equal to the truth | 10 minutes of backlog cleared in 30 s | stop search during 10 minutes of edits and deletes; compare index with truth |
 | Waiting and retrying | 3 s per call; again after 1, 2, 4 … 60 s with jitter; never give up on an outage | a receiver that accepts and never answers |

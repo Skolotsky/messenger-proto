@@ -1,0 +1,611 @@
+{
+ "rows": [
+  [
+   "healthy burst",
+   "every acknowledged action is saved, once",
+   true,
+   true,
+   "3000 acknowledged, 2941 changes in the log"
+  ],
+  [
+   "healthy burst",
+   "every saved change is in the log",
+   true,
+   true,
+   "0 of 1301 messages have a change missing from the log"
+  ],
+  [
+   "healthy burst",
+   "search equals the truth",
+   true,
+   true,
+   "0 of 1301 messages differ"
+  ],
+  [
+   "healthy burst",
+   "the feed equals a clean replay of the log",
+   true,
+   true,
+   "0 of 4288 entries differ; 1969 notes against 1969"
+  ],
+  [
+   "healthy burst",
+   "a notification is sent once",
+   true,
+   true,
+   "0 repeats among 626 sent"
+  ],
+  [
+   "healthy burst",
+   "none sent for what was read or deleted within the hold",
+   true,
+   true,
+   "0 of 626 sent"
+  ],
+  [
+   "healthy burst",
+   "no due notification is missing",
+   true,
+   true,
+   "0 missing of 1246 due"
+  ],
+  [
+   "repeats, lost answers and late copies on every hop",
+   "every acknowledged action is saved, once",
+   true,
+   true,
+   "1500 acknowledged, 1466 changes in the log"
+  ],
+  [
+   "repeats, lost answers and late copies on every hop",
+   "every saved change is in the log",
+   true,
+   true,
+   "0 of 664 messages have a change missing from the log"
+  ],
+  [
+   "repeats, lost answers and late copies on every hop",
+   "search equals the truth",
+   true,
+   true,
+   "0 of 664 messages differ"
+  ],
+  [
+   "repeats, lost answers and late copies on every hop",
+   "the feed equals a clean replay of the log",
+   true,
+   true,
+   "0 of 2331 entries differ; 887 notes against 887"
+  ],
+  [
+   "repeats, lost answers and late copies on every hop",
+   "a notification is sent once",
+   true,
+   true,
+   "0 repeats among 370 sent"
+  ],
+  [
+   "repeats, lost answers and late copies on every hop",
+   "none sent for what was read or deleted within the hold",
+   true,
+   true,
+   "0 of 370 sent"
+  ],
+  [
+   "repeats, lost answers and late copies on every hop",
+   "no due notification is missing",
+   true,
+   true,
+   "0 missing of 591 due"
+  ],
+  [
+   "search stopped for 5 s mid-burst",
+   "every acknowledged action is saved, once",
+   true,
+   true,
+   "2400 acknowledged, 2344 changes in the log"
+  ],
+  [
+   "search stopped for 5 s mid-burst",
+   "every saved change is in the log",
+   true,
+   true,
+   "0 of 1048 messages have a change missing from the log"
+  ],
+  [
+   "search stopped for 5 s mid-burst",
+   "search equals the truth",
+   true,
+   true,
+   "0 of 1048 messages differ"
+  ],
+  [
+   "search stopped for 5 s mid-burst",
+   "the feed equals a clean replay of the log",
+   true,
+   true,
+   "0 of 3519 entries differ; 1584 notes against 1584"
+  ],
+  [
+   "search stopped for 5 s mid-burst",
+   "a notification is sent once",
+   true,
+   true,
+   "0 repeats among 573 sent"
+  ],
+  [
+   "search stopped for 5 s mid-burst",
+   "none sent for what was read or deleted within the hold",
+   true,
+   true,
+   "0 of 573 sent"
+  ],
+  [
+   "search stopped for 5 s mid-burst",
+   "no due notification is missing",
+   true,
+   true,
+   "0 missing of 1016 due"
+  ],
+  [
+   "search answers after 1.5 s (longer than the 1 s limit) for 4 s",
+   "every acknowledged action is saved, once",
+   true,
+   true,
+   "1998 acknowledged, 1951 changes in the log"
+  ],
+  [
+   "search answers after 1.5 s (longer than the 1 s limit) for 4 s",
+   "every saved change is in the log",
+   true,
+   true,
+   "0 of 847 messages have a change missing from the log"
+  ],
+  [
+   "search answers after 1.5 s (longer than the 1 s limit) for 4 s",
+   "search equals the truth",
+   true,
+   true,
+   "0 of 847 messages differ"
+  ],
+  [
+   "search answers after 1.5 s (longer than the 1 s limit) for 4 s",
+   "the feed equals a clean replay of the log",
+   true,
+   true,
+   "0 of 2811 entries differ; 1158 notes against 1158"
+  ],
+  [
+   "search answers after 1.5 s (longer than the 1 s limit) for 4 s",
+   "a notification is sent once",
+   true,
+   true,
+   "0 repeats among 401 sent"
+  ],
+  [
+   "search answers after 1.5 s (longer than the 1 s limit) for 4 s",
+   "none sent for what was read or deleted within the hold",
+   true,
+   true,
+   "0 of 401 sent"
+  ],
+  [
+   "search answers after 1.5 s (longer than the 1 s limit) for 4 s",
+   "no due notification is missing",
+   true,
+   true,
+   "0 missing of 738 due"
+  ],
+  [
+   "search refuses one delete, then refuses everything · while parked",
+   "search equals the truth",
+   false,
+   false,
+   "1 of 177 messages differ"
+  ],
+  [
+   "search refuses one delete, then refuses everything · after \"try again\"",
+   "search equals the truth",
+   true,
+   true,
+   "0 of 177 messages differ"
+  ],
+  [
+   "search refuses one delete, then refuses everything · refusing everything",
+   "the worker pauses and parks no more than two",
+   true,
+   true,
+   "2 parked, 145 changes waiting"
+  ],
+  [
+   "search refuses one delete, then refuses everything · after recovery",
+   "every acknowledged action is saved, once",
+   true,
+   true,
+   "540 acknowledged, 527 changes in the log"
+  ],
+  [
+   "search refuses one delete, then refuses everything · after recovery",
+   "every saved change is in the log",
+   true,
+   true,
+   "0 of 219 messages have a change missing from the log"
+  ],
+  [
+   "search refuses one delete, then refuses everything · after recovery",
+   "search equals the truth",
+   true,
+   true,
+   "0 of 219 messages differ"
+  ],
+  [
+   "search refuses one delete, then refuses everything · after recovery",
+   "the feed equals a clean replay of the log",
+   true,
+   true,
+   "0 of 880 entries differ; 317 notes against 317"
+  ],
+  [
+   "search refuses one delete, then refuses everything · after recovery",
+   "a notification is sent once",
+   true,
+   true,
+   "0 repeats among 142 sent"
+  ],
+  [
+   "search refuses one delete, then refuses everything · after recovery",
+   "none sent for what was read or deleted within the hold",
+   true,
+   true,
+   "0 of 142 sent"
+  ],
+  [
+   "search refuses one delete, then refuses everything · after recovery",
+   "no due notification is missing",
+   true,
+   true,
+   "0 missing of 218 due"
+  ],
+  [
+   "the core killed five times mid-burst",
+   "every acknowledged action is saved, once",
+   true,
+   true,
+   "1998 acknowledged, 1950 changes in the log"
+  ],
+  [
+   "the core killed five times mid-burst",
+   "every saved change is in the log",
+   true,
+   true,
+   "0 of 843 messages have a change missing from the log"
+  ],
+  [
+   "the core killed five times mid-burst",
+   "search equals the truth",
+   true,
+   true,
+   "0 of 843 messages differ"
+  ],
+  [
+   "the core killed five times mid-burst",
+   "the feed equals a clean replay of the log",
+   true,
+   true,
+   "0 of 2819 entries differ; 1315 notes against 1315"
+  ],
+  [
+   "the core killed five times mid-burst",
+   "a notification is sent once",
+   true,
+   true,
+   "0 repeats among 444 sent"
+  ],
+  [
+   "the core killed five times mid-burst",
+   "none sent for what was read or deleted within the hold",
+   true,
+   true,
+   "0 of 444 sent"
+  ],
+  [
+   "the core killed five times mid-burst",
+   "no due notification is missing",
+   true,
+   true,
+   "0 missing of 827 due"
+  ],
+  [
+   "delivery, feed, sender and search each killed mid-burst; the feed's place moved by mistake",
+   "every acknowledged action is saved, once",
+   true,
+   true,
+   "2400 acknowledged, 2347 changes in the log"
+  ],
+  [
+   "delivery, feed, sender and search each killed mid-burst; the feed's place moved by mistake",
+   "every saved change is in the log",
+   true,
+   true,
+   "0 of 1015 messages have a change missing from the log"
+  ],
+  [
+   "delivery, feed, sender and search each killed mid-burst; the feed's place moved by mistake",
+   "search equals the truth",
+   true,
+   true,
+   "0 of 1015 messages differ"
+  ],
+  [
+   "delivery, feed, sender and search each killed mid-burst; the feed's place moved by mistake",
+   "the feed equals a clean replay of the log",
+   true,
+   true,
+   "0 of 3401 entries differ; 1581 notes against 1581"
+  ],
+  [
+   "delivery, feed, sender and search each killed mid-burst; the feed's place moved by mistake",
+   "a notification is sent once",
+   true,
+   true,
+   "0 repeats among 521 sent"
+  ],
+  [
+   "delivery, feed, sender and search each killed mid-burst; the feed's place moved by mistake",
+   "none sent for what was read or deleted within the hold",
+   true,
+   true,
+   "0 of 521 sent"
+  ],
+  [
+   "delivery, feed, sender and search each killed mid-burst; the feed's place moved by mistake",
+   "no due notification is missing",
+   true,
+   true,
+   "0 missing of 988 due"
+  ],
+  [
+   "the feed wiped mid-burst and rebuilt",
+   "every acknowledged action is saved, once",
+   true,
+   true,
+   "2496 acknowledged, 2439 changes in the log"
+  ],
+  [
+   "the feed wiped mid-burst and rebuilt",
+   "every saved change is in the log",
+   true,
+   true,
+   "0 of 1066 messages have a change missing from the log"
+  ],
+  [
+   "the feed wiped mid-burst and rebuilt",
+   "search equals the truth",
+   true,
+   true,
+   "0 of 1066 messages differ"
+  ],
+  [
+   "the feed wiped mid-burst and rebuilt",
+   "the feed equals a clean replay of the log",
+   true,
+   true,
+   "0 of 3650 entries differ; 1635 notes against 1635"
+  ],
+  [
+   "the feed wiped mid-burst and rebuilt",
+   "a notification is sent once",
+   true,
+   true,
+   "0 repeats among 565 sent"
+  ],
+  [
+   "the feed wiped mid-burst and rebuilt",
+   "none sent for what was read or deleted within the hold",
+   true,
+   true,
+   "0 of 565 sent"
+  ],
+  [
+   "the feed wiped mid-burst and rebuilt",
+   "no due notification is missing",
+   true,
+   true,
+   "0 missing of 1044 due"
+  ],
+  [
+   "then the notification sender wiped and refilled",
+   "a notification is sent once",
+   true,
+   true,
+   "0 repeats among 565 sent"
+  ],
+  [
+   "then the notification sender wiped and refilled",
+   "none sent for what was read or deleted within the hold",
+   true,
+   true,
+   "0 of 565 sent"
+  ],
+  [
+   "then the notification sender wiped and refilled",
+   "no due notification is missing",
+   true,
+   true,
+   "0 missing of 1044 due"
+  ],
+  [
+   "then search wiped and its place set back to the start",
+   "search equals the truth",
+   true,
+   true,
+   "0 of 1066 messages differ"
+  ],
+  [
+   "hold \"event\" · the feed down for 3 s",
+   "none sent for what was read or deleted within the hold",
+   false,
+   false,
+   "88 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing"
+  ],
+  [
+   "hold \"arrival\" · the feed down for 3 s",
+   "none sent for what was read or deleted within the hold",
+   false,
+   false,
+   "8 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing"
+  ],
+  [
+   "hold \"watermark\" · the feed down for 3 s",
+   "none sent for what was read or deleted within the hold",
+   true,
+   true,
+   "0 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing"
+  ],
+  [
+   "hold \"event\" · the feed slower than the traffic",
+   "none sent for what was read or deleted within the hold",
+   false,
+   false,
+   "159 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing"
+  ],
+  [
+   "hold \"arrival\" · the feed slower than the traffic",
+   "none sent for what was read or deleted within the hold",
+   false,
+   false,
+   "147 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing"
+  ],
+  [
+   "hold \"watermark\" · the feed slower than the traffic",
+   "none sent for what was read or deleted within the hold",
+   true,
+   true,
+   "0 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing"
+  ],
+  [
+   "broken on purpose: search without the version rule, under late copies",
+   "search equals the truth",
+   false,
+   false,
+   "17 of 664 messages differ"
+  ],
+  [
+   "broken on purpose: a feed that accepts any newer change, with its place moved by mistake",
+   "the feed equals a clean replay of the log",
+   false,
+   false,
+   "139 of 1559 entries differ; 629 notes against 662"
+  ],
+  [
+   "broken on purpose: a sender that keeps no list of what it sent, with the feed rebuilt",
+   "a notification is sent once",
+   false,
+   false,
+   "171 repeats among 709 sent"
+  ],
+  [
+   "broken on purpose: the log entry saved in a second step, with the core dying in between",
+   "every saved change is in the log",
+   false,
+   false,
+   "4 of 635 messages have a change missing from the log"
+  ],
+  [
+   "numbering model (a model, not PostgreSQL)",
+   "numbers taken before the save finishes: nothing stepped over",
+   false,
+   false,
+   "1194 of 2400 changes never seen by the reader"
+  ],
+  [
+   "numbering model (a model, not PostgreSQL)",
+   "numbers handed out one save at a time: nothing stepped over",
+   true,
+   true,
+   "0 of 2400 changes never seen by the reader"
+  ]
+ ],
+ "notes": [
+  [
+   "healthy burst",
+   "time to level after the last action",
+   "1.6 s (includes the 1 s hold)"
+  ],
+  [
+   "healthy burst",
+   "save to search",
+   "median 6 ms, 19 in 20 within 11 ms, worst 72 ms (1980 changes)"
+  ],
+  [
+   "healthy burst",
+   "save to feed",
+   "median 7 ms, 19 in 20 within 12 ms, worst 72 ms (2941 changes)"
+  ],
+  [
+   "healthy burst",
+   "notification sent after its hold ended",
+   "median 30 ms, 19 in 20 within 88 ms, worst 126 ms (626 changes)"
+  ],
+  [
+   "healthy burst",
+   "load",
+   "2941 changes at about 300 actions a second; 1246 notifications due, 626 sent"
+  ],
+  [
+   "repeats, lost answers and late copies on every hop",
+   "faults",
+   "each delivery: 15% arrive late as a stale copy, 15% lose their answer, 20% are delivered twice"
+  ],
+  [
+   "repeats, lost answers and late copies on every hop",
+   "time to level",
+   "47.2 s"
+  ],
+  [
+   "search stopped for 5 s mid-burst",
+   "feed freshness during the outage",
+   "median 7 ms, 19 in 20 within 12 ms, worst 18 ms (971 changes)"
+  ],
+  [
+   "search stopped for 5 s mid-burst",
+   "search caught up with the backlog",
+   "0.6 s after it came back (661 changes)"
+  ],
+  [
+   "search answers after 1.5 s (longer than the 1 s limit) for 4 s",
+   "feed freshness meanwhile",
+   "median 7 ms, 19 in 20 within 12 ms, worst 17 ms (782 changes)"
+  ],
+  [
+   "search refuses one delete, then refuses everything",
+   "parked after the refused delete",
+   "2"
+  ],
+  [
+   "killothers",
+   "feed place moved by mistake",
+   "from 2173 to 2213"
+  ],
+  [
+   "the feed wiped mid-burst and rebuilt",
+   "rebuild",
+   "1220 earlier changes replayed while new ones kept arriving; level again 1.4 s after the wipe"
+  ],
+  [
+   "then the notification sender wiped and refilled",
+   "tray before and after",
+   "565 before, 565 after; 0 entries not refilled (0 of them were sent and read later), 0 new"
+  ],
+  [
+   "then search wiped and its place set back to the start",
+   "refilled",
+   "2439 changes in 1.6 s"
+  ],
+  [
+   "mut",
+   "feed place moved by mistake",
+   "from 511 to 551"
+  ]
+ ]
+}

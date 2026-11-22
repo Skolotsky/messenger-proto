@@ -2,11 +2,10 @@
 
 Work in flight. Order inside a section is priority. Finished work moves to `done.md`. Rules: CLAUDE.md, section "Tasks".
 
-**Where we are:** The product scope is decided (2026-11-22). Accepted: D-001 the three-bucket feed; D-002 scripted participants; D-003 reading is enough, with Keep and Done; D-004 edits and deletes; D-009 the first-version surfaces; D-010 the large seeded team with a control panel; D-011 a flag has no state of its own; D-012 notifications follow the bucket; D-013 readings from E-001; D-014 reactions; D-015 what read means; D-016 history tabs. E-001 was rerun with all of them and checked independently twice: the rules hold together, and the notification default comes to about 29 a day in the simulated team. The architecture proposal (T-022) is drafted and waits for the user: D-005 to D-008 are proposed, D-017 and D-018 registered, none taken. The look-and-feel experiment runs in a separate session. Text rules judged by a model are in scope but built last, after an experiment.
+**Where we are:** The product scope is decided (2026-11-22). Accepted: D-001 the three-bucket feed; D-002 scripted participants; D-003 reading is enough, with Keep and Done; D-004 edits and deletes; D-009 the first-version surfaces; D-010 the large seeded team with a control panel; D-011 a flag has no state of its own; D-012 notifications follow the bucket; D-013 readings from E-001; D-014 reactions; D-015 what read means; D-016 history tabs. E-001 was rerun with all of them and checked independently twice: the rules hold together, and the notification default comes to about 29 a day in the simulated team. The architecture proposal (T-022) is drafted, tried out in E-003 (the design held; the notification hold was changed to the log's own clock; the PostgreSQL-specific part is not verified), and waits for the user: D-005 to D-008 are proposed, D-017 and D-018 registered, none taken. The look-and-feel experiment runs in a separate session. Text rules judged by a model are in scope but built last, after an experiment.
 
 ## Now
 
-- **T-023** `experiment` E-003, the delivery spine: a throwaway version of the proposed architecture as separate processes, broken on purpose (killed, slowed, repeated, wiped) and compared with the truth. Asked by the user on 2026-11-22 before reading the proposal. Check: `./experiments/E-003-delivery-spine/run.sh` reports no unexpected result, and each deliberately broken variant is caught
 _Nothing in progress._
 
 ## Waiting on user

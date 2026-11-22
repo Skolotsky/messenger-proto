@@ -170,6 +170,12 @@ details > .stack { gap: 10px; }
 </div>
 
 <section>
+  <h2>Tried out before you read it</h2>
+  <p>A throwaway version of this design was built as separate programs and broken on purpose: killed, slowed, fed repeats and late copies, wiped. Nothing was lost, a slow part delayed nobody else, and every receiver ended equal to the truth (75 checks). It changed the proposal in one place that matters: how a notification is held back (section 6). The database-specific part is not verified yet. <a href="E-003-delivery-spine.html">Results of E-003</a>.</p>
+  <p class="note">Since this page was drafted, D-022 moved notifications out of the product into a separate mock notification app. Where this page says "tray", read that app; the design behind it is unchanged.</p>
+</section>
+
+<section>
   <h2>Contents</h2>
   <ol>
     <li><a href="#map">The parts and what moves between them</a></li>
@@ -455,7 +461,7 @@ server → screen   { "conversations": 4856, "kind": "message.changed", … }
   "text": "@Marco can you sign off the pricing page?" }
 
 { "name": "marco / thread_77 / 4812", "kind": "withdrawn" }   ← read, deleted or re-sorted meanwhile</code></pre>
-    <figcaption>What the feed tells the sender. The sender waits five seconds before sending (D-004's "brief hold"), so a delete or a read whose "withdrawn" reaches the sender inside those five seconds produces nothing. Past that, the notification has gone and the tray entry shows the current truth. It keeps the list of names it has sent, so rebuilding the feed never sends anything again. A "withdrawn" that arrives before its "due" is remembered. A row that moves up into Focus while unread gets a second note with its own name (D-012); the personal "Focus only" switch is a fact the feed applies before writing "due".</figcaption>
+    <figcaption>What the feed tells the sender. The sender waits five seconds before sending (D-004's "brief hold"), measured by the log's own clock: the core writes a clock tick into the log several times a second, the feed passes it on, and the sender sends only once it has received something stamped later than the end of the hold. So a message read or deleted within five seconds never notifies, however late any part is running (E-003: 0 of 160 wrongly sent, against 147 of 160 when the hold is counted from the note's arrival). Past the hold, the notification has gone and the tray entry shows the current truth. It keeps the list of names it has sent, so rebuilding the feed never sends anything again. A "withdrawn" that arrives before its "due" is remembered. A row that moves up into Focus while unread gets a second note with its own name (D-012); the personal "Focus only" switch is a fact the feed applies before writing "due".</figcaption>
   </figure>
   <p class="note">Best practice: Slack's 2026 notification rebuild separates deciding what deserves attention from delivering it (R-002). A is that separation.</p>
 </section>
@@ -523,7 +529,7 @@ answers:  200 applied · 200 already had it · 422 I refuse this one (→ parked
         <tr><td>No change is stepped over when many people write at once.</td><td>0 skipped</td><td>Many writers at once, with one save held open on purpose while later ones finish.</td></tr>
         <tr><td>Other open screens show a message.</td><td>1 s</td><td>None; measured under the scripted team at fast pace.</td></tr>
         <tr><td>Search and the feed reflect a change when healthy.</td><td>2 s, 19 times in 20</td><td>A burst at ten times the normal pace.</td></tr>
-        <tr><td>A notification is held before sending.</td><td>5 s</td><td>Delete, or read, inside the five seconds: nothing is sent.</td></tr>
+        <tr><td>A notification is held before sending, and never goes out for something read or deleted within the hold.</td><td>5 s, by the log's own clock</td><td>Read or delete 0.3 s after a mention while the feed is stopped, and while it is slower than the traffic; and let the machine's clock step backwards. Tried in E-003.</td></tr>
         <tr><td>A slow receiver delays nobody else.</td><td>feed stays within 2 s</td><td>Make search answer after 10 s, or stop it, during a burst.</td></tr>
         <tr><td>A receiver that was down ends equal to the truth.</td><td>10 minutes of backlog cleared in 30 s</td><td>Stop search for 10 minutes of edits and deletes; afterwards compare the whole index with the truth.</td></tr>
         <tr><td>How long we wait for a receiver, and retry.</td><td>3 s per call; again after 1, 2, 4 … 60 s; never give up on an outage</td><td>A receiver that accepts the connection and never answers.</td></tr>
@@ -596,8 +602,9 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
   <div class="split">
     <div class="panel agent"><div class="label">Experiments the draft needs</div>
       <ul>
-        <li><strong>The spine.</strong> A log, one worker, one stand-in: does a change reach a receiver within two seconds, 19 times in 20, under a burst, and is no change stepped over with many writers?</li>
-        <li><strong>Rebuild.</strong> Can the feed for the seeded team (two weeks, 36 participants) be rebuilt from the log in under a minute, so Reset can use it?</li>
+        <li><strong>Done: the spine (E-003).</strong> Loss, repeats, order, outages, parking and rebuild all behaved as promised on a small build without PostgreSQL.</li>
+        <li><strong>The database part.</strong> On PostgreSQL: is no change stepped over with many writers, and does a change still reach a receiver within two seconds under a burst? Needs a download.</li>
+        <li><strong>Rebuild at full size.</strong> Can the feed for the seeded team (two weeks, 36 participants) with the full rules be rebuilt in under a minute, so Reset can use it? E-003 rebuilt 2,400 changes in under two seconds with a subset of the rules.</li>
         <li><strong>Text rules judged by a model</strong>, already planned for last (D-001).</li>
       </ul>
       <p class="note">Streamed text needs no experiment: keeping it off the log is a design choice, proven by tests.</p>
