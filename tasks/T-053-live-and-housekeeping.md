@@ -51,4 +51,13 @@ An open screen stays current over one live connection and recovers from any inte
 
 ## Evidence
 
-Filled in with the final runs before this task is handed back.
+- `./scripts/verify` (full, with G-012 and G-026) passed on the branch merged with `main`, including `TestTheRealProgramServesTheLiveConnection` against the composed program. The browser suites in it run against the mock door, so they do not exercise this live connection.
+- Seen failing with the rule off, rerun after the merge:
+  - `fault_hub_handed`: "change 7 was never applied by the screen (applied [6 8 9]): a message was lost silently".
+  - `fault_no_lease_check`: "a copy declared dead saved 1 start(s) of watching under its old identity".
+  - `fault_no_watch_end`: a vanished screen was still watching after 45 s on the clock.
+  - `fault_tick_from_newest`: "12 s of traffic got 0 ticks".
+  - `fault_idle_scan`: the tick question read 507 rows beside 500 idle organizations and 57 beside 50.
+- The enforced `retire-and-delete` test first failed on a new table with an organization column. The table was removed and the list moved onto the organization's own row, which the delete already covers; the test was not edited.
+- Race detector on `live-order` and `watching-lapses`, in a separate Go image.
+- Not verified: the real feed service (a stand-in answers per the contract); a browser against the real program (T-058); two copies behind a real router (T-057); nudges between copies over the network; pieces and agent status reaching a screen, which need T-054 to call `Store.Outside`.
