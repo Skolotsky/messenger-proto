@@ -1,0 +1,154 @@
+# 2026/11/22 20:01:14.213546 [TestConversationsAreIndependent] [rapid] draw steps: 5
+# 2026/11/22 20:01:14.213549 [TestConversationsAreIndependent] [rapid] draw organization-wide: 0
+# 2026/11/22 20:01:14.213550 [TestConversationsAreIndependent] [rapid] draw person: 0
+# 2026/11/22 20:01:14.213551 [TestConversationsAreIndependent] [rapid] draw on: false
+# 2026/11/22 20:01:14.213551 [TestConversationsAreIndependent] [rapid] draw org-wide kind: 0
+# 2026/11/22 20:01:14.213552 [TestConversationsAreIndependent] [rapid] draw rule: 0
+# 2026/11/22 20:01:14.213553 [TestConversationsAreIndependent] [rapid] draw organization-wide: 0
+# 2026/11/22 20:01:14.213553 [TestConversationsAreIndependent] [rapid] draw person: 0
+# 2026/11/22 20:01:14.213553 [TestConversationsAreIndependent] [rapid] draw on: false
+# 2026/11/22 20:01:14.213554 [TestConversationsAreIndependent] [rapid] draw org-wide kind: 0
+# 2026/11/22 20:01:14.213554 [TestConversationsAreIndependent] [rapid] draw rule: 0
+# 2026/11/22 20:01:14.213555 [TestConversationsAreIndependent] [rapid] draw organization-wide: 0
+# 2026/11/22 20:01:14.213555 [TestConversationsAreIndependent] [rapid] draw person: 0
+# 2026/11/22 20:01:14.213555 [TestConversationsAreIndependent] [rapid] draw on: false
+# 2026/11/22 20:01:14.213556 [TestConversationsAreIndependent] [rapid] draw org-wide kind: 0
+# 2026/11/22 20:01:14.213556 [TestConversationsAreIndependent] [rapid] draw rule: 0
+# 2026/11/22 20:01:14.213556 [TestConversationsAreIndependent] [rapid] draw organization-wide: 1
+# 2026/11/22 20:01:14.213557 [TestConversationsAreIndependent] [rapid] draw conversation: 0
+# 2026/11/22 20:01:14.213558 [TestConversationsAreIndependent] [rapid] draw reader: 0
+# 2026/11/22 20:01:14.213558 [TestConversationsAreIndependent] [rapid] draw kind: 0
+# 2026/11/22 20:01:14.213559 [TestConversationsAreIndependent] [rapid] draw author: 0
+# 2026/11/22 20:01:14.213559 [TestConversationsAreIndependent] [rapid] draw mention: 0
+# 2026/11/22 20:01:14.213559 [TestConversationsAreIndependent] [rapid] draw mention: 0
+# 2026/11/22 20:01:14.213560 [TestConversationsAreIndependent] [rapid] draw mention: 0
+# 2026/11/22 20:01:14.213560 [TestConversationsAreIndependent] [rapid] draw mention: 0
+# 2026/11/22 20:01:14.213560 [TestConversationsAreIndependent] [rapid] draw mention: 0
+# 2026/11/22 20:01:14.213561 [TestConversationsAreIndependent] [rapid] draw mention: 0
+# 2026/11/22 20:01:14.213561 [TestConversationsAreIndependent] [rapid] draw level: 0
+# 2026/11/22 20:01:14.213562 [TestConversationsAreIndependent] [rapid] draw organization-wide: 0
+# 2026/11/22 20:01:14.213563 [TestConversationsAreIndependent] [rapid] draw person: 0
+# 2026/11/22 20:01:14.213563 [TestConversationsAreIndependent] [rapid] draw on: true
+# 2026/11/22 20:01:14.213563 [TestConversationsAreIndependent] [rapid] draw org-wide kind: 0
+# 2026/11/22 20:01:14.213564 [TestConversationsAreIndependent] [rapid] draw rule: 0
+# 2026/11/22 20:01:14.213677 [TestConversationsAreIndependent] [rapid] draw next conversation: 0
+# 2026/11/22 20:01:14.213678 [TestConversationsAreIndependent] [rapid] draw next conversation: 0
+# 2026/11/22 20:01:14.213678 [TestConversationsAreIndependent] [rapid] draw next conversation: 0
+# 2026/11/22 20:01:14.213679 [TestConversationsAreIndependent] [rapid] draw next conversation: 0
+# 2026/11/22 20:01:14.213680 [TestConversationsAreIndependent] [rapid] draw next conversation: 0
+# 2026/11/22 20:01:14.213680 [TestConversationsAreIndependent] [rapid] draw next conversation: 0
+# 2026/11/22 20:01:14.213768 [TestConversationsAreIndependent] interleaving the conversations changed the result. D-030: a rule may depend only on its own conversation and on organization-wide changes at their place.
+# reader ann differs:
+#  a: {"rows":[],"thread_dials":{},"focus_people":[],"counts":{"focus":0,"needs_you":0,"fyi":false,"kept":0},"history":{"direct":{"tab":"direct","entries":[],"unread":0,"next":null},"mentions":{"tab":"mentions","entries":[],"unread":0,"next":null},"reactions":{"tab":"reactions","entries":[],"unread":0,"next":null},"threads":{"tab":"threads","entries":[],"unread":0,"next":null}},"settings":{"focus_people":[],"removed_people":[],"auto_add":true,"focus_only":false,"release_on_act":true,"rules":[{"type":"item_kind","value":"flags"}],"removed_rules":[],"levels":[]},"feed":[]}
+#  b: {"rows":[],"thread_dials":{},"focus_people":[],"counts":{"focus":0,"needs_you":0,"fyi":false,"kept":0},"history":{"direct":{"tab":"direct","entries":[],"unread":0,"next":null},"mentions":{"tab":"mentions","entries":[],"unread":0,"next":null},"reactions":{"tab":"reactions","entries":[],"unread":0,"next":null},"threads":{"tab":"threads","entries":[],"unread":0,"next":null}},"settings":{"focus_people":[],"removed_people":[],"auto_add":true,"focus_only":false,"release_on_act":true,"rules":[],"removed_rules":[{"type":"item_kind","value":"flags"}],"levels":[]},"feed":[]}
+# 
+v0.4.8#2501641395206534645
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x1
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x1
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0

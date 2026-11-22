@@ -1,0 +1,348 @@
+# 2026/11/22 20:01:15.258929 [TestConversationsAreIndependent] [rapid] draw steps: 10
+# 2026/11/22 20:01:15.258933 [TestConversationsAreIndependent] [rapid] draw organization-wide: 1
+# 2026/11/22 20:01:15.258934 [TestConversationsAreIndependent] [rapid] draw conversation: 2
+# 2026/11/22 20:01:15.258935 [TestConversationsAreIndependent] [rapid] draw reader: 0
+# 2026/11/22 20:01:15.258935 [TestConversationsAreIndependent] [rapid] draw kind: 0
+# 2026/11/22 20:01:15.258936 [TestConversationsAreIndependent] [rapid] draw author: 0
+# 2026/11/22 20:01:15.258936 [TestConversationsAreIndependent] [rapid] draw mention: 0
+# 2026/11/22 20:01:15.258937 [TestConversationsAreIndependent] [rapid] draw mention: 3
+# 2026/11/22 20:01:15.258937 [TestConversationsAreIndependent] [rapid] draw mention: 2
+# 2026/11/22 20:01:15.258938 [TestConversationsAreIndependent] [rapid] draw mention: 0
+# 2026/11/22 20:01:15.258938 [TestConversationsAreIndependent] [rapid] draw mention: 2
+# 2026/11/22 20:01:15.258938 [TestConversationsAreIndependent] [rapid] draw mention: 1
+# 2026/11/22 20:01:15.258939 [TestConversationsAreIndependent] [rapid] draw level: 2
+# 2026/11/22 20:01:15.258940 [TestConversationsAreIndependent] [rapid] draw organization-wide: 1
+# 2026/11/22 20:01:15.258940 [TestConversationsAreIndependent] [rapid] draw conversation: 1
+# 2026/11/22 20:01:15.258941 [TestConversationsAreIndependent] [rapid] draw reader: 2
+# 2026/11/22 20:01:15.258941 [TestConversationsAreIndependent] [rapid] draw kind: 2
+# 2026/11/22 20:01:15.258941 [TestConversationsAreIndependent] [rapid] draw author: 1
+# 2026/11/22 20:01:15.258942 [TestConversationsAreIndependent] [rapid] draw mention: 0
+# 2026/11/22 20:01:15.258943 [TestConversationsAreIndependent] [rapid] draw mention: 0
+# 2026/11/22 20:01:15.258943 [TestConversationsAreIndependent] [rapid] draw mention: 1
+# 2026/11/22 20:01:15.258943 [TestConversationsAreIndependent] [rapid] draw mention: 1
+# 2026/11/22 20:01:15.258944 [TestConversationsAreIndependent] [rapid] draw mention: 3
+# 2026/11/22 20:01:15.258944 [TestConversationsAreIndependent] [rapid] draw mention: 1
+# 2026/11/22 20:01:15.258944 [TestConversationsAreIndependent] [rapid] draw level: 1
+# 2026/11/22 20:01:15.258945 [TestConversationsAreIndependent] [rapid] draw organization-wide: 0
+# 2026/11/22 20:01:15.258946 [TestConversationsAreIndependent] [rapid] draw person: 0
+# 2026/11/22 20:01:15.258946 [TestConversationsAreIndependent] [rapid] draw on: true
+# 2026/11/22 20:01:15.258946 [TestConversationsAreIndependent] [rapid] draw org-wide kind: 1
+# 2026/11/22 20:01:15.258947 [TestConversationsAreIndependent] [rapid] draw about: 1
+# 2026/11/22 20:01:15.258947 [TestConversationsAreIndependent] [rapid] draw organization-wide: 0
+# 2026/11/22 20:01:15.258948 [TestConversationsAreIndependent] [rapid] draw person: 0
+# 2026/11/22 20:01:15.258948 [TestConversationsAreIndependent] [rapid] draw on: false
+# 2026/11/22 20:01:15.258948 [TestConversationsAreIndependent] [rapid] draw org-wide kind: 0
+# 2026/11/22 20:01:15.258949 [TestConversationsAreIndependent] [rapid] draw rule: 1
+# 2026/11/22 20:01:15.258949 [TestConversationsAreIndependent] [rapid] draw organization-wide: 0
+# 2026/11/22 20:01:15.258950 [TestConversationsAreIndependent] [rapid] draw person: 0
+# 2026/11/22 20:01:15.258950 [TestConversationsAreIndependent] [rapid] draw on: true
+# 2026/11/22 20:01:15.258950 [TestConversationsAreIndependent] [rapid] draw org-wide kind: 0
+# 2026/11/22 20:01:15.258951 [TestConversationsAreIndependent] [rapid] draw rule: 1
+# 2026/11/22 20:01:15.258951 [TestConversationsAreIndependent] [rapid] draw organization-wide: 0
+# 2026/11/22 20:01:15.258952 [TestConversationsAreIndependent] [rapid] draw person: 0
+# 2026/11/22 20:01:15.258952 [TestConversationsAreIndependent] [rapid] draw on: false
+# 2026/11/22 20:01:15.258952 [TestConversationsAreIndependent] [rapid] draw org-wide kind: 6
+# 2026/11/22 20:01:15.258953 [TestConversationsAreIndependent] [rapid] draw organization-wide: 4
+# 2026/11/22 20:01:15.258953 [TestConversationsAreIndependent] [rapid] draw conversation: 0
+# 2026/11/22 20:01:15.258953 [TestConversationsAreIndependent] [rapid] draw reader: 1
+# 2026/11/22 20:01:15.258954 [TestConversationsAreIndependent] [rapid] draw kind: 11
+# 2026/11/22 20:01:15.258954 [TestConversationsAreIndependent] [rapid] draw watch: true
+# 2026/11/22 20:01:15.258954 [TestConversationsAreIndependent] [rapid] draw organization-wide: 1
+# 2026/11/22 20:01:15.258955 [TestConversationsAreIndependent] [rapid] draw conversation: 0
+# 2026/11/22 20:01:15.258955 [TestConversationsAreIndependent] [rapid] draw reader: 1
+# 2026/11/22 20:01:15.258956 [TestConversationsAreIndependent] [rapid] draw kind: 1
+# 2026/11/22 20:01:15.258956 [TestConversationsAreIndependent] [rapid] draw author: 1
+# 2026/11/22 20:01:15.258956 [TestConversationsAreIndependent] [rapid] draw mention: 0
+# 2026/11/22 20:01:15.258957 [TestConversationsAreIndependent] [rapid] draw mention: 1
+# 2026/11/22 20:01:15.258957 [TestConversationsAreIndependent] [rapid] draw mention: 0
+# 2026/11/22 20:01:15.258957 [TestConversationsAreIndependent] [rapid] draw mention: 0
+# 2026/11/22 20:01:15.258958 [TestConversationsAreIndependent] [rapid] draw mention: 1
+# 2026/11/22 20:01:15.258958 [TestConversationsAreIndependent] [rapid] draw mention: 0
+# 2026/11/22 20:01:15.258958 [TestConversationsAreIndependent] [rapid] draw level: 1
+# 2026/11/22 20:01:15.258959 [TestConversationsAreIndependent] [rapid] draw organization-wide: 1
+# 2026/11/22 20:01:15.258959 [TestConversationsAreIndependent] [rapid] draw conversation: 1
+# 2026/11/22 20:01:15.258960 [TestConversationsAreIndependent] [rapid] draw reader: 1
+# 2026/11/22 20:01:15.258960 [TestConversationsAreIndependent] [rapid] draw top level: false
+# 2026/11/22 20:01:15.258960 [TestConversationsAreIndependent] [rapid] draw thread: 0
+# 2026/11/22 20:01:15.258961 [TestConversationsAreIndependent] [rapid] draw kind: 0
+# 2026/11/22 20:01:15.258961 [TestConversationsAreIndependent] [rapid] draw author: 0
+# 2026/11/22 20:01:15.258961 [TestConversationsAreIndependent] [rapid] draw mention: 0
+# 2026/11/22 20:01:15.258962 [TestConversationsAreIndependent] [rapid] draw mention: 1
+# 2026/11/22 20:01:15.258962 [TestConversationsAreIndependent] [rapid] draw mention: 1
+# 2026/11/22 20:01:15.258962 [TestConversationsAreIndependent] [rapid] draw mention: 1
+# 2026/11/22 20:01:15.258964 [TestConversationsAreIndependent] [rapid] draw mention: 2
+# 2026/11/22 20:01:15.258964 [TestConversationsAreIndependent] [rapid] draw mention: 3
+# 2026/11/22 20:01:15.258964 [TestConversationsAreIndependent] [rapid] draw level: 3
+# 2026/11/22 20:01:15.258965 [TestConversationsAreIndependent] [rapid] draw organization-wide: 0
+# 2026/11/22 20:01:15.258965 [TestConversationsAreIndependent] [rapid] draw person: 1
+# 2026/11/22 20:01:15.258966 [TestConversationsAreIndependent] [rapid] draw on: false
+# 2026/11/22 20:01:15.258966 [TestConversationsAreIndependent] [rapid] draw org-wide kind: 5
+# 2026/11/22 20:01:15.259109 [TestConversationsAreIndependent] [rapid] draw next conversation: 1
+# 2026/11/22 20:01:15.259110 [TestConversationsAreIndependent] [rapid] draw next conversation: 0
+# 2026/11/22 20:01:15.259110 [TestConversationsAreIndependent] [rapid] draw next conversation: 2
+# 2026/11/22 20:01:15.259110 [TestConversationsAreIndependent] [rapid] draw next conversation: 0
+# 2026/11/22 20:01:15.259111 [TestConversationsAreIndependent] [rapid] draw next conversation: 1
+# 2026/11/22 20:01:15.259111 [TestConversationsAreIndependent] [rapid] draw next conversation: 0
+# 2026/11/22 20:01:15.259112 [TestConversationsAreIndependent] [rapid] draw next conversation: 0
+# 2026/11/22 20:01:15.259112 [TestConversationsAreIndependent] [rapid] draw next conversation: 0
+# 2026/11/22 20:01:15.259113 [TestConversationsAreIndependent] [rapid] draw next conversation: 1
+# 2026/11/22 20:01:15.259113 [TestConversationsAreIndependent] [rapid] draw next conversation: 0
+# 2026/11/22 20:01:15.259247 [TestConversationsAreIndependent] interleaving the conversations changed the result. D-030: a rule may depend only on its own conversation and on organization-wide changes at their place.
+# reader bob differs:
+#  a: {"rows":[{"key":"dm:dm:a|b","where":"Focus/new","kept":false,"hold":false,"flagged":[],"items":[{"msg":"m1","kind":"msg","bucket":3,"read":false,"retracted":false}]},{"key":"th:m2","where":"Earlier","kept":false,"hold":false,"flagged":[],"items":[{"msg":"m2","kind":"msg","bucket":1,"read":true,"retracted":false}]}],"thread_dials":{},"focus_people":["ann"],"counts":{"focus":1,"needs_you":0,"fyi":false,"kept":0},"history":{"direct":{"tab":"direct","entries":[{"message":"m1","conversation":"dm:a|b","thread":null,"author":"ann","preview":"text of m1","at":"2026-11-22T10:00:07.7Z","number":11,"unread":true,"by":null,"emoji":null,"level":null,"kept":null}],"unread":1,"next":null},"mentions":{"tab":"mentions","entries":[{"message":"m1","conversation":"dm:a|b","thread":null,"author":"ann","preview":"text of m1","at":"2026-11-22T10:00:07.7Z","number":11,"unread":true,"by":null,"emoji":null,"level":null,"kept":null}],"unread":1,"next":null},"reactions":{"tab":"reactions","entries":[],"unread":0,"next":null},"threads":{"tab":"threads","entries":[],"unread":0,"next":null}},"settings":{"focus_people":[{"person":"ann","items_last_7_days":1}],"removed_people":[],"auto_add":true,"focus_only":false,"release_on_act":true,"rules":[{"type":"item_kind","value":"flags"}],"removed_rules":[],"levels":[]},"feed":[{"conversation":"dm:a|b","thread":null,"message":"m1","bucket":"focus","unread":true,"kept":null,"why":"Direct message from ann","newest":11,"first_new":11,"author":"ann","preview":"text of m1","at":"2026-11-22T10:00:07.7Z","new_items":1,"reactions":[],"state":"none","fenced":false,"explanation":{"what":"A direct message from ann.","decided_by":"ann is in your Focus people.","otherwise":"Without them it would land in Needs you.","change":{"label":"Remove ann from Focus","do":{"kind":"focus_person","about":"ann","on":false},"undo":{"kind":"focus_person","about":"ann","on":true},"moved_last_7_days":null}}}]}
+#  b: {"rows":[{"key":"dm:dm:a|b","where":"FYI","kept":false,"hold":false,"flagged":[],"items":[{"msg":"m1","kind":"msg","bucket":1,"read":false,"retracted":false}]},{"key":"th:m2","where":"Earlier","kept":false,"hold":false,"flagged":[],"items":[{"msg":"m2","kind":"msg","bucket":1,"read":true,"retracted":false}]}],"thread_dials":{},"focus_people":["ann"],"counts":{"focus":0,"needs_you":0,"fyi":true,"kept":0},"history":{"direct":{"tab":"direct","entries":[{"message":"m1","conversation":"dm:a|b","thread":null,"author":"ann","preview":"text of m1","at":"2026-11-22T10:00:07.7Z","number":11,"unread":true,"by":null,"emoji":null,"level":null,"kept":null}],"unread":1,"next":null},"mentions":{"tab":"mentions","entries":[{"message":"m1","conversation":"dm:a|b","thread":null,"author":"ann","preview":"text of m1","at":"2026-11-22T10:00:07.7Z","number":11,"unread":true,"by":null,"emoji":null,"level":null,"kept":null}],"unread":1,"next":null},"reactions":{"tab":"reactions","entries":[],"unread":0,"next":null},"threads":{"tab":"threads","entries":[],"unread":0,"next":null}},"settings":{"focus_people":[{"person":"ann","items_last_7_days":1}],"removed_people":[],"auto_add":true,"focus_only":false,"release_on_act":true,"rules":[{"type":"item_kind","value":"flags"}],"removed_rules":[],"levels":[]},"feed":[{"conversation":"dm:a|b","thread":null,"message":"m1","bucket":"fyi","unread":true,"kept":null,"why":"Direct message from ann","newest":11,"first_new":11,"author":"ann","preview":"text of m1","at":"2026-11-22T10:00:07.7Z","new_items":1,"reactions":[],"state":"none","fenced":false,"explanation":{"what":"A direct message from ann.","decided_by":"ann is in your Focus people.","otherwise":"Without them it would land in Needs you.","change":{"label":"Remove ann from Focus","do":{"kind":"focus_person","about":"ann","on":false},"undo":{"kind":"focus_person","about":"ann","on":true},"moved_last_7_days":null}}}]}
+# 
+v0.4.8#11657756694620509445
+0x0
+0x6b74f03291620
+0x5
+0x0
+0x6b74f03291620
+0x1
+0x0
+0x38e38e38e38e4
+0x2
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x469a0914c5d8e
+0x3
+0x1d51503440f5df
+0x9bef014e7512d
+0x2
+0xc3a3d02b049b8
+0x3fb1cbaf22563
+0x0
+0x37a748d3c6944
+0x1c224140bc2455
+0x2
+0x3b34a219991e
+0x44c50c5cd9c35
+0x1
+0x160ea41229594
+0x8a021e67fb259
+0x2
+0x1b3dbc92971635
+0x1617dc1f800131
+0x1
+0xeac0a621030ff
+0x149af1dffce1e2
+0x1
+0x11792f73950c04
+0x12fe2a383d519b
+0x2
+0x560712db10f30
+0x9d4318670dfa1
+0x2
+0x26fec993d2ced
+0x1c88efb1f14d62
+0x1
+0x1dab6555d4e469
+0x199bd73d04cfa7
+0x0
+0x1f7fa4bc04bfef
+0x11c0366351d914
+0x0
+0x91509e035fd27
+0x1c06717b5d722e
+0x1
+0x389a4dd288188
+0x6108e7c1b5d65
+0x1
+0x48c108f8b9c51
+0x1f5ff33981fdb5
+0xffffffffffffffff
+0x1db97419012e06
+0x11adca0b4a7851
+0x1
+0x147df665fc430c
+0x1ca70b2bdecbfc
+0x1
+0x5a6141a8ac455
+0x1a9624f4c62a5
+0x0
+0xc6bdbccd77e7c
+0x100b8c75a352bf
+0x0
+0x1
+0x5aa8af93a41e6
+0x2
+0x1
+0x6234ec4df7cd1
+0x2
+0x1
+0x1f0b06a0dafced
+0x1
+0x0
+0x9e254fa031d70
+0x0
+0x0
+0x0
+0x1
+0x1
+0x0
+0x0
+0x0
+0x1
+0x2
+0x1
+0x0
+0x3
+0x2
+0x0
+0x1
+0x1
+0x679c5c3f6815e
+0x0
+0x0
+0x384e4f2c0783b
+0x1
+0x0
+0x5812da37c4a43
+0x0
+0x1
+0x81b714d7993c6
+0x0
+0x0
+0x8479c6263587a
+0x1fb6a0599fed45
+0xffffffffffffffff
+0xbade8d88d7db2
+0x1588fe15706bc6
+0x4
+0x10c1b11253927
+0x1
+0x0
+0x65dc2ab278703
+0x1
+0x1
+0x1f822b9888f008
+0x1fffffffffffff
+0x0
+0x1
+0x16c15df55a189b
+0x1
+0x1
+0x1c6bc666ff21b6
+0x0
+0x0
+0xd4445a85731d1
+0x2
+0x1
+0x882d35b2ce358
+0x1
+0x1
+0x3607d049a7025
+0x1
+0x1
+0x1b872fa5e91d92
+0x3
+0x0
+0xbd279f5717b5e
+0x0
+0x1
+0x1a658fafb5ba9b
+0x1
+0x0
+0x6db9853646134
+0x1
+0x0
+0x1403ebddb6333c
+0x1
+0x1
+0x12db16ce1d770b
+0x3
+0x0
+0x1bb7c1af72a5b
+0x1
+0x1
+0x5b395ff9a17e
+0x1
+0x1
+0x122b3c530628c5
+0x1
+0x1
+0xf3ec3358f95b1
+0x1
+0x1
+0x0
+0x1
+0x1
+0x0
+0x0
+0x1
+0x0
+0x1
+0x1
+0x0
+0x1
+0x0
+0x0
+0x0
+0x0
+0x1
+0x0
+0x0
+0x1
+0x1
+0x177503184cbc46
+0x1
+0x2
+0x13f176024d2b48
+0x2
+0x2
+0x191e4b75c05b87
+0x3
+0x1
+0xcb9907fb929eb
+0x3
+0x0
+0x1135e1c2a69d88
+0x0
+0x1
+0x0
+0x1
+0x0
+0x0
+0x1a8717427b345e
+0x5
+0x4
+0x14e17495e8cf9
+0x1
+0x0
+0x1410882b84144c
+0x0
+0x0
+0xb31dcde910a86
+0x2
+0x1
+0x1
+0x0
+0x0
+0x0
+0x1
+0x0
+0x0
+0x0
+0x1
+0x1
+0x0
+0x1
+0x2
+0x0
+0x1
+0x2
+0x1
+0x0
+0x1
+0x0

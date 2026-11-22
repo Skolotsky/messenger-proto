@@ -148,6 +148,8 @@ else
 
   if out=$(TOOL_DIR=server ./scripts/tool go test ./... 2>&1); then pass "server unit tests, with every contract example against its schema and Go type"; else fail "server unit tests failed. Run: TOOL_DIR=server ./scripts/tool go test ./..."; printf '%s\n' "$out" | tail -25; fi
 
+  if out=$(TOOL_DIR=tests ./scripts/tool go test ./guardrails/conversations-independent/ 2>&1); then pass "the feed's result per conversation does not depend on other conversations (G-030)"; else fail "G-030 failed. A failing guardrail is a finding: fix the rules, not the test. Run: TOOL_DIR=tests ./scripts/tool go test ./guardrails/conversations-independent/"; printf '%s\n' "$out" | tail -25; fi
+
   section "Contracts in machine form (T-045)"
   if out=$(./scripts/contracts --check 2>&1); then pass "TypeScript types match the schema"; else fail "contracts/generated/types.ts is out of date. Run: ./scripts/contracts"; printf '%s\n' "$out" | tail -5; fi
 fi
