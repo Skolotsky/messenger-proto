@@ -70,10 +70,11 @@ def run(browser, slug, size, vp, scale):
     click('[data-row="r-inc"] .row-main')
     click('[data-row="r-anna"] .row-main')
     pg.locator('[data-row="r-anna"] .reply input').fill("Yes to 3 pm. Legal cleared the terms page yesterday.")
-    pg.locator('[data-row="r-anna"] .reply button').click()
-    ok("reply from the row appears in the row", "Legal cleared" in pg.locator('[data-row="r-anna"] .row-exp').inner_text())
     shot("02-row-expanded")
-    click('[data-row="r-anna"] .row-main')
+    pg.locator('[data-row="r-anna"] .reply button').click()
+    ra = pg.locator('article[data-row="r-anna"]')
+    ok("sending a reply from the row closes the row and shows the reply on it", ra.locator(".row-exp").count() == 0 and "Legal cleared" in ra.locator(".row-preview").inner_text() and "replied" in ra.inner_text().lower() and "read" in ra.get_attribute("class").split(), ra.inner_text()[:160])
+    shot("02b-replied")
 
     # 4. an agent's flag asking for approval; react from the row releases it
     click('[data-row="r-rc"] .row-main')
@@ -128,6 +129,7 @@ def run(browser, slug, size, vp, scale):
     ok('"3 new" appears and nothing in the list moves', vis(".newpill").inner_text() == "3 new" and pg.locator(".row").count() == n and abs(top(".row") - y) < 0.5)
     shot("05-three-new")
     click(".newpill")
+    shot("05b-new-applied")
     ok("the new rows come in when asked", pg.locator('[data-row="r-sam"]').count() == 1 and pg.locator(".newpill").count() == 0)
 
     # 8. an empty bucket

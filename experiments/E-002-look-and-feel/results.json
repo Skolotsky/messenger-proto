@@ -72,9 +72,9 @@
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "reply from the row appears in the row",
+  "check": "sending a reply from the row closes the row and shows the reply on it",
   "pass": true,
-  "detail": ""
+  "detail": "AL\nAnna Lindqvist\n10:41\nIn Focus: direct message from Anna\nYou: Yes to 3 pm. Legal cleared the terms page yesterday.\nREPLIED"
  },
  {
   "page": "slack-like",
@@ -646,9 +646,9 @@
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "reply from the row appears in the row",
+  "check": "sending a reply from the row closes the row and shows the reply on it",
   "pass": true,
-  "detail": ""
+  "detail": "AL\nAnna Lindqvist\n10:41\nIn Focus: direct message from Anna\nYou: Yes to 3 pm. Legal cleared the terms page yesterday.\nREPLIED"
  },
  {
   "page": "slack-like",
@@ -1206,9 +1206,9 @@
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "reply from the row appears in the row",
+  "check": "sending a reply from the row closes the row and shows the reply on it",
   "pass": true,
-  "detail": ""
+  "detail": "AL\nAnna Lindqvist\n10:41\nIn Focus: direct message from Anna\nYou: Yes to 3 pm. Legal cleared the terms page yesterday.\nREPLIED"
  },
  {
   "page": "telegram-like",
@@ -1773,9 +1773,9 @@
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "reply from the row appears in the row",
+  "check": "sending a reply from the row closes the row and shows the reply on it",
   "pass": true,
-  "detail": ""
+  "detail": "AL\nAnna Lindqvist\n10:41\nIn Focus: direct message from Anna\nYou: Yes to 3 pm. Legal cleared the terms page yesterday.\nREPLIED"
  },
  {
   "page": "telegram-like",
@@ -2333,9 +2333,9 @@
  {
   "page": "own",
   "width": "desktop",
-  "check": "reply from the row appears in the row",
+  "check": "sending a reply from the row closes the row and shows the reply on it",
   "pass": true,
-  "detail": ""
+  "detail": "AL\nAnna Lindqvist\n10:41\nIn Focus: direct message from Anna\nYou: Yes to 3 pm. Legal cleared the terms page yesterday.\nREPLIED"
  },
  {
   "page": "own",
@@ -2900,9 +2900,9 @@
  {
   "page": "own",
   "width": "phone",
-  "check": "reply from the row appears in the row",
+  "check": "sending a reply from the row closes the row and shows the reply on it",
   "pass": true,
-  "detail": ""
+  "detail": "AL\nAnna Lindqvist\n10:41\nIn Focus: direct message from Anna\nYou: Yes to 3 pm. Legal cleared the terms page yesterday.\nREPLIED"
  },
  {
   "page": "own",

@@ -303,6 +303,8 @@ button.rx:hover{border-color:var(--accent)}
   .picker{left:0 !important;right:0;top:auto !important;bottom:0;width:auto;max-height:62dvh;border-radius:16px 16px 0 0}.pk-grid button{height:42px;font-size:24px}}
 /* reactions on their own line, buttons on the next */
 .acts .quick{flex:0 0 100%;margin:0 0 2px}
+.row.fresh{background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.row.fresh .row-time::after{content:" · just in";color:var(--accent);font-weight:600}
 
 /* The agent's own: a calm page. The reason leads every row, and a row's size says how much attention it asks for. */
 :root{--bg:#faf8f4;--panel:#fff;--panel2:#f1eee7;--line:#e4dfd4;--hover:#f3f0e9;--accent:#1f4f46;--accent-soft:#e1ece9;--serif:ui-serif,Georgia,"Times New Roman",serif}
@@ -696,7 +698,7 @@ function rowHTML(r) {
   const sub = r.sub || (c.kind === 'dm' ? '' : c.kind === 'channel' ? (r.chan ? '' : '#' + c.name) : '#' + c.where);
   const n = left(r), cnt = n > 1 ? `<span class="row-count">${n} new</span>` : '';
   const marks = (ms.some(m => m.flag) ? '<span class="tag flag">⚑</span>' : '') + (ms.some(m => m.info) ? '<span class="tag info">Info</span>' : '') + (isAgent(r.by) ? '<span class="tag ag">agent</span>' : '');
-  const state = r.done ? '<span class="state">Done</span>' : r.keptNow ? '<span class="state">Kept</span>' : '';
+  const state = r.replied ? '<span class="state">Replied</span>' : r.done ? '<span class="state">Done</span>' : r.keptNow ? '<span class="state">Kept</span>' : '';
   const badge = r.read ? '' : `<span class="row-badge">${n > 1 ? n : ''}</span>`;
   const lockS = last.edited && L.body ? ` style="max-height:${L.body}px"` : '';
   let x = '';
@@ -707,11 +709,11 @@ function rowHTML(r) {
       <div class="acts"><span class="quick"><small>React to the latest</small>${EMO.map(e => `<button class="rx-btn" data-act="react" data-id="${r.id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}<button class="rx-btn rx-pick" data-act="pick" data-m="${last.id}" aria-label="More reactions" title="More reactions">${ic('smile')}</button></span>${kd}<button class="btn sm" data-act="openConv" data-c="${r.conv}" data-id="${r.id}">Open conversation</button>${dialCtl(c, r.id)}<button class="btn sm" data-act="ruleFor" data-c="${r.conv}" data-by="${r.by}">Add to Focus…</button></div>
       <form class="reply" data-form="reply" data-id="${r.id}"><input name="t" autocomplete="off" aria-label="Reply" placeholder="Reply ${c.kind === 'dm' ? 'to ' + first(c.with) : 'in ' + where}…"><button class="btn pri">Send</button></form></div>`;
   }
-  return `<article class="row b-${r.bucket} ${r.read ? 'read' : 'unread'}${exp ? ' expanded' : ''}${r.sec === 'kept' ? ' kept' : ''}${r.done ? ' done' : ''}" data-row="${r.id}">
+  return `<article class="row b-${r.bucket} ${r.read ? 'read' : 'unread'}${exp ? ' expanded' : ''}${r.fresh ? ' fresh' : ''}${r.sec === 'kept' ? ' kept' : ''}${r.done ? ' done' : ''}" data-row="${r.id}">
     <div class="row-main" role="button" tabindex="0" data-act="toggle" data-id="${r.id}" aria-expanded="${exp}">${av(r.chan ? '#' : r.kind === 'rx' ? r.by : last.by)}
       <div class="row-text"><div class="row-head"><span class="row-title">${esc(title)}</span>${sub ? `<span class="row-sub">${sub}</span>` : ''}${marks}${cnt}<span class="row-time">${r.t}${last.edited ? ' · edited' : ''}</span></div>
         <div class="row-reason"><span class="why-dot"></span>${WHY === 'a' ? `<button class="why-btn" data-act="why" data-id="${r.id}" aria-expanded="${S.whyOpen === r.id}">${esc(r.reason)} ${ic('chev')}</button>` : esc(r.reason)}${r.note ? ` · <em>${r.note}</em>` : ''}${WHY === 'c' ? `<button class="why-btn c" data-act="whySheet" data-id="${r.id}">Why? Change…</button>` : ''}</div>
-        <div class="row-preview" data-k="${k}"${lockS}><b>${last.by === ME ? 'You' : first(last.by)}:</b> ${rich(last.text)}</div>
+        <div class="row-preview" data-k="${k}"${lockS}>${r.replies.length ? `<b>You:</b> ${rich(S.msgs[r.replies[r.replies.length - 1]].text)}` : `<b>${last.by === ME ? 'You' : first(last.by)}:</b> ${rich(last.text)}`}</div>
         ${r.kind !== 'rx' && last.rx.length ? rxHTML(last) : ''}</div>
       <div class="row-side">${state}${badge}<span class="row-btns"><button class="rx-pick" data-act="pick" data-m="${last.id}" aria-label="React without opening" title="React to the latest message without opening">${ic('smile')}</button>${!r.read ? `<button class="mark-read" data-act="read" data-id="${r.id}" aria-label="Mark read without opening" title="Mark read without opening">${ic('check')}</button>` : ''}<button class="open-btn" data-act="openConv" data-c="${r.conv}" data-id="${r.id}" aria-label="Open the conversation" title="Open the conversation at the first new message">${ic('open')}</button></span>${r.sec === 'kept' && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : ''}<span class="row-chev">${ic('chev')}</span></div></div>${WHY === 'a' && S.whyOpen === r.id ? `<div class="why-pop" data-stop="1"><h3>Why this is in ${BK[r.bucket][0]}</h3>${whyBody(r)}</div>` : ''}${x}</article>`;
 }
@@ -852,7 +854,7 @@ function settle() { // the person leaves the feed: read rows go, kept rows move 
     if (!info) { const hit = S.rules.find(x => (x.kind === 'person' && x.target === r.by) || (x.kind === 'channel' && (c.name === x.target) && r.bucket !== 'focus') || (x.kind === 'thread' && x.target === c.id) || (x.id === 'mention' && /mentioned you/.test(r.reason))); if (hit && r.bucket !== 'focus') { r.bucket = 'focus'; r.reason = `In Focus: your rule "${hit.label}"`; r.why = 'Your own Focus rule matched. You can remove it under Rules.'; } }
     return true;
   });
-  S.exp.clear(); S.lock = {}; S.open.clear(); S.fyiSeen = false;
+  S.exp.clear(); S.lock = {}; S.open.clear(); S.fyiSeen = false; S.rows.forEach(r => { r.fresh = false; });
   const order = { focus: 0, needs: 1, fyi: 2 }; S.rows.sort((a, b) => order[a.bucket] - order[b.bucket]);
 }
 function snap(mid) { // remember the size of everything showing this message, so a change cannot move what is around it
@@ -903,7 +905,7 @@ const A = {
   keepH(d) { if (S.kept.has(d.k)) S.kept.delete(d.k); else S.kept.add(d.k); },
   level(d) { S.level = S.level === d.l ? '' : d.l; },
   applyNew() {
-    S.pending.forEach(p => { if (p.into) { const r = row(p.into); if (r) { r.items.push(...p.items); r.read = false; r.t = p.t; r.by = p.by; S.rows = [r, ...S.rows.filter(x => x !== r)]; return; } } S.rows.unshift(p.row); });
+    S.pending.forEach(p => { if (p.into) { const r = row(p.into); if (r) { r.items.push(...p.items); r.read = false; r.t = p.t; r.by = p.by; r.fresh = true; S.rows = [r, ...S.rows.filter(x => x !== r)]; return; } } p.row.fresh = true; S.rows.unshift(p.row); });
     const order = { focus: 0, needs: 1, fyi: 2 }; S.rows.sort((a, b) => (order[a.bucket] - order[b.bucket]) || ((a.sec === 'kept') - (b.sec === 'kept'))); S.pending = null;
   },
   demo() { S.demo = !S.demo; },
@@ -937,7 +939,7 @@ const A = {
 function submit(f) {
   const text = f.elements.t.value.trim(); if (!text) return;
   const id = 'me' + (++S.nid);
-  if (f.dataset.form === 'reply') { const r = row(f.dataset.id); S.msgs[id] = { id, by: ME, t: 'now', text, rx: [], conv: r.conv }; conv(r.conv).msgs.push(id); r.replies.push(id); act(r); }
+  if (f.dataset.form === 'reply') { const r = row(f.dataset.id); S.msgs[id] = { id, by: ME, t: 'now', text, rx: [], conv: r.conv }; conv(r.conv).msgs.push(id); r.replies.push(id); act(r); r.replied = true; S.exp.delete(r.id); } // sent: the row closes again; staying in the conversation is what opening it is for
   else { const c = conv(S.conv); S.msgs[id] = { id, by: ME, t: 'now', text, rx: [], conv: c.id, flag: S.level === 'flag' ? 1 : 0, info: S.level === 'info' ? 1 : 0 }; c.msgs.push(id); S.level = ''; S.rows.forEach(r => { if (r.conv === c.id && r.read) act(r); }); }
   render();
   const b = document.querySelector('.conv-body'); if (b && f.dataset.form === 'send') b.scrollTop = b.scrollHeight;
@@ -961,6 +963,7 @@ document.addEventListener('click', e => {
     if (inp) { inp.scrollIntoView({ block: 'nearest' }); if (matchMedia('(hover:hover)').matches) inp.focus({ preventScroll: true }); }
   }
   if (el.dataset.act === 'pick' && S.pick && matchMedia('(hover:hover)').matches) { const pi = document.querySelector('.picker input'); if (pi) pi.focus(); }
+  if (el.dataset.act === 'applyNew') { const sc = document.querySelector('.feed-scroll'); if (sc) sc.scrollTop = 0; } // you asked for them: go to where they are
   if (el.dataset.act === 'openConv') { const nl = document.querySelector('.conv .newline'); if (nl) nl.scrollIntoView({ block: 'start' }); }
 });
 document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"]')) { e.preventDefault(); e.target.click(); } if (e.key === 'Escape' && (S.modal || S.menu || S.pick)) { S.modal = null; S.menu = null; S.pick = null; render(); } });

@@ -295,3 +295,5 @@ button.rx:hover{border-color:var(--accent)}
   .picker{left:0 !important;right:0;top:auto !important;bottom:0;width:auto;max-height:62dvh;border-radius:16px 16px 0 0}.pk-grid button{height:42px;font-size:24px}}
 /* reactions on their own line, buttons on the next */
 .acts .quick{flex:0 0 100%;margin:0 0 2px}
+.row.fresh{background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.row.fresh .row-time::after{content:" · just in";color:var(--accent);font-weight:600}
