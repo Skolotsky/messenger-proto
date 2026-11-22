@@ -51,6 +51,8 @@ As listed under "Decided"; where the agent had built something else first, the r
 
 19. **Threads put in Focus are not listed in settings.** "I'm not sure I want focus threads in settings, it would be polluted over time." A thread is put in Focus, and taken out, on the thread itself: it is the thread's own level (D-001's thread dial), not a rule kept in a list. History → Threads shows each thread's level. This narrows points 16 and 18: people and channel levels are lists in settings, threads are not.
 
+20. **No inline threads.** "Please don't do inlined threads. Do it Slack way. I hate inlined threads." A message with replies shows a link under it (who replied, how many, when last) and the thread opens on its own. A deleted message that has replies keeps its marker and that link (D-004).
+
 ### Still the agent's proposal, shown in the mock-up, awaiting the user's word
 
 - **Context in an opened row:** the message before the new ones in a direct conversation; the start of the thread and the reply before in a thread; none for a mention in a channel.
@@ -58,6 +60,7 @@ As listed under "Decided"; where the agent had built something else first, the r
 - **The arrivals button is called "Show"**, and the control names how many arrived in Focus and Needs you.
 - **Which swipe is which:** the user set the pair; that right is read and left is keep is the agent's pick.
 - **On a phone the reply box is not given the cursor automatically**, since that opens the keyboard.
+- **Where a thread opens on a wide screen:** in the conversation pane, in place of the channel, with a link back to the channel. The messenger people know opens it beside the channel; here Activity already takes the second column.
 - **The settings sections** are Account, Activity feed (with Focus people and Channel levels under it) and Notifications. Sign out and switching person are named in the menu but not built: the first version has a person switcher in place of sign-in (D-009).
 - **The Notifications page** asks one question, "What should send you a notification?", with two choices and their daily figures from E-001. The user disliked the first form and did not understand the first Channels page; both were redrawn and not yet reviewed.
 
@@ -65,7 +68,7 @@ As listed under "Decided"; where the agent had built something else first, the r
 
 - Easier: one way to each thing, and a phone layout with two states, list and conversation.
 - Harder: two interaction models for a row, by width. The settings screen becomes a surface of its own that every later setting must fit into.
-- Committed to: the nineteen points above.
+- Committed to: the twenty points above.
 
 ## Follow-ups
 

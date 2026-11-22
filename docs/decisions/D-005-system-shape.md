@@ -50,7 +50,12 @@ Second opinion (a fresh agent, given the options without this recommendation): c
 
 ## Decision
 
-Not yet taken.
+Partly taken.
+
+- **The database: PostgreSQL.** Chosen by the user on 2026-11-22: "let's use PostgreSQL as an industry standard". The user added that it probably does not influence the architecture much; E-004 agrees (one implementation rule, no change of shape).
+- The shape (A, B or C), the live connection and the server language are not yet decided.
+
+Evidence since the proposal: E-003 built shape B small and broke it on purpose; it held. E-004 confirmed on PostgreSQL 17 that plain sequence numbering makes a worker miss about a fifth of the changes under concurrent writes, that numbering one writer at a time misses none at no measurable cost (about 1,000 changes a second either way), and that NOTIFY wakes a worker in about a millisecond.
 
 ## Consequences
 

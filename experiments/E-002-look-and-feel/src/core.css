@@ -393,3 +393,10 @@ button.rx:hover{border-color:var(--accent)}
 .set-link small{color:var(--muted);font-size:13px}
 .set-link .ic{transform:rotate(-90deg);color:var(--muted)}
 .set-back{display:inline-block;margin:-2px 0 6px}
+/* threads the familiar way: a link under the message, the thread opens on its own */
+.thread-link{display:flex;align-items:center;gap:6px;margin:2px 0 6px 46px;padding:4px 8px;border:1px solid transparent;border-radius:6px;font-size:13px;color:var(--accent)}
+.thread-link:hover{border-color:var(--line);background:var(--panel)}
+.thread-link small{color:var(--muted)}
+.thread-link .tl-go{color:var(--muted);visibility:hidden}
+.thread-link:hover .tl-go{visibility:visible}
+.to-chan{font-size:12px}

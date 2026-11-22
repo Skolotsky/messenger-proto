@@ -225,8 +225,9 @@ function rxHTML(m) {
 }
 function msgHTML(id, ctx) {
   const m = S.msgs[id], k = ctx + ':' + id, L = S.lock[k] || {};
-  const replies = (m.replies || []).map(x => msgHTML(x, ctx)).join('');
-  const rep = replies ? `<div class="msg-replies">${replies}</div>` : '';
+  // replies are never shown inline: a message with replies carries a link that opens its thread (the habit people know)
+  const rs = m.replies || [], replies = rs.length, inThread = S.conv === 'th-' + id, lastR = replies && S.msgs[rs[rs.length - 1]];
+  const rep = replies && !inThread ? `<button class="thread-link" data-act="openThread" data-m="${id}">${[...new Set(rs.map(x => S.msgs[x].by))].slice(0, 3).map(x => av(x, 'xs')).join('')}<b>${replies} ${replies === 1 ? 'reply' : 'replies'}</b><small>Last reply ${lastR.t}</small><span class="tl-go">View thread ›</span></button>` : '';
   if (m.deleted) {
     if (!replies && !L.self) return '';
     return `<div class="msg deleted" data-k="${k}"><div class="msg-self"${L.self ? ` style="height:${L.self}px"` : ''}><span class="tomb">${first(m.by)} deleted this message</span></div>${rep}</div>`;
@@ -370,7 +371,7 @@ function convPane() {
   if (!S.conv) return `<div class="conv none"><div class="empty">${SUN}<p>${S.actOpen === false ? 'Choose a channel or a person on the left. Activity is closed; its count stays in the sidebar.' : 'Open a row to read the conversation here, next to the feed.'}</p></div></div>`;
   const c = conv(S.conv);
   const title = c.kind === 'dm' ? pn(c.with) : c.kind === 'channel' ? '#' + c.name : c.title;
-  const sub = c.kind === 'dm' ? P[c.with][1] + (isAgent(c.with) ? ' · agent' : '') : c.kind === 'channel' ? `Channel · ${c.people} people` : `Thread in #${c.where}`;
+  const sub = c.kind === 'dm' ? P[c.with][1] + (isAgent(c.with) ? ' · agent' : '') : c.kind === 'channel' ? `Channel · ${c.people} people` : `<button class="link to-chan" data-act="openConv" data-c="ch-${c.where}">‹ #${c.where}</button> · Thread`;
   let seenNew = false;
   const body = c.msgs.map(id => { const m = S.msgs[id]; let d = ''; if (m.isNew && !seenNew) { seenNew = true; d = '<div class="newline"><span>New</span></div>'; } return d + msgHTML(id, 'conv'); }).join('');
   const lv = l => `<button type="button" class="btn sm lv-${l}${S.level === l ? ' on' : ''}" data-act="level" data-l="${l}">${l === 'flag' ? '⚑ Flag' : 'Info'}</button>`;
@@ -506,6 +507,11 @@ const A = {
   toggle(d) { const r = row(d.id); if (S.exp.has(d.id)) S.exp.delete(d.id); else { S.exp.add(d.id); r.read = true; } },
   more(d) { row(d.id).all = true; },
   openConv(d) { if (S.conv !== d.c) S.lock = Object.fromEntries(Object.entries(S.lock).filter(([k]) => !k.startsWith('conv:'))); S.conv = d.c; conv(d.c); S.menu = null; S.modal = null; S.rows.forEach(r => { if (r.conv === d.c && (!d.id || r.id === d.id || conv(d.c).kind !== 'channel')) r.read = true; }); const sr = document.getElementById('sr'); if (sr) sr.innerHTML = ''; S.q = ''; },
+  openThread(d) { // a thread opens as its own conversation, in place of the channel, with a way back
+    const m = S.msgs[d.m], id = 'th-' + d.m, par = conv(m.conv);
+    if (!S.convs[id]) S.convs[id] = { id, kind: 'thread', title: m.deleted ? 'Thread' : m.text.slice(0, 40) + (m.text.length > 40 ? '…' : ''), where: par.name || par.where, tdial: 'off', tauto: 'you are not part of it', msgs: [d.m, ...m.replies] };
+    A.openConv({ c: id });
+  },
   closeConv() { S.conv = null; S.menu = null; },
   read(d) { row(d.id).read = true; },
   keep(d) { const r = row(d.id); r.kept = r.kept || 'you'; r.read = true; r.keptNow = true; },
