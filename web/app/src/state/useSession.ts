@@ -21,6 +21,7 @@ type Action =
   | { type: 'own'; key: string; message: ChatMessage }
   | { type: 'read'; conversation: string }
   | { type: 'connected'; connected: boolean }
+  | { type: 'preference'; key: string; value: string }
   | { type: 'reload' };
 
 const initial: State = { phase: 'loading', start: null, conversations: [], lists: {}, connected: false, generation: 0 };
@@ -54,6 +55,14 @@ function reduce(state: State, action: Action): State {
       };
     case 'connected':
       return { ...state, connected: action.connected };
+    case 'preference': {
+      if (!state.start) return state;
+      const preferences = [
+        ...state.start.preferences.filter((p) => p.key !== action.key),
+        { key: action.key, value: action.value },
+      ];
+      return { ...state, start: { ...state.start, preferences } };
+    }
     case 'reload':
       return { ...initial, generation: state.generation + 1 };
   }
@@ -85,6 +94,7 @@ export interface Session {
   edit(message: ChatMessage, text: string): Promise<void>;
   read(conversation: string, thread: string | null, upTo: number): void;
   setOpenConversation(conversation: string | null): void;
+  setPreference(key: string, value: string): Promise<void>;
   retry(): void;
 }
 
@@ -191,6 +201,14 @@ export function useSession(person: string): Session {
     openRef.current = conversation;
   }, []);
 
+  const setPreference = useCallback(
+    async (key: string, value: string) => {
+      await act({ kind: 'preference', id: newId('act'), as: person, key, value });
+      dispatch({ type: 'preference', key, value });
+    },
+    [person],
+  );
+
   const retry = useCallback(() => dispatch({ type: 'reload' }), []);
 
   const start = state.start;
@@ -213,6 +231,7 @@ export function useSession(person: string): Session {
     edit,
     read,
     setOpenConversation,
+    setPreference,
     retry,
   };
 }

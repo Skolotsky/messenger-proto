@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
-import { DoorError } from '../api/door';
+import { act, DoorError, newId } from '../api/door';
 import type { MessageRow, PersonView } from '../api/types';
 import type { Session } from '../state/useSession';
 import { AutoTextarea } from './AutoTextarea';
 import { Avatar } from './Avatar';
 import { timeOf, whenOf } from './format';
 import { Icon } from './Icon';
+import { usePicker } from './ReactionPicker';
 
 interface Props {
   row: MessageRow;
@@ -47,6 +48,14 @@ export function MessageItem({ row, session, inThread, isThreadOpen, onOpenThread
   const author = session.people.get(m.author);
   const mine = m.author === session.me?.id;
   const replies = summary?.replies ?? 0;
+  const openPicker = usePicker();
+  const myId = session.me?.id;
+  // The screen shows the reaction when the door says so; a reaction is one action with its own ID (D-023).
+  const react = (emoji: string) => {
+    if (!myId) return;
+    const on = !m.reactions.some((r) => r.emoji === emoji && r.people.includes(myId));
+    act({ kind: 'react', id: newId('act'), as: myId, message: m.id, emoji, on }).catch(() => undefined);
+  };
   const classes = ['msg', mine && 'mine', m.level === 'flag' && 'is-flag', m.level === 'info' && 'is-info', m.deleted && 'deleted']
     .filter(Boolean)
     .join(' ');
@@ -85,6 +94,21 @@ export function MessageItem({ row, session, inThread, isThreadOpen, onOpenThread
       <div className="msg-self">
         {!editing && (
           <span className="msg-tools">
+            <button
+              aria-label="React"
+              title="React"
+              onClick={(e) => {
+                const box = e.currentTarget.getBoundingClientRect();
+                openPicker({
+                  label: `React to ${mine ? 'your' : `${(author?.name ?? m.author).split(' ')[0]}'s`} message`,
+                  x: box.left + box.width / 2,
+                  y: box.bottom,
+                  choose: react,
+                });
+              }}
+            >
+              <Icon name="smile" />
+            </button>
             {!inThread && m.thread === null && (
               <button aria-label="Reply in thread" title="Reply in thread" onClick={() => onOpenThread?.(m.id)}>
                 <Icon name="chat" />
@@ -114,13 +138,15 @@ export function MessageItem({ row, session, inThread, isThreadOpen, onOpenThread
           {m.reactions.length > 0 && (
             <div className="rxs">
               {m.reactions.map((r) => (
-                <span
+                <button
                   key={r.emoji}
                   className={`rx${session.me && r.people.includes(session.me.id) ? ' on' : ''}`}
                   title={r.people.map((p) => session.people.get(p)?.name ?? p).join(', ')}
+                  aria-label={`${r.emoji}, ${r.people.length} ${r.people.length === 1 ? 'person' : 'people'}`}
+                  onClick={() => react(r.emoji)}
                 >
                   {r.emoji} <i>{r.people.length}</i>
-                </span>
+                </button>
               ))}
             </div>
           )}

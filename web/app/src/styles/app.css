@@ -254,8 +254,8 @@ body.resizing { cursor: col-resize; user-select: none; }
   .nav[disabled] { opacity: .5; }
   .conv-head, .conv-body, .top { padding-left: 12px; padding-right: 12px; }
   .composer { padding-left: 12px; padding-right: 12px; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
-  .msg-head { padding-right: 42px; }
-  .msg.mine .msg-head { padding-right: 72px; }
+  .msg-head { padding-right: 76px; }
+  .msg.mine .msg-head { padding-right: 110px; }
   .msg-tools { border-color: transparent; background: none; box-shadow: none; }
   .msg-tools button { width: 34px; height: 30px; }
   .msg-tools button + button { border-left: 0; }

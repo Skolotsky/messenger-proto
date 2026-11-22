@@ -12,10 +12,13 @@ interface Props {
   onToggleActivity(): void;
   onOpen(conversation: string): void;
   onSwitch(person: PersonView): void;
+  onSettings(): void;
+  /** Unread rows in Focus and Needs you. It stays here while Activity is closed (D-023, point 12). */
+  attention: number;
 }
 
 /** Organization, Activity, channels, direct messages, and the person's own menu (D-019, D-023). */
-export function Sidebar({ session, open, activityOpen, onToggleActivity, onOpen, onSwitch }: Props) {
+export function Sidebar({ session, open, activityOpen, onToggleActivity, onOpen, onSwitch, onSettings, attention }: Props) {
   const channels = session.conversations.filter((c) => c.type === 'channel');
   const directs = session.conversations.filter((c) => c.type === 'direct');
 
@@ -61,6 +64,7 @@ export function Sidebar({ session, open, activityOpen, onToggleActivity, onOpen,
       >
         <Icon name="bell" />
         <span>Activity</span>
+        {attention > 0 && <span className="badge">{attention}</span>}
       </button>
       <div className="side-scroll">
         <nav className="chats" aria-label="Conversations">
@@ -70,7 +74,7 @@ export function Sidebar({ session, open, activityOpen, onToggleActivity, onOpen,
           {directs.map(item)}
         </nav>
       </div>
-      <PersonMenu session={session} onSwitch={onSwitch} />
+      <PersonMenu session={session} onSwitch={onSwitch} onSettings={onSettings} />
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
+import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { MessageRow } from '../api/types';
 import { dayKey, dayLabel } from './format';
 
@@ -8,6 +8,8 @@ interface Props {
   onPinnedChange(pinned: boolean): void;
   /** Shown after the first row, for a thread: how many replies follow its root. */
   afterFirst?: ReactNode;
+  /** Opened from a feed row: start at this number, under a New line (D-023, point 21). */
+  newFrom?: number | null;
 }
 
 const NEAR_BOTTOM = 8;
@@ -17,7 +19,7 @@ const NEAR_BOTTOM = 8;
  * away from the bottom, the message at the top of the view keeps its exact place through
  * arrivals and through a change of the panel's width. At the bottom, the list stays there.
  */
-export function MessageList({ rows, renderRow, onPinnedChange, afterFirst }: Props) {
+export function MessageList({ rows, renderRow, onPinnedChange, afterFirst, newFrom = null }: Props) {
   const scroller = useRef<HTMLDivElement>(null);
   const inner = useRef<HTMLDivElement>(null);
   const pinned = useRef(true);
@@ -51,6 +53,20 @@ export function MessageList({ rows, renderRow, onPinnedChange, afterFirst }: Pro
     if (Math.abs(delta) > 0.1) box.scrollTop += delta;
   }, []);
 
+  // Held once, for this opening: a message arriving later must not move the line.
+  const [newLine] = useState(() => rows.find((r) => r.message.number >= (newFrom ?? Infinity))?.message.id ?? null);
+
+  useLayoutEffect(() => {
+    const box = scroller.current;
+    if (!newLine || !box) return;
+    const line = box.querySelector<HTMLElement>('.newline');
+    if (!line) return;
+    box.scrollTop += line.getBoundingClientRect().top - box.getBoundingClientRect().top - 8;
+    pinned.current = box.scrollHeight - box.scrollTop - box.clientHeight < NEAR_BOTTOM;
+    onPinnedChange(pinned.current);
+    capture();
+  }, [newLine, capture, onPinnedChange]);
+
   useLayoutEffect(hold, [rows, hold]);
 
   useEffect(() => {
@@ -82,6 +98,11 @@ export function MessageList({ rows, renderRow, onPinnedChange, afterFirst }: Pro
           return (
             <Fragment key={row.message.id}>
               {line}
+              {row.message.id === newLine && (
+                <div className="newline" role="separator">
+                  <span>New</span>
+                </div>
+              )}
               {renderRow(row)}
               {index === 0 && afterFirst}
             </Fragment>
