@@ -10,12 +10,12 @@ The search delivery worker (ours) calls the search index (a stand-in behind a re
 
 Every call is made for one organization (D-026). It is in the address of every call a screen, an agent or the door makes (`/orgs/acme/…`) and in every item a worker delivers; a live connection is opened for one organization. All numbers, places and logs count within that organization. Nothing of another organization is ever sent or accepted.
 
-Finished messages only: created, changed, deleted. Every message of every channel, also channels a person never opened. A change carries the whole current message and its version; a delete carries which message and its version.
+Finished messages only: created, changed, deleted. Every message of every channel, also channels a person never opened, and of direct conversations. A direct message carries its `participants`; only they can find it (D-031). A reply closed as stopped is indexed with its text so far. A change carries the whole current message and its version; a delete carries which message and its version.
 
 ```json
 POST /changes
 { "org": "acme", "number": 4830, "kind": "message.changed",
-  "message": { "id": "msg_7Q2", "version": 2, "conversation": "#launch", "author": "anna",
+  "message": { "id": "msg_7Q2", "version": 2, "conversation": "#launch", "thread": null, "edited": true, "participants": null, "author": "anna",
                "text": "@Marco @Lena can you sign off the pricing page?", "mentions": ["marco", "lena"],
                "level": null, "reactions": [] } }
 { "org": "acme", "number": 4855, "kind": "message.deleted", "message": { "id": "msg_7Q2", "version": 3 } }
@@ -37,7 +37,7 @@ answers: 200 applied · 200 already had it · 422 I refuse this one · anything 
 - While the index is unreachable a person sees "Search is unavailable right now. Your messages are safe."; while it is more than 10 s behind, results carry "the last N minutes may be missing".
 - A place is kept per organization; workers find work through an index of the organizations that have some, claim an organization for a few seconds and deliver outside any transaction, so any number can run (D-029). A claim that runs out is taken over, so a change can arrive twice; the version rule makes that harmless.
 - How long to wait before the next try at an index that is down is kept once per receiver and shared by all workers, so more workers do not mean more retries. How often a change was refused is kept with the organization's place.
-- Wiped, for one organization or for all: the place of each wiped organization is set back to the start and its entries refill.
+- Wiped, for one organization or for all: the index answers with its place when asked (`operations-and-control.md`); the place of each wiped organization is set back to the start and its entries refill.
 
 ## 5. Evolution
 

@@ -1,6 +1,6 @@
 # D-031: Corrections to the contracts before they become schemas
 
-- Status: proposed
+- Status: accepted
 - Level: contract
 - Date: 2026-11-22
 - Decided by: user
@@ -69,7 +69,7 @@ A on all five, plus the corrections above. Reversibility: cheap now, moderate af
 
 ## Decision
 
-_Waiting for the user._
+The user accepted the recommended answer on all five on 2026-11-22 ("Accept all five"): 1A a row is a conversation plus an optional thread, each with its own read position; 2A the 8-second promise stays, with clock entries after the last change; 3A only its participants find a direct message; 4A the list of names sent survives a wipe; 5A a stopped reply is saved, searchable, and gives people in the thread a For your information row. The corrections with one sensible answer are accepted with them.
 
 ## Consequences
 

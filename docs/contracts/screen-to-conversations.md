@@ -18,15 +18,28 @@ Every action is one call carrying an ID the caller chose. Conversations saves it
 | edit, delete | a change to the caller's own message; removing its flag is an edit |
 | create channel, add people | a new channel with a name and people; more people later (D-009, D-024) |
 | react | add or remove one emoji on a message |
-| read | "I have read this conversation up to here" (opening a conversation, or Mark read on a row) |
-| watching | "this conversation is open in front of me", and "no longer" when it stops. Said over the screen's live connection; only the start and the end are saved as changes |
-| keep, done | Keep a row; release it |
+| read | "I have read this row up to here" (opening a conversation or thread, or Mark read on a row) |
+| watching | "this row is open in front of me", and "no longer" when it stops. Not a call: said only over the live connection (`conversations-to-screen.md`); only the start and the end are saved as changes |
+| keep, done | Keep a row; release it. Both name the row |
 | dial | the level of a channel or of a thread |
 | focus rule, focus person | add or remove a rule; remove a person from Focus or add them back; switch the option that adds everyone who writes directly |
 | focus only | the personal notification switch (D-012) |
+| release setting | whether a reply or a reaction releases a kept row (D-023, point 26). The feed acts on it |
+| profile line | the person's own line under their name (D-023, point 29). No receiver acts on it |
 | preference | a setting that only changes the person's own screens, such as which key sends a message (D-024). It follows the person to every screen; no receiver acts on it |
 
-Questions, which change nothing: "what would this change have moved in the last 7 days?" (D-020, answered by the feed); the people and channels to suggest after `@` (D-024); a conversation's messages around a position, with each message's thread summary (D-023).
+Questions, which change nothing. Every answer that fills a view carries `number`: the last number of its stream for this person, read together with the content, so the screen can resume from it (`after`).
+
+| Question | Answers with |
+|---|---|
+| `GET /orgs/acme/people/marco/start` | the person, their preferences and profile line, channels and direct conversations with unread marks, `number` for the `conversations` stream |
+| `GET /orgs/acme/conversations/%23launch/messages?around=4812` (also `&thread=msg_7Q2`) | messages around a position, each with its thread summary (D-023), `number` |
+| `GET /orgs/acme/people/marco/feed` | the feed's rows and counts, `edition`, `number` for the `feed` stream, or a notice |
+| `GET /orgs/acme/people/marco/history?tab=mentions` | history entries with unread marks and the tab's count (D-016) |
+| `GET /orgs/acme/people/marco/settings` | Focus people, removed people, levels in effect |
+| `GET /orgs/acme/people/marco/preview?change=…` | what the change would have moved in the last 7 days (D-020) |
+| `GET /orgs/acme/people/marco/search?q=pricing` | the search answer of `door-reads.md`, or a notice |
+| `GET /orgs/acme/suggest?q=mar` | people and channels to suggest after `@` (D-024) |
 
 ```json
 POST /orgs/acme/people/actions
@@ -35,8 +48,8 @@ POST /orgs/acme/people/actions
                "text": "@Marco can you sign off the pricing page?", "mentions": ["marco"], "level": null } }
 → 200 { "saved": true, "number": 4812 }
 
-{ "id": "act_01JD3K9R1", "as": "marco", "kind": "read", "conversation": "#launch", "up_to": 4812 }
-{ "id": "act_01JD3KA07", "as": "marco", "kind": "watching", "conversation": "#launch" }
+{ "id": "act_01JD3K9R1", "as": "marco", "kind": "read", "conversation": "#launch", "thread": null, "up_to": 4812 }
+{ "id": "act_01JD3KB22", "as": "marco", "kind": "keep", "conversation": "#launch", "thread": "msg_7Q2" }
 → 409 { "refused": "unknown kind" }        for a kind Conversations does not know
 → 409 { "refused": "message deleted" }     an edit or reaction on a message that is gone; trying again cannot help
 
@@ -47,9 +60,10 @@ GET /orgs/acme/people/marco/preview?change=dial&channel=%23incidents&level=muted
 ## 3. Guarantees
 
 - "Saved" is answered only after the action and its log entry are saved together.
-- The same ID again changes nothing and gets the same answer.
+- The same ID again changes nothing and gets the same answer (scope: `README.md`, "IDs").
 - A read position only moves forward.
-- Watching is per connection and belongs to its conversation: "connection X of Marco is watching #launch". A person counts as watching a conversation while at least one such entry is open, so the start on a new connection and the end of an old one can arrive in either order.
+- Acting implies read (D-015): a reply, reaction, Keep or Done moves the person's read position on that row in the same step as the act, up to the message acted on.
+- Watching is per connection and belongs to its row: "connection X of Marco is watching #launch". A person counts as watching a conversation while at least one such entry is open, so the start on a new connection and the end of an old one can arrive in either order.
 - It lasts only as long as its connection. The connection is checked every 20 seconds and counts as gone after 40 without an answer; Conversations then writes the end to the log. Each copy of Conversations holds a lease in the database, renewed every 5 seconds and valid for 15; a start is saved only in a step that also confirms the copy's lease is valid. Housekeeping, every 5 seconds, declares a copy whose lease ran out dead and ends every watching it had started; a copy declared dead cannot save anything further under that identity. So a vanished screen is "no longer watching" within about 40 seconds and the screens of a dead copy within about 25, both inside 60 (D-015: nothing is read while the person is not looking), and keeping a watching alive writes nothing per screen (D-029).
 - Actions of one screen are saved in the order they were sent; an answer comes within 3 seconds or the screen treats the action as not sent.
 - Undo is the opposite action with its own ID.

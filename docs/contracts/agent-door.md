@@ -15,11 +15,16 @@ GET  /orgs/acme/agents/release-agent/events?after=311&wait=25
 → [ { "org": "acme", "number": 312, "kind": "mentioned", "agent_chain": 0,
       "message": { "id": "msg_7Q2", "version": 1, "conversation": "#launch", "author": "anna", "text": "…" } } ]
 
-POST /orgs/acme/agents/release-agent/messages          { "id": "a-91", "thread": "msg_7Q2", "text": "On it.", "level": "info", "because_of": 312 }
-POST /orgs/acme/agents/release-agent/replies           { "id": "a-92", "thread": "msg_7Q2", "because_of": 312 }        "I am starting a reply"
+POST /orgs/acme/agents/release-agent/messages          { "id": "a-91", "conversation": "#launch", "thread": "msg_7Q2", "text": "On it.", "level": "info", "because_of": 312 }
+→ 200 { "message": "msg_8B3", "number": 4870 }
+POST /orgs/acme/agents/release-agent/replies           { "id": "a-92", "conversation": "#launch", "thread": "msg_7Q2", "because_of": 312 }        "I am starting a reply"
+→ 200 { "message": "msg_9A1", "number": 4871 }          later calls name the reply by the agent's ID, a-92; screens see msg_9A1
 POST /orgs/acme/agents/release-agent/replies/a-92/pieces  { "at": 0, "text": "Build 2.4.1 " }
 POST /orgs/acme/agents/release-agent/replies/a-92/finish  { "id": "a-92-done", "level": "flag", "mentions": ["marco"] }
 POST /orgs/acme/agents/release-agent/status            { "state": "waiting", "on": "marco" }
+POST /orgs/acme/agents/release-agent/reactions         { "id": "a-93", "message": "msg_7Q2", "emoji": "eyes", "on": true }
+PUT  /orgs/acme/agents/release-agent/subscriptions/%23launch      everything in that channel from now on; DELETE to stop
+GET  /orgs/acme/agents/release-agent/conversations/%23launch/messages?around=4812      as the people door answers
 
 answers: 200 · 200 already had it · 409 { "have": 12 } a piece is missing · 409 closed · 429 slow down · 410 { "too_far_behind": true, "oldest": 290 }
 ```
@@ -31,8 +36,8 @@ An agent is told what addresses it: a mention, a direct message, a reply in a th
 - Events are numbered per agent, kept 7 days, delivered in order, and may be read again; the agent ignores a number it has handled. An agent that asks for events older than 7 days is told so and from which number it can continue.
 - Event kinds are named for what happened to the agent (`mentioned`, `direct_message`, `reply`, `reaction`, `changed`, `deleted`); the message inside has the same shape as everywhere else.
 - Anything an agent posts with the same ID is saved once. A piece is identified by its reply and its position, so it needs no ID of its own; a status has none either, the latest one counts.
-- Text of a reply in progress goes to open screens only. Search, the feed and notifications learn of the reply when it is finished, as one whole message.
-- A reply with no new piece for 60 seconds, or older than 10 minutes, is closed as "stopped" with the text so far.
+- Text of a reply in progress goes to open screens only. The log carries a text-free `reply.started`; search, the feed and notifications learn the text when it is finished, as one whole message.
+- A reply with no new piece for 60 seconds, or older than 10 minutes, is closed as "stopped" with the text so far: a finished message marked `stopped`, searchable, a For your information row for people in the thread, and no notification (D-031).
 - A piece that repeats text already received adds nothing.
 - An agent is not told about another agent's message unless it is named in it. Each message counts the agents in a row behind it; after three, no further agent is told until a person writes.
 - At most 20 messages a minute per agent. An organization's agents are served by one copy of Conversations (D-029), which keeps that count in memory; it starts fresh if the copy restarts.

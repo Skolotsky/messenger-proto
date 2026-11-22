@@ -10,19 +10,25 @@ Conversations' live connection sends; an open screen receives. One connection pe
 
 Every call is made for one organization (D-026). It is in the address of every call a screen, an agent or the door makes (`/orgs/acme/…`) and in every item a worker delivers; a live connection is opened for one organization. All numbers, places and logs count within that organization. Nothing of another organization is ever sent or accepted.
 
-A connection is opened at `/orgs/acme/live` for one person of one organization. Everything of one organization (every call of its screens, their connections, its agents) is served by one copy of Conversations, chosen from the organization in the address (D-029); if that changes, the connection is closed and the screen reconnects and resumes by number. Updates for what the screen shows, in two streams: `conversations` (messages, reactions, thread summaries, unread marks; numbered by the change log) and `feed` (the person's rows and counts; numbered by the feed's own log, with the feed's edition). A screen is sent only what concerns it, so the numbers it sees have gaps. Each update therefore also says which number was sent to this screen before it (`after`). Text of a reply being written arrives as pieces outside the numbering.
+A connection is opened at `/orgs/acme/live` for one person of one organization. Everything of one organization (every call of its screens, their connections, its agents) is served by one copy of Conversations, chosen from the organization in the address (D-029); if that changes, the connection is closed and the screen reconnects and resumes by number. Updates for what the screen shows, in two streams: `conversations` (messages, reactions, thread summaries, unread marks; numbered by the change log) and `feed` (the person's rows and counts; numbered by the feed's row log, with the feed's edition). One number is one update: whatever a change means for this screen travels together as a list of `parts`. A screen is sent only what concerns it, so the numbers it sees have gaps. Each update therefore also says which number was sent to this screen before it (`after`). Text of a reply being written arrives as pieces outside the numbering.
 
 ```json
 screen → { "resume": { "conversations": 4855, "feed": 97, "feed_edition": "feed-7c1" } }
-server → { "stream": "conversations", "number": 4859, "after": 4855, "kind": "message.changed", "message": { "id": "msg_7Q2", "version": 2, "text": "…" } }
-server → { "stream": "feed", "number": 103, "after": 97, "edition": "feed-7c1", "kind": "row.changed", "row": { "conversation": "#launch", "bucket": "needs_you", "unread": true, "why": "Anna mentioned you" } }
-server → { "last_sent": { "conversations": 4859, "feed": 103 } }       every 5 s
+screen → { "watching": { "conversation": "#launch", "thread": null, "open": true } }      "open": false when it stops
+server → { "stream": "conversations", "number": 4859, "after": 4855, "parts": [
+            { "kind": "message.changed", "message": { "id": "msg_7Q2", "version": 2, "text": "…" } },
+            { "kind": "thread.summary", "conversation": "#launch", "thread": "msg_7Q2", "replies": 4 },
+            { "kind": "unread", "conversation": "#launch", "thread": "msg_7Q2", "unread": true } ] }
+server → { "stream": "feed", "number": 103, "after": 97, "edition": "feed-7c1", "parts": [
+            { "kind": "row.changed", "row": { "conversation": "#launch", "thread": null, "bucket": "needs_you", "unread": true, "why": "Anna mentioned you" } } ] }
+server → { "last_sent": { "conversations": 4859, "feed": 103, "feed_edition": "feed-7c1" } }       every 5 s
 server → { "too_far_behind": "feed" }                                   the screen loads that view fresh
 server → { "piece": { "message": "msg_9A1", "at": 120, "text": "ready. " } }
 ```
 
 ## 3. Guarantees
 
+- A screen starts from the `number` in the answer that filled the view: the last number of that stream for this person, read together with the content.
 - A screen applies an update only if its `after` equals the last number the screen applied in that stream. A number it already has is ignored; any other mismatch makes it ask again from its own number. The same holds for the regular `last_sent` message.
 - If the feed was rebuilt (a new edition), the screen is told to load the feed view fresh.
 - After any interruption the screen ends equal to a freshly loaded one.
@@ -39,10 +45,10 @@ server → { "piece": { "message": "msg_9A1", "at": 120, "text": "ready. " } }
 
 ## 5. Evolution
 
-New kinds of update may be added; a screen ignores a kind it does not know but still counts its number.
+New kinds of part may be added; a screen ignores a part it does not know but still counts the update's number.
 
 ## 6. Enforced by
 
 G-015, G-019, G-025, G-026, G-029, G-027.
 
-Note: E-005 tried this contract with numbers that had no gaps; the `after` field was added on the verifier's finding that a filtered stream always has gaps, and is tried with G-015's test.
+Note: E-005 tried this contract with numbers that had no gaps; the `after` field was added on the verifier's finding that a filtered stream always has gaps, and is tried with G-015's test. `parts`, the per-person starting number and the edition in `last_sent` come from D-031.
