@@ -16,7 +16,9 @@ trap cleanup EXIT
 
 [ -d web/app/node_modules ] || TOOL_DIR=web/app ./scripts/tool npm ci --no-audit --no-fund
 [ -d tests/browser/node_modules ] || TOOL_DIR=tests/browser ./scripts/tool npm ci --no-audit --no-fund
-TOOL_DIR=web/app ./scripts/tool npm run build
+# scripts/verify builds once, then runs one process per width, each with its own mock door.
+[ -n "${CONTEXIA_SKIP_BUILD:-}" ] || TOOL_DIR=web/app ./scripts/tool npm run build
+[ -z "${CONTEXIA_BUILD_ONLY:-}" ] || exit 0
 
 cache="$(dirname "$(git -C "$root" rev-parse --path-format=absolute --git-common-dir)")/.cache"
 mkdir -p "$cache/go"

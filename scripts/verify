@@ -63,7 +63,21 @@ finish_timed() {
   if [ "$code" -ne 0 ]; then echo "verify: FAIL a timed guardrail failed. A failing guardrail is a finding: fix the cause, never the test."; exit 1; fi
 }
 echo; echo "Browser tests, at 1280 and 400 px"
-if ! env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV web/app/scripts/browser-tests --reporter=line; then
+# The tests of one width share one mock door, so each width gets its own and they run side by side.
+browser() { env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV CONTEXIA_SKIP_BUILD=1 web/app/scripts/browser-tests --project="$1" --output="test-results/$1" --reporter=line; }
+browser_ok=1
+if ! env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV CONTEXIA_BUILD_ONLY=1 web/app/scripts/browser-tests; then browser_ok=0
+else
+  wide_log=$(mktemp); phone_log=$(mktemp)
+  browser wide > "$wide_log" 2>&1 & wide_pid=$!
+  browser phone > "$phone_log" 2>&1 & phone_pid=$!
+  wait "$wide_pid" || browser_ok=0
+  wait "$phone_pid" || browser_ok=0
+  tail -n 40 "$wide_log" | tr '\r' '\n' | grep -E "passed|failed|flaky|^\s+[0-9]+\) " ; tail -n 40 "$phone_log" | tr '\r' '\n' | grep -E "passed|failed|flaky|^\s+[0-9]+\) "
+  if [ "$browser_ok" -eq 0 ]; then cat "$wide_log" "$phone_log" | tail -n 80; fi
+  rm -f "$wide_log" "$phone_log"
+fi
+if [ "$browser_ok" -eq 0 ]; then
   finish_timed; echo "verify: FAIL a browser test failed. See the output above."; exit 1
 fi
 echo; echo "Control panel and notification app, at 1280 and 400 px"
