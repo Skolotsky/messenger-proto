@@ -1,6 +1,6 @@
-// Package orgdelete is the feed's part of deleting an organization (D-033). The
-// feed's service is built in T-052; this is only the removal of its note tables.
-// The note tables the delivery workers keep (due, places, parked) are removed by
+// Package orgdelete is the feed's part of deleting an organization (D-033): every
+// table of the service and the note log. The note tables the delivery workers
+// keep (due, places, parked) are removed by
 // delivery's own delete.
 package orgdelete
 
@@ -19,7 +19,7 @@ import (
 )
 
 // Tables are the feed's own tables that hold an organization.
-var Tables = []string{"note_log", "note_heads"}
+var Tables = []string{"feed_rows", "feed_readers", "feed_held", "feed_row_updates", "feed_fences", "feed_journal", "feed_state", "note_log", "note_heads"}
 
 // Delete removes every row of org from the feed's tables. Repeating it changes
 // nothing.

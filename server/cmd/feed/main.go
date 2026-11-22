@@ -1,5 +1,4 @@
-// Command feed is the feed part of Contexia. Until T-052 builds the service it
-// only answers the removal of an organization's notes (D-033).
+// Command feed is the activity feed part of Contexia (T-052).
 package main
 
 import (
@@ -7,7 +6,8 @@ import (
 	"log/slog"
 	"os"
 
-	"contexia/internal/feed/orgdelete"
+	"contexia/internal/feed/service"
+	"contexia/internal/shared/clock"
 	"contexia/internal/shared/migrate"
 	"contexia/internal/shared/orgdb"
 	"contexia/internal/shared/part"
@@ -24,5 +24,5 @@ func main() {
 		slog.Error("cannot start", "part", "feed", "err", err)
 		os.Exit(1)
 	}
-	part.Serve("feed", orgdelete.Routes(db))
+	part.Serve("feed", service.New(service.Options{Dir: db, Clock: clock.Default()}).Routes())
 }
