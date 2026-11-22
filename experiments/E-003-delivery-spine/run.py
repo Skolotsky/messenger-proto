@@ -71,11 +71,11 @@ class Sys:
                 os.remove(g)
         self.start(role)
 
-    def down(self):
+    def down(self, expect_errors=False):
         for r in list(self.procs):
             self.kill(r)
         errs = sum(open(f).read().count('Traceback') for f in glob.glob(self.dir + '/*.log'))
-        if errs:
+        if errs and not expect_errors:
             NOTES.append((self.name, 'tracebacks in process logs', f'{errs} (kept in {self.dir})'))
         else:
             shutil.rmtree(self.dir, ignore_errors=True)
@@ -510,6 +510,80 @@ def mutation(name, brk, check_name, run, chaos=False, env=None):
     sy.down()
 
 
+def check_outside(sy, scenario):
+    """With fences up: is everything outside them still exactly what a clean replay gives?"""
+    fences = [x[0] for x in sy.q('feed.db', 'select scope from fences')]
+    convs = {f[5:] for f in fences if f.startswith('conv:')}
+    readers = {f[7:] for f in fences if f.startswith('reader:')}
+    log = sy.q('core.db', "select number,kind,body,saved_at from change_log where kind!='tick' order by number")
+    ref, reflog = spine.DictStore(), []
+    for n, k, b, at in log:
+        out = []
+        spine.fold(ref, n, k, json.loads(b), out)
+        reflog += [(e['kind'], e['name']) for e in out]
+    outside = lambda p, ck: p not in readers and ck not in convs
+    rows = lambda d: {k: v for k, v in d.items() if k.startswith('row:') and outside(*k.split(':', 2)[1:])}
+    live = dict(sy.q('feed.db', 'select k,v from kv'))
+    a, b = rows(live), rows(ref.dump())
+    diff = sum(1 for k in set(a) | set(b) if a.get(k) != b.get(k))
+    inside = sum(1 for k in ref.d if k.startswith('row:') and not outside(*k.split(':', 2)[1:]))
+    note_out = lambda nm: outside(*nm.split('/')[:2])
+    livelog = [(k, json.loads(x)['name']) for k, x in sy.q('feed.db', "select kind,body from feedlog where kind!='tick' order by number")]
+    la, lb = [x for x in livelog if note_out(x[1])], [x for x in reflog if note_out(x[1])]
+    aside = sy.q('feed.db', 'select count(*) from set_aside')[0][0]
+    ROWS.append((scenario, 'outside the fences, every row equals a clean replay', diff == 0, True,
+                 f'{diff} of {len(b)} rows differ; {inside} rows are inside the fences; fenced: {", ".join(sorted(fences))}; {aside} changes set aside of {len(log)}'))
+    ROWS.append((scenario, 'outside the fences, the notification notes equal a clean replay', la == lb, True, f'{len(la)} notes against {len(lb)}'))
+    return fences
+
+
+def s_fence():
+    S = 'the feed cannot apply one edit and one dial change'
+    sy = Sys('fence', env={'FEED_POISON': 'msg:mP,reader:p3'}).up()
+    core = sy.url('core') + '/act'
+    drv = Driver(sy, 11).run(300, 150)
+    drv.join()
+    call(core, dict(id='q1', kind='post', msg='rootP', conv='#c0', author='p0', text='root', mentions=[], level=None))
+    call(core, dict(id='q2', kind='post', msg='mP', conv='#c0', thread='rootP', author='p0', text='reply', mentions=['p1'], level=None))
+    call(core, dict(id='q3', kind='edit', msg='mP', text='reply, edited', mentions=['p1', 'p2'], level=None))   # the feed chokes on this
+    call(core, dict(id='q4', kind='post', msg='mP2', conv='#c0', thread='rootP', author='p1', text='answer', mentions=[], level=None))
+    call(core, dict(id='q5', kind='dial', person='p3', channel='#c1', level='muted'))                           # and on this
+    drv.run(1500, 200).join()
+    quiesce(sy)
+    fences = check_outside(sy, S + ' · while fenced')
+    ROWS.append((S + ' · while fenced', 'only what the two changes touch is fenced', sorted(fences) == ['conv:t:rootP', 'reader:p3'], True, ', '.join(sorted(fences))))
+    check(sy, drv, S + ' · while fenced', expect={'the feed equals a clean replay of the log': False},
+          only=['the feed equals a clean replay of the log', 'a notification is sent once', 'search equals the truth'])
+    sy.env.pop('FEED_POISON')                         # the fault in the feed is fixed
+    sy.wipe('feed', ['feed.db', 'feed-delivery.db'])  # and the feed is rebuilt from the log
+    quiesce(sy)
+    names = ['every acknowledged action is saved, once', 'every saved change is in the log', 'search equals the truth',
+             'the feed equals a clean replay of the log', 'a notification is sent once', 'no due notification is missing']
+    c = check(sy, drv, S + ' · after the fix and a rebuild', only=names)
+    convs = {f[5:] for f in fences if f.startswith('conv:')}
+    readers = {f[7:] for f in fences if f.startswith('reader:')}
+    viol = [n for n in c['tray'] if n in c['wd'] and c['wd'][n] - c['due'][n] < HOLD]
+    stray = [n for n in viol if n.split('/')[0] not in readers and n.split('/')[1] not in convs]
+    ROWS.append((S + ' · after the fix and a rebuild', 'a notification sent although the row was read in time can only come from inside a fence',
+                 not stray, True, f'{len(viol)} such notifications, {len(viol) - len(stray)} of them from inside the fences'))
+
+    S = 'the feed cannot apply any edit'
+    sy2 = Sys('fenceall', env={'FEED_POISON': 'all'}).up()
+    drv = Driver(sy2, 12).run(600, 200)
+    drv.join()
+    time.sleep(2)
+    nf = sy2.q('feed.db', 'select count(*) from fences')[0][0]
+    head = call(sy2.url('core') + '/head')[1]['head']
+    last = dict(sy2.q('feed.db', 'select k,v from meta'))['last']
+    ROWS.append((S, 'after five fences the feed stops instead of fencing everything', nf == 5 and last < head, True, f'{nf} fences, {head - last} changes waiting'))
+    sy2.env.pop('FEED_POISON')
+    sy2.wipe('feed', ['feed.db', 'feed-delivery.db'])
+    quiesce(sy2)
+    check(sy2, drv, S + ' · after the fix and a rebuild')
+    sy.down(expect_errors=True)
+    sy2.down(expect_errors=True)
+
+
 def s_mutations():
     mutation('search without the version rule, under late copies', 'search_noguard', 'search equals the truth',
              lambda sy: Driver(sy, 2).run(1500, 150), chaos=True)
@@ -592,7 +666,7 @@ def s_numbering_model():
 
 SCENARIOS = {'healthy': s_healthy, 'chaos': s_chaos, 'search-down': s_search_down, 'search-slow': s_search_slow, 'park': s_park,
              'kill-core': s_kill_core, 'kill-others': s_kill_others, 'rebuild': s_rebuild, 'hold': s_hold,
-             'mutations': s_mutations, 'numbering': s_numbering_model}
+             'fence': s_fence, 'mutations': s_mutations, 'numbering': s_numbering_model}
 
 if __name__ == '__main__':
     random.seed(1)

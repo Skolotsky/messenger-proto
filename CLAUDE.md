@@ -73,7 +73,7 @@ The `board` skill shows where things stand and manages tasks, for example when t
 
 ## Environment
 
-WSL2 Ubuntu. Present as of 2026-11-22: git, Docker, Python 3.12, gh, jq, make; Docker images for PostgreSQL 17 and Python 3.12. Not installed: Node, Go, pip on the host. Check with `command -v` before assuming a toolchain.
+WSL2 Ubuntu. Present as of 2026-11-22: git, Docker, Python 3.12, gh, jq, make; Docker images for PostgreSQL 17 and Python 3.12. Not installed: Node (needed from the first implementation task: the server is TypeScript, D-005), Go, pip on the host. Check with `command -v` before assuming a toolchain.
 
 Installing or downloading what the work needs (tools, images, packages) needs no approval; say what was installed (user's instruction, 2026-11-22: "just install whatever you lack"). Pushing, publishing and rewriting history still need a yes.
 

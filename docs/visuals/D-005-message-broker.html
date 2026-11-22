@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D-005: when a message broker</title>
+<style>
+/* Layout: one reading column. Diagrams, tables and code may run wider inside their own scroll box. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --sunken: #eceef2; --line: #d8dce4;
+  --ink: #17202b; --ink-2: #445063; --ink-3: #5f6b7d;
+  --agent: #2351c9; --agent-soft: #e5ecfc; /* the agent's work, links */
+  --you: #a64b08; --you-soft: #fcebd9;     /* where the user's attention is needed */
+  --ok: #1b7548; --ok-soft: #e1f3e8;       /* recommended, holds, verified */
+  --risk: #b3261e; --risk-soft: #fbe8e6;   /* risk, broken, not verified */
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Cascadia Code", "Cascadia Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+    --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+    --agent: #86a8ff; --agent-soft: #1b2a4c;
+    --you: #f2a766; --you-soft: #3b2814;
+    --ok: #62cf99; --ok-soft: #14301f;
+    --risk: #ff8f85; --risk-soft: #3d1815;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+  --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+  --agent: #86a8ff; --agent-soft: #1b2a4c;
+  --you: #f2a766; --you-soft: #3b2814;
+  --ok: #62cf99; --ok-soft: #14301f;
+  --risk: #ff8f85; --risk-soft: #3d1815;
+  color-scheme: dark;
+}
+
+/* Base */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--font); }
+.page {
+  max-width: 880px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 34px;
+}
+section, .stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+h1 { font: 650 27px/1.2 var(--display); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h2 { font: 650 18.5px/1.3 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 650 14.5px/1.35 var(--font); margin: 0; }
+p { margin: 0; max-width: 68ch; }
+ul, ol { margin: 0; padding-left: 1.25em; display: flex; flex-direction: column; gap: 5px; max-width: 68ch; }
+a { color: var(--agent); }
+strong { font-weight: 650; }
+code { font: 0.88em var(--mono); background: var(--sunken); border: 1px solid var(--line); border-radius: 4px; padding: 0.08em 0.36em; overflow-wrap: anywhere; }
+:focus-visible { outline: 2px solid var(--agent); outline-offset: 2px; }
+.label { font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.note { color: var(--ink-3); font-size: 13.5px; }
+
+/* Header */
+.top { display: flex; flex-direction: column; gap: 8px; }
+.lede { font-size: 16.5px; color: var(--ink-2); max-width: 62ch; }
+
+/* Needs you: the one thing the user has to decide or answer */
+.ask { background: var(--you-soft); border: 1px solid color-mix(in srgb, var(--you) 40%, transparent); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.ask .label { color: var(--you); }
+
+/* Chips */
+.chip { display: inline-flex; align-items: center; font: 600 12px/1 var(--font); padding: 4px 9px; border-radius: 999px; background: var(--sunken); color: var(--ink-2); white-space: nowrap; }
+.chip.you { background: var(--you-soft); color: var(--you); }
+.chip.agent { background: var(--agent-soft); color: var(--agent); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.risk { background: var(--risk-soft); color: var(--risk); }
+
+/* Panels side by side */
+.split { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.panel.you .label { color: var(--you); }
+.panel.agent .label { color: var(--agent); }
+.files { list-style: none; padding: 0; gap: 7px; }
+.files li { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.files span { color: var(--ink-2); font-size: 13.5px; }
+
+/* Lanes: who does what, phase by phase. Children in order: three .head cells, then .phase, .you, .agent per row */
+.lanes { display: grid; grid-template-columns: minmax(128px, 0.75fr) 1.25fr 1.5fr; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.lanes > * { padding: 12px 14px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin: -1px 0 0 -1px; min-width: 0; }
+.lanes > .head { background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.lanes > .head.you { color: var(--you); background: var(--sunken); }
+.lanes > .head.agent { color: var(--agent); }
+.lanes > .phase { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.lanes > .phase strong { font: 650 15px/1.3 var(--display); }
+.lanes > .phase .say { color: var(--ink-2); font-size: 13.5px; }
+.lanes > .you { background: color-mix(in srgb, var(--you-soft) 60%, var(--surface)); }
+.lanes > .you.idle { background: var(--surface); color: var(--ink-3); }
+@media (max-width: 600px) {
+  .lanes { grid-template-columns: 1fr 1.2fr; }
+  .lanes > .head.first { display: none; }
+  .lanes > .phase { grid-column: 1 / -1; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--sunken); padding-block: 8px; }
+}
+
+/* Options: a choice, side by side */
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.option { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.option.pick { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+.option header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.option dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; font-size: 14px; }
+.option dt { font-weight: 650; color: var(--ink-3); }
+.option dd { margin: 0; min-width: 0; }
+.brief { border: 1px dashed var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+/* Steps: what happens, in order */
+.steps { list-style: none; padding: 0; gap: 0; counter-reset: step; max-width: none; }
+.steps > li { counter-increment: step; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding-bottom: 16px; position: relative; }
+.steps > li::before { content: counter(step); width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; font: 600 13px var(--mono); color: var(--ink-2); position: relative; z-index: 1; }
+.steps > li:not(:last-child)::after { content: ""; position: absolute; left: 13.5px; top: 28px; bottom: 0; width: 1px; background: var(--line); }
+.steps > li:last-child { padding-bottom: 0; }
+.steps .body { display: flex; flex-direction: column; gap: 5px; padding-top: 3px; min-width: 0; }
+
+/* Figures: diagrams and snippets */
+figure { margin: 0; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+figcaption { font-size: 13px; color: var(--ink-3); max-width: 68ch; }
+.diagram .scroll { overflow-x: auto; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; }
+.diagram svg { display: block; min-width: 680px; width: 100%; height: auto; color: var(--ink-3); font-family: var(--font); }
+.diagram .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
+.diagram .box-you { fill: var(--you-soft); stroke: var(--you); stroke-width: 1.25; }
+.diagram .box-agent { fill: var(--agent-soft); stroke: var(--agent); stroke-width: 1.25; }
+.diagram .box-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.25; }
+.diagram .box-risk { fill: var(--risk-soft); stroke: var(--risk); stroke-width: 1.25; }
+.diagram .t { fill: var(--ink); font-size: 13px; font-weight: 650; }
+.diagram .t2 { fill: var(--ink-2); font-size: 11px; }
+.diagram .edge { stroke: currentColor; stroke-width: 1.5; fill: none; }
+.diagram .edge-label { fill: var(--ink-2); font-size: 11px; }
+.snippet pre { margin: 0; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; overflow-x: auto; font: 13px/1.5 var(--mono); }
+.snippet pre code { background: none; border: 0; padding: 0; font: inherit; overflow-wrap: normal; }
+.snippet mark { background: var(--you-soft); color: inherit; border-radius: 3px; padding: 0 2px; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+thead th { border-top: 0; background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Depth on demand */
+details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 0 16px; }
+details > summary { cursor: pointer; padding: 11px 0; font-weight: 650; }
+details[open] { padding-bottom: 14px; }
+details > .stack { gap: 10px; }
+
+/* Footer */
+.foot { border-top: 1px solid var(--line); padding-top: 14px; color: var(--ink-3); font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body>
+<main class="page">
+<header class="top">
+  <div class="label">Decision brief · D-005 · 2026-11-22 · decided: no message broker in the first version</div>
+  <h1>A message broker: when it becomes the right choice, and how it would slot in</h1>
+  <p class="lede">The first version delivers changes with a log in PostgreSQL and one worker per receiver. A broker becomes right when receivers multiply, belong to other teams, or need to work in parallel. Because the rules that matter stay the same, adding one later replaces a single layer.</p>
+</header>
+
+<section>
+  <h2>When you would need one</h2>
+  <p>Any one of these is a reason; none is true of this product today.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Sign</th><th>Why a broker then</th><th>Today</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Receivers you do not own</strong>: other teams, other codebases, outside systems reading the changes.</td><td>They need a standard place to read from, at their own pace, without access to your database.</td><td>Three receivers, all ours.</td></tr>
+        <tr><td><strong>More than a handful of receivers</strong>, with new ones arriving.</td><td>Each new one is a new reader with its own place; nothing else is touched or even knows.</td><td>Three, plus agents.</td></tr>
+        <tr><td><strong>A receiver that cannot keep up alone</strong> and needs several copies working side by side.</td><td>A broker splits the stream into lanes and keeps order inside each; doing that by hand is where home-made delivery gets hard.</td><td>One worker per receiver was 7 ms behind at 300 actions a second.</td></tr>
+        <tr><td><strong>Sustained traffic in the high hundreds of changes a second.</strong></td><td>The database would be both the truth and the thing every receiver keeps reading; a broker takes the reading off it.</td><td>About 0.02 a second for the seeded team; PostgreSQL managed about 1,000 saves a second in our test.</td></tr>
+        <tr><td><strong>More than one service producing changes.</strong></td><td>One log table in one database no longer is the single order; a shared stream is.</td><td>One producer: Conversations.</td></tr>
+        <tr><td><strong>Several live-connection servers</strong>, or several regions.</td><td>Each needs the whole stream; a broker fans it out and can copy it between regions.</td><td>One server.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>How you would notice in practice: receivers falling behind while their own systems are healthy; the database busy serving the workers' reads; a second team asking for "the events". Until then a broker is one more system that has to be up, and it would replace delivery machinery that is already built small and tested.</p>
+</section>
+
+<section>
+  <h2>Why adding it later is cheap</h2>
+  <p>Three things carry the guarantees, and none of them is the broker: the change and its log entry saved in one step; receivers that ignore repeats and older versions; the feed worked out from the stream in order. With a broker those stay exactly as they are. Only the layer between the log and the receivers changes: one relay publishes the log into the broker, and each receiver reads the broker from its own place. The picture below is that later shape.</p>
+</section>
+
+<section>
+  <h2>1 · The later shape, with a broker</h2>
+  <figure class="diagram">
+    <div class="scroll">
+      <svg viewBox="0 0 900 480" role="img" aria-label="Conversations saves a change and its log entry in one step. A relay publishes the log to the broker. The broker keeps every change in order and remembers each reader's place. Search, the feed, the live connection and the agent door each read from it independently. The feed publishes notification notes to a second topic, which the notification sender reads.">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <rect class="box" x="20" y="16" width="330" height="84" rx="6"/>
+        <text class="t" x="36" y="40">Conversations</text>
+        <text class="t2" x="36" y="58">the truth in PostgreSQL; the change and its log entry</text>
+        <text class="t2" x="36" y="73">saved in one step, numbered one writer at a time</text>
+        <text class="t2" x="36" y="88">(unchanged)</text>
+
+        <line class="edge" x1="350" y1="58" x2="470" y2="58" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="410" y="50" text-anchor="middle">new log entries</text>
+
+        <rect class="box-agent" x="470" y="16" width="410" height="84" rx="6"/>
+        <text class="t" x="486" y="40">Relay</text>
+        <text class="t2" x="486" y="58">publishes the log to the broker, in order, and remembers how</text>
+        <text class="t2" x="486" y="73">far it got. If the broker is down, changes wait safely in</text>
+        <text class="t2" x="486" y="88">PostgreSQL and people keep working.</text>
+
+        <line class="edge" x1="675" y1="100" x2="675" y2="150" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="683" y="130">publish, at least once</text>
+
+        <rect class="box-ok" x="20" y="150" width="860" height="70" rx="8"/>
+        <text class="t" x="36" y="175">Message broker · the stream of changes</text>
+        <text class="t2" x="36" y="194">keeps every change, in order; remembers each reader's place; any reader can start again from the beginning;</text>
+        <text class="t2" x="36" y="208">a reader that is slow or away falls behind alone</text>
+
+        <line class="edge" x1="120" y1="220" x2="120" y2="280" marker-end="url(#arrow)"/>
+        <line class="edge" x1="340" y1="220" x2="340" y2="280" marker-end="url(#arrow)"/>
+        <line class="edge" x1="560" y1="220" x2="560" y2="280" marker-end="url(#arrow)"/>
+        <line class="edge" x1="780" y1="220" x2="780" y2="280" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="128" y="255">each reads from its own place</text>
+
+        <rect class="box" x="20" y="280" width="200" height="70" rx="6"/>
+        <text class="t" x="120" y="304" text-anchor="middle">Search connector</text>
+        <text class="t2" x="120" y="322" text-anchor="middle">calls the search index;</text>
+        <text class="t2" x="120" y="336" text-anchor="middle">waits out an outage</text>
+
+        <rect class="box-ok" x="240" y="280" width="200" height="70" rx="6"/>
+        <text class="t" x="340" y="304" text-anchor="middle">Activity feed</text>
+        <text class="t2" x="340" y="322" text-anchor="middle">saves its place together</text>
+        <text class="t2" x="340" y="336" text-anchor="middle">with its rows</text>
+
+        <rect class="box" x="460" y="280" width="200" height="70" rx="6"/>
+        <text class="t" x="560" y="304" text-anchor="middle">Live connection</text>
+        <text class="t2" x="560" y="322" text-anchor="middle">pushes numbered updates</text>
+        <text class="t2" x="560" y="336" text-anchor="middle">to open screens</text>
+
+        <rect class="box-agent" x="680" y="280" width="200" height="70" rx="6"/>
+        <text class="t" x="780" y="304" text-anchor="middle">Agent door</text>
+        <text class="t2" x="780" y="322" text-anchor="middle">hands each agent what</text>
+        <text class="t2" x="780" y="336" text-anchor="middle">addresses it</text>
+
+        <line class="edge" x1="340" y1="350" x2="340" y2="404" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="348" y="382">notification due, withdrawn</text>
+        <rect class="box-ok" x="240" y="404" width="200" height="56" rx="6"/>
+        <text class="t" x="340" y="428" text-anchor="middle">Broker · notification notes</text>
+        <text class="t2" x="340" y="446" text-anchor="middle">a second stream, same rules</text>
+        <line class="edge" x1="440" y1="432" x2="500" y2="432" marker-end="url(#arrow)"/>
+        <rect class="box" x="500" y="404" width="380" height="56" rx="6"/>
+        <text class="t" x="690" y="428" text-anchor="middle">Notification sender, through its connector</text>
+        <text class="t2" x="690" y="446" text-anchor="middle">holds by the stream's own clock, sends once</text>
+      </svg>
+    </div>
+    <figcaption>Green: the broker's streams. What was "one delivery worker per receiver with its own place in our log" becomes "one relay into the broker, and every receiver reads the broker from its own place".</figcaption>
+  </figure>
+  <div class="split">
+    <div class="panel"><div class="label">Replaced by the broker</div><ul><li>Our own delivery workers and their table of places.</li><li>Our own "parking place": a standard side stream for changes a receiver refuses.</li><li>Our own way of telling how far behind a receiver is.</li><li>The separate catch-up paths for the live connection and for agents: they become ordinary readers.</li></ul></div>
+    <div class="panel"><div class="label">Stays exactly as designed</div><ul><li>Saving the change and its log entry in one step, in PostgreSQL.</li><li>Receivers that ignore repeats and older versions; a delete wins.</li><li>The feed worked out from the stream, fenced when it chokes, rebuilt by replay.</li><li>The feed deciding notifications; the hold measured by the stream's own clock.</li></ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>2 · What a broker would give</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Reason</th><th>What it means here</th></tr></thead>
+      <tbody>
+        <tr><td><strong>It is the machinery we were writing by hand.</strong></td><td>An ordered log that is kept, a remembered place per reader, replay from the start: that is our design, and it is also the definition of a log-style broker. Our first experiment found three faults in my hand-written version of it. The broker's version has been run by thousands of teams.</td></tr>
+        <tr><td><strong>Adding a receiver touches nothing else.</strong></td><td>A fourth or fifth system (analytics, an audit trail, a second search engine) is a new reader with its own place. Conversations and the other receivers do not change and do not know.</td></tr>
+        <tr><td><strong>One slow receiver cannot hurt the others or the database.</strong></td><td>A receiver that is down for an hour falls behind in the broker, alone. The database people type into is not the thing every receiver keeps asking.</td></tr>
+        <tr><td><strong>The road to a larger size is configuration.</strong></td><td>Today one stream in one lane. Later the stream is split into lanes by channel, with several copies of a receiver working side by side, order kept inside each channel. In the draft this was the item "split the log by conversation"; with a broker it is a setting plus the choice of key.</td></tr>
+        <tr><td><strong>Screens and agents become ordinary readers.</strong></td><td>Several live-connection servers can each read the stream and push to their screens. That is the step the draft listed under "at a hundred times this size".</td></tr>
+        <tr><td><strong>It is what the products we studied run.</strong></td><td>Every product in our research saves first, publishes each change, and lets search, notifications and the feed consume it from a queue; Slack's own write-up puts Kafka at the front of that path (R-002). A reviewer recognises the shape without explanation.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>3 · What a broker would not do</h2>
+  <p>These are why the first version loses nothing by waiting: the hard parts have to be built either way, and they are.</p>
+  <div class="split">
+    <div class="panel"><div class="label"><span class="chip risk">not solved by a broker</span> Getting changes into it safely</div><p>Writing to the database and publishing to the broker are two steps; a crash between them loses a change or announces one that was never saved. We keep "save and log in one step" and a relay that publishes the log. The broker does not replace this; it sits after it.</p></div>
+    <div class="panel"><div class="label"><span class="chip risk">not solved by a broker</span> Repeats</div><p>The relay may publish a change twice, and a reader may read one twice after a restart. A broker's "exactly once" holds only inside the broker, not for a search index or a push service outside it. Receivers still ignore repeats and older versions.</p></div>
+    <div class="panel"><div class="label"><span class="chip risk">not solved by a broker</span> Order across lanes</div><p>Order is kept inside one lane only. The feed needs "was it read before it was deleted", so a conversation's messages and its readers' actions must travel in the same lane. We start with one lane (total order) and name the key for splitting: the channel.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>4 · Questions and answers, with or without a broker</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Question</th><th>Answer</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Why is there no message broker?</strong></td><td>Because nothing it is good at is needed yet (see the table at the top), and everything that makes delivery reliable has to be built with or without one. We built those parts, tested them by breaking them, and kept the door open: adding a broker replaces one layer. A broker at 1,500 messages a day would be one more system to keep running for no gain we could show.</td></tr>
+        <tr><td><strong>Why not publish to the broker straight from the request?</strong></td><td>Two writes that cannot be made together. Shown by test: with the log entry saved in a second step and the process dying in between, 4 of 635 messages lost a change (E-003). So the change and its log entry are one database transaction, and a relay publishes afterwards.</td></tr>
+        <tr><td><strong>The broker offers exactly-once. Why do receivers still check versions?</strong></td><td>That guarantee covers reading from and writing to the broker itself. A search index or a push provider is outside it. At the boundary the honest promise is "at least once, and a repeat changes nothing". Shown by test: without the version rule, 17 of 664 messages ended wrong under repeats.</td></tr>
+        <tr><td><strong>What happens when the broker is down?</strong></td><td>People keep working: changes are saved and wait in PostgreSQL. Search, the feed and notifications fall behind and say so. When the broker returns, the relay continues from where it stopped. The broker being down never loses or refuses a message.</td></tr>
+        <tr><td><strong>What happens when a receiver is down, for longer than the broker keeps data?</strong></td><td>PostgreSQL stays the truth, and the stream can be published again from the log. At this size the stream is simply kept in full.</td></tr>
+        <tr><td><strong>How is order guaranteed?</strong></td><td>The log in PostgreSQL has one order (numbers handed out one writer at a time; without that rule a reader missed about a fifth of the changes, E-004). The relay publishes in that order into one lane. Every change carries its number, and the feed takes only the next one.</td></tr>
+        <tr><td><strong>And when you split into lanes?</strong></td><td>By channel, so a channel's messages, threads and its readers' reads and dial stay in order. What crosses lanes (a person's Focus rules, for example) takes effect "from about then" instead of at an exact position; a rebuild may place a row that arrived in that same instant differently. We would say so, not hide it.</td></tr>
+        <tr><td><strong>A change one receiver cannot process?</strong></td><td>Search: after three tries it goes to a side stream, visible, and can be sent again. The feed: the change is set aside and only the conversation or reader it touches is fenced; the rest stays exact (E-003: 51 rows fenced, 452 exact).</td></tr>
+        <tr><td><strong>Why not read the database's own replication log instead of a relay?</strong></td><td>That is the next step at larger size and removes the one-writer-at-a-time rule. It also adds another moving part. For a first version a relay over a log table is fewer things to run and was tested.</td></tr>
+        <tr><td><strong>How do you know any of this works?</strong></td><td>By breaking it. Every promise has a test that injects the failure: processes killed mid-burst, receivers stopped, slowed and wiped, half of all deliveries repeated or late. E-003 and E-004 are the record.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>5 · If the day comes: which broker, and what to prove again</h2>
+  <p>Apache Kafka would be the first candidate: it is the standard, and its model (a log that is kept, a remembered place per reader, replay from the start) is our design word for word. NATS JetStream is lighter and less widely known. RabbitMQ in its classic form hands a message over and forgets it, which does not fit rebuilding a receiver by replay. Redis Streams keeps data in memory first and promises less about not losing it.</p>
+  <p>What would have to be tested again with the broker in the middle: the relay killed between publishing and noting how far it got; the broker stopped mid-burst while people keep working; a receiver stopped, and wiped and rebuilt from the start of the stream; freshness against the 2-second target.</p>
+  <p class="note">How this was decided: you first chose a broker, asked for the case for it, and after reading the case and its limits decided to build the first version without one (2026-11-22).</p>
+</section>
+
+<footer class="foot">
+  <span>Belongs to D-005 · Evidence: R-002, E-003, E-004 · The whole design: <a href="T-022-architecture-proposal.html">architecture review</a></span>
+  <span>Full reasoning: <code>docs/decisions/D-005-system-shape.md</code></span>
+</footer>
+</main>
+</body>
+</html>

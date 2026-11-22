@@ -166,7 +166,7 @@ details > .stack { gap: 10px; }
 
 <section>
   <h2>What was built</h2>
-  <p>A throwaway version of the system map: the core, the delivery workers, a search stand-in, the feed and a notification sender, as separate programs on this machine that talk only over the network. A scripted team of 12 posts, replies, mentions, flags, edits, deletes, reacts and reads at up to 300 actions a second. The test stops programs for real and then compares every receiver with the truth. 75 checks; all came out as expected.</p>
+  <p>A throwaway version of the system map: the core, the delivery workers, a search stand-in, the feed and a notification sender, as separate programs on this machine that talk only over the network. A scripted team of 12 posts, replies, mentions, flags, edits, deletes, reacts and reads at up to 300 actions a second. The test stops programs for real and then compares every receiver with the truth. 96 checks; all came out as expected.</p>
   <div class="split">
     <div class="panel"><div class="label">Nothing lost</div><p>The core was killed five times mid-burst. Every action a screen was told "saved" is there, once.</p></div>
     <div class="panel"><div class="label">One slow part delays nobody</div><p>With search stopped or answering too slowly, the feed stayed 7 ms behind (worst 18 ms). Search cleared 661 waiting changes 0.6 s after coming back.</p></div>
@@ -196,6 +196,17 @@ details > .stack { gap: 10px; }
   <div class="split">
     <div class="panel"><div class="label">Time must not run backwards in the log</div><p>This machine's clock steps back by about 0.8 s now and then (measured). Before the core forced its timestamps never to decrease, 4 of 617 notifications in a healthy run went out wrongly. Parts compare log times only with log times, never with their own clock.</p></div>
     <div class="panel"><div class="label">An idle receiver must be able to say where it is</div><p>A wiped notification sender went unnoticed while nothing new arrived. The worker's idle check-in is now answered with "I am at 0", and the worker starts over.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Added on request: a smaller blast radius when the feed chokes on one change</h2>
+  <p>The first design stopped the whole feed until the fault was fixed. Now the change is set aside and a fence goes up around only what it touches. Tried with two faults planted, one on an edit and one on a person's dial change:</p>
+  <div class="split">
+    <div class="panel"><div class="label">Fenced</div><p>One conversation and one reader: 51 rows marked "may be out of date", 38 of 1,772 changes waiting.</p></div>
+    <div class="panel"><div class="label">Everything else</div><p>The other 452 rows and all 910 notification notes equal a clean replay. Search unaffected.</p></div>
+    <div class="panel"><div class="label">After the fix</div><p>The feed is rebuilt from the log and is whole and exact again; no notification repeats.</p></div>
+    <div class="panel"><div class="label">The price</div><p>Inside a fence nothing new notifies, and one notification already on its way went out although the person had answered. With a fault on every edit, the feed stops after five fences.</p></div>
   </div>
 </section>
 

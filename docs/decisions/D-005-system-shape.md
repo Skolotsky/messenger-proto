@@ -1,9 +1,9 @@
 # D-005: System shape and stack
 
-- Status: proposed
+- Status: accepted
 - Level: system shape
 - Date: 2026-11-22
-- Decided by: user (not yet decided)
+- Decided by: user
 - Depends on: D-001 to D-004, D-009 to D-016 (what the product demands)
 - Evidence: R-002; the brief; second opinion and claim checks recorded in `tasks/T-022-architecture-draft.md`
 - Visual: `docs/visuals/T-022-architecture-proposal.html`, section 5; walk-throughs in `docs/visuals/T-022-walkthroughs.html`
@@ -50,10 +50,15 @@ Second opinion (a fresh agent, given the options without this recommendation): c
 
 ## Decision
 
-Partly taken.
+Accepted by the user on 2026-11-22, in four parts.
 
 - **The database: PostgreSQL.** Chosen by the user on 2026-11-22: "let's use PostgreSQL as an industry standard". The user added that it probably does not influence the architecture much; E-004 agrees (one implementation rule, no change of shape).
-- The shape (A, B or C), the live connection and the server language are not yet decided.
+- **The shape: B, parts that talk only over the network and run as separate programs from one codebase, without a message broker.** Decided by the user on 2026-11-22: "ok let's do without message broker". The user first chose C ("I would choose a message broker. I think it's important part of scalable architecture"), asked for the case for it, and after reading the case and its limits (`docs/visuals/D-005-message-broker.html`) chose B, asking to be told when a broker would become necessary. That answer is on the same page and summarised below.
+- **PostgreSQL runs in Docker** (confirmed by the user, 2026-11-22).
+- **How changes reach a screen: WebSocket with numbered updates and "everything after number N".** "I agree with your recommendation" (2026-11-22).
+- **The server is written in TypeScript**, against the agent's proposal of Python: "i don't like python. I'd rather choose typescript" (2026-11-22). The agent sees no risk to the goal in this: one language for server and web app, and the contracts can be shared as types. Consequences: Node is needed (not installed on this machine; it runs in Docker or is installed with the first implementation task); the experiments E-001 and E-003 to E-005 stay as throwaway Python, which is their purpose, and what they showed concerns the design, not the language; the PostgreSQL numbering rule (E-004) holds for any client.
+
+When a broker becomes the right choice (any one of these): receivers owned by other teams or other codebases, or more than a handful of them; a receiver that needs several copies working side by side to keep up; sustained traffic in the high hundreds of changes a second, where one database is both the truth and what every receiver reads; systems that are not ours consuming the changes; more than one service producing changes; several live-connection servers that each need the stream. Because the save-and-log step, the numbered log and receivers that ignore repeats stay as they are, adding a broker later replaces only the delivery workers with a relay and readers.
 
 Evidence since the proposal: E-003 built shape B small and broke it on purpose; it held. E-004 confirmed on PostgreSQL 17 that plain sequence numbering makes a worker miss about a fifth of the changes under concurrent writes, that numbering one writer at a time misses none at no measurable cost (about 1,000 changes a second either way), and that NOTIFY wakes a worker in about a millisecond.
 

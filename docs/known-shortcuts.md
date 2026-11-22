@@ -12,6 +12,7 @@ Every place the design knowingly cuts a corner, with what the full answer would 
 | One database server with an area per part (D-005, proposed) | Independence is kept by rule and a check, not by hardware | A store per service |
 | Log numbers handed out one at a time (D-005, proposed) | About 1.5 messages a second at a hundred times our size | Split the log by conversation, or read the database's replication log |
 | The change log is never trimmed | Two weeks of a 36-member team is small | Keep a window, rebuild from snapshots |
+| After a fenced change is fixed, the whole feed is rebuilt, not only the fenced part | Seconds at this size, and exact | Rebuild one conversation or one reader in place |
 | A rebuild replays the whole log | Fast at this size (to be measured) | Snapshots and replay from a checkpoint |
 | One copy of each part | A local demonstration | Several, with failover |
 | Every post writes a feed row per affected reader | Channels of 30 | Work out large channels when the feed is read |

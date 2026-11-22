@@ -5,20 +5,20 @@ holds                  | healthy burst | the feed equals a clean replay of the l
 holds                  | healthy burst | a notification is sent once | 0 repeats among 626 sent
 holds                  | healthy burst | none sent for what was read or deleted within the hold | 0 of 626 sent
 holds                  | healthy burst | no due notification is missing | 0 missing of 1246 due
-holds                  | repeats, lost answers and late copies on every hop | every acknowledged action is saved, once | 1500 acknowledged, 1466 changes in the log
+holds                  | repeats, lost answers and late copies on every hop | every acknowledged action is saved, once | 1500 acknowledged, 1467 changes in the log
 holds                  | repeats, lost answers and late copies on every hop | every saved change is in the log | 0 of 664 messages have a change missing from the log
 holds                  | repeats, lost answers and late copies on every hop | search equals the truth | 0 of 664 messages differ
-holds                  | repeats, lost answers and late copies on every hop | the feed equals a clean replay of the log | 0 of 2331 entries differ; 887 notes against 887
+holds                  | repeats, lost answers and late copies on every hop | the feed equals a clean replay of the log | 0 of 2332 entries differ; 891 notes against 891
 holds                  | repeats, lost answers and late copies on every hop | a notification is sent once | 0 repeats among 370 sent
 holds                  | repeats, lost answers and late copies on every hop | none sent for what was read or deleted within the hold | 0 of 370 sent
-holds                  | repeats, lost answers and late copies on every hop | no due notification is missing | 0 missing of 591 due
-holds                  | search stopped for 5 s mid-burst | every acknowledged action is saved, once | 2400 acknowledged, 2344 changes in the log
+holds                  | repeats, lost answers and late copies on every hop | no due notification is missing | 0 missing of 593 due
+holds                  | search stopped for 5 s mid-burst | every acknowledged action is saved, once | 2400 acknowledged, 2343 changes in the log
 holds                  | search stopped for 5 s mid-burst | every saved change is in the log | 0 of 1048 messages have a change missing from the log
 holds                  | search stopped for 5 s mid-burst | search equals the truth | 0 of 1048 messages differ
-holds                  | search stopped for 5 s mid-burst | the feed equals a clean replay of the log | 0 of 3519 entries differ; 1584 notes against 1584
+holds                  | search stopped for 5 s mid-burst | the feed equals a clean replay of the log | 0 of 3519 entries differ; 1586 notes against 1586
 holds                  | search stopped for 5 s mid-burst | a notification is sent once | 0 repeats among 573 sent
 holds                  | search stopped for 5 s mid-burst | none sent for what was read or deleted within the hold | 0 of 573 sent
-holds                  | search stopped for 5 s mid-burst | no due notification is missing | 0 missing of 1016 due
+holds                  | search stopped for 5 s mid-burst | no due notification is missing | 0 missing of 1017 due
 holds                  | search answers after 1.5 s (longer than the 1 s limit) for 4 s | every acknowledged action is saved, once | 1998 acknowledged, 1951 changes in the log
 holds                  | search answers after 1.5 s (longer than the 1 s limit) for 4 s | every saved change is in the log | 0 of 847 messages have a change missing from the log
 holds                  | search answers after 1.5 s (longer than the 1 s limit) for 4 s | search equals the truth | 0 of 847 messages differ
@@ -32,17 +32,17 @@ holds                  | search refuses one delete, then refuses everything · r
 holds                  | search refuses one delete, then refuses everything · after recovery | every acknowledged action is saved, once | 540 acknowledged, 527 changes in the log
 holds                  | search refuses one delete, then refuses everything · after recovery | every saved change is in the log | 0 of 219 messages have a change missing from the log
 holds                  | search refuses one delete, then refuses everything · after recovery | search equals the truth | 0 of 219 messages differ
-holds                  | search refuses one delete, then refuses everything · after recovery | the feed equals a clean replay of the log | 0 of 880 entries differ; 317 notes against 317
+holds                  | search refuses one delete, then refuses everything · after recovery | the feed equals a clean replay of the log | 0 of 880 entries differ; 319 notes against 319
 holds                  | search refuses one delete, then refuses everything · after recovery | a notification is sent once | 0 repeats among 142 sent
 holds                  | search refuses one delete, then refuses everything · after recovery | none sent for what was read or deleted within the hold | 0 of 142 sent
-holds                  | search refuses one delete, then refuses everything · after recovery | no due notification is missing | 0 missing of 218 due
+holds                  | search refuses one delete, then refuses everything · after recovery | no due notification is missing | 0 missing of 219 due
 holds                  | the core killed five times mid-burst | every acknowledged action is saved, once | 1998 acknowledged, 1950 changes in the log
 holds                  | the core killed five times mid-burst | every saved change is in the log | 0 of 843 messages have a change missing from the log
 holds                  | the core killed five times mid-burst | search equals the truth | 0 of 843 messages differ
-holds                  | the core killed five times mid-burst | the feed equals a clean replay of the log | 0 of 2819 entries differ; 1315 notes against 1315
+holds                  | the core killed five times mid-burst | the feed equals a clean replay of the log | 0 of 2819 entries differ; 1313 notes against 1313
 holds                  | the core killed five times mid-burst | a notification is sent once | 0 repeats among 444 sent
 holds                  | the core killed five times mid-burst | none sent for what was read or deleted within the hold | 0 of 444 sent
-holds                  | the core killed five times mid-burst | no due notification is missing | 0 missing of 827 due
+holds                  | the core killed five times mid-burst | no due notification is missing | 0 missing of 826 due
 holds                  | delivery, feed, sender and search each killed mid-burst; the feed's place moved by mistake | every acknowledged action is saved, once | 2400 acknowledged, 2347 changes in the log
 holds                  | delivery, feed, sender and search each killed mid-burst; the feed's place moved by mistake | every saved change is in the log | 0 of 1015 messages have a change missing from the log
 holds                  | delivery, feed, sender and search each killed mid-burst; the feed's place moved by mistake | search equals the truth | 0 of 1015 messages differ
@@ -53,42 +53,63 @@ holds                  | delivery, feed, sender and search each killed mid-burst
 holds                  | the feed wiped mid-burst and rebuilt | every acknowledged action is saved, once | 2496 acknowledged, 2439 changes in the log
 holds                  | the feed wiped mid-burst and rebuilt | every saved change is in the log | 0 of 1066 messages have a change missing from the log
 holds                  | the feed wiped mid-burst and rebuilt | search equals the truth | 0 of 1066 messages differ
-holds                  | the feed wiped mid-burst and rebuilt | the feed equals a clean replay of the log | 0 of 3650 entries differ; 1635 notes against 1635
+holds                  | the feed wiped mid-burst and rebuilt | the feed equals a clean replay of the log | 0 of 3650 entries differ; 1633 notes against 1633
 holds                  | the feed wiped mid-burst and rebuilt | a notification is sent once | 0 repeats among 565 sent
 holds                  | the feed wiped mid-burst and rebuilt | none sent for what was read or deleted within the hold | 0 of 565 sent
-holds                  | the feed wiped mid-burst and rebuilt | no due notification is missing | 0 missing of 1044 due
+holds                  | the feed wiped mid-burst and rebuilt | no due notification is missing | 0 missing of 1043 due
 holds                  | then the notification sender wiped and refilled | a notification is sent once | 0 repeats among 565 sent
 holds                  | then the notification sender wiped and refilled | none sent for what was read or deleted within the hold | 0 of 565 sent
-holds                  | then the notification sender wiped and refilled | no due notification is missing | 0 missing of 1044 due
+holds                  | then the notification sender wiped and refilled | no due notification is missing | 0 missing of 1043 due
 holds                  | then search wiped and its place set back to the start | search equals the truth | 0 of 1066 messages differ
-caught                 | hold "event" · the feed down for 3 s | none sent for what was read or deleted within the hold | 88 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing
+caught                 | hold "event" · the feed down for 3 s | none sent for what was read or deleted within the hold | 83 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing
 caught                 | hold "arrival" · the feed down for 3 s | none sent for what was read or deleted within the hold | 8 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing
 holds                  | hold "watermark" · the feed down for 3 s | none sent for what was read or deleted within the hold | 0 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing
 caught                 | hold "event" · the feed slower than the traffic | none sent for what was read or deleted within the hold | 159 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing
 caught                 | hold "arrival" · the feed slower than the traffic | none sent for what was read or deleted within the hold | 147 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing
 holds                  | hold "watermark" · the feed slower than the traffic | none sent for what was read or deleted within the hold | 0 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing
+holds                  | the feed cannot apply one edit and one dial change · while fenced | outside the fences, every row equals a clean replay | 0 of 452 rows differ; 51 rows are inside the fences; fenced: conv:t:rootP, reader:p3; 38 changes set aside of 1772
+holds                  | the feed cannot apply one edit and one dial change · while fenced | outside the fences, the notification notes equal a clean replay | 910 notes against 910
+holds                  | the feed cannot apply one edit and one dial change · while fenced | only what the two changes touch is fenced | conv:t:rootP, reader:p3
+holds                  | the feed cannot apply one edit and one dial change · while fenced | search equals the truth | 0 of 775 messages differ
+caught                 | the feed cannot apply one edit and one dial change · while fenced | the feed equals a clean replay of the log | 48 of 2720 entries differ; 933 notes against 990
+holds                  | the feed cannot apply one edit and one dial change · while fenced | a notification is sent once | 0 repeats among 379 sent
+holds                  | the feed cannot apply one edit and one dial change · after the fix and a rebuild | every acknowledged action is saved, once | 1800 acknowledged, 1772 changes in the log
+holds                  | the feed cannot apply one edit and one dial change · after the fix and a rebuild | every saved change is in the log | 0 of 775 messages have a change missing from the log
+holds                  | the feed cannot apply one edit and one dial change · after the fix and a rebuild | search equals the truth | 0 of 775 messages differ
+holds                  | the feed cannot apply one edit and one dial change · after the fix and a rebuild | the feed equals a clean replay of the log | 0 of 2720 entries differ; 990 notes against 990
+holds                  | the feed cannot apply one edit and one dial change · after the fix and a rebuild | a notification is sent once | 0 repeats among 416 sent
+holds                  | the feed cannot apply one edit and one dial change · after the fix and a rebuild | no due notification is missing | 0 missing of 674 due
+holds                  | the feed cannot apply one edit and one dial change · after the fix and a rebuild | a notification sent although the row was read in time can only come from inside a fence | 1 such notifications, 1 of them from inside the fences
+holds                  | the feed cannot apply any edit | after five fences the feed stops instead of fencing everything | 5 fences, 569 changes waiting
+holds                  | the feed cannot apply any edit · after the fix and a rebuild | every acknowledged action is saved, once | 600 acknowledged, 582 changes in the log
+holds                  | the feed cannot apply any edit · after the fix and a rebuild | every saved change is in the log | 0 of 259 messages have a change missing from the log
+holds                  | the feed cannot apply any edit · after the fix and a rebuild | search equals the truth | 0 of 259 messages differ
+holds                  | the feed cannot apply any edit · after the fix and a rebuild | the feed equals a clean replay of the log | 0 of 995 entries differ; 355 notes against 355
+holds                  | the feed cannot apply any edit · after the fix and a rebuild | a notification is sent once | 0 repeats among 158 sent
+holds                  | the feed cannot apply any edit · after the fix and a rebuild | none sent for what was read or deleted within the hold | 0 of 158 sent
+holds                  | the feed cannot apply any edit · after the fix and a rebuild | no due notification is missing | 0 missing of 250 due
 caught                 | broken on purpose: search without the version rule, under late copies | search equals the truth | 17 of 664 messages differ
 caught                 | broken on purpose: a feed that accepts any newer change, with its place moved by mistake | the feed equals a clean replay of the log | 139 of 1559 entries differ; 629 notes against 662
 caught                 | broken on purpose: a sender that keeps no list of what it sent, with the feed rebuilt | a notification is sent once | 171 repeats among 709 sent
 caught                 | broken on purpose: the log entry saved in a second step, with the core dying in between | every saved change is in the log | 4 of 635 messages have a change missing from the log
-caught                 | numbering model (a model, not PostgreSQL) | numbers taken before the save finishes: nothing stepped over | 1194 of 2400 changes never seen by the reader
+caught                 | numbering model (a model, not PostgreSQL) | numbers taken before the save finishes: nothing stepped over | 1221 of 2400 changes never seen by the reader
 holds                  | numbering model (a model, not PostgreSQL) | numbers handed out one save at a time: nothing stepped over | 0 of 2400 changes never seen by the reader
 
-measured | healthy burst | time to level after the last action | 1.6 s (includes the 1 s hold)
-measured | healthy burst | save to search | median 6 ms, 19 in 20 within 11 ms, worst 72 ms (1980 changes)
-measured | healthy burst | save to feed | median 7 ms, 19 in 20 within 12 ms, worst 72 ms (2941 changes)
-measured | healthy burst | notification sent after its hold ended | median 30 ms, 19 in 20 within 88 ms, worst 126 ms (626 changes)
+measured | healthy burst | time to level after the last action | 1.4 s (includes the 1 s hold)
+measured | healthy burst | save to search | median 6 ms, 19 in 20 within 11 ms, worst 69 ms (1980 changes)
+measured | healthy burst | save to feed | median 7 ms, 19 in 20 within 12 ms, worst 69 ms (2941 changes)
+measured | healthy burst | notification sent after its hold ended | median 29 ms, 19 in 20 within 89 ms, worst 127 ms (626 changes)
 measured | healthy burst | load | 2941 changes at about 300 actions a second; 1246 notifications due, 626 sent
 measured | repeats, lost answers and late copies on every hop | faults | each delivery: 15% arrive late as a stale copy, 15% lose their answer, 20% are delivered twice
-measured | repeats, lost answers and late copies on every hop | time to level | 47.2 s
-measured | search stopped for 5 s mid-burst | feed freshness during the outage | median 7 ms, 19 in 20 within 12 ms, worst 18 ms (971 changes)
-measured | search stopped for 5 s mid-burst | search caught up with the backlog | 0.6 s after it came back (661 changes)
-measured | search answers after 1.5 s (longer than the 1 s limit) for 4 s | feed freshness meanwhile | median 7 ms, 19 in 20 within 12 ms, worst 17 ms (782 changes)
+measured | repeats, lost answers and late copies on every hop | time to level | 48.1 s
+measured | search stopped for 5 s mid-burst | feed freshness during the outage | median 7 ms, 19 in 20 within 12 ms, worst 19 ms (970 changes)
+measured | search stopped for 5 s mid-burst | search caught up with the backlog | 1.1 s after it came back (660 changes)
+measured | search answers after 1.5 s (longer than the 1 s limit) for 4 s | feed freshness meanwhile | median 6 ms, 19 in 20 within 11 ms, worst 20 ms (782 changes)
 measured | search refuses one delete, then refuses everything | parked after the refused delete | 2
-measured | killothers | feed place moved by mistake | from 2173 to 2213
-measured | the feed wiped mid-burst and rebuilt | rebuild | 1220 earlier changes replayed while new ones kept arriving; level again 1.4 s after the wipe
+measured | killothers | feed place moved by mistake | from 2172 to 2212
+measured | the feed wiped mid-burst and rebuilt | rebuild | 1220 earlier changes replayed while new ones kept arriving; level again 1.3 s after the wipe
 measured | then the notification sender wiped and refilled | tray before and after | 565 before, 565 after; 0 entries not refilled (0 of them were sent and read later), 0 new
-measured | then search wiped and its place set back to the start | refilled | 2439 changes in 1.6 s
-measured | mut | feed place moved by mistake | from 511 to 551
+measured | then search wiped and its place set back to the start | refilled | 2439 changes in 1.4 s
+measured | mut | feed place moved by mistake | from 510 to 550
 
-75 checks, 0 unexpected. Timings scaled down: calls limited to 1 s, hold 1 s.
+96 checks, 0 unexpected. Timings scaled down: calls limited to 1 s, hold 1 s.

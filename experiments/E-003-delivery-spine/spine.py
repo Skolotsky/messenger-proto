@@ -545,13 +545,40 @@ def feed(a):
     c.executescript('''create table if not exists kv(k text primary key, v text);
         create table if not exists meta(k text primary key, v);
         create table if not exists feedlog(number integer primary key autoincrement, kind text, body text, saved_at real);
-        create table if not exists applied(number int primary key, t real);''')
+        create table if not exists applied(number int primary key, t real);
+        create table if not exists fences(scope text primary key, number int, reason text);
+        create table if not exists set_aside(number int primary key, scope text);
+        create table if not exists aside_msgs(id text primary key, scope text);''')
     if not c.execute("select 1 from meta where k='edition'").fetchone():
         c.executemany('insert into meta values(?,?)', [('edition', uuid.uuid4().hex), ('last', 0), ('wm', 0.0)])
     st = SqlStore(c)
     strict = 'feed_nonstrict' not in BREAK
     slow = float(os.environ.get('SLOW_FEED', '0'))
     meta = lambda k: c.execute('select v from meta where k=?', (k,)).fetchone()[0]
+    # A change the feed cannot apply is fenced off with what it touches (one conversation, or one
+    # reader); everything else carries on. Past FENCE_LIMIT fences it is not one bad change: stop.
+    poison = set(filter(None, os.environ.get('FEED_POISON', '').split(',')))   # faults planted by the test
+    FENCE_LIMIT = 5
+    fencing = 'feed_stops' not in BREAK
+
+    def scope_of(o):
+        k, b = o['kind'], o['body']
+        if k == 'message.created':
+            return 'conv:' + ck_of(b)
+        if k in ('message.changed', 'message.deleted'):
+            m = st.get('msg:' + b['id'])
+            if m:
+                return 'conv:' + ck_of(m)
+            r = c.execute('select scope from aside_msgs where id=?', (b['id'],)).fetchone()
+            return r[0] if r else None
+        if k.startswith('reader.'):
+            return 'reader:' + b['person']
+        return None
+
+    def planted(o):
+        k, b = o['kind'], o['body']
+        return ((k == 'message.changed' and ('all' in poison or 'msg:' + b['id'] in poison))
+                or (k == 'reader.dial' and 'reader:' + b['person'] in poison))
 
     def h(path, o):
         if path == '/ping':
@@ -568,21 +595,45 @@ def feed(a):
                 return 409, {'at': last}
             if slow:
                 time.sleep(slow)
+            sc = scope_of(o)
+            fenced = bool(sc and c.execute('select 1 from fences where scope=?', (sc,)).fetchone())
+            b = o['body']
+            if not fenced and o['kind'] == 'message.created' and b.get('thread') and \
+                    c.execute('select 1 from aside_msgs where id=?', (b['thread'],)).fetchone():
+                fenced = None                          # a reply under a message that was set aside: fence its thread too
             c.execute('begin immediate')
             try:
+                if fenced or fenced is None:
+                    raise RuntimeError('inside a fence')
+                if planted(o):
+                    raise RuntimeError('fault planted by the test')
                 out = []
                 fold(st, o['number'], o['kind'], o['body'], out)
                 if o['kind'] == 'tick':
                     out.append(dict(kind='tick', name=''))
+                shut = {x[0][7:] for x in c.execute("select scope from fences where scope like 'reader:%'")}
+                out = [e for e in out if not (e['kind'] == 'due' and e.get('person') in shut)]
                 for e in out:
                     c.execute('insert into feedlog(kind,body,saved_at) values(?,?,?)', (e['kind'], json.dumps(e), o['at']))
                 c.execute("update meta set v=? where k='last'", (o['number'],))
                 c.execute("update meta set v=max(v,?) where k='wm'", (o['at'],))
                 c.execute('insert or ignore into applied values(?,?)', (o['number'], clock()))
                 c.execute('commit')
-            except Exception:
+            except Exception as ex:
                 c.execute('rollback')
-                raise
+                if not fencing or sc is None:
+                    raise
+                if not fenced and c.execute('select count(*) from fences').fetchone()[0] >= FENCE_LIMIT:
+                    raise                              # too many: stop rather than fence everything
+                c.execute('begin immediate')
+                c.execute('insert or ignore into fences values(?,?,?)', (sc, o['number'], repr(ex)))
+                c.execute('insert into set_aside values(?,?)', (o['number'], sc))
+                if o['kind'] == 'message.created':
+                    c.execute('insert or ignore into aside_msgs values(?,?)', (b['id'], sc))
+                c.execute("update meta set v=? where k='last'", (o['number'],))
+                c.execute("update meta set v=max(v,?) where k='wm'", (o['at'],))
+                c.execute('insert or ignore into applied values(?,?)', (o['number'], clock()))
+                c.execute('commit')
         return 200, {}
 
     def extra(src):

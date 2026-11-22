@@ -30,7 +30,7 @@ Timings are scaled down: a delivery call may take 1 s (proposal: 3 s) and a noti
 
 ## Result
 
-Final run, 2026-11-22, Python 3.12, WSL2, 16 cores. Raw output: `results.txt`, `results.json`. **75 checks, none unexpected**: 65 hold, 10 failed where a failure was expected.
+Final run, 2026-11-22, Python 3.12, WSL2, 16 cores. Raw output: `results.txt`, `results.json`. **96 checks, none unexpected** (75 before the fence scenario was added).
 
 ### What held
 
@@ -47,6 +47,8 @@ Final run, 2026-11-22, Python 3.12, WSL2, 16 cores. Raw output: `results.txt`, `
 | Feed wiped mid-burst | rebuilt while new changes kept arriving, level 1.4 s after the wipe; equal to a clean replay; no notification repeated |
 | Then the sender wiped | tray refilled from the feed's log: 565 entries before, the same 565 after |
 | Then search wiped | 2,439 changes refilled in 1.6 s; equal to the truth |
+| The feed cannot apply one edit and one dial change (faults planted) | only that conversation and that reader are fenced: 51 rows inside, the other 452 rows and all 910 notification notes outside equal a clean replay; 38 of 1,772 changes set aside; after the fault is removed and the feed rebuilt, everything equals a clean replay and no notification repeats |
+| The feed cannot apply any edit | after five fences it stops instead of fencing everything; whole again after the fix and a rebuild |
 
 ### Each check seen to fail
 
@@ -72,6 +74,8 @@ The proposal's wording ("a withdrawal that reaches the sender inside the hold ca
 **2. Timestamps in the log must never go backwards.** This machine's wall clock steps back by about 0.8 s every so often (measured: one step of 0.811 s in 25 s; WSL2 time sync). Before the core forced its stamps to be non-decreasing, 4 of 617 notifications in a healthy run, and 2 of 494 in a kill run, went out wrongly. Receivers compare log stamps only with log stamps, never with their own clock.
 
 **3. A receiver that insists on order needs a way to say where it is, also when idle.** A wiped sender was not noticed while nothing new arrived, until the worker's idle heartbeat was answered with "I am at 0".
+
+**4. A change the feed cannot apply can be contained** (added after the user asked for a smaller blast radius, 2026-11-22). The first design stopped the whole feed. Now the change is set aside and a fence goes up around the one conversation, or the one reader, it touches; later changes inside the fence wait with it; everything outside stays exact (table above). The price, measured: inside a fence nothing new notifies, and one notification that was already due went out although the person had answered within the hold, because the feed could no longer see that. Past five fences the feed stops: that is a broken feed, not one bad change. Repair is fixing the fault and rebuilding the feed from the log.
 
 Not design findings: three false failures came from the harness itself (two threads creating one SQLite file, ports already used by other programs on this machine, a test fault overwritten by the worker) and were fixed in the harness.
 
