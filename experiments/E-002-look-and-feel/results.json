@@ -450,6 +450,20 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "a reaction can be put on any message in the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "clicking your reaction takes it back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "one click on the row opens the conversation at the first new message",
   "pass": true,
   "detail": ""
@@ -955,6 +969,20 @@
   "page": "slack-like",
   "width": "phone",
   "check": "a thread row shows the message that started the thread and the reply before the new ones",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "a reaction can be put on any message in the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "clicking your reaction takes it back",
   "pass": true,
   "detail": ""
  },
@@ -1472,6 +1500,20 @@
  {
   "page": "telegram-like",
   "width": "desktop",
+  "check": "a reaction can be put on any message in the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
+  "check": "clicking your reaction takes it back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "desktop",
   "check": "one click on the row opens the conversation at the first new message",
   "pass": true,
   "detail": ""
@@ -1983,6 +2025,20 @@
  {
   "page": "telegram-like",
   "width": "phone",
+  "check": "a reaction can be put on any message in the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "clicking your reaction takes it back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
   "check": "one click on the row opens the conversation at the first new message",
   "pass": true,
   "detail": ""
@@ -2494,6 +2550,20 @@
  {
   "page": "own",
   "width": "desktop",
+  "check": "a reaction can be put on any message in the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
+  "check": "clicking your reaction takes it back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "desktop",
   "check": "one click on the row opens the conversation at the first new message",
   "pass": true,
   "detail": ""
@@ -2999,6 +3069,20 @@
   "page": "own",
   "width": "phone",
   "check": "a thread row shows the message that started the thread and the reply before the new ones",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "a reaction can be put on any message in the row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "clicking your reaction takes it back",
   "pass": true,
   "detail": ""
  },

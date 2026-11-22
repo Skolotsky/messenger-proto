@@ -272,6 +272,18 @@ h1,h2,h3,p{margin:0}
 .row-btns button:hover{background:var(--accent-soft);color:var(--accent)}
 @media (hover:hover) and (min-width:761px){.row-btns{opacity:0;transition:opacity .12s}.row-main:hover .row-btns,.row-btns:focus-within,.row.expanded .row-btns{opacity:1}}
 @media (max-width:760px){.row-btns .mark-read,.row-btns .open-btn{width:38px;height:34px}}
+/* react to any message */
+.msg-self{position:relative}
+.msg-tools{position:absolute;top:2px;right:0;z-index:3;display:flex;gap:0;border:1px solid var(--line);border-radius:8px;background:var(--panel);box-shadow:0 1px 3px rgba(0,0,0,.1);overflow:hidden}
+.msg-tools .rx-btn,.msg-tools .rx-add{width:30px;height:26px;border:0;border-radius:0;background:none;font-size:14px;display:grid;place-items:center;color:var(--muted)}
+.msg-tools .rx-add .ic{width:16px;height:16px}
+.msg-tools button:hover{background:var(--accent-soft)}
+button.rx{cursor:pointer}
+button.rx:hover{border-color:var(--accent)}
+.quick{align-items:center}
+.quick small{font-size:12px;color:var(--muted);margin-right:4px}
+@media (hover:hover) and (min-width:761px){.msg-tools{opacity:0}.msg-self:hover>.msg-tools,.msg-tools:focus-within{opacity:1}.msg-tools .rx-add{display:none}}
+@media (hover:none),(max-width:760px){.msg-tools:not(.open) .rx-btn{display:none}.msg-tools:not(.open){border-color:transparent;background:none;box-shadow:none}}
 
 /* Telegram-like: one list, round avatars, big targets, folders for buckets, bubbles. Own colours. */
 :root{--accent:#6a4fd0;--accent-soft:#ebe6fb;--r:14px;--wall:#eeebe4}
@@ -377,6 +389,7 @@ const IC = {
   feed: '<path d="M4 6h16M4 12h16M4 18h10"/>', clock: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
   chat: '<path d="M4 5h16v11H9l-5 4z"/>', home: '<path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/>',
   check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  smile: '<circle cx="11" cy="13" r="7"/><path d="M8.5 14.5a3 3 0 0 0 5 0M9 11h.01M13 11h.01M19 3v4M17 5h4"/>',
   open: '<path d="M14 5h5v5"/><path d="M19 5l-8 8"/><path d="M10 6H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3"/>',
   rules: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>'
 };
@@ -556,9 +569,11 @@ const RCOUNT = { tomas: 7, anna: 19, marco: 11, lena: 8, priya: 9, sam: 6, jonas
 const CVOL = { engineering: 64, incidents: 23, launch: 41, support: 88, sales: 27, general: 52, product: 33, design: 29, marketing: 21, data: 12, releases: 18, research: 9 };
 
 /* ---------- pieces ---------- */
+const EMO = ['👍', '✅', '👀', '🎉'];
+function toggleRx(m, e) { const x = m.rx.find(y => y[0] === e); if (x) { if (x[1].includes(ME)) { x[1] = x[1].filter(y => y !== ME); if (!x[1].length) m.rx = m.rx.filter(y => y !== x); } else x[1].push(ME); } else m.rx.push([e, [ME]]); }
 function rxHTML(m) {
   if (!m.rx.length) return '';
-  return '<div class="rxs">' + m.rx.map(([e, who]) => `<span class="rx${who.includes(ME) ? ' on' : ''}">${e} <i>${who.length > 2 ? who.length : who.map(w => w === ME ? 'You' : first(w)).join(', ')}</i></span>`).join('') + '</div>';
+  return '<div class="rxs">' + m.rx.map(([e, who]) => `<button class="rx${who.includes(ME) ? ' on' : ''}" data-act="reactMsg" data-m="${m.id}" data-e="${e}" title="${who.includes(ME) ? 'Remove your reaction' : 'React with ' + e}">${e} <i>${who.length > 2 ? who.length : who.map(w => w === ME ? 'You' : first(w)).join(', ')}</i></button>`).join('') + '</div>';
 }
 function msgHTML(id, ctx) {
   const m = S.msgs[id], k = ctx + ':' + id, L = S.lock[k] || {};
@@ -571,7 +586,8 @@ function msgHTML(id, ctx) {
   const locked = m.edited && L.body && !S.open.has(k);
   const tags = (isAgent(m.by) ? '<span class="tag ag">agent</span>' : '') + (m.flag ? '<span class="tag flag">⚑ Flag</span>' : '') + (m.info ? '<span class="tag info">Info</span>' : '');
   const ed = m.edited ? `<span class="edited">edited</span>` + (locked ? `<button class="link" data-act="openMsg" data-k="${k}">Show all</button>` : '') : '';
-  return `<div class="msg${m.by === ME ? ' mine' : ''}${m.flag ? ' is-flag' : ''}${m.info ? ' is-info' : ''}" data-k="${k}"><div class="msg-self">${av(m.by)}<div class="msg-main"><div class="msg-head"><b>${pn(m.by)}</b>${tags}<time>${m.t}</time>${ed}</div><div class="msg-body${locked ? ' locked' : ''}"${locked ? ` style="max-height:${L.body}px"` : ''}>${rich(m.text)}</div>${rxHTML(m)}${m.status ? `<div class="status"><span class="st-dot"></span>${m.status}</div>` : ''}</div></div>${rep}</div>`;
+  const tools = `<span class="msg-tools${S.rxFor === k ? ' open' : ''}"><button class="rx-add" data-act="rxFor" data-rk="${k}" aria-label="Add a reaction" title="Add a reaction">${ic('smile')}</button>${EMO.map(e => `<button class="rx-btn" data-act="reactMsg" data-m="${id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}</span>`;
+  return `<div class="msg${m.by === ME ? ' mine' : ''}${m.flag ? ' is-flag' : ''}${m.info ? ' is-info' : ''}" data-k="${k}"><div class="msg-self">${tools}${av(m.by)}<div class="msg-main"><div class="msg-head"><b>${pn(m.by)}</b>${tags}<time>${m.t}</time>${ed}</div><div class="msg-body${locked ? ' locked' : ''}"${locked ? ` style="max-height:${L.body}px"` : ''}>${rich(m.text)}</div>${rxHTML(m)}${m.status ? `<div class="status"><span class="st-dot"></span>${m.status}</div>` : ''}</div></div>${rep}</div>`;
 }
 function dialCtl(c, ctx) {
   const key = 'dial:' + c.id + ':' + ctx, open = S.menu === key;
@@ -642,7 +658,7 @@ function rowHTML(r) {
     const mine = r.replies.map(i => msgHTML(i, 'exp')).join('');
     const kd = r.kept && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : r.done ? '' : `<button class="btn sm" data-act="keep" data-id="${r.id}">Keep</button>`;
     x = `<div class="row-exp">${WHY === 'b' ? `<div class="why-inline">${whyBody(r)}</div>` : `<p class="why"><b>Why it is here.</b> ${esc(r.why)}</p>`}${ctxFor(r)}${ctxFor(r) ? '<div class="newline"><span>New</span></div>' : ''}${r.items.length > CAP && !r.all ? `<div class="more-new"><button class="btn sm" data-act="more" data-id="${r.id}">Show ${r.items.length - CAP} earlier new messages</button></div>` : ''}${(r.all ? r.items : r.items.slice(-CAP)).map(i => msgHTML(i, 'exp')).join('')}${mine}
-      <div class="acts"><span class="quick">${['👍', '✅', '👀', '🎉'].map(e => `<button class="rx-btn" data-act="react" data-id="${r.id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}</span>${kd}<button class="btn sm" data-act="openConv" data-c="${r.conv}" data-id="${r.id}">Open conversation</button>${dialCtl(c, r.id)}<button class="btn sm" data-act="ruleFor" data-c="${r.conv}" data-by="${r.by}">Add to Focus…</button></div>
+      <div class="acts"><span class="quick"><small>React to the latest</small>${EMO.map(e => `<button class="rx-btn" data-act="react" data-id="${r.id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}</span>${kd}<button class="btn sm" data-act="openConv" data-c="${r.conv}" data-id="${r.id}">Open conversation</button>${dialCtl(c, r.id)}<button class="btn sm" data-act="ruleFor" data-c="${r.conv}" data-by="${r.by}">Add to Focus…</button></div>
       <form class="reply" data-form="reply" data-id="${r.id}"><input name="t" autocomplete="off" aria-label="Reply" placeholder="Reply ${c.kind === 'dm' ? 'to ' + first(c.with) : 'in ' + where}…"><button class="btn pri">Send</button></form></div>`;
   }
   return `<article class="row b-${r.bucket} ${r.read ? 'read' : 'unread'}${exp ? ' expanded' : ''}${r.sec === 'kept' ? ' kept' : ''}${r.done ? ' done' : ''}" data-row="${r.id}">
@@ -811,7 +827,9 @@ const A = {
   read(d) { row(d.id).read = true; },
   keep(d) { const r = row(d.id); r.kept = r.kept || 'you'; r.read = true; r.keptNow = true; },
   done(d) { const r = row(d.id); r.done = true; r.read = true; },
-  react(d) { const r = row(d.id), m = S.msgs[r.items[r.items.length - 1]]; const e = m.rx.find(x => x[0] === d.e); if (e) { if (e[1].includes(ME)) { e[1] = e[1].filter(x => x !== ME); if (!e[1].length) m.rx = m.rx.filter(x => x !== e); } else e[1].push(ME); } else m.rx.push([d.e, [ME]]); act(r); },
+  react(d) { const r = row(d.id); toggleRx(S.msgs[r.items[r.items.length - 1]], d.e); act(r); },
+  reactMsg(d) { toggleRx(S.msgs[d.m], d.e); S.rxFor = null; S.rows.forEach(r => { if (r.items.includes(d.m)) act(r); }); },
+  rxFor(d) { S.rxFor = S.rxFor === d.rk ? null : d.rk; },
   markAll(d) { S.rows.forEach(r => { if (r.bucket === d.b && r.sec !== 'kept') r.read = true; }); },
   view(d) { if (S.view === 'feed' && d.v !== 'feed') settle(); S.view = d.v; S.menu = null; },
   btab(d) { S.btab = d.b; if (d.b === 'fyi') S.fyiSeen = true; },

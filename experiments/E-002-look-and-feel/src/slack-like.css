@@ -36,3 +36,8 @@
 .sk .tabs{padding:0 8px;gap:0}
 .sk .tab{padding:9px 7px;gap:4px}
 .sk .tabs-sep{padding:0 4px 0 8px;margin-left:4px;font-size:10px}
+/* hover on a message: the highlight has room around the avatar and text */
+.sk .msg-self{padding:6px 8px;margin:0 -8px;border-radius:6px}
+.sk .msg.is-flag>.msg-self{padding-left:10px}
+.sk .msg.deleted>.msg-self{padding-left:54px}
+.sk .msg-tools{right:6px;top:4px}
