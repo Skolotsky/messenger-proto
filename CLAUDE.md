@@ -18,7 +18,8 @@ The user steers product and technical direction and reviews **qualities** and **
 7. **Show it.** Anything with structure (a flow, a boundary, a trade-off, a sequence, a screen) gets an HTML visual (the `visual` skill) instead of paragraphs.
 8. **Don't overload.** Lead with the conclusion and what needs their attention. Detail stays in the repo until they ask. Write the least documentation that lets the next session or the user pick up the thread, and update a file before adding one.
 9. **Report faithfully.** Say what was verified and how, what was not, what was skipped. "Done" means verified.
-10. **Calibrate.** When the user corrects how we work, change this file or the relevant skill in the same turn. When something goes wrong, fix its cause in the setup (an instruction, a skill, a check), not only the result.
+10. **Cheap models for simple work.** Hand bounded, mechanical lookups (fetching and reading web pages, data retrieval, reading logs, searching files, condensing long output) to the `scout` agent, which runs on `haiku`; two to four in parallel where the parts are independent. The brief states the scope, the constraints that matter (a subagent may not see these rules) and the evidence wanted back. Keep splitting the work, analysis, judgement, verification and anything the user will read on the main model. Treat a scout's report as evidence: spot-check it, and redo on the main model what it could not settle. Skip delegation when the material is already in context; regathering it costs more than it saves (user's instruction, 2026-11-22; practice in `docs/research/R-003-cheap-model-delegation.md`).
+11. **Calibrate.** When the user corrects how we work, change this file or the relevant skill in the same turn. When something goes wrong, fix its cause in the setup (an instruction, a skill, a check), not only the result.
 
 ## The flow
 
