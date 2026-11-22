@@ -159,99 +159,115 @@ details > .stack { gap: 10px; }
 <body>
 <main class="page">
 <header class="top">
-  <div class="label">Decision brief · D-001 · 2026-11-22</div>
-  <h1>Which bet does the early access programme test?</h1>
-  <p class="lede">For small startup teams with mixed roles who use AI heavily. One bet sets the scope of everything else.</p>
+  <div class="label">Decision brief · D-001 · 2026-11-22 · revised</div>
+  <h1>The feed sorts what deserves your attention into three buckets</h1>
+  <p class="lede">For small startup teams with mixed roles who use AI heavily. The top bucket is yours to shape; the other two follow fixed rules that every item explains.</p>
 </header>
 
 <div class="ask">
   <div class="label">Needs you</div>
-  <p><strong>Pick the product hypothesis.</strong> I recommend A: the feed is the short list of what is waiting on you, because it is where existing products leave a real gap and it stays inside the brief.</p>
+  <p><strong>Do these starting rules look right?</strong> One difference from your proposal: I start direct mentions in Needs you, not Focus, because with them in Focus the middle bucket is left almost empty. “Any direct mention” stays one click away.</p>
 </div>
 
 <section>
-  <h2>The three bets</h2>
-  <div class="options">
-    <div class="option pick">
-      <header><h3>A. The short list of what is waiting on you</h3><span class="chip ok">Recommended</span></header>
-      <p>When agents write as much as people, attention is the scarce thing. The feed separates “needs you” from “for your information” by plain, visible rules, and keeps agent chatter out.</p>
-      <dl>
-        <dt>Borrowed</dt><dd>Slack's item types and thread rules.</dd>
-        <dt>Changed</dt><dd>Two tiers; “an agent is waiting on you” as its own item; in-progress agent output stays silent.</dd>
-        <dt>Upside</dt><dd>Answers what deserves attention and what does not. Measurable in early use.</dd>
-        <dt>Risk</dt><dd>A wrong rule demotes something important and trust goes. We demote, never hide, and show why each item is there.</dd>
-        <dt>Signal</dt><dd>People clear the feed daily; “needs you” items get acted on far more than the rest.</dd>
-        <dt>Undo</dt><dd>Cheap now, moderate once built.</dd>
-      </dl>
-    </div>
-    <div class="option">
-      <header><h3>B. People and agents as teammates</h3></header>
-      <p>One place where agents are given work, report progress, hand off and ask for approval. The feed is the view of that work.</p>
-      <dl>
-        <dt>Upside</dt><dd>Most novel, strongest AI story.</dd>
-        <dt>Risk</dt><dd>The result depends on how good the agents are, not on our product. Pulls effort from messaging, the feed and reliable delivery.</dd>
-        <dt>Signal</dt><dd>Teams route real work through agents here.</dd>
-        <dt>Undo</dt><dd>Expensive: it shapes the whole product.</dd>
-      </dl>
-    </div>
-    <div class="option">
-      <header><h3>C. A Slack-style feed, done carefully</h3></header>
-      <p>No new bet. Copy Slack's model and spend the effort on it being correct and never stale under edits, deletes and outages.</p>
-      <dl>
-        <dt>Upside</dt><dd>Smallest scope, most time for reliability.</dd>
-        <dt>Risk</dt><dd>Early access teaches us nothing, and a team has no reason to switch.</dd>
-        <dt>Signal</dt><dd>None specific.</dd>
-        <dt>Undo</dt><dd>Cheap.</dd>
-      </dl>
-    </div>
-  </div>
-</section>
-
-<section>
-  <h2>What A looks like for one person</h2>
-  <p>The same morning in a busy team, sorted by rule. Left needs an action from this person; right is worth knowing and can be cleared in one go.</p>
+  <h2>What lands where on day one</h2>
+  <p>An item lives in exactly one bucket. Focus wins, then Needs you. Each item says why it is there. The examples are from a seeded team.</p>
   <div class="split">
     <div class="panel you">
-      <div class="label">Needs you</div>
+      <div class="label">Focus · your rules</div>
+      <p class="note">Two starting rules, both removable. Add more in one click from any person, channel, thread or message.</p>
       <ul>
-        <li><strong>Release agent is waiting on you:</strong> approve the rollback plan for checkout.</li>
-        <li><strong>Maya mentioned you</strong> in #launch: “can you confirm pricing copy by noon?”</li>
-        <li><strong>Jon replied</strong> in your thread about the onboarding drop-off.</li>
+        <li><strong>Direct messages from people.</strong><br>“Anna: can you look at the pricing page before 3?”<br><span class="chip you">Direct message from Anna</span></li>
+        <li><strong>Anything marked as needing you,</strong> by a person or an agent.<br>“Release agent: staging is ready. Approve the deploy to production?”<br><span class="chip you">Marked as needing you</span></li>
       </ul>
     </div>
     <div class="panel">
-      <div class="label">For your information</div>
+      <div class="label">Needs you · fixed rules</div>
+      <p class="note">Directed at you, but nobody said it is urgent.</p>
       <ul>
-        <li>Maya, Jon and 3 others reacted to your launch note.</li>
-        <li>#launch was mentioned as a whole channel: stand-up moved to 10:30.</li>
-        <li>Research agent finished the competitor summary you follow.</li>
+        <li><strong>Direct mentions of you.</strong><br>“@you does this copy work for the launch email?”<br><span class="chip">Mentioned you in #launch</span></li>
+        <li><strong>Replies in threads you started or replied in.</strong><br>“Marco replied: the numbers are from last week.”<br><span class="chip">Reply in your thread</span></li>
       </ul>
     </div>
     <div class="panel">
-      <div class="label">Never reaches the feed</div>
+      <div class="label">For your information · fixed rules</div>
+      <p class="note">About you or your work. Nobody is waiting.</p>
       <ul>
-        <li>An agent's half-written reply while it is still working.</li>
-        <li>Agents answering other agents.</li>
-        <li>A mention that was edited away before you saw it.</li>
+        <li><strong>Reactions to your messages,</strong> grouped.<br>“Priya, Marco and 3 others reacted to your update.”</li>
+        <li><strong>Mentions of a whole channel or group.</strong></li>
+        <li><strong>Activity in threads you only follow.</strong></li>
       </ul>
     </div>
   </div>
-  <p class="note">Illustration of the idea only. The exact rules are the next decisions (D-003, D-004).</p>
+  <p class="note"><strong>Never in the feed:</strong> an agent's in-progress output, and ordinary channel traffic you were not addressed in.</p>
 </section>
 
 <section>
-  <h2>What I would take from the other two</h2>
-  <ul>
-    <li><strong>From C:</strong> after an edit or delete the feed always shows the current truth. We hold this as a quality whichever bet wins.</li>
-    <li><strong>From B:</strong> only the “agent is waiting on you” item, with agents as scripted participants in the seeded team.</li>
-  </ul>
+  <h2>How an item finds its bucket</h2>
+  <ol class="steps">
+    <li><div class="body"><h3>It appears at once, placed by exact rules</h3><p>First match wins: one of your Focus rules, then the fixed Needs you rules, then For your information. This step involves no model and no waiting.</p></div></li>
+    <li><div class="body"><h3>Later, a text rule may move it up</h3><p>If you wrote a rule in plain words (“anything about pricing or contracts”), a language model reads the item afterwards. It can only promote an item into Focus, never hide or lower one. If the model is slow or down, the item simply stays where step one put it.</p><p><span class="chip">Built last, after an experiment</span></p></div></li>
+    <li><div class="body"><h3>It changes without jumping</h3><p>An edit or a delete never changes the size or position of what is on screen. A longer edit sits behind an expander, a deleted message leaves a marker in its place, and emptied space gets an illustration, not a gap.</p></div></li>
+  </ol>
 </section>
+
+<section>
+  <h2>“This needs you”: the mark, and what agents do with it</h2>
+  <p>A sender can mark a message as needing a response from a named person. The mark stays open until that person responds or the sender withdraws it.</p>
+  <div class="split">
+    <div class="panel">
+      <div class="label">Agents: always</div>
+      <p>An agent working on a task sometimes has to stop for a human: an approval, a choice between two options, a missing detail. Whenever it stops, it marks the message for the person it is waiting on. Everything else it writes is unmarked, and its in-progress output never reaches the feed.</p>
+    </div>
+    <div class="panel">
+      <div class="label">People: when they choose</div>
+      <p>A person can mark a message the same way when a mention is not strong enough. Most messages stay unmarked. An AI suggesting the mark is a later idea, outside this scope.</p>
+    </div>
+  </div>
+  <p class="note">In the proof of concept the agents in the seeded team follow a script (post, work, stop and ask) so a demo runs the same way every time. Whether a real model drives them is decision D-002.</p>
+</section>
+
+<section>
+  <h2>Borrowed and changed</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Borrowed</th><th>From</th><th>What we change</th></tr></thead>
+      <tbody>
+        <tr><td>Item types: mentions, thread replies, reactions; who is notified of a reply</td><td>Slack</td><td>Sorted into buckets by purpose instead of filtered by type</td></tr>
+        <tr><td>A personal priority view</td><td>Slack VIP filter, Linear Priority, Gmail priority inbox</td><td>The rules are visible, yours, one click to add, and show their effect before saving</td></tr>
+        <tr><td>An agent's “waiting” status</td><td>Slack</td><td>It becomes a feed item, and people can use the same mark</td></tr>
+        <tr><td>In-progress agent output notifies nobody</td><td>Teams</td><td>Kept as is</td></tr>
+        <tr><td>Smart filtering by a model</td><td>Nobody in the feed itself yet</td><td>Promote-only, after the item is shown, with the matching rule named</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<details>
+  <summary>Risks, and how we would notice</summary>
+  <div class="stack">
+    <ul>
+      <li><strong>A rule puts something important too low.</strong> We lower, never hide, and each item shows its reason.</li>
+      <li><strong>A broad rule floods Focus</strong> (“everything in #launch”). The product shows how many items the rule would have pulled in before you save it.</li>
+      <li><strong>The mark is overused,</strong> like the high-importance flag in email. It names one person, closes when they respond, and the starting rule can be removed.</li>
+      <li><strong>A text rule gets it wrong in the top bucket,</strong> where a mistake costs the most trust. Promote-only, the rule is named on the item, and an experiment comes before the build.</li>
+    </ul>
+    <p><strong>What early access should show:</strong> people clear the feed daily; how many add a Focus rule; how many start from Focus; items in higher buckets get acted on clearly more often.</p>
+  </div>
+</details>
+
+<details>
+  <summary>The options that were set aside</summary>
+  <div class="stack">
+    <p><strong>B. People and agents as teammates.</strong> The strongest AI story, but the result depends on how good the agents are, and it pulls effort from messaging, the feed and reliable delivery.</p>
+    <p><strong>C. A Slack-style feed, done carefully.</strong> The smallest scope, but early access would teach us nothing.</p>
+  </div>
+</details>
 
 <footer class="foot">
   <span>Belongs to D-001 · Evidence: R-002</span>
   <span>Full reasoning: <code>docs/decisions/D-001-product-hypothesis.md</code></span>
 </footer>
-
 </main>
 </body>
 </html>

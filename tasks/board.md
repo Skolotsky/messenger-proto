@@ -2,7 +2,7 @@
 
 Work in flight. Order inside a section is priority. Finished work moves to `done.md`. Rules: CLAUDE.md, section "Tasks".
 
-**Where we are:** Research is done (R-002). Audience set by the user: small to mid-size startup teams, mixed roles, heavy AI use; the PoC exists to launch an early access programme. D-001 (the product hypothesis) is proposed and waiting on the user. Order set by the user: product decisions first (D-001 to D-004, D-009); technical ones (D-005 to D-008) are not opened until the product scope is final and the experiments are agreed.
+**Where we are:** Research is done (R-002). Audience set by the user: small to mid-size startup teams, mixed roles, heavy AI use; the PoC exists to launch a closed early access programme. D-001 (the product hypothesis) is proposed: option A with a third bucket, Focus, added by the user; only the starting rules are still to confirm. Order set by the user: product decisions first (D-001 to D-004, D-009); technical ones (D-005 to D-008) wait until the product scope is final and the experiments are agreed. Text rules judged by a model are in scope but built last, after an experiment.
 
 ## Now
 
@@ -10,7 +10,7 @@ _Nothing in progress._
 
 ## Waiting on user
 
-- **T-007** `decide` D-001: pick the product hypothesis. Recommended: A, the feed is the short list of what is waiting on you. Brief: `docs/visuals/D-001-product-hypothesis.html`
+- **T-007** `decide` D-001: confirm the starting rules of the three buckets (open point: direct mentions start in Needs you, not Focus), then accept. Brief: `docs/visuals/D-001-product-hypothesis.html`
 
 ## Next
 
