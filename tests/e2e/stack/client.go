@@ -308,6 +308,9 @@ type Screen struct {
 	messages map[string]ScreenMessage
 	received map[int64]time.Time
 	resumes  atomic.Int64
+	frames   [][]byte
+	feedAt   *int64
+	edition  *int64
 
 	cancel context.CancelFunc
 	done   chan struct{}
@@ -327,9 +330,10 @@ func (o *Org) OpenScreen(person string) *Screen {
 		Number int64 `json:"number"`
 	}
 	o.S.MustGet(o.Address("/people/"+person+"/start"), &start)
+	feed := o.FeedFor(person)
 	ctx, cancel := context.WithCancel(context.Background())
 	sc := &Screen{org: o, person: person, last: start.Number, messages: map[string]ScreenMessage{},
-		received: map[int64]time.Time{}, cancel: cancel, done: make(chan struct{})}
+		received: map[int64]time.Time{}, cancel: cancel, done: make(chan struct{}), feedAt: feed.Number, edition: feed.Edition}
 	first := make(chan error, 1)
 	go sc.run(ctx, first)
 	select {
@@ -378,10 +382,10 @@ func (sc *Screen) run(ctx context.Context, first chan<- error) {
 
 func (sc *Screen) resume(ctx context.Context, ws *websocket.Conn) error {
 	sc.mu.Lock()
-	n := sc.last
+	n, feedAt, edition := sc.last, sc.feedAt, sc.edition
 	sc.mu.Unlock()
 	sc.resumes.Add(1)
-	b, _ := json.Marshal(map[string]any{"resume": map[string]any{"conversations": n, "feed": nil, "feed_edition": nil}})
+	b, _ := json.Marshal(map[string]any{"resume": map[string]any{"conversations": n, "feed": feedAt, "feed_edition": edition}})
 	return ws.Write(ctx, websocket.MessageText, b)
 }
 
@@ -416,6 +420,13 @@ func (sc *Screen) follow(ctx context.Context, ws *websocket.Conn, first chan<- e
 		if json.Unmarshal(raw, &u) != nil {
 			continue
 		}
+		sc.mu.Lock()
+		sc.frames = append(sc.frames, raw)
+		if u.Stream == "feed" && (sc.feedAt == nil || u.Number > *sc.feedAt) {
+			n := u.Number
+			sc.feedAt = &n
+		}
+		sc.mu.Unlock()
 		if u.LastSent != nil {
 			sc.mu.Lock()
 			behind := u.LastSent.Conversations > sc.last
@@ -494,39 +505,74 @@ func (sc *Screen) Messages() map[string]ScreenMessage {
 	return out
 }
 
+// Saw says whether anything that reached this screen holds the text.
+func (sc *Screen) Saw(text string) bool {
+	sc.mu.Lock()
+	defer sc.mu.Unlock()
+	for _, f := range sc.frames {
+		if bytes.Contains(f, []byte(text)) {
+			return true
+		}
+	}
+	return false
+}
+
 // Resumes counts how many times the screen asked to resume.
 func (sc *Screen) Resumes() int64 { return sc.resumes.Load() }
 
-// FreshMessages loads a channel from the door, every page, as a new screen would.
+// FreshMessages loads a channel and its threads from the door, every page, as a
+// new screen would.
 func (o *Org) FreshMessages(person, conversation string) map[string]ScreenMessage {
 	o.S.T.Helper()
 	out := map[string]ScreenMessage{}
+	for _, root := range o.freshPage(person, conversation, "", out) {
+		o.freshPage(person, conversation, root, out)
+	}
+	return out
+}
+
+// freshPage loads one channel or thread into out and answers the messages with replies.
+func (o *Org) freshPage(person, conversation, thread string, out map[string]ScreenMessage) []string {
+	o.S.T.Helper()
+	var roots []string
 	var before *int64
 	for {
 		q := url.Values{"as": {person}, "limit": {"100"}}
+		if thread != "" {
+			q.Set("thread", thread)
+		}
 		if before != nil {
 			q.Set("before", fmt.Sprint(*before))
 		}
 		var a struct {
 			Messages []struct {
-				ID      string `json:"id"`
-				Number  int64  `json:"number"`
-				Version int64  `json:"version"`
-				Text    string `json:"text"`
-				Deleted bool   `json:"deleted"`
+				Message struct {
+					ID      string `json:"id"`
+					Number  int64  `json:"number"`
+					Version int64  `json:"version"`
+					Text    string `json:"text"`
+					Deleted bool   `json:"deleted"`
+				} `json:"message"`
+				ThreadSummary *struct {
+					Replies int64 `json:"replies"`
+				} `json:"thread_summary"`
 			} `json:"messages"`
 			HasBefore bool `json:"has_before"`
 		}
 		o.S.MustGet(o.Address("/conversations/"+url.PathEscape(conversation)+"/messages?"+q.Encode()), &a)
-		for _, m := range a.Messages {
+		oldest := int64(0)
+		for _, v := range a.Messages {
+			m := v.Message
 			out[m.ID] = ScreenMessage{Version: m.Version, Text: m.Text, Deleted: m.Deleted}
+			if oldest == 0 || m.Number < oldest {
+				oldest = m.Number
+			}
+			if v.ThreadSummary != nil && v.ThreadSummary.Replies > 0 {
+				roots = append(roots, m.ID)
+			}
 		}
 		if !a.HasBefore || len(a.Messages) == 0 {
-			return out
-		}
-		oldest := a.Messages[0].Number
-		for _, m := range a.Messages {
-			oldest = min(oldest, m.Number)
+			return roots
 		}
 		before = &oldest
 	}

@@ -394,6 +394,9 @@ func (s *Stack) requireFeedContract() {
 	}
 }
 
+// LoginURL is the database address of one part's own login.
+func (s *Stack) LoginURL(part string) string { return login(part, s.DB) }
+
 func (s *Stack) all() []*Proc {
 	out := append([]*Proc{}, s.Conversations...)
 	out = append(out, s.Deliveries...)
