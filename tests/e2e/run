@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Runs the Milestone 1 tests (T-057) against the real programs, each started by the
+# test itself, on a private PostgreSQL that is removed afterwards.
+#
+#   tests/e2e/run real   [go test arguments]    the real feed (needs T-052)
+#   tests/e2e/run standin [go test arguments]   the stand-in feed in tests/e2e/standinfeed
+#
+# Without arguments after the feed it runs the spine, G-013, G-025 and G-027.
+set -euo pipefail
+root="$(cd "$(dirname "$0")/../.." && pwd)"
+feed="${1:-real}"; shift || true
+case "$feed" in real|standin) ;; *) echo "usage: tests/e2e/run real|standin [go test arguments]" >&2; exit 2 ;; esac
+[ $# -gt 0 ] || set -- -timeout 20m ./e2e/... ./harness/router/ ./guardrails/freshness/ ./guardrails/orgs-apart/ ./guardrails/two-copies/
+
+id="contexia-t057-$$"
+cleanup() { docker rm -f "$id-pg" >/dev/null 2>&1 || true; docker network rm "$id" >/dev/null 2>&1 || true; }
+trap cleanup EXIT
+docker network create "$id" >/dev/null
+docker run -d --name "$id-pg" --network "$id" --network-alias postgres \
+  -e POSTGRES_USER=contexia_admin -e POSTGRES_PASSWORD=admin_dev -e POSTGRES_DB=contexia \
+  -v "$root/deploy/postgres:/docker-entrypoint-initdb.d:ro" --tmpfs /var/lib/postgresql/data \
+  postgres:17-alpine -c max_connections=300 >/dev/null
+for _ in $(seq 1 60); do
+  # The init scripts run on a temporary server first, so ask over the network address.
+  if docker exec "$id-pg" pg_isready -q -h postgres -U contexia_admin -d contexia 2>/dev/null; then break; fi
+  sleep 0.5
+done
+docker exec "$id-pg" pg_isready -q -h postgres -U contexia_admin -d contexia
+
+CONTEXIA_TOOL_NETWORK="$id" \
+CONTEXIA_TOOL_ENV="CONTEXIA_PG_HOST=postgres CONTEXIA_E2E_FEED=$feed" \
+TOOL_DIR=tests "$root/scripts/tool" go test -count=1 -p 1 "$@"
