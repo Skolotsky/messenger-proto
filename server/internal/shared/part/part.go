@@ -29,13 +29,25 @@ func Handler(name string) http.Handler {
 	return mux
 }
 
-// Run serves the part until the process is told to stop.
-func Run(name string) {
+// Run serves a part that has only its "alive" answer.
+func Run(name string) { Serve(name, nil) }
+
+// Serve runs the part until the process is told to stop. Addresses in routes
+// are served beside /alive.
+func Serve(name string, routes http.Handler) {
 	addr := os.Getenv("CONTEXIA_LISTEN")
 	if addr == "" {
 		addr = ":8080"
 	}
-	srv := &http.Server{Addr: addr, Handler: Handler(name), ReadHeaderTimeout: 3 * time.Second}
+	handler := Handler(name)
+	if routes != nil {
+		mux := http.NewServeMux()
+		mux.Handle("/alive", handler)
+		mux.Handle("/test/", handler)
+		mux.Handle("/", routes)
+		handler = mux
+	}
+	srv := &http.Server{Addr: addr, Handler: handler, ReadHeaderTimeout: 3 * time.Second}
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 	go func() {

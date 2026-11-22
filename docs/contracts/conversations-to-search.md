@@ -20,9 +20,9 @@ POST /changes
                "level": null } }
 { "org": "acme", "number": 4855, "kind": "message.deleted", "message": { "id": "msg_7Q2", "version": 3 } }
 
-Every answer carries the index's `wipe` number for this organization. A changed number sends the worker back to the start (D-032).
+Every answer except a stale-reset one carries the index's `wipe` number for this organization. A changed number sends the worker back to the start (D-032).
 
-answers: 200 applied · 200 already had it · 422 I refuse this one · anything else, or 3 s of silence: down (for every organization)
+answers: 200 applied · 200 already had it · 409 { "stale_reset": 3 } · 422 I refuse this one · anything else, or 3 s of silence: down (for every organization)
 ```
 
 ## 3. Guarantees

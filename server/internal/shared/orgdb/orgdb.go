@@ -5,7 +5,9 @@ package orgdb
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"os"
 
 	"contexia/internal/shared/ids"
 
@@ -28,6 +30,19 @@ type Single struct{ Pool *pgxpool.Pool }
 
 // PoolFor returns the only database.
 func (s Single) PoolFor(context.Context, ids.Org) (*pgxpool.Pool, error) { return s.Pool, nil }
+
+// Open connects with the login in CONTEXIA_DATABASE_URL.
+func Open(ctx context.Context) (Single, error) {
+	url := os.Getenv("CONTEXIA_DATABASE_URL")
+	if url == "" {
+		return Single{}, errors.New("CONTEXIA_DATABASE_URL is not set")
+	}
+	pool, err := pgxpool.New(ctx, url)
+	if err != nil {
+		return Single{}, fmt.Errorf("connect: %w", err)
+	}
+	return Single{Pool: pool}, nil
+}
 
 // InOrg runs fn in a transaction bound to org. The binding is local to the
 // transaction, so it cannot reach the next user of a pooled connection. fn's

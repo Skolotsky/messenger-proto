@@ -13,7 +13,7 @@ Every call is made for one organization (D-026). It is in the address of every c
 All are questions; none changes anything.
 
 ```json
-GET feed/orgs/acme/people/marco/rows                     → { "edition": 7, "through": 4861, "number": 103, "rows": [ { "conversation": "#launch", "thread": null, "bucket": "needs_you", "unread": true, "kept": null, "why": "Anna mentioned you", "newest": 4812 } ], "counts": { "focus": 1, "needs_you": 4, "fyi": true } }
+GET feed/orgs/acme/people/marco/rows                     → { "edition": 7, "through": 4861, "number": 103, "rows": [ { "conversation": "#launch", "thread": "msg_7Q2", "message": "msg_7Q2", "bucket": "needs_you", "unread": true, "kept": null, "why": "Anna mentioned you", "newest": 4812 } ], "counts": { "focus": 1, "needs_you": 4, "fyi": true } }
 GET feed/orgs/acme/people/marco/history?tab=mentions     → entries with an unread mark each, and the tab's unread count
 GET feed/orgs/acme/people/marco/settings                 → Focus people, removed people, each thread's and channel's level as it is in effect
 GET feed/orgs/acme/people/marco/preview?change=…         → what the change would have moved in the last 7 days
@@ -27,6 +27,7 @@ GET search/orgs/acme/query?q=pricing&as=marco&after=…     → { "through": 485
 
 - An answer includes everything up to `through`, except rows under a fence, and possibly later changes (the feed may work on conversations side by side, D-030).
 - A search answer holds only what `as` may see: every channel message, and a direct message only if `as` is one of its participants (D-031). It gives the true total, not the number shown, marks where the text matched, says whether a message was edited, and names the thread of a reply so the screen can open it there (D-024; T-038, points 20 to 22).
+- A history entry names its row as a feed row does, so Keep from a tab acts on that row. The settings answer may include thread levels; the settings screen does not list them (D-023).
 - The feed's row updates are numbered by its own log and carry its edition; after a rebuild the edition changes and the door tells screens to load the feed fresh.
 - The door adds nothing and remembers nothing: what it shows is what the part answered, or a notice.
 - The feed never calls Conversations. The door learns that the feed has news from Conversations' own delivery worker, which nudges the organization's copy when the feed has confirmed a change; the nudge carries no data and may be lost. The door also asks every 5 seconds for each organization it has open screens for. It asks by organization, never per person and never with a call held open, so any copy of the feed can answer, and the cost follows the organizations that have screens open and the changes they have.

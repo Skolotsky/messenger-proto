@@ -13,13 +13,13 @@ Every call is made for one organization (D-026). It is in the address of every c
 ```json
 POST /notes
 { "org": "acme", "number": 1286, "previous": 1285, "edition": 7, "at": "2026-11-22T10:14:03.120Z", "kind": "due",
-  "name": "acme / marco / #launch / 4812", "row": { "conversation": "#launch", "thread": null }, "person": "marco", "bucket": "needs_you",
+  "name": "acme / marco / #launch:msg_7Q2 / 4812", "row": { "conversation": "#launch", "thread": "msg_7Q2" }, "person": "marco", "bucket": "needs_you",
   "why": "Anna mentioned you in #launch", "text": "@Marco can you sign off the pricing page?" }
-{ "org": "acme", "number": 1301, "previous": 1300, "edition": 7, "at": "…", "kind": "changed",   "name": "acme / marco / #launch / 4812", "text": "…new text…" }
-{ "org": "acme", "number": 1317, "previous": 1316, "edition": 7, "at": "…", "kind": "withdrawn", "name": "acme / marco / #launch / 4812", "because": "read" }
+{ "org": "acme", "number": 1301, "previous": 1300, "edition": 7, "at": "…", "kind": "changed",   "name": "acme / marco / #launch:msg_7Q2 / 4812", "text": "…new text…" }
+{ "org": "acme", "number": 1317, "previous": 1316, "edition": 7, "at": "…", "kind": "withdrawn", "name": "acme / marco / #launch:msg_7Q2 / 4812", "because": "read" }
 { "org": "acme", "number": 1318, "previous": 1317, "edition": 7, "at": "…", "kind": "clock" }
 
-answers: 200 taken · 200 already had it · 409 { "i_am_at": 1285 } · 422 I refuse this one · anything else, or 3 s of silence: down (for every organization)
+answers: 200 taken · 200 already had it · 409 { "i_am_at": 1285, "edition": 7 } · 409 { "stale_reset": 3 } · 422 I refuse this one · anything else, or 3 s of silence: down (for every organization)
 ```
 
 A name is the organization, the person, the row and the number of the change that caused it; a thread's row is written `#launch:msg_7Q2`. A row that moves up into Focus while unread gets a second "due" with its own name (D-012). The "Focus only" switch is applied by the feed before it writes "due".

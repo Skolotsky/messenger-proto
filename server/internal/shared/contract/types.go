@@ -954,6 +954,13 @@ type RowActDone struct {
 	Thread       *string `json:"thread"`
 }
 
+// RowActKeep is the contract type of the same name.
+type RowActKeep struct {
+	Kind         string  `json:"kind"`
+	Conversation string  `json:"conversation"`
+	Thread       *string `json:"thread"`
+}
+
 // RowAct is any one of its member types.
 type RowAct struct{ Value any }
 
@@ -983,16 +990,20 @@ func (u *RowAct) UnmarshalJSON(b []byte) error {
 		v, err := decode[RowActDone](b)
 		u.Value = v
 		return err
+	case "keep":
+		v, err := decode[RowActKeep](b)
+		u.Value = v
+		return err
 	}
 	return fmt.Errorf("RowAct: unknown kind %q", k.Kind)
 }
 
 // RowChange is the contract type of the same name.
 type RowChange struct {
-	Label          string  `json:"label"`
-	Do             RowAct  `json:"do"`
-	Undo           *RowAct `json:"undo"`
-	MovedLast7Days *int64  `json:"moved_last_7_days"`
+	Label          string `json:"label"`
+	Do             RowAct `json:"do"`
+	Undo           RowAct `json:"undo"`
+	MovedLast7Days *int64 `json:"moved_last_7_days"`
 }
 
 // RowExplanation is the contract type of the same name.
@@ -1576,6 +1587,7 @@ type RowUpdate struct {
 
 // RowUpdatesPage is the contract type of the same name.
 type RowUpdatesPage struct {
+	Reset   int64       `json:"reset"`
 	Updates []RowUpdate `json:"updates"`
 	Next    *int64      `json:"next"`
 }
@@ -2174,6 +2186,7 @@ var Types = map[string]func([]byte) (any, error){
 	"RowActFocusPerson":           func(b []byte) (any, error) { return decode[RowActFocusPerson](b) },
 	"RowActFocusRule":             func(b []byte) (any, error) { return decode[RowActFocusRule](b) },
 	"RowActDone":                  func(b []byte) (any, error) { return decode[RowActDone](b) },
+	"RowActKeep":                  func(b []byte) (any, error) { return decode[RowActKeep](b) },
 	"RowChange":                   func(b []byte) (any, error) { return decode[RowChange](b) },
 	"RowExplanation":              func(b []byte) (any, error) { return decode[RowExplanation](b) },
 	"FeedRow":                     func(b []byte) (any, error) { return decode[FeedRow](b) },

@@ -35,12 +35,15 @@ Every operation and event of the eight contracts has a schema and a checked exam
 
 - 2026-11-22: Independent review of the schemas: 12 blockers, 12 gaps, 6 minor, all applied. One ruling that follows from accepted decisions rather than a new one: a top-level message addressing you is the row of its own thread (D-001, E-001), and opening its channel reads it because it is shown there, while unseen replies stay unread (D-032). Agent status travels outside the numbering, latest wins, as the agent door already said.
 
+- 2026-11-22: Third review: 7 blockers and 7 minor, all applied (read rule for a thread row, Undo for Done, the row in examples and history, reply positions). The review rounds stop here: remaining doubts are tested by building against the schemas.
+- 2026-11-22: Added for Wave 1 (lead-session shared files): each part applies its own migrations (`shared/migrate`), and the log and delivery tables are fixed in `server/migrations/conversations/001_log.sql` and `feed/001_notes.sql`, so T-046, T-047 and T-052 agree on them. Test: delivery has exactly its rights; row rules hold.
+
 ## Evidence
 
-Schemas (2026-11-22, after the review): 205 types, 181 examples, 54 operations. `./scripts/check` validates every example, refuses each example with a required field removed or an unknown field added, round-trips each through its Go type, and compares the generated TypeScript.
+Schemas (2026-11-22, after three independent reviews): 206 types, 182 examples, 54 operations. `./scripts/check` validates every example, refuses each example with a required field removed or an unknown field added, round-trips each through its Go type, and compares the generated TypeScript.
 
 Seen failing, each planted in a throwaway clone: an example breaking its schema; a bad timestamp; a schema changed without regenerating; a type without an example; a Go type losing a field (`unknown field "connection"`, on the rerun described in the log).
 
 Tools (2026-11-22): the log writer's 3,000 entries each validate against the schema, chain by number and time, use every change kind, repeat byte for byte from a seed, and match across two organizations except for the name. The mock door's answers and live updates validate against the schemas; it was run and called from the host (`./scripts/mock-door`). Log writer and mock door tests passed 25 runs in a row. `./scripts/verify` passes.
 
-Not verified yet: the fixes from the schema review have not been re-checked independently. The mock door sorts rows by a deliberately plain rule, not the product's.
+Not verified: the fixes from the third independent review were applied and pass the automated checks, but no reviewer has read them; real use by the packages and the Milestone 1 verifier are their next test. The mock door sorts rows by a deliberately plain rule, not the product's.

@@ -56,8 +56,7 @@
   "ItemKind": {
    "enum": [
     "flags",
-    "mentions",
-    "direct_messages"
+    "mentions"
    ]
   },
   "Stream": {
@@ -361,6 +360,25 @@
        }
       }
      }
+    },
+    {
+     "if": {
+      "properties": {
+       "stopped": {
+        "const": true
+       }
+      },
+      "required": [
+       "stopped"
+      ]
+     },
+     "then": {
+      "properties": {
+       "mentions": {
+        "maxItems": 0
+       }
+      }
+     }
     }
    ]
   },
@@ -372,7 +390,7 @@
     },
     "version": {
      "type": "integer",
-     "minimum": 1
+     "minimum": 2
     },
     "conversation": {
      "type": "string"
@@ -2734,7 +2752,8 @@
     },
     "at": {
      "type": "integer",
-     "minimum": 0
+     "minimum": 0,
+     "description": "The length of text in Unicode code points: where the next piece starts."
     },
     "text": {
      "type": "string"
@@ -2922,6 +2941,29 @@
    ],
    "additionalProperties": false
   },
+  "RowActKeep": {
+   "type": "object",
+   "properties": {
+    "kind": {
+     "const": "keep"
+    },
+    "conversation": {
+     "type": "string"
+    },
+    "thread": {
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   },
+   "required": [
+    "kind",
+    "conversation",
+    "thread"
+   ],
+   "additionalProperties": false
+  },
   "RowAct": {
    "oneOf": [
     {
@@ -2935,6 +2977,9 @@
     },
     {
      "$ref": "#/$defs/RowActDone"
+    },
+    {
+     "$ref": "#/$defs/RowActKeep"
     }
    ]
   },
@@ -2948,14 +2993,7 @@
      "$ref": "#/$defs/RowAct"
     },
     "undo": {
-     "oneOf": [
-      {
-       "$ref": "#/$defs/RowAct"
-      },
-      {
-       "type": "null"
-      }
-     ]
+     "$ref": "#/$defs/RowAct"
     },
     "moved_last_7_days": {
      "type": [
@@ -3241,7 +3279,8 @@
      "type": [
       "string",
       "null"
-     ]
+     ],
+     "description": "The row's thread, as on FeedRow. message and number open at the message."
     },
     "author": {
      "type": "string"
@@ -3691,7 +3730,8 @@
     },
     "at": {
      "type": "integer",
-     "minimum": 0
+     "minimum": 0,
+     "description": "The length of text in Unicode code points: where the next piece starts."
     },
     "text": {
      "type": "string"
@@ -4411,7 +4451,8 @@
     },
     "at": {
      "type": "integer",
-     "minimum": 0
+     "minimum": 0,
+     "description": "Where this piece starts in the reply, in Unicode code points."
     },
     "text": {
      "type": "string"
@@ -4528,6 +4569,10 @@
   "RowUpdatesPage": {
    "type": "object",
    "properties": {
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "updates": {
      "type": "array",
      "items": {
@@ -4543,6 +4588,7 @@
     }
    },
    "required": [
+    "reset",
     "updates",
     "next"
    ],
@@ -4647,7 +4693,7 @@
     },
     "version": {
      "type": "integer",
-     "minimum": 1
+     "minimum": 2
     }
    },
    "required": [

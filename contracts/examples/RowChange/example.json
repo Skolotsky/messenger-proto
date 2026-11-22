@@ -1,13 +1,19 @@
 {
- "label": "Move Anna into Focus",
+ "label": "Move what Anna sends into Focus",
  "do": {
-  "kind": "focus_person",
-  "about": "anna",
+  "kind": "focus_rule",
+  "rule": {
+   "type": "person",
+   "value": "anna"
+  },
   "on": true
  },
  "undo": {
-  "kind": "focus_person",
-  "about": "anna",
+  "kind": "focus_rule",
+  "rule": {
+   "type": "person",
+   "value": "anna"
+  },
   "on": false
  },
  "moved_last_7_days": 6

@@ -1,14 +1,14 @@
 {
  "message": "msg_7Q2",
  "conversation": "#launch",
- "thread": null,
+ "thread": "msg_7Q2",
  "author": "anna",
  "preview": "@Marco can you sign off the pricing page?",
  "at": "2026-11-22T10:14:03.120Z",
  "number": 4812,
  "unread": true,
- "by": "lena",
- "emoji": "eyes",
+ "by": null,
+ "emoji": null,
  "level": null,
  "kept": null
 }

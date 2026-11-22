@@ -6,13 +6,13 @@
  "previous": 1285,
  "edition": 7,
  "at": "2026-11-22T10:14:03.120Z",
- "name": "acme / marco / #launch / 4812",
+ "name": "acme / marco / #launch:msg_7Q2 / 4812",
  "row": {
   "conversation": "#launch",
-  "thread": "msg_4C1"
+  "thread": "msg_7Q2"
  },
  "person": "marco",
  "bucket": "needs_you",
- "why": "Anna mentioned you",
+ "why": "Anna mentioned you in #launch",
  "text": "@Marco can you sign off the pricing page?"
 }

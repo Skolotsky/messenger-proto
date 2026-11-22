@@ -1,21 +1,21 @@
 {
- "tab": "direct",
+ "tab": "mentions",
  "entries": [
   {
    "message": "msg_7Q2",
    "conversation": "#launch",
-   "thread": "msg_4C1",
+   "thread": "msg_7Q2",
    "author": "anna",
    "preview": "@Marco can you sign off the pricing page?",
    "at": "2026-11-22T10:14:03.120Z",
    "number": 4812,
    "unread": true,
-   "by": "lena",
-   "emoji": "eyes",
-   "level": "needs_you",
-   "kept": "flag"
+   "by": null,
+   "emoji": null,
+   "level": null,
+   "kept": null
   }
  ],
- "unread": 2,
- "next": "cursor_2"
+ "unread": 1,
+ "next": null
 }

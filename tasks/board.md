@@ -6,7 +6,12 @@ Work in flight. Order inside a section is priority. Finished work moves to `done
 
 ## Now
 
-- **T-045** `implement` Contracts in machine form with examples; the log writer, the mock door and the test harness. D-031 and D-032 are applied; the schemas settle the remaining shapes and get an independent check before Wave 1. Detail: `tasks/T-045-contracts-and-tools.md`
+- **T-046** `implement` Wave 1 · Conversations: saving and the log (G-003, G-004, G-005). Needs T-045
+- **T-047** `implement` Wave 1 · Delivery workers (G-012, G-014, G-023, G-026, G-029). Needs T-045
+- **T-048** `implement` Wave 1 · Search and notification stand-ins (G-006, G-010, G-011). Needs T-045
+- **T-049** `implement` Wave 1 · The feed's rules as a pure package (G-030; T-038 points 1 to 19). Needs T-045
+- **T-050** `implement` Wave 1 · Web app: the frame, the look, a conversation, against the mock door. Needs T-045
+- **T-051** `implement` Wave 1 · The seeded organization as data, with D-010's situations. Needs T-045
 
 
 ## Waiting on user
@@ -16,12 +21,6 @@ Work in flight. Order inside a section is priority. Finished work moves to `done
 
 ## Next
 
-- **T-046** `implement` Wave 1 · Conversations: saving and the log (G-003, G-004, G-005). Needs T-045
-- **T-047** `implement` Wave 1 · Delivery workers (G-012, G-014, G-023, G-026, G-029). Needs T-045
-- **T-048** `implement` Wave 1 · Search and notification stand-ins (G-006, G-010, G-011). Needs T-045
-- **T-049** `implement` Wave 1 · The feed's rules as a pure package (G-030; T-038 points 1 to 19). Needs T-045
-- **T-050** `implement` Wave 1 · Web app: the frame, the look, a conversation, against the mock door. Needs T-045
-- **T-051** `implement` Wave 1 · The seeded organization as data, with D-010's situations. Needs T-045
 - **T-052** `implement` Wave 2 · The feed as a service (G-007, G-009, G-008). Needs T-049
 - **T-053** `implement` Wave 2 · Conversations: live connection, reading through the door, housekeeping (G-024; server half of G-015, G-019). Needs T-046
 - **T-054** `implement` Wave 2 · Conversations: the agent door (G-016, G-017, G-018). Needs T-046

@@ -149,7 +149,8 @@
   "query": {},
   "request": null,
   "answers": {
-   "ReplyText": 200
+   "ReplyText": 200,
+   "Refusal": 409
   },
   "also": []
  },

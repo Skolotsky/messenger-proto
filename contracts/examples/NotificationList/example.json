@@ -1,13 +1,13 @@
 {
  "notifications": [
   {
-   "name": "launch",
+   "name": "acme / marco / #launch:msg_7Q2 / 4812",
    "person": "marco",
-   "state": "held",
+   "state": "sent",
    "at": "2026-11-22T10:14:03.120Z",
    "delayed": false,
-   "why": "Anna mentioned you",
-   "text": "@Marco can you sign off the pricing page?",
+   "why": "Anna mentioned you in #launch",
+   "text": "@Marco @Lena can you sign off the pricing page?",
    "now": "read"
   }
  ]

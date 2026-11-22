@@ -5,18 +5,16 @@
  "reset": 2,
  "agent_chain": 2,
  "message": {
-  "id": "msg_7Q2",
-  "number": 4812,
+  "id": "msg_8B3",
+  "number": 4870,
   "version": 1,
   "conversation": "#launch",
-  "thread": null,
+  "thread": "msg_7Q2",
   "author": "anna",
   "author_is_agent": false,
   "participants": null,
-  "text": "@Marco can you sign off the pricing page?",
-  "mentions": [
-   "marco"
-  ],
+  "text": "Looks right to me.",
+  "mentions": [],
   "level": "flag",
   "reactions": [
    {

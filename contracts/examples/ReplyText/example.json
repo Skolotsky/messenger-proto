@@ -1,8 +1,8 @@
 {
- "message": "msg_7Q2",
+ "message": "msg_9A1",
  "conversation": "#launch",
- "thread": "msg_4C1",
- "author": "anna",
- "at": 120,
- "text": "@Marco can you sign off the pricing page?"
+ "thread": "msg_7Q2",
+ "author": "release-agent",
+ "at": 12,
+ "text": "Build 2.4.1 "
 }

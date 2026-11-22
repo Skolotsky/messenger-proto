@@ -45,7 +45,7 @@ POST /changes
 
 POST /changes/batch   { "changes": [ …up to 100 of the above, of one organization, in order… ] }      for a backlog
 
-answers: 200 applied · 200 already had it · 200 { "applied": true, "fenced": true } taken and set aside · 409 { "i_am_at": 4811 } · 423 { "organization_stopped": "acme" } · anything else, or 3 s of silence: down (for every organization)
+answers: 200 applied · 200 already had it · 200 { "applied": true, "fenced": true } taken and set aside · 409 { "i_am_at": 4811 } · 409 { "stale_reset": 3 } · 423 { "organization_stopped": "acme" } · anything else, or 3 s of silence: down (for every organization)
 Applying a batch stops at the first change that is not answered 200, and answers with that one.
 ```
 

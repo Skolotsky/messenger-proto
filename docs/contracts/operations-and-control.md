@@ -28,7 +28,7 @@ POST demo/orgs/acme/rebuild              { "receiver": "feed", "rules_changed": 
 POST demo/orgs/acme/reset                                                   restores this organization's saved copies
 
 GET  sender/orgs/acme/notifications?person=marco
-→ { "notifications": [ { "name": "acme / marco / #launch / 4812", "person": "marco", "state": "sent", "at": "…", "delayed": false, "why": "Anna mentioned you in #launch", "text": "…", "now": "read" } ] }
+→ { "notifications": [ { "name": "acme / marco / #launch:msg_7Q2 / 4812", "person": "marco", "state": "sent", "at": "…", "delayed": false, "why": "Anna mentioned you in #launch", "text": "…", "now": "read" } ] }
 
 GET  demo/orgs/acme/script               → { "running": true, "pace": 1, "happened": […], "next": […], "situations": […] }
 POST demo/orgs/acme/script               { "do": "start" }        start · pause · pace · play_situation (with "pace" or "situation")

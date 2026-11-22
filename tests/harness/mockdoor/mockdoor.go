@@ -206,7 +206,7 @@ func (d *Door) rowsFor(person string) map[string]map[string]any {
 		case m["thread"] != nil:
 			continue
 		}
-		if d.reads[key(person, conv, thread)] >= num(m["number"]) {
+		if d.isRead(person, m, thread) {
 			continue
 		}
 		k := key(person, conv, thread)
@@ -226,6 +226,19 @@ func (d *Door) rowsFor(person string) map[string]map[string]any {
 		row["explanation"] = map[string]any{"what": why + ".", "decided_by": "The mock door's plain sorting.", "otherwise": "It would stay in the channel.", "change": nil}
 	}
 	return rows
+}
+
+// isRead applies docs/contracts/README.md: a root counts as read through its
+// channel or its thread, a reply only through its thread.
+func (d *Door) isRead(person string, m msg, thread any) bool {
+	conv, n := m["conversation"].(string), num(m["number"])
+	if thread == nil {
+		return d.reads[key(person, conv, nil)] >= n
+	}
+	if m["thread"] == nil && d.reads[key(person, conv, nil)] >= n {
+		return true
+	}
+	return d.reads[key(person, conv, thread)] >= n
 }
 
 func sortedRows(rows map[string]map[string]any) []any {
@@ -400,7 +413,8 @@ func (d *Door) start(w http.ResponseWriter, r *http.Request) {
 
 func (d *Door) unread(person, conv string) bool {
 	for _, m := range d.msgs {
-		if m["conversation"] == conv && m["thread"] == nil && m["deleted"] != true && m["author"] != person && num(m["number"]) > d.reads[key(person, conv, nil)] {
+		if m["conversation"] == conv && m["thread"] == nil && m["deleted"] != true && m["author"] != person &&
+			!d.isRead(person, m, nil) && !d.isRead(person, m, m["id"]) {
 			return true
 		}
 	}
@@ -504,11 +518,15 @@ func (d *Door) history(w http.ResponseWriter, r *http.Request) {
 		if !match {
 			continue
 		}
-		isUnread := d.reads[key(person, m["conversation"].(string), m["thread"])] < num(m["number"])
+		rowThread := m["thread"]
+		if rowThread == nil && c != nil && c["type"] != "direct" {
+			rowThread = m["id"]
+		}
+		isUnread := !d.isRead(person, m, rowThread)
 		if isUnread {
 			unread++
 		}
-		entries = append(entries, map[string]any{"message": m["id"], "conversation": m["conversation"], "thread": m["thread"], "author": m["author"],
+		entries = append(entries, map[string]any{"message": m["id"], "conversation": m["conversation"], "thread": rowThread, "author": m["author"],
 			"preview": m["text"], "at": m["created_at"], "number": m["number"], "unread": isUnread, "by": nil, "emoji": nil, "level": nil, "kept": nil})
 	}
 	send(w, 200, map[string]any{"tab": tab, "entries": entries, "unread": unread, "next": nil})

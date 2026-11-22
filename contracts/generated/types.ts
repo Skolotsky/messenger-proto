@@ -33,7 +33,7 @@ export type ChannelDial = "focus" | "all" | "default" | "muted";
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "ItemKind".
  */
-export type ItemKind = "flags" | "mentions" | "direct_messages";
+export type ItemKind = "flags" | "mentions";
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "Stream".
@@ -196,7 +196,7 @@ export type RowActDial = {
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "RowAct".
  */
-export type RowAct = RowActDial | RowActFocusPerson | RowActFocusRule | RowActDone;
+export type RowAct = RowActDial | RowActFocusPerson | RowActFocusRule | RowActDone | RowActKeep;
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "LevelEntry".
@@ -357,6 +357,7 @@ export interface ContractTypes {
   RowActFocusPerson?: RowActFocusPerson;
   RowActFocusRule?: RowActFocusRule;
   RowActDone?: RowActDone;
+  RowActKeep?: RowActKeep;
   RowAct?: RowAct;
   RowChange?: RowChange;
   RowExplanation?: RowExplanation;
@@ -1184,6 +1185,9 @@ export interface ReplyInProgress {
   conversation: string;
   thread: string | null;
   author: string;
+  /**
+   * The length of text in Unicode code points: where the next piece starts.
+   */
   at: number;
   text: string;
 }
@@ -1228,12 +1232,21 @@ export interface RowActDone {
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "RowActKeep".
+ */
+export interface RowActKeep {
+  kind: "keep";
+  conversation: string;
+  thread: string | null;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "RowChange".
  */
 export interface RowChange {
   label: string;
   do: RowAct;
-  undo: RowAct | null;
+  undo: RowAct;
   moved_last_7_days: number | null;
 }
 /**
@@ -1311,6 +1324,9 @@ export interface ScreenFeedAnswer {
 export interface HistoryEntry {
   message: string;
   conversation: string;
+  /**
+   * The row's thread, as on FeedRow. message and number open at the message.
+   */
   thread: string | null;
   author: string;
   preview: string;
@@ -1429,6 +1445,9 @@ export interface ReplyText {
   conversation: string;
   thread: string | null;
   author: string;
+  /**
+   * The length of text in Unicode code points: where the next piece starts.
+   */
   at: number;
   text: string;
 }
@@ -1693,6 +1712,9 @@ export interface LiveReset {
  */
 export interface PieceBody {
   message: string;
+  /**
+   * Where this piece starts in the reply, in Unicode code points.
+   */
   at: number;
   text: string;
 }
@@ -1734,6 +1756,7 @@ export interface RowUpdate {
  * via the `definition` "RowUpdatesPage".
  */
 export interface RowUpdatesPage {
+  reset: number;
   updates: RowUpdate[];
   next: number | null;
 }

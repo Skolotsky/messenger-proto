@@ -20,7 +20,7 @@ server → { "stream": "conversations", "number": 4859, "after": 4855, "parts": 
             { "kind": "thread.summary", "conversation": "#launch", "thread": "msg_7Q2", "replies": 4 },
             { "kind": "unread", "conversation": "#launch", "thread": "msg_7Q2", "unread": true } ] }
 server → { "stream": "feed", "number": 103, "after": 97, "edition": 7, "parts": [
-            { "kind": "row.changed", "row": { "conversation": "#launch", "thread": null, "bucket": "needs_you", "unread": true, "why": "Anna mentioned you" } } ] }
+            { "kind": "row.changed", "row": { "conversation": "#launch", "thread": "msg_7Q2", "bucket": "needs_you", "unread": true, "why": "Anna mentioned you" } } ] }
 server → { "last_sent": { "conversations": 4859, "feed": 103, "feed_edition": 7 } }       every 5 s
 server → { "too_far_behind": "feed" }                                   the screen loads that view fresh
 server → { "reset": 3 }                                                 the organization was Reset: the screen loads everything fresh
@@ -36,6 +36,7 @@ server → { "agent_status": { "agent": "release-agent", "state": "waiting", "on
 - After any interruption the screen ends equal to a freshly loaded one.
 - When connected, an update reaches the screen within 1 second. After reconnecting, a screen has caught up within 2 seconds. An update lost on a live connection is noticed and fetched within 20 seconds.
 - Up to 500 updates per stream are replayed; further behind, the screen is told to load fresh.
+- A piece's `at` is where it starts in the reply; the `at` of the text so far is its length, where the next piece starts (both in code points). If the reply has closed, that question answers `409 { "refused": "closed" }` and the screen waits for `message.created` or `reply.abandoned`.
 - Pieces of a reply carry their position; a screen that sees a gap, or loads while a reply is in progress, fetches the text so far (`GET /orgs/acme/replies/msg_9A1`).
 - The closed list of update parts and their payloads is in `contracts/schema/`.
 
