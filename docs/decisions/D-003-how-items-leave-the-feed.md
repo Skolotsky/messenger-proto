@@ -1,6 +1,6 @@
 # D-003: How an item leaves the feed
 
-- Status: accepted
+- Status: accepted; superseded in part (how a flagged row leaves: D-011)
 - Level: product
 - Date: 2026-11-22 (proposed, reshaped by the user and accepted the same day)
 - Decided by: user

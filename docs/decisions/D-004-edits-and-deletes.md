@@ -1,6 +1,6 @@
 # D-004: What an edit or a delete does to what people already have
 
-- Status: accepted
+- Status: accepted; superseded in part (the marker for a flagged row: D-011)
 - Level: product
 - Date: 2026-11-22
 - Decided by: user

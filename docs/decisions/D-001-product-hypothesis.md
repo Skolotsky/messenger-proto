@@ -1,6 +1,6 @@
 # D-001: The product hypothesis the early access programme tests
 
-- Status: accepted
+- Status: accepted; superseded in part (when a flag closes: D-011; the Muted and All activity levels are narrowed by D-013)
 - Level: product
 - Date: 2026-11-22 (proposed, shaped in discussion and accepted the same day)
 - Decided by: user

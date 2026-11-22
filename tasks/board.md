@@ -2,15 +2,15 @@
 
 Work in flight. Order inside a section is priority. Finished work moves to `done.md`. Rules: CLAUDE.md, section "Tasks".
 
-**Where we are:** Accepted so far (2026-11-22): D-001, the three-bucket feed with dials, Flag and Info; D-009, the feed plus what makes it observable, as a PWA, with creating channels; D-002, scripted people and agents, and a coding agent can join as either for verification; D-010, a large seeded team (about 30 people, 6 agents) with a control panel for the demonstration. D-003, reading is enough for a row to leave, with Keep and Done. D-004, what edits and deletes leave behind. All product decisions prepared so far are accepted. E-001 modelled them and ran a simulated team: the rules hold together, with one hole (a flag nobody answers never leaves) and a short list to confirm, now waiting on the user as D-011 to D-013. After those, the product scope is complete. Order set by the user: product decisions first; technical ones (D-005 to D-008) wait until the product scope is final and the experiments are agreed. Text rules judged by a model are in scope but built last, after an experiment.
+**Where we are:** Accepted (2026-11-22): D-001 the three-bucket feed; D-009 the first-version surfaces; D-002 scripted participants; D-010 the large seeded team with a control panel; D-003 reading is enough, with Keep and Done; D-004 edits and deletes; D-011 a flag is a marker for each reader's feed with no state of its own; D-013 the readings E-001 needed. E-001 modelled the rules and found them sound apart from the hole D-011 closes. Remaining product decision: D-012, what sends a notification. Then the product scope is complete and the technical decisions (D-005 to D-008) can open. Text rules judged by a model are in scope but built last, after an experiment.
 
 ## Now
 
-_Nothing in progress._
+- **T-017** `experiment` Bring the E-001 model in line with D-011 and D-013 and rerun it, to confirm the hole is closed. Done when: `./experiments/E-001-feed-rules-model/run.sh` passes and the README states the new result
 
 ## Waiting on user
 
-- **T-015** `decide` The seven points E-001 raised, starting with D-011 (a flag nobody answers never leaves the feed). Recommendations per point: `docs/visuals/E-001-feed-rules-model.html`
+- **T-016** `decide` D-012: what sends a notification. The last product decision E-001 raised; to be prepared
 
 ## Next
 
