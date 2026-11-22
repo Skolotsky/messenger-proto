@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where state lives</title>
+<style>
+/* Layout: one reading column. Diagrams, tables and code may run wider inside their own scroll box. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --sunken: #eceef2; --line: #d8dce4;
+  --ink: #17202b; --ink-2: #445063; --ink-3: #5f6b7d;
+  --agent: #2351c9; --agent-soft: #e5ecfc; /* the agent's work, links */
+  --you: #a64b08; --you-soft: #fcebd9;     /* where the user's attention is needed */
+  --ok: #1b7548; --ok-soft: #e1f3e8;       /* recommended, holds, verified */
+  --risk: #b3261e; --risk-soft: #fbe8e6;   /* risk, broken, not verified */
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Cascadia Code", "Cascadia Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+    --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+    --agent: #86a8ff; --agent-soft: #1b2a4c;
+    --you: #f2a766; --you-soft: #3b2814;
+    --ok: #62cf99; --ok-soft: #14301f;
+    --risk: #ff8f85; --risk-soft: #3d1815;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+  --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+  --agent: #86a8ff; --agent-soft: #1b2a4c;
+  --you: #f2a766; --you-soft: #3b2814;
+  --ok: #62cf99; --ok-soft: #14301f;
+  --risk: #ff8f85; --risk-soft: #3d1815;
+  color-scheme: dark;
+}
+
+/* Base */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--font); }
+.page {
+  max-width: 880px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 34px;
+}
+section, .stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+h1 { font: 650 27px/1.2 var(--display); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h2 { font: 650 18.5px/1.3 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 650 14.5px/1.35 var(--font); margin: 0; }
+p { margin: 0; max-width: 68ch; }
+ul, ol { margin: 0; padding-left: 1.25em; display: flex; flex-direction: column; gap: 5px; max-width: 68ch; }
+a { color: var(--agent); }
+strong { font-weight: 650; }
+code { font: 0.88em var(--mono); background: var(--sunken); border: 1px solid var(--line); border-radius: 4px; padding: 0.08em 0.36em; overflow-wrap: anywhere; }
+:focus-visible { outline: 2px solid var(--agent); outline-offset: 2px; }
+.label { font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.note { color: var(--ink-3); font-size: 13.5px; }
+
+/* Header */
+.top { display: flex; flex-direction: column; gap: 8px; }
+.lede { font-size: 16.5px; color: var(--ink-2); max-width: 62ch; }
+
+/* Needs you: the one thing the user has to decide or answer */
+.ask { background: var(--you-soft); border: 1px solid color-mix(in srgb, var(--you) 40%, transparent); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.ask .label { color: var(--you); }
+
+/* Chips */
+.chip { display: inline-flex; align-items: center; font: 600 12px/1 var(--font); padding: 4px 9px; border-radius: 999px; background: var(--sunken); color: var(--ink-2); white-space: nowrap; }
+.chip.you { background: var(--you-soft); color: var(--you); }
+.chip.agent { background: var(--agent-soft); color: var(--agent); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.risk { background: var(--risk-soft); color: var(--risk); }
+
+/* Panels side by side */
+.split { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.panel.you .label { color: var(--you); }
+.panel.agent .label { color: var(--agent); }
+.files { list-style: none; padding: 0; gap: 7px; }
+.files li { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.files span { color: var(--ink-2); font-size: 13.5px; }
+
+/* Lanes: who does what, phase by phase. Children in order: three .head cells, then .phase, .you, .agent per row */
+.lanes { display: grid; grid-template-columns: minmax(128px, 0.75fr) 1.25fr 1.5fr; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.lanes > * { padding: 12px 14px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin: -1px 0 0 -1px; min-width: 0; }
+.lanes > .head { background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.lanes > .head.you { color: var(--you); background: var(--sunken); }
+.lanes > .head.agent { color: var(--agent); }
+.lanes > .phase { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.lanes > .phase strong { font: 650 15px/1.3 var(--display); }
+.lanes > .phase .say { color: var(--ink-2); font-size: 13.5px; }
+.lanes > .you { background: color-mix(in srgb, var(--you-soft) 60%, var(--surface)); }
+.lanes > .you.idle { background: var(--surface); color: var(--ink-3); }
+@media (max-width: 600px) {
+  .lanes { grid-template-columns: 1fr 1.2fr; }
+  .lanes > .head.first { display: none; }
+  .lanes > .phase { grid-column: 1 / -1; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--sunken); padding-block: 8px; }
+}
+
+/* Options: a choice, side by side */
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.option { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.option.pick { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+.option header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.option dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; font-size: 14px; }
+.option dt { font-weight: 650; color: var(--ink-3); }
+.option dd { margin: 0; min-width: 0; }
+.brief { border: 1px dashed var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+/* Steps: what happens, in order */
+.steps { list-style: none; padding: 0; gap: 0; counter-reset: step; max-width: none; }
+.steps > li { counter-increment: step; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding-bottom: 16px; position: relative; }
+.steps > li::before { content: counter(step); width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; font: 600 13px var(--mono); color: var(--ink-2); position: relative; z-index: 1; }
+.steps > li:not(:last-child)::after { content: ""; position: absolute; left: 13.5px; top: 28px; bottom: 0; width: 1px; background: var(--line); }
+.steps > li:last-child { padding-bottom: 0; }
+.steps .body { display: flex; flex-direction: column; gap: 5px; padding-top: 3px; min-width: 0; }
+
+/* Figures: diagrams and snippets */
+figure { margin: 0; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+figcaption { font-size: 13px; color: var(--ink-3); max-width: 68ch; }
+.diagram .scroll { overflow-x: auto; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; }
+.diagram svg { display: block; min-width: 680px; width: 100%; height: auto; color: var(--ink-3); font-family: var(--font); }
+.diagram .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
+.diagram .box-you { fill: var(--you-soft); stroke: var(--you); stroke-width: 1.25; }
+.diagram .box-agent { fill: var(--agent-soft); stroke: var(--agent); stroke-width: 1.25; }
+.diagram .box-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.25; }
+.diagram .box-risk { fill: var(--risk-soft); stroke: var(--risk); stroke-width: 1.25; }
+.diagram .t { fill: var(--ink); font-size: 13px; font-weight: 650; }
+.diagram .t2 { fill: var(--ink-2); font-size: 11px; }
+.diagram .edge { stroke: currentColor; stroke-width: 1.5; fill: none; }
+.diagram .edge-label { fill: var(--ink-2); font-size: 11px; }
+.snippet pre { margin: 0; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; overflow-x: auto; font: 13px/1.5 var(--mono); }
+.snippet pre code { background: none; border: 0; padding: 0; font: inherit; overflow-wrap: normal; }
+.snippet mark { background: var(--you-soft); color: inherit; border-radius: 3px; padding: 0 2px; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+thead th { border-top: 0; background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Depth on demand */
+details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 0 16px; }
+details > summary { cursor: pointer; padding: 11px 0; font-weight: 650; }
+details[open] { padding-bottom: 14px; }
+details > .stack { gap: 10px; }
+
+/* Footer */
+.foot { border-top: 1px solid var(--line); padding-top: 14px; color: var(--ink-3); font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body>
+<main class="page">
+<header class="top">
+  <div class="label">Architecture · state · 2026-11-22 · follows D-005, D-017, D-018, D-026, D-028</div>
+  <h1>Where state lives</h1>
+  <p class="lede">Everything that must survive a restart is in PostgreSQL, in one area per part. Memory holds only things that can be lost and rebuilt. There is no Redis and no cache layer.</p>
+</header>
+
+<section>
+  <h2>The picture</h2>
+  <figure class="diagram">
+    <div class="scroll">
+      <svg viewBox="0 0 900 470" role="img" aria-label="One PostgreSQL server with four separate areas: Conversations holds the originals, the feed, the search stand-in and the notification sender hold copies that can be rebuilt. Each program keeps only disposable things in memory. The browser holds what is on screen.">
+        <rect class="box" x="20" y="16" width="860" height="250" rx="8"/>
+        <text class="t" x="36" y="40">PostgreSQL · one server, one area per part, every row belongs to one organization</text>
+
+        <rect class="box-ok" x="36" y="54" width="250" height="196" rx="6"/>
+        <text class="t" x="50" y="76">Conversations · the originals</text>
+        <text class="t2" x="50" y="96">organizations, people, agents, channels</text>
+        <text class="t2" x="50" y="112">messages and reactions (current version)</text>
+        <text class="t2" x="50" y="128">what each reader did: read positions,</text>
+        <text class="t2" x="50" y="144">dials, Focus rules and people, Keep</text>
+        <text class="t2" x="50" y="160">the change log, numbered per organization</text>
+        <text class="t2" x="50" y="176">IDs of actions already handled</text>
+        <text class="t2" x="50" y="192">delivery: a place per receiver and</text>
+        <text class="t2" x="50" y="208">organization; parked changes</text>
+        <text class="t2" x="50" y="224">agents' events; replies in progress</text>
+
+        <rect class="box" x="302" y="54" width="200" height="196" rx="6"/>
+        <text class="t" x="316" y="76">Activity feed</text>
+        <text class="t2" x="316" y="96">rows per reader</text>
+        <text class="t2" x="316" y="112">its own copy of messages</text>
+        <text class="t2" x="316" y="128">and of readers' settings</text>
+        <text class="t2" x="316" y="144">its place in each log</text>
+        <text class="t2" x="316" y="160">fences and set-aside changes</text>
+        <text class="t2" x="316" y="176">its own numbered log of</text>
+        <text class="t2" x="316" y="192">notification notes</text>
+        <text class="edge-label" x="316" y="232">can be wiped and rebuilt</text>
+
+        <rect class="box" x="518" y="54" width="170" height="196" rx="6"/>
+        <text class="t" x="532" y="76">Search (stand-in)</text>
+        <text class="t2" x="532" y="96">one entry per message:</text>
+        <text class="t2" x="532" y="112">version, current text,</text>
+        <text class="t2" x="532" y="128">or "deleted at version"</text>
+        <text class="edge-label" x="532" y="232">can be wiped and refilled</text>
+
+        <rect class="box" x="704" y="54" width="160" height="196" rx="6"/>
+        <text class="t" x="718" y="76">Notification sender</text>
+        <text class="t2" x="718" y="96">(stand-in)</text>
+        <text class="t2" x="718" y="116">every notification by</text>
+        <text class="t2" x="718" y="132">name: due, sent,</text>
+        <text class="t2" x="718" y="148">withdrawn; the text</text>
+        <text class="t2" x="718" y="164">its place in the</text>
+        <text class="t2" x="718" y="180">feed's log</text>
+        <text class="edge-label" x="718" y="232">can be refilled</text>
+
+        <rect class="box-agent" x="20" y="286" width="560" height="168" rx="8"/>
+        <text class="t" x="36" y="310">In the programs' memory · gone on restart, nothing is lost by it</text>
+        <text class="t2" x="36" y="332">Live connection: who is connected, and the last number sent to each screen</text>
+        <text class="t2" x="36" y="350">Agent door: agents waiting for their next event; each agent's messages in the last minute</text>
+        <text class="t2" x="36" y="368">Delivery workers: how long to wait before the next try at a receiver that is down</text>
+        <text class="t2" x="36" y="386">Reply in progress: the newest pieces, passed straight to open screens</text>
+        <text class="t2" x="36" y="404">Scripted team: where it is in its script</text>
+        <text class="t2" x="36" y="432">Each of these is either rebuilt from PostgreSQL or simply starts again.</text>
+
+        <rect class="box-you" x="600" y="286" width="280" height="168" rx="8"/>
+        <text class="t" x="616" y="310">In the browser</text>
+        <text class="t2" x="616" y="332">what is on screen, and the last number</text>
+        <text class="t2" x="616" y="348">applied in each stream</text>
+        <text class="t2" x="616" y="366">arrivals held behind "Show"</text>
+        <text class="t2" x="616" y="384">read rows that stay until you leave</text>
+        <text class="t2" x="616" y="402">your own action, shown before "saved"</text>
+        <text class="t2" x="616" y="420">a message waiting as "not sent"</text>
+      </svg>
+    </div>
+    <figcaption>Green holds the only originals. Everything else in PostgreSQL is a copy that can be emptied and filled again from the change log. Blue and orange are memory.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>In PostgreSQL, part by part</h2>
+  <p>Each part has its own area and its own database login, and cannot read another's (G-008). Every table carries the organization, and the database refuses a row of another organization (G-025). Table names are working names; the exact columns are settled in the first build task.</p>
+
+  <h3>Conversations: the originals</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Table</th><th>Holds</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td><code>organizations</code>, <code>people</code>, <code>channels</code>, <code>members</code></td><td>Who exists and who is in which channel. Agents are people of kind "agent".</td><td>A person belongs to one organization.</td></tr>
+        <tr><td><code>messages</code></td><td>The current version of every message: conversation, thread, author, text, mentions, level, version, whether deleted, whether still being written.</td><td>No edit history (a known shortcut). A deleted message keeps its row as a marker.</td></tr>
+        <tr><td><code>reactions</code></td><td>Who reacted with what to which message.</td><td>A reaction raises the message's version.</td></tr>
+        <tr><td><code>read_positions</code></td><td>Per person and conversation: read up to which change.</td><td>Moves forward only. Channel unread marks are worked out from this.</td></tr>
+        <tr><td><code>watching</code></td><td>Per person: which conversation is open in front of them, and when that was last reported.</td><td>Lapses after 60 s.</td></tr>
+        <tr><td><code>dials</code>, <code>focus_rules</code>, <code>focus_people</code>, <code>kept</code>, <code>person_settings</code></td><td>What each reader set: channel and thread levels, rules, people removed from or added back to Focus, rows kept, "Focus only".</td><td>Only what the person did. What follows from it is worked out by the feed.</td></tr>
+        <tr><td><strong><code>change_log</code></strong>, <code>log_counters</code></td><td>Every change, numbered per organization, with its time; one counter row per organization hands out the numbers.</td><td>Written in the same transaction as the change (G-004). The database refuses a change without its log entry. Never trimmed in the first version.</td></tr>
+        <tr><td><code>handled_actions</code></td><td>The IDs of actions already saved.</td><td>What makes a retry harmless (G-003).</td></tr>
+        <tr><td><code>delivery_places</code>, <code>parked</code></td><td>For each receiver and organization: the last change delivered. Changes a receiver refused, with the reason.</td><td>The only state the delivery workers have.</td></tr>
+        <tr><td><code>agent_events</code>, <code>replies_in_progress</code></td><td>Numbered events per agent, kept 7 days. For a reply being written: the text so far and when the last piece came.</td><td>The text so far is saved about twice a second, so a screen that joins late can catch up.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Activity feed: worked out, never original</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Table</th><th>Holds</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td><code>feed_places</code></td><td>Per organization: the last change applied, and the edition of this build of the feed.</td><td>Saved in the same step as the rows it changed (G-007).</td></tr>
+        <tr><td><code>message_copies</code>, <code>thread_participants</code>, <code>reader_copies</code></td><td>The feed's own copy of what it needs to judge: messages, who takes part in which thread, each reader's settings and read positions, the list of Focus people as it fills itself.</td><td>So the feed never has to ask Conversations for anything.</td></tr>
+        <tr><td><strong><code>rows</code></strong>, <code>row_items</code></td><td>Per reader and conversation: bucket, unread or read, kept by whom, the reason, and the items that make up the row.</td><td>What the feed screen and the history tabs show.</td></tr>
+        <tr><td><code>fences</code>, <code>set_aside</code></td><td>Conversations or readers fenced off, and the changes waiting behind each fence.</td><td>Empty in normal running.</td></tr>
+        <tr><td><code>note_log</code>, <code>note_places</code></td><td>The feed's own numbered log per organization: "due", "changed", "withdrawn", clock ticks. How far the notification sender has got in it.</td><td>The same pattern as the change log, one level down.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>The two stand-ins</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Part</th><th>Table</th><th>Holds</th></tr></thead>
+      <tbody>
+        <tr><td>Search index</td><td><code>entries</code></td><td>Per message: its version and current text, or the version at which it was deleted. A real search engine would replace this whole area.</td></tr>
+        <tr><td>Notification sender</td><td><code>notifications</code>, <code>sender_places</code></td><td>Every notification by its fixed name: when due, whether sent, withdrawn or still held, the text shown. Its place in the feed's log per organization. This is what the mock notification app displays.</td></tr>
+        <tr><td>Control panel</td><td>saved copies</td><td>A copy of every area taken after a rebuild, for Reset; the scripted team's schedule.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>In memory: what, and what happens when it is lost</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Where</th><th>What</th><th>If the program restarts</th></tr></thead>
+      <tbody>
+        <tr><td>Live connection</td><td>Open connections; the last number sent to each screen.</td><td>Screens reconnect and say the last number they have; nothing else is needed (G-015).</td></tr>
+        <tr><td>Agent door</td><td>Agents waiting for an answer; how many messages each agent sent in the last minute.</td><td>Agents ask again from their place. The per-minute count starts fresh, so an agent could briefly exceed 20 a minute. Accepted.</td></tr>
+        <tr><td>Delivery workers</td><td>The pause before the next try at a receiver that is down.</td><td>They read their place from PostgreSQL and try at once.</td></tr>
+        <tr><td>Reply in progress</td><td>Pieces on their way to open screens.</td><td>Screens fetch the text so far, which is saved.</td></tr>
+        <tr><td>Scripted team</td><td>Its position in the script.</td><td>Reset starts it again.</td></tr>
+        <tr><td>Browser</td><td>What is on screen; held arrivals; rows that stay until you leave; your own action before "saved".</td><td>A reload shows the current truth. Held arrivals simply appear.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Why no Redis or other cache</h2>
+  <div class="split">
+    <div class="panel"><div class="label">Nothing needs it at this size</div><p>PostgreSQL saved about 1,000 changes a second in the test and woke a worker within a millisecond. The seeded team produces a few hundredths of a change a second. Workers are woken by the database itself the moment something is saved.</p></div>
+    <div class="panel"><div class="label">A cache is a second copy to keep true</div><p>Most of the guardrails say "equals the truth". Every cache would be one more place that can be stale after an edit or a delete, with its own tests. The feed already is the one deliberate copy, and it is rebuilt from the log.</p></div>
+    <div class="panel"><div class="label">When one would come in</div><p>With several copies of the live connection or the agent door: something must pass updates between them and count an agent's messages across them. That is the usual job for Redis. It belongs to the same step as "several copies of each program", which is prepared for and not built.</p></div>
+  </div>
+</section>
+
+<footer class="foot">
+  <span>Follows D-005, D-006, D-017, D-018, D-026, D-028 and the contracts · Table names are working names; the schema is written in the first build task</span>
+  <span>The whole design: <a href="T-022-architecture-proposal.html">architecture review</a> · Guardrails: <a href="T-034-guardrails.html">what must stay true</a></span>
+</footer>
+</main>
+</body>
+</html>
