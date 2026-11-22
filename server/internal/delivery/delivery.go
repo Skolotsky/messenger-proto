@@ -81,11 +81,6 @@ type Service struct {
 	rng *rand.Rand
 
 	nudging sync.Map
-
-	turnsMu sync.Mutex
-	turning map[ids.Org]int             // turns of this copy under way
-	idle    map[ids.Org][]chan struct{} // closed when an organization's last turn ends
-	stopped map[ids.Org]bool            // stopped here: no further call starts
 }
 
 // New builds a Service. Run starts it; Routes answers its operations.
@@ -97,8 +92,7 @@ func New(cfg Config) *Service {
 	if me == "" {
 		me = ids.New("worker")
 	}
-	s := &Service{cfg: cfg, me: me, rng: rand.New(rand.NewSource(cfg.Seed)), lanes: map[string]*lane{},
-		turning: map[ids.Org]int{}, idle: map[ids.Org][]chan struct{}{}, stopped: map[ids.Org]bool{}}
+	s := &Service{cfg: cfg, me: me, rng: rand.New(rand.NewSource(cfg.Seed)), lanes: map[string]*lane{}}
 	s.lanes[Search] = &lane{s: s, name: Search, rc: newClient(Search, cfg.Search)}
 	s.lanes[Feed] = &lane{s: s, name: Feed, rc: newClient(Feed, cfg.Feed)}
 	s.lanes[Sender] = &lane{s: s, name: Sender, notes: true, rc: newClient(Sender, cfg.Sender)}

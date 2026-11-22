@@ -96,13 +96,24 @@ type senderState struct {
 }
 
 func lockSenderState(ctx context.Context, tx pgx.Tx, org ids.Org) (senderState, error) {
-	if _, err := tx.Exec(ctx, "INSERT INTO state (org) VALUES ($1) ON CONFLICT DO NOTHING", string(org)); err != nil {
-		return senderState{}, err
-	}
+	// One statement, so a delete between two steps cannot leave it with no row.
 	var st senderState
+	err := tx.QueryRow(ctx, `INSERT INTO state (org) VALUES ($1)
+		ON CONFLICT (org) DO UPDATE SET org = EXCLUDED.org
+		RETURNING edition, place, clock`, string(org)).Scan(&st.edition, &st.place, &st.clock)
+	return st, err
+}
+
+// findSenderState locks the row if there is one, and creates nothing. With no
+// row it answers the start: the first edition, place 0.
+func findSenderState(ctx context.Context, tx pgx.Tx, org ids.Org) (senderState, bool, error) {
+	st := senderState{edition: 1}
 	err := tx.QueryRow(ctx, "SELECT edition, place, clock FROM state WHERE org = $1 FOR UPDATE", string(org)).
 		Scan(&st.edition, &st.place, &st.clock)
-	return st, err
+	if errors.Is(err, pgx.ErrNoRows) {
+		return senderState{edition: 1}, false, nil
+	}
+	return st, err == nil, err
 }
 
 func saveSenderState(ctx context.Context, tx pgx.Tx, org ids.Org, st senderState) error {
@@ -316,7 +327,7 @@ func (s *Sender) place(w http.ResponseWriter, r *http.Request) {
 	}
 	var p contract.SenderPlace
 	err := orgdb.InOrg(r.Context(), s.opt.Dir, org, func(tx pgx.Tx) error {
-		st, err := lockSenderState(r.Context(), tx, org)
+		st, _, err := findSenderState(r.Context(), tx, org)
 		p = contract.SenderPlace{Through: st.place, Edition: st.edition}
 		return err
 	})
@@ -374,9 +385,9 @@ func (s *Sender) notifications(w http.ResponseWriter, r *http.Request) {
 // wipeOrg empties what the sender holds, except the list of what it sent.
 func (s *Sender) wipeOrg(ctx context.Context, org ids.Org) error {
 	return orgdb.InOrg(ctx, s.opt.Dir, org, func(tx pgx.Tx) error {
-		st, err := lockSenderState(ctx, tx, org)
-		if err != nil {
-			return err
+		st, found, err := findSenderState(ctx, tx, org)
+		if err != nil || !found {
+			return err // nothing was ever delivered, or it was deleted: nothing to wipe
 		}
 		if _, err := tx.Exec(ctx, "DELETE FROM notifications WHERE org = $1 AND state <> 'sent'", string(org)); err != nil {
 			return err

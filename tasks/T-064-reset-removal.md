@@ -27,6 +27,7 @@ No contract, schema or product code knows a Reset number. A retired organization
 - 2026-11-22: Started after the user accepted D-033 and its five readings.
 - 2026-11-22: `reset` removed (bd1da42). Retire, stop, delete per part, `seed.sealed` and G-031 built (f2a2b9f).
 - 2026-11-22: A rule reading the log in order cannot tell a seeded change from a live one, so the log now says it: `seed.opened` starts a seeded history and `seed.sealed` ends it. A session without the opener writes no seal, so G-005 and G-003 needed no change. The rules decide from the log alone.
+- 2026-11-22: An independent verifier found that with two delivery copies a finished delete could leave rows in search, and that retiring alone did not stop delivery. Every copy now reads the durable mark (stopped or retired) before each receiver call; stop answers only when no copy holds a live claim, otherwise 503 "ask again". Place questions and wipes create nothing for a deleted organization, and no copy keeps a private memory of a stop.
 
 ## Evidence
 
@@ -37,3 +38,4 @@ No contract, schema or product code knows a Reset number. A retired organization
 - Suppression, rule off in a scratch copy: `TestNoNotesUpToTheSeal` failed with "a seeded mention wrote notes".
 - Seeded history: the new history without its opener, with every number moved back by one, hashes exactly to the previous pin.
 - Protected tests `saved-once`, `log-numbering`, `change-and-log-together`, `conversations-independent`: no line changed.
+- Two copies (`tests/guardrails/retire-and-delete-copies`), each case seen failing on the code before the fix: stop answered 200 while another copy was inside a call; a retired organization delivered "search 7, feed 30, sender 10"; a batch went on for 21 calls after retiring; a state row created by asking about a deleted organization, in search and in the sender; a reused ID never delivered; unforced, "after a finished delete search holds 15 message(s) and 1 state row(s)" (3 of 3 runs failed). After the fix: the forced cases passed 25 of 25 runs, the unforced case 10 of 10 runs of 12 trials each.

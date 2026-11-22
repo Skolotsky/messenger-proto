@@ -10,7 +10,8 @@
       "Edit(/tests/guardrails/change-and-log-together/**)",
       "Edit(/tests/guardrails/log-numbering/**)",
       "Edit(/tests/guardrails/conversations-independent/**)",
-      "Edit(/tests/guardrails/retire-and-delete/**)"
+      "Edit(/tests/guardrails/retire-and-delete/**)",
+      "Edit(/tests/guardrails/retire-and-delete-copies/**)"
     ]
   }
 }

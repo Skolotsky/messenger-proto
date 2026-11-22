@@ -152,7 +152,7 @@ func (s *Service) retry(w http.ResponseWriter, r *http.Request, org ids.Org) {
 	}
 	var halted bool
 	if err := orgdb.InOrg(r.Context(), s.cfg.DB, org, func(tx pgx.Tx) error {
-		return tx.QueryRow(r.Context(), `SELECT EXISTS (SELECT 1 FROM delivery_stopped WHERE org = $1)`, string(org)).Scan(&halted)
+		return tx.QueryRow(r.Context(), haltedSQL, string(org)).Scan(&halted)
 	}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
