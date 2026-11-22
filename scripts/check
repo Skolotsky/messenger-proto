@@ -77,6 +77,55 @@ external=$(grep -liE "(src|href)=[\"']?(https?:)?//|url\\([\"']?(https?:)?//|@im
 if [ -z "$external" ]; then pass "visuals are self-contained"; else fail "visuals reference external files (scripts, styles, images, links): $external. Inline them; put source links in the research note instead"; fi
 
 # ---------------------------------------------------------------------------
+section "Contracts and guardrails (G-021)"
+
+# Every contract names guardrails that exist; every guardrail comes from an accepted decision.
+trace=$(python3 - <<'PY'
+import pathlib, re
+g = pathlib.Path('docs/guardrails.md').read_text()
+rows = {}
+for line in g.splitlines():
+    m = re.match(r'\|\s*(G-\d+)\s*\|', line)
+    if m:
+        rows[m.group(1)] = [c.strip() for c in line.strip().strip('|').split('|')]
+index = pathlib.Path('docs/decisions/README.md').read_text()
+accepted = set(re.findall(r'\*\*(D-\d+)\*\* \[accepted', index))
+problems = []
+for f in sorted(pathlib.Path('docs/contracts').glob('*.md')):
+    if f.name == 'README.md':
+        continue
+    t = f.read_text()
+    part = t.split('## 6. Enforced by')[1] if '## 6. Enforced by' in t else ''
+    ids = re.findall(r'G-\d+', part)
+    if not ids:
+        problems.append(f'{f} names no guardrail under "## 6. Enforced by". Add the G-nnn IDs that hold this contract')
+    for i in ids:
+        if i not in rows:
+            problems.append(f'{f} names {i}, which is not in docs/guardrails.md. Register it there or correct the ID')
+for f in sorted(pathlib.Path('docs/contracts').glob('*.md')):
+    if f.name != 'README.md':
+        t = f.read_text()
+        missing = [h for h in ('## 1. Parties', '## 2. ', '## 3. Guarantees', '## 4. Failure behaviour', '## 5. Evolution', '## 6. Enforced by') if h not in t]
+        if missing:
+            problems.append(f'{f} lacks the part(s) {", ".join(missing)} that docs/contracts/README.md asks for')
+for d in sorted(accepted):
+    recs = list(pathlib.Path('docs/decisions').glob(d + '-*.md'))
+    if recs and not re.search(r'^- Status: accepted', recs[0].read_text(), re.M):
+        problems.append(f'{d} is accepted in the index but its record {recs[0]} does not say "Status: accepted". Make them agree')
+for i, c in rows.items():
+    src = c[3] if len(c) > 3 else ''
+    ds = re.findall(r'D-\d+', src)
+    if not ds and 'setup' not in src:
+        problems.append(f'{i} names no decision in its "From" column')
+    for d in ds:
+        if d not in accepted:
+            problems.append(f'{i} comes from {d}, which is not accepted in docs/decisions/README.md. A guardrail needs an accepted decision behind it')
+print('\n'.join(problems))
+PY
+)
+if [ -z "$trace" ]; then pass "contracts name existing guardrails; guardrails come from accepted decisions"; else while IFS= read -r line; do fail "$line"; done <<< "$trace"; fi
+
+# ---------------------------------------------------------------------------
 # Product checks (lint, types, tests, guardrail tests) are added here once the
 # stack is chosen. Each one calls pass or fail like the checks above.
 

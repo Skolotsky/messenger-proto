@@ -60,6 +60,14 @@ Why: each number is either the established figure (3 s per call, Slack's rule; r
 
 Decided by the agent on 2026-11-22, delegated by the user: "Ok, make a decision based on best practices and our product needs." The user had asked how many important decisions were left (three: D-006, D-007, D-008) and then gave this instruction; the agent read it as covering all three and said so. The user can overturn any of them; a change is a new record.
 
+### Corrections, 2026-11-22 (added after acceptance; the decision is unchanged)
+
+Found by the independent check of the contracts:
+- The table row "The feed never skips: stops visibly on a change it cannot apply" predates the fence the user asked for and D-006 records. It reads: a change the feed cannot apply fences only the conversation or reader it touches; more than five fences stop the feed (G-009).
+- "A silently lost update healed within 20 s" needs the screen to be told the last number sent every 10 seconds, not "about every 20"; the contract says 10.
+- The log carries a clock tick every second while there is activity, which bounds the hold: a notification goes out within 8 seconds of becoming due when everything is healthy (G-010).
+- "Watching" lapses after 60 seconds without renewal (G-024), so a vanished screen cannot leave messages read on arrival.
+
 ## Consequences
 
 - Easier: "done" for the delivery work is a list of tests that break things.

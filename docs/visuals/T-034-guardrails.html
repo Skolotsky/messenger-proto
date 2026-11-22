@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contexia guardrails</title>
+<style>
+/* Layout: one reading column. Diagrams, tables and code may run wider inside their own scroll box. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --sunken: #eceef2; --line: #d8dce4;
+  --ink: #17202b; --ink-2: #445063; --ink-3: #5f6b7d;
+  --agent: #2351c9; --agent-soft: #e5ecfc; /* the agent's work, links */
+  --you: #a64b08; --you-soft: #fcebd9;     /* where the user's attention is needed */
+  --ok: #1b7548; --ok-soft: #e1f3e8;       /* recommended, holds, verified */
+  --risk: #b3261e; --risk-soft: #fbe8e6;   /* risk, broken, not verified */
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Cascadia Code", "Cascadia Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+    --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+    --agent: #86a8ff; --agent-soft: #1b2a4c;
+    --you: #f2a766; --you-soft: #3b2814;
+    --ok: #62cf99; --ok-soft: #14301f;
+    --risk: #ff8f85; --risk-soft: #3d1815;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+  --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+  --agent: #86a8ff; --agent-soft: #1b2a4c;
+  --you: #f2a766; --you-soft: #3b2814;
+  --ok: #62cf99; --ok-soft: #14301f;
+  --risk: #ff8f85; --risk-soft: #3d1815;
+  color-scheme: dark;
+}
+
+/* Base */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--font); }
+.page {
+  max-width: 880px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 34px;
+}
+section, .stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+h1 { font: 650 27px/1.2 var(--display); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h2 { font: 650 18.5px/1.3 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 650 14.5px/1.35 var(--font); margin: 0; }
+p { margin: 0; max-width: 68ch; }
+ul, ol { margin: 0; padding-left: 1.25em; display: flex; flex-direction: column; gap: 5px; max-width: 68ch; }
+a { color: var(--agent); }
+strong { font-weight: 650; }
+code { font: 0.88em var(--mono); background: var(--sunken); border: 1px solid var(--line); border-radius: 4px; padding: 0.08em 0.36em; overflow-wrap: anywhere; }
+:focus-visible { outline: 2px solid var(--agent); outline-offset: 2px; }
+.label { font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.note { color: var(--ink-3); font-size: 13.5px; }
+
+/* Header */
+.top { display: flex; flex-direction: column; gap: 8px; }
+.lede { font-size: 16.5px; color: var(--ink-2); max-width: 62ch; }
+
+/* Needs you: the one thing the user has to decide or answer */
+.ask { background: var(--you-soft); border: 1px solid color-mix(in srgb, var(--you) 40%, transparent); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.ask .label { color: var(--you); }
+
+/* Chips */
+.chip { display: inline-flex; align-items: center; font: 600 12px/1 var(--font); padding: 4px 9px; border-radius: 999px; background: var(--sunken); color: var(--ink-2); white-space: nowrap; }
+.chip.you { background: var(--you-soft); color: var(--you); }
+.chip.agent { background: var(--agent-soft); color: var(--agent); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.risk { background: var(--risk-soft); color: var(--risk); }
+
+/* Panels side by side */
+.split { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.panel.you .label { color: var(--you); }
+.panel.agent .label { color: var(--agent); }
+.files { list-style: none; padding: 0; gap: 7px; }
+.files li { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.files span { color: var(--ink-2); font-size: 13.5px; }
+
+/* Lanes: who does what, phase by phase. Children in order: three .head cells, then .phase, .you, .agent per row */
+.lanes { display: grid; grid-template-columns: minmax(128px, 0.75fr) 1.25fr 1.5fr; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.lanes > * { padding: 12px 14px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin: -1px 0 0 -1px; min-width: 0; }
+.lanes > .head { background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.lanes > .head.you { color: var(--you); background: var(--sunken); }
+.lanes > .head.agent { color: var(--agent); }
+.lanes > .phase { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.lanes > .phase strong { font: 650 15px/1.3 var(--display); }
+.lanes > .phase .say { color: var(--ink-2); font-size: 13.5px; }
+.lanes > .you { background: color-mix(in srgb, var(--you-soft) 60%, var(--surface)); }
+.lanes > .you.idle { background: var(--surface); color: var(--ink-3); }
+@media (max-width: 600px) {
+  .lanes { grid-template-columns: 1fr 1.2fr; }
+  .lanes > .head.first { display: none; }
+  .lanes > .phase { grid-column: 1 / -1; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--sunken); padding-block: 8px; }
+}
+
+/* Options: a choice, side by side */
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.option { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.option.pick { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+.option header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.option dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; font-size: 14px; }
+.option dt { font-weight: 650; color: var(--ink-3); }
+.option dd { margin: 0; min-width: 0; }
+.brief { border: 1px dashed var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+/* Steps: what happens, in order */
+.steps { list-style: none; padding: 0; gap: 0; counter-reset: step; max-width: none; }
+.steps > li { counter-increment: step; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding-bottom: 16px; position: relative; }
+.steps > li::before { content: counter(step); width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; font: 600 13px var(--mono); color: var(--ink-2); position: relative; z-index: 1; }
+.steps > li:not(:last-child)::after { content: ""; position: absolute; left: 13.5px; top: 28px; bottom: 0; width: 1px; background: var(--line); }
+.steps > li:last-child { padding-bottom: 0; }
+.steps .body { display: flex; flex-direction: column; gap: 5px; padding-top: 3px; min-width: 0; }
+
+/* Figures: diagrams and snippets */
+figure { margin: 0; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+figcaption { font-size: 13px; color: var(--ink-3); max-width: 68ch; }
+.diagram .scroll { overflow-x: auto; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; }
+.diagram svg { display: block; min-width: 680px; width: 100%; height: auto; color: var(--ink-3); font-family: var(--font); }
+.diagram .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
+.diagram .box-you { fill: var(--you-soft); stroke: var(--you); stroke-width: 1.25; }
+.diagram .box-agent { fill: var(--agent-soft); stroke: var(--agent); stroke-width: 1.25; }
+.diagram .box-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.25; }
+.diagram .box-risk { fill: var(--risk-soft); stroke: var(--risk); stroke-width: 1.25; }
+.diagram .t { fill: var(--ink); font-size: 13px; font-weight: 650; }
+.diagram .t2 { fill: var(--ink-2); font-size: 11px; }
+.diagram .edge { stroke: currentColor; stroke-width: 1.5; fill: none; }
+.diagram .edge-label { fill: var(--ink-2); font-size: 11px; }
+.snippet pre { margin: 0; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; overflow-x: auto; font: 13px/1.5 var(--mono); }
+.snippet pre code { background: none; border: 0; padding: 0; font: inherit; overflow-wrap: normal; }
+.snippet mark { background: var(--you-soft); color: inherit; border-radius: 3px; padding: 0 2px; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+thead th { border-top: 0; background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Depth on demand */
+details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 0 16px; }
+details > summary { cursor: pointer; padding: 11px 0; font-weight: 650; }
+details[open] { padding-bottom: 14px; }
+details > .stack { gap: 10px; }
+
+/* Footer */
+.foot { border-top: 1px solid var(--line); padding-top: 14px; color: var(--ink-3); font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body>
+<main class="page">
+<header class="top">
+  <div class="label">Guardrails · T-034 · 2026-11-22</div>
+  <h1>What must stay true while we build</h1>
+  <p class="lede">The technical decisions are now written as seven contracts and twenty-two guardrails. Each guardrail is one sentence you can check against what you decided, and each names the test that will fail if the sentence stops being true.</p>
+</header>
+
+<div class="ask">
+  <div class="label">Needs you</div>
+  <p><strong>Do you recognise your decisions in these sentences?</strong> Say which to change, drop or add. All but one are "pending": the product has no code yet, so their tests are named but not written. The first build task that touches one writes its test first and sees it fail.</p>
+</div>
+
+<section>
+  <h2>Nothing is lost, nothing happens twice</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>What must stay true</th><th>How it is enforced</th><th>Already shown in</th></tr></thead>
+      <tbody>
+        <tr><td>G&#8209;003</td><td>An action a screen or an agent was told is saved, is saved exactly once, also when sent again and when Conversations dies mid-burst.</td><td>A test that kills Conversations five times mid-burst and resends actions.</td><td>E-003</td></tr>
+        <tr><td>G&#8209;004</td><td>A change and its log entry are saved in one step; no change exists without a log entry.</td><td>The database itself refuses to save a change without its log entry; plus a test that tries.</td><td>E-003</td></tr>
+        <tr><td>G&#8209;005</td><td>A reader of the change log never steps over a change, with many writers at once.</td><td>A test on PostgreSQL with one save held open while later ones finish.</td><td>E-004</td></tr>
+        <tr><td>G&#8209;010</td><td>Every notification that is due and not withdrawn in time is sent exactly once, also after restarts and a rebuilt feed; within 8 s when healthy; marked "delayed" when more than 10 minutes late.</td><td>A test that stops the sender for 5 and 11 minutes, kills it mid-send and rebuilds the feed mid-burst. It must fail for a sender that sends nothing.</td><td>E-003</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Every receiver ends equal to the truth</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>What must stay true</th><th>How it is enforced</th><th>Already shown in</th></tr></thead>
+      <tbody>
+        <tr><td>G&#8209;006</td><td>Once level, search holds the current text of every message that is not deleted and nothing else, after an outage, repeats, late copies and a wipe; level within 30 s after a 10-minute outage.</td><td>A test with a troublemaker that repeats and delays deliveries; compare index with truth.</td><td>E-003</td></tr>
+        <tr><td>G&#8209;007</td><td>The feed equals a clean replay of the log after an outage, repeats, a restart and a wipe.</td><td>A test over generated sequences of changes with injected faults.</td><td>E-003</td></tr>
+        <tr><td>G&#8209;009</td><td>A change the feed cannot apply fences only the conversation or reader it touches; everything outside stays exact; more than five fences stop the feed.</td><td>A test that plants a fault on one edit and one dial change, then on every edit.</td><td>E-003</td></tr>
+        <tr><td>G&#8209;014</td><td>A change a receiver refuses is parked after three tries, shown, and can be sent again; three different refusals in a row pause the worker.</td><td>A test that refuses one delete, then everything.</td><td>E-003</td></tr>
+        <tr><td>G&#8209;020</td><td>The feed, search and the notification sender can each be rebuilt from nothing in under 2 minutes at the seeded team's size; Reset restores saved copies.</td><td>A test that wipes each receiver while the team is active, compares and times it.</td><td>E-003</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>What a person experiences</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>What must stay true</th><th>How it is enforced</th><th>Already shown in</th></tr></thead>
+      <tbody>
+        <tr><td>G&#8209;011</td><td>No notification is sent for something read or deleted within the 5-second hold, however late any part is, and when the machine clock steps backwards.</td><td>A test with a controlled clock, the feed stopped and overloaded.</td><td>E-003</td></tr>
+        <tr><td>G&#8209;024</td><td>Nothing is marked read on your behalf unless one of your screens reported the conversation open within the last 60 seconds.</td><td>A test with a controlled clock: a screen vanishes; a message a minute later is unread and notifies.</td><td>not yet</td></tr>
+        <tr><td>G&#8209;012</td><td>A stopped or slow receiver delays no other: the feed stays within 2 s while search is stopped or slow, and with the feed stopped, sending, reading, unread marks and search work as before.</td><td>A measured test.</td><td>E-003</td></tr>
+        <tr><td>G&#8209;013</td><td>When healthy, at 50 actions a second for a minute (about ten times the seeded team's pace), search and the feed reflect 19 changes in 20 within 2 s, and other screens show them within 1 s.</td><td>A measured test with the seeded team.</td><td>partly (small build)</td></tr>
+        <tr><td>G&#8209;015</td><td>A screen whose connection was cut, refused, lost single updates, or was away too long ends equal to a freshly loaded one; caught up within 2 s of reconnecting, a lost update fetched within 20 s.</td><td>A test in a real browser on the real web app.</td><td>E-005</td></tr>
+        <tr><td>G&#8209;019</td><td>Any surface more than 10 s behind says so: "Search is unavailable", "Catching up", "may be out of date", "Reconnecting".</td><td>A browser test at both widths: 5 s behind shows nothing, 15 s behind shows the notice.</td><td>not yet</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Agents</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>What must stay true</th><th>How it is enforced</th><th>Already shown in</th></tr></thead>
+      <tbody>
+        <tr><td>G&#8209;016</td><td>An agent misses no event addressed to it within 7 days and receives them in order; one that never reads delays nobody.</td><td>A test with scripted agents that go away and crash.</td><td>E-003</td></tr>
+        <tr><td>G&#8209;017</td><td>Text of a reply in progress never reaches search, the feed or notifications; a reply with no piece for 60 s, or older than 10 minutes, is closed as "stopped".</td><td>Unfinished replies have no entry receivers are sent; plus a test with a controlled clock.</td><td>E-003</td></tr>
+        <tr><td>G&#8209;018</td><td>After three agents in a row no further agent is told until a person writes; an agent is held to 20 messages a minute.</td><td>A test with two agents that always answer each other.</td><td>E-003</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>How the system is put together, and how we work</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>What must stay true</th><th>How it is enforced</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>G&#8209;008</td><td>No part reads or writes another part's store; the feed holds nothing original.</td><td>Each part gets its own database login with rights to its own area only; plus a rule against importing another part's storage code.</td><td><span class="chip">pending</span></td></tr>
+        <tr><td>G&#8209;023</td><td>Every call from one part to another gives up after at most 3 s and has a stated answer for failure.</td><td>One shared way of calling, with the limit built in; plus a test with a part that accepts a call and never answers.</td><td><span class="chip">pending</span></td></tr>
+        <tr><td>G&#8209;021</td><td>Every contract names guardrails that exist, and every guardrail comes from an accepted decision.</td><td>The repository check; seen failing before the guardrails were registered.</td><td><span class="chip ok">enforced</span></td></tr>
+        <tr><td>G&#8209;022</td><td>A guardrail test is not edited without your approval.</td><td>The project settings ask you before any edit under the guardrail tests folder. It covers the edit tools only, and is not yet seen working: no such file exists yet.</td><td><span class="chip">pending</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>The seven contracts</h2>
+  <p>Each says who calls whom, what is sent (with one real example), what is promised, what happens on failure, how it may change, and which guardrails hold it.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Boundary</th><th>In one line</th><th>File</th></tr></thead>
+      <tbody>
+        <tr><td>Screen → Conversations</td><td>Every action carries an ID; "saved" means saved and logged; the same ID again changes nothing.</td><td><code>screen-to-conversations.md</code></td></tr>
+        <tr><td>Conversations → Screen</td><td>Numbered updates; after any gap the screen says its number and gets the rest, or reloads.</td><td><code>conversations-to-screen.md</code></td></tr>
+        <tr><td>Conversations → Search</td><td>Whole message with a version; never lost, may repeat; newest version wins, delete wins.</td><td><code>conversations-to-search.md</code></td></tr>
+        <tr><td>Conversations → Activity feed</td><td>Every change, strictly in order; a change the feed cannot apply is fenced.</td><td><code>conversations-to-feed.md</code></td></tr>
+        <tr><td>Activity feed → Notification sender</td><td>"Due", "changed", "withdrawn"; a name is sent once; held 5 s by the log's own clock.</td><td><code>feed-to-notification-sender.md</code></td></tr>
+        <tr><td>The door reading from the feed and search</td><td>Questions only; each answer says how far it reaches, so the door can say "catching up".</td><td><code>door-reads.md</code></td></tr>
+        <tr><td>The agent door</td><td>The agent reads from its own place; posts with an ID; replies in progress stay off the reliable path.</td><td><code>agent-door.md</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">All under <code>docs/contracts/</code>. A contract or a guardrail changes only through a decision.</p>
+</section>
+
+<footer class="foot">
+  <span>Belongs to T-034 · From D-005, D-006, D-007, D-008, D-015, D-017, D-018 · Behaviour already shown in experiments E-003, E-004, E-005 · An independent verifier found four blockers and six larger gaps; all are answered here, and the corrections were not re-checked</span>
+  <span>Full list: <code>docs/guardrails.md</code> · Architecture: <a href="T-022-architecture-proposal.html">review page</a></span>
+</footer>
+</main>
+</body>
+</html>
