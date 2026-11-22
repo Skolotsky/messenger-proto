@@ -166,7 +166,7 @@ details > .stack { gap: 10px; }
 
 <div class="ask">
   <div class="label">Needs you</div>
-  <p><strong>D-005 is decided:</strong> parts that talk only over the network with no message broker, PostgreSQL in Docker, WebSocket with numbered updates to the screen, TypeScript on the server. <strong>Next: who owns what a reader did (D-017, section 6).</strong> Four more decisions follow in order; each has options, risks, reasoning and a recommendation.</p>
+  <p><strong>D-005 is decided:</strong> parts that talk only over the network with no message broker, PostgreSQL in Docker, WebSocket with numbered updates to the screen, TypeScript on the server. <strong>D-017 is decided:</strong> Conversations owns what a reader did. <strong>Next: who decides that a notification is due (D-018, section 7).</strong> Three more decisions follow.</p>
   <p class="note">When a message broker would become the right choice, and how it would slot in: <a href="D-005-message-broker.html">its own page</a>.</p>
 </div>
 
@@ -460,7 +460,7 @@ server → screen   { "conversations": 4856, "kind": "message.changed", … }
   <p>Where a message lands depends on the reader: their Focus rules, dials, what they read, what they kept. Someone has to own those.</p>
   <div class="options">
     <div class="option pick">
-      <header><h3>A. Conversations owns the facts; the feed is worked out</h3><span class="chip ok">Recommended</span></header>
+      <header><h3>A. Conversations owns the facts; the feed is worked out</h3><span class="chip ok">Decided</span></header>
       <p>Read, dial, rule, Keep and Done are saved in Conversations like a message is, and travel on the same numbered log. The feed computes rows from the log and holds nothing original.</p>
       <dl>
         <dt>Upside</dt><dd>D-004 asks "had the reader read it when it was deleted?". With reads and deletes in one numbered order there is exactly one answer, on every rebuild. Unread marks on channels and the feed use the same read position (D-015). The feed can be wiped and rebuilt.</dd>

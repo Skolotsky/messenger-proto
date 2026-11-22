@@ -30,7 +30,7 @@ Line format: `- **D-nnn** [status] The decision as a statement, and what it comm
 ## System shape: components, boundaries, stack
 
 - **D-005** [accepted] Parts that talk only over the network and run as separate programs from one codebase, with no message broker; PostgreSQL in Docker as the one source of truth with a numbered change log; a delivery worker per receiver; WebSocket with numbered updates and catch-up to the screen; TypeScript on the server. Commits us to network boundaries between parts and one log every receiver is fed from. When a broker would become right is recorded in the decision → [record](D-005-system-shape.md)
-- **D-017** [open] Who owns what a reader did (read positions, dials, Focus rules, Keep and Done): the core as facts on the same log, with the feed worked out from them, or the feed itself. The draft assumes the core. Options: `docs/visuals/T-022-architecture-proposal.html`, section 6
+- **D-017** [accepted] Conversations owns what a reader did (read positions, watching, dials, Focus rules and people, Keep and Done) as facts on the one log; the feed holds nothing original and is worked out from it. Commits us to a feed that can be wiped, fenced and rebuilt, and to every reader action being a round trip through the log → [record](D-017-who-owns-reader-state.md)
 
 ## Contracts and qualities: what services promise each other
 
