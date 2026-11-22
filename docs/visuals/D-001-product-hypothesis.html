@@ -166,7 +166,7 @@ details > .stack { gap: 10px; }
 
 <div class="ask">
   <div class="label">Needs you</div>
-  <p><strong>Accept this as the product hypothesis?</strong> It holds everything we settled: the three buckets, the starting rules, the channel dial, what Focus means for a channel or thread, and the sender's Flag and Info.</p>
+  <p><strong>Accept this as the product hypothesis?</strong> It holds everything we settled: the three buckets, the starting rules, the channel and thread dials, what Focus means for a channel or thread, and the sender's Flag and Info.</p>
 </div>
 
 <section>
@@ -222,6 +222,28 @@ details > .stack { gap: 10px; }
 </section>
 
 <section>
+  <h2>Tuning it: one dial per thread</h2>
+  <p>For a thread the dial simply chooses the bucket its replies go to. Follow and Unfollow are the one-click shortcuts; a small menu beside the button offers all four levels.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Level</th><th>New replies land in</th><th>You get it automatically when</th></tr></thead>
+      <tbody>
+        <tr><td><span class="chip you">Focus</span></td><td>Focus</td><td>Never; you choose it</td></tr>
+        <tr><td><strong>Needs you</strong></td><td>Needs you</td><td>You started the thread or replied in it</td></tr>
+        <tr><td><strong>For your information</strong></td><td>For your information</td><td>You were mentioned in it, or you clicked Follow</td></tr>
+        <tr><td><strong>Off</strong></td><td>Nowhere</td><td>Every other thread; also what Unfollow sets</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ul>
+    <li>What names you gets through even at Off.</li>
+    <li>The thread's dial wins over the channel's, so a followed thread in a muted channel still reaches you.</li>
+    <li>Replying in a thread you turned off sets it back to Needs you.</li>
+    <li>A thread is one row in whichever bucket it lands in: “Pricing page · 4 new replies”.</li>
+  </ul>
+</section>
+
+<section>
   <h2>What Focus means for a channel and for a thread</h2>
   <p>People focus a channel when they are on call, in a crunch, when every post matters, or when they are the one who answers. All of them want every post, not only what names them.</p>
   <div class="split">
@@ -241,7 +263,7 @@ details > .stack { gap: 10px; }
       </ul>
     </div>
   </div>
-  <p class="note">Reactions never land in Focus. An end date on a Focus rule was considered and set aside for now.</p>
+  <p class="note">Reactions never land in Focus. An end date on a Focus rule was considered and set aside for now. Ad-hoc topics (a handful of people around one subject, archived automatically) are noted as a later surface; channels are enough for the first version.</p>
 </section>
 
 <section>

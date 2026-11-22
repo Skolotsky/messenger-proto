@@ -53,6 +53,16 @@ The first version of this option had two tiers. The user leaned to A and added t
   | Muted | Only what names you: direct mentions and flags that mention you |
 
   Whatever the level, a direct mention or a flag that names you always gets through, and every item's reason includes the channel's level ("#launch is set to All activity").
+- **Each thread has a dial too, and its levels are the buckets themselves.** The question is always "where should replies from this thread go?":
+
+  | Level | Where new replies land | Set automatically when |
+  |---|---|---|
+  | Focus | Focus | never; the person chooses it |
+  | Needs you | Needs you | you started the thread or replied in it |
+  | For your information | For your information | you were mentioned in it, or you clicked Follow |
+  | Off | nowhere | every other thread; also what Unfollow sets |
+
+  Follow and Unfollow are one-click shortcuts for "For your information" and "Off"; a small menu beside the button offers all four levels, which most people will never open. Rules that go with it: what names you gets through even at Off; the thread's dial wins over the channel's for replies, so a followed thread in a muted channel still reaches you; replying in a thread you turned off sets it back to Needs you; being mentioned does not override an explicit Off, though the mention itself arrives; "everyone in the thread", for a flag that mentions nobody, means everyone whose dial for it is not Off; Info replies still land no higher than For your information. A thread is one row in whichever bucket it lands in.
 - **Nothing jumps.** An edit or a delete never changes the size or position of what is on screen. A longer edit sits behind an expander, a shorter one keeps its space, a deleted message leaves a marker in its place, and emptied space is filled with care (an illustration, not a gap). The feed still always shows the current truth. Detail belongs to D-004.
 
 Starting rules, so that Focus is useful before anyone configures anything (recommended; the user proposed "any direct message" and "any direct mention", see the note below):
@@ -60,8 +70,8 @@ Starting rules, so that Focus is useful before anyone configures anything (recom
 | Bucket | What lands there from day one |
 |---|---|
 | Focus (your rules, both removable) | Direct messages from people, one to one. Flagged messages that mention you or are sent to you directly, from a person or an agent |
-| Needs you (fixed) | Direct mentions of you. Replies in threads you started or replied in. Flagged messages that mention nobody, in your threads and channels |
-| For your information (fixed) | Reactions to your messages, grouped. Mentions of a whole channel or group. Activity in threads you only follow. Messages marked Info that concern you |
+| Needs you (fixed) | Direct mentions of you. Replies in threads you started or replied in (the thread dial's automatic level). Flagged messages that mention nobody, in your threads and channels |
+| For your information (fixed) | Reactions to your messages, grouped. Mentions of a whole channel or group. Replies in threads you follow or were mentioned in. Messages marked Info that concern you |
 | Never in the feed | Agent text that is still streaming in. Ordinary channel traffic you were not addressed in |
 
 Note on the difference from the user's proposal: direct mentions start in Needs you, not Focus. Mentions are frequent and often a courtesy ("thanks @sam"), and with them in Focus the Needs you bucket is left almost empty and Focus becomes Needs you under another name. "Any direct mention" is offered as a suggested rule, one click to add.
@@ -102,7 +112,7 @@ Where A as shaped goes beyond that practice: text rules judged by a model add a 
 
 **A as described above**, with the starting rules in the table.
 
-Locks in: three buckets with one item in one place; Focus is defined only by the person's rules; fixed, explained rules for the other two; the sender's level on a message (Flag, Info); one dial per channel; one row per conversation in Focus; agents are participants in conversations; text rules judged by a model are in scope, built last, after an experiment; nothing jumps on edit or delete.
+Locks in: three buckets with one item in one place; Focus is defined only by the person's rules; fixed, explained rules for the other two; the sender's level on a message (Flag, Info); one dial per channel and one per thread; one row per conversation; agents are participants in conversations; text rules judged by a model are in scope, built last, after an experiment; nothing jumps on edit or delete.
 
 Order of building: the three buckets with exact rules and flags first; text rules last.
 
@@ -112,13 +122,15 @@ No second opinion was sought: nothing is built yet, so changing course costs lit
 
 ## Decision
 
-_Open._ Settled in discussion so far (user, 2026-11-22): option A; Focus as a third, top bucket defined by the person's rules; one item in one place with Focus winning; a count before a rule is saved; text rules judged by a model stay in scope, promote-only and after the item is shown, with experiment and build postponed until the rest is done; nothing jumps on edit or delete; the sender's mark is called a flag, is for whoever the message mentions, and for everyone in scope when it mentions nobody. the starting rules are good as defaults, with one dial per channel to tune them (Focus, All activity, Default, Muted); a channel or thread in Focus brings every new post or reply, shown as one row per conversation; senders can also mark a message Info. Set aside for now, to keep it simple: an end date on a Focus rule. Still to confirm: the record as a whole.
+_Open._ Settled in discussion so far (user, 2026-11-22): option A; Focus as a third, top bucket defined by the person's rules; one item in one place with Focus winning; a count before a rule is saved; text rules judged by a model stay in scope, promote-only and after the item is shown, with experiment and build postponed until the rest is done; nothing jumps on edit or delete; the sender's mark is called a flag, is for whoever the message mentions, and for everyone in scope when it mentions nobody. the starting rules are good as defaults, with one dial per channel to tune them (Focus, All activity, Default, Muted); a channel or thread in Focus brings every new post or reply, shown as one row per conversation; senders can also mark a message Info. each thread has a dial whose levels are the buckets plus Off, with Follow and Unfollow as shortcuts. Set aside for now, to keep it simple: an end date on a Focus rule. Noted by the user as a later surface, not in the first version because channels are enough: ad-hoc topics (see Follow-ups). Still to confirm: the record as a whole.
 
 ## Consequences
 
 _Filled in when accepted._
 
 ## Follow-ups
+
+- Later surface, out of scope for the first version (user, 2026-11-22): **ad-hoc topics**, for gathering a handful of people around one subject, the role group direct messages play in Slack. A topic behaves like a channel but is not listed among channels, has no channel identity (a title for the subject, no name), is archived automatically after a period without activity, and has its own notification defaults. Recorded so D-009 and the data model do not rule it out.
 
 - D-009 (which surfaces the PoC includes) and D-002 to D-004 open once this is accepted. D-002 inherits flags and "agents are participants"; D-003 inherits the buckets and rules; D-004 inherits "nothing jumps", plus the open question of how long a deleted message's marker stays and whether it counts as needing you.
 - An experiment on text rules, run after the rest is built: can a plain-text rule sort our seeded messages well enough and fast enough? It needs a real model, which becomes a system-shape question at that point.
