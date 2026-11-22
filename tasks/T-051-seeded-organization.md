@@ -38,6 +38,8 @@ One invented organization, 30 people, 6 agents and 20 channels, with two weeks o
 - 2026-11-22: reading samples found defects the tests had not: builds out of order, ticket numbers repeating, research progress going backwards, "We are frozen" before the freeze, a customer with tickets before it signed, a monitoring reply from the marketing lead. Fixed: exchanges can be pinned to a day, agents' numbers rise, each agent is answered by people who would answer it.
 - 2026-11-22: replaying through the model with the seeded Focus rules showed a situation would have been wrong (Omar is Maya's Focus person, so his reply lands in Focus). The replier changed.
 
+- 2026-11-22: Correction to commit a9b5542: its message says the replay test failed when the rule keeping a read flag in Focus was removed. That planted change only broke the build, and a corrected version of it changes no behaviour, because the code falls through to the same answer. Two faults that do change behaviour were then planted, and the replay test caught both (`"ask" is in focus_new, expected focus_kept`).
+
 ## Evidence
 
 Default seed (20261117): 7,956 changes in the log, of which 1,564 messages (813 replies, 237 with a mention, 43 flags, 300 Info, 382 by agents), 29 edits, 8 deletes, 806 reactions added and 13 taken back. Two other seeds give 1,542 and 1,553 messages.
