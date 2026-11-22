@@ -166,7 +166,7 @@ details > .stack { gap: 10px; }
 
 <section>
   <h2>What was built</h2>
-  <p>A throwaway version of the system map: the core, the delivery workers, a search stand-in, the feed and a notification sender, as separate programs on this machine that talk only over the network. A scripted team of 12 posts, replies, mentions, flags, edits, deletes, reacts and reads at up to 300 actions a second. The test stops programs for real and then compares every receiver with the truth. 96 checks; all came out as expected.</p>
+  <p>A throwaway version of the system map: the core, the delivery workers, a search stand-in, the feed and a notification sender, as separate programs on this machine that talk only over the network. A scripted team of 12 posts, replies, mentions, flags, edits, deletes, reacts and reads at up to 300 actions a second. The test stops programs for real and then compares every receiver with the truth. 110 checks; all came out as expected.</p>
   <div class="split">
     <div class="panel"><div class="label">Nothing lost</div><p>The core was killed five times mid-burst. Every action a screen was told "saved" is there, once.</p></div>
     <div class="panel"><div class="label">One slow part delays nobody</div><p>With search stopped or answering too slowly, the feed stayed 7 ms behind (worst 18 ms). Search cleared 661 waiting changes 0.6 s after coming back.</p></div>
@@ -211,6 +211,21 @@ details > .stack { gap: 10px; }
 </section>
 
 <section>
+  <h2>Added on request: the agent door, with scripted agents only</h2>
+  <p>Three scripted agents read what addresses them and answer. One is away for three seconds; each "crashes" now and then before noting how far it got, so it reads the same event again and answers again.</p>
+  <div class="split">
+    <div class="panel"><div class="label">Nothing missed, nothing doubled</div><p>183 events: all received, in order. 183 replies saved; 46 repeats recognised by their ID.</p></div>
+    <div class="panel"><div class="label">Replies written piece by piece</div><p>59 of them. No receiver saw one unfinished; a piece sent twice appears once; 10 abandoned mid-way were closed as "stopped" with the text so far.</p></div>
+    <div class="panel"><div class="label">Agents and each other</div><p>Two agents that always answer each other stopped after three messages. One posting too fast had 20 of 45 accepted and was told to slow down.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Added on request: rebuilding at the seeded team's size</h2>
+  <p>36 participants, 20 channels, 48,800 changes. The rebuilt feed equals a clean replay, but it took <strong>80 seconds</strong> (107 without batches), not the "under a minute" I had proposed. So Reset in the control panel will restore a saved copy, and Rebuild stays as its own button with a test that both give the same result.</p>
+</section>
+
+<section>
   <h2>Can the checks fail? Four versions broken on purpose</h2>
   <div class="table-wrap">
     <table>
@@ -231,7 +246,7 @@ details > .stack { gap: 10px; }
     <li><span class="chip risk">Not verified</span> <strong>The database.</strong> The experiment uses SQLite, which lets one program write at a time. The proposal's PostgreSQL has a known trap (a change saved a moment late being stepped over) that cannot occur here. It was only modelled. Checking it for real needs PostgreSQL, which would have to be downloaded.</li>
     <li><strong>Real speeds.</strong> 6 to 12 ms is this machine, local calls, a tiny store. It says the 2-second target has a wide margin, not what the product will measure.</li>
     <li><strong>The feed's rules.</strong> A subset was used; E-001 is the evidence for the rules themselves.</li>
-    <li><strong>Screens and agents.</strong> No browser, no live connection, no streamed replies.</li>
+    <li><strong>Screens.</strong> Tried separately in a real browser (E-005). Real agents and a reply in progress as seen on a screen are not tried.</li>
   </ul>
 </section>
 

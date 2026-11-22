@@ -34,7 +34,7 @@ The numbers are proposals; each is a dial the user can turn. Measured on one loc
 | A slow or failing model breaks nothing (built last) | the row stays | a model fake that times out |
 | Repeats and late arrivals change nothing | identical end state | a proxy that repeats every delivery and shuffles nearby ones |
 | A notification appears in the tray once, late if need be | 1; marked "delayed" past ten minutes | stop the sender for five minutes; stop it between sending and confirming; rebuild the feed while it runs |
-| A receiver can be rebuilt from nothing | under 1 minute at seeded size, equal to before | wipe the feed, then search, then the notification sender, while the team is active; the sender refills its tray without interrupting anyone |
+| A receiver can be rebuilt from nothing | under 2 minutes at seeded size, equal to before (E-003 at full size: feed 80 s with batches of 100, 107 s without; search 21 s; "under 1 minute" as first proposed was not reached) | wipe the feed, then search, then the notification sender, while the team is active; the sender refills its tray without interrupting anyone |
 | A screen that lost its connection ends right | caught up 2 s after reconnecting; a silently lost update healed within 20 s; reload past 500 missed updates | cut the connection for 30 s; swallow single updates; keep a screen away past the limit; compare with a fresh load |
 | A surface that is behind says so | notice when more than 10 s behind | any outage above, on the rendered page |
 
@@ -50,7 +50,7 @@ Timeouts on every call, exponential backoff with jitter, a parking place for poi
 
 ## Recommendation
 
-The table as proposed. Reset in the control panel uses the rebuild path (reload the seeded truth, receivers rebuild from the log), so that path runs at every reset. Reversibility: cheap; these are settings and tests.
+The table as proposed. Reset in the control panel restores a saved copy of each part taken after a rebuild (a rebuild at full size takes over a minute); Rebuild is its own control, and a test proves a rebuilt receiver equals the saved copy. Reversibility: cheap; these are settings and tests.
 
 ## Decision
 

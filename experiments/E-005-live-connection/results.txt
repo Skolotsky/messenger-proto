@@ -1,0 +1,16 @@
+holds                  | steady: 2,000 updates at 400 a second | the screen equals a fresh load | 0 of 700 items differ; screen at 2000, server at 2000; reconnected 0, asked again 0, reloaded 0, repeats ignored 0
+holds                  | the connection cut five times mid-burst | the screen equals a fresh load | 0 of 1444 items differ; screen at 4000, server at 4000; reconnected 5, asked again 0, reloaded 0, repeats ignored 0
+holds                  | the server refuses connections for 2 s mid-burst | the screen equals a fresh load | 0 of 1985 items differ; screen at 5600, server at 5600; reconnected 10, asked again 0, reloaded 1, repeats ignored 0
+holds                  | one update in twenty lost silently on a live connection | the screen equals a fresh load | 0 of 2740 items differ; screen at 7600, server at 7600; reconnected 10, asked again 26, reloaded 1, repeats ignored 0
+holds                  | the last update of a burst lost silently, then silence | the screen equals a fresh load | 0 of 2757 items differ; screen at 7650, server at 7650; reconnected 10, asked again 27, reloaded 1, repeats ignored 0
+holds                  | away while 800 updates pass (more than the 500 kept ready) | the screen equals a fresh load | 0 of 3014 items differ; screen at 8450, server at 8450; reconnected 10, asked again 27, reloaded 2, repeats ignored 0
+holds                  | away while 800 updates pass (more than the 500 kept ready) | it reloaded once instead of replaying | 1 reloads
+caught                 | broken on purpose: a screen that applies whatever arrives, one update in twenty lost | the screen equals a fresh load | 45 of 3442 items differ; screen at 9650, server at 9650; reconnected 0, asked again 0, reloaded 1, repeats ignored 0
+caught                 | broken on purpose: a screen that reconnects without saying where it was, connection cut | the screen equals a fresh load | 3007 of 3861 items differ; screen at 10850, server at 10850; reconnected 3, asked again 0, reloaded 0, repeats ignored 0
+holds                  | the good screen, after sharing those faults | the screen equals a fresh load | 0 of 3861 items differ; screen at 10850, server at 10850; reconnected 13, asked again 46, reloaded 2, repeats ignored 0
+holds                  | twelve tabs open at once on plain http://127.0.0.1 | WebSocket: every tab is connected and current | 12 of 12
+caught                 | twelve tabs open at once on plain http://127.0.0.1 | the browser's one-way stream: every tab is connected | 6 of 12 (the browser allows six per site)
+
+measured | steady: 2,000 updates at 400 a second | server to screen | median -0 ms, 19 in 20 within 0 ms, worst 5 ms
+
+12 checks, 0 unexpected. Heartbeat every 0.5 s (proposal: about 20 s).

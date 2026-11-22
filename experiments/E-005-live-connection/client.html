@@ -1,0 +1,47 @@
+<!doctype html><meta charset="utf-8"><title>E-005 screen</title>
+<script>
+// A screen's side of the contract. mode=good is the design; "careless" applies whatever arrives;
+// "noresume" reconnects without saying where it was. The last two exist to see the checks fail.
+const mode = new URLSearchParams(location.search).get('mode') || 'good';
+let state = {}, last = 0, ws = null, back = 100, paused = false, reloading = false, lastAsk = 0, lastUpdate = 0;
+const stats = {reconnects: 0, resumes: 0, reloads: 0, repeatsIgnored: 0, lat: []};
+
+function apply(u) {
+  if (u.kind === 'set') state[u.key] = u.value; else delete state[u.key];
+  last = u.n; lastUpdate = Date.now(); stats.lat.push(Date.now() - u.t);
+}
+function ask() {                                   // "send me everything after the last one I have"
+  if (Date.now() - lastAsk < 200 || !ws || ws.readyState !== 1) return;
+  lastAsk = Date.now(); stats.resumes++;
+  ws.send(JSON.stringify({resume: last}));
+}
+async function reload() {                          // too far behind: load the view fresh, then carry on
+  reloading = true;
+  const r = await (await fetch('/snapshot')).json();
+  state = r.state; last = r.n; stats.reloads++; reloading = false;
+  ws.send(JSON.stringify({resume: last}));
+}
+function connect() {
+  if (paused) return;
+  ws = new WebSocket(`ws://${location.host}/ws`);
+  ws.onopen = () => { back = 100; ws.send(JSON.stringify({resume: mode === 'noresume' ? -1 : last})); };
+  ws.onmessage = e => {
+    const u = JSON.parse(e.data);
+    if (u.too_far_behind) { reload(); return; }
+    if (reloading) return;
+    if (u.head !== undefined) {                    // "the newest number is ...": did I miss the end of something?
+      if (mode === 'good' && u.head > last && Date.now() - lastUpdate > 300) ask();
+      return;
+    }
+    if (mode !== 'good') { apply(u); return; }
+    if (u.n <= last) { stats.repeatsIgnored++; return; }
+    if (u.n === last + 1) { apply(u); return; }
+    ask();                                         // a gap: do not apply out of order, ask again
+  };
+  ws.onclose = () => { if (paused) return; stats.reconnects++; setTimeout(connect, back); back = Math.min(back * 2, 1000); };
+}
+window.pause = () => { paused = true; ws.close(); };
+window.resume = () => { paused = false; connect(); };
+window.snap = () => ({state, last, stats});
+connect();
+</script>

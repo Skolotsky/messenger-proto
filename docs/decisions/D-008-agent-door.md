@@ -35,6 +35,8 @@ Chat products deliver events to agents across a boundary with acknowledgement an
 
 Reversibility: cheap to moderate; A can be added beside B.
 
+Tried with scripted agents in E-003 (2026-11-22): 183 events to three agents, one of them away for 3 s and all of them crashing now and then, none missed and in order; 46 repeated replies saved once; 59 streamed replies never seen unfinished by a receiver; 10 abandoned ones closed as "stopped"; an agent loop stopped at three; a too-fast agent slowed down and retried. An agent told to slow down must wait and send the same thing again; that is part of the contract.
+
 Second opinion: chose B; noted that through MCP nothing is pushed, so "reads from its place" is a call the agent makes, and that agent posts need an ID against double posting. Both are in the proposal.
 
 ## Decision

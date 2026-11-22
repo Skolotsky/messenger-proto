@@ -8,7 +8,7 @@ sys.path.insert(0, HERE)
 import spine
 from spine import HOLD, PEOPLE, call
 
-CH = ['#c0', '#c1', '#c2', '#c3']
+CH = [f'#c{i}' for i in range(int(os.environ.get('E003_CHANNELS', '4')))]
 ROWS = []          # (scenario, check, ok, expected_ok, detail)
 NOTES = []         # (scenario, measurement, value)
 
@@ -584,6 +584,154 @@ def s_fence():
     sy2.down(expect_errors=True)
 
 
+def s_agents():
+    """Scripted agents only: they are told what addresses them, go away, crash and repeat themselves."""
+    S = 'scripted agents at the agent door'
+    sy = Sys('agents').up()
+    core = sy.url('core')
+    drv = Driver(sy, 21).run(1200, 150)                # ordinary traffic meanwhile
+    stop, t0 = threading.Event(), spine.clock()
+    got, place, repeats, lat = {a: [] for a in spine.AGENTS}, {a: 0 for a in spine.AGENTS}, [0], []
+    full, cut_short = {}, {}                            # what a streamed reply should end up as
+    pieces = [f'piece {k}. ' for k in range(5)]
+
+    slowed = [0]
+
+    def act(o):
+        while True:
+            st, out = call(core + '/agent/act', o, timeout=2)
+            if st != 429:
+                break
+            slowed[0] += 1                              # told to slow down: wait and send the same thing again
+            time.sleep(0.3)
+        if out.get('dup'):
+            repeats[0] += 1
+        return st, out
+
+    def respond(name, e, rng):
+        m, n = e['message'], e['number']
+        rid, thread = f'{name}-re-{n}', e['message']['thread'] or e['message']['id']
+        if m['text'] == 'loop':                         # two agents that always answer each other
+            other = 'a1' if name == 'a0' else 'a0'
+            act(dict(id=rid, agent=name, kind='post', msg=rid, conv=m['conv'], thread=thread, text='loop', mentions=[other], cause=n))
+        elif m['author'] not in PEOPLE:
+            return
+        elif n % 3 == 0:                                # a reply written piece by piece, ending with a flag
+            act(dict(id=rid + '-start', agent=name, kind='start', msg=rid, conv=m['conv'], thread=thread, cause=n))
+            dies = name == 'a2' and n % 6 == 0
+            at = 0
+            for k, p in enumerate(pieces):
+                if dies and k == 2:
+                    cut_short[rid] = ''.join(pieces[:2])
+                    return                              # the agent dies mid-reply and never finishes
+                act(dict(agent=name, kind='piece', msg=rid, at=at, text=p))
+                if k == 1:
+                    act(dict(agent=name, kind='piece', msg=rid, at=at, text=p))   # the same piece again
+                at += len(p)
+                time.sleep(0.02)
+            act(dict(id=rid + '-finish', agent=name, kind='finish', msg=rid, level='flag', mentions=[m['author']]))
+            full[rid] = ''.join(pieces)
+        else:
+            act(dict(id=rid, agent=name, kind='post', msg=rid, conv=m['conv'], thread=thread, text='done', mentions=[], level='info', cause=n))
+
+    def agent(name, away=None):
+        rng = random.Random(name)
+        while not stop.is_set():
+            if away and away[0] < spine.clock() - t0 < away[1]:
+                time.sleep(0.1)                         # this agent is simply not there for a while
+                continue
+            st, out = call(f'{core}/agent/events?agent={name}&after={place[name]}&wait=0.5', timeout=2)
+            if st != 200:
+                time.sleep(0.05)
+                continue
+            for e in out['events']:
+                got[name].append(e['number'])
+                if name == 'a0':
+                    lat.append((spine.clock() - e['t']) * 1000)
+                respond(name, e, rng)
+                if rng.random() < 0.2 and e['number'] not in (cut_short and [int(k.split('-re-')[1]) for k in cut_short]):
+                    break                               # crashes before noting how far it got: reads this event again
+                place[name] = e['number']
+    ts = [threading.Thread(target=agent, args=('a0',)), threading.Thread(target=agent, args=('a1', (2, 5))), threading.Thread(target=agent, args=('a2',))]
+    for t in ts:
+        t.start()
+    post = lambda o: call(core + '/act', o, timeout=2)
+    time.sleep(0.5)
+    post(dict(id='hl', kind='post', msg='loopstart', conv='#c0', author='p0', text='loop', mentions=['a0'], level=None))
+    for i in range(180):                                # people mention agents, a1 also while it is away
+        ag = ['a0', 'a2', 'a1'][i % 3]
+        post(dict(id=f'h{i}', kind='post', msg=f'ask{i}', conv=CH[i % 4], author=PEOPLE[i % 12], text=f'question {i}', mentions=[ag], level=None))
+        time.sleep(0.04)
+    drv.join()
+    time.sleep(6)                                       # a1 is back and has caught up; abandoned replies are closed
+    stop.set()
+    for t in ts:
+        t.join()
+    time.sleep(spine.RATE_WINDOW + 0.5)
+    accepted = sum(1 for i in range(45) if call(core + '/agent/act', dict(id=f'rate{i}', agent='a2', kind='post', msg=f'rate{i}', conv='#c3',
+                                                                           text='burst', mentions=[], level='info'))[0] == 200)
+    quiesce(sy)
+    ev = {a: [n for (n,) in sy.q('core.db', 'select number from agent_events where agent=? order by number', (a,))] for a in spine.AGENTS}
+    ok = all(sorted(set(got[a])) == ev[a] and got[a] == sorted(got[a]) for a in spine.AGENTS)
+    ROWS.append((S, 'every agent received every event addressed to it, in order', ok, True,
+                 '; '.join(f'{a}: {len(ev[a])} events, read {len(got[a])} times' for a in spine.AGENTS) + ' (a1 was away for 3 s)'))
+    truth = {i: json.loads(b) for i, b in sy.q('core.db', 'select id,body from messages')}
+    answered = [f'{a}-re-{n}' for a in spine.AGENTS for n in ev[a]]
+    human = [rid for rid in answered if rid in truth]
+    missing = [a for a in ('a0', 'a1', 'a2') for n in ev[a]
+               if json.loads(sy.q('core.db', 'select body from agent_events where agent=? and number=?', (a, n))[0][0])['message']['author'] in PEOPLE
+               and f'{a}-re-{n}' not in truth]
+    ROWS.append((S, 'a reply sent again after a crash is saved once, and none is missing', not missing and repeats[0] > 0, True,
+                 f'{len(human)} replies saved, {repeats[0]} repeats recognised by their ID, {len(missing)} missing'))
+    log = sy.q('core.db', "select kind,body from change_log where kind!='tick' order by number")
+    streamed = {json.loads(b)['id'] for k, b in log if k == 'stream.started'}
+    early = [json.loads(b)['id'] for k, b in log if k.startswith('message.') and json.loads(b).get('id') in streamed and not json.loads(b).get('finished', True)]
+    docs = dict(sy.q('search.db', 'select id,text from docs'))
+    wrong = [i for i in streamed if docs.get(i) != truth[i]['text'] or not truth[i]['finished']]
+    ROWS.append((S, 'text in progress reached no receiver; the finished reply reached search whole', not early and not wrong and len(streamed) > 0, True,
+                 f'{len(streamed)} replies written piece by piece; {len(early)} unfinished ones sent to receivers; {len(wrong)} differ in search'))
+    bad_full = [i for i, t in full.items() if truth[i]['text'] != t or truth[i].get('stopped')]
+    ROWS.append((S, 'a piece sent twice appears once', not bad_full and len(full) > 0, True, f'{len(full)} finished replies, {len(bad_full)} with wrong text'))
+    bad_cut = [i for i, t in cut_short.items() if truth[i]['text'] != t or not truth[i].get('stopped')]
+    ROWS.append((S, 'a reply abandoned mid-way is closed as "stopped" with the text so far', not bad_cut and len(cut_short) > 0, True,
+                 f'{len(cut_short)} abandoned, {len(bad_cut)} not closed properly'))
+    loop = [m for m in truth.values() if m.get('thread') == 'loopstart' and m['author'] in spine.AGENTS]
+    ROWS.append((S, 'two agents that always answer each other stop after three messages', len(loop) == spine.CHAIN_CAP, True, f'{len(loop)} agent messages in the thread'))
+    ROWS.append((S, 'an agent posting too fast is told to slow down', accepted == spine.RATE, True, f'{accepted} of 45 accepted in one window (limit {spine.RATE})'))
+    NOTES.append((S, 'event written to received by a waiting agent', fmt(lat)))
+    NOTES.append((S, 'agents told to slow down while catching up', f'{slowed[0]} times; each waited and sent again'))
+    check(sy, drv, S + ' · and the receivers')
+    sy.down()
+
+
+def s_rebuild_full():
+    """Not in the default run: E003_PEOPLE=36 E003_CHANNELS=20 run.py rebuild-full. The seeded team's size."""
+    n = int(os.environ.get('E003_CHANGES', '50000'))
+    S = f'rebuild at the seeded team\'s size: {len(PEOPLE)} participants, {len(CH)} channels'
+    sy = Sys('full').up()
+    drv = Driver(sy, 31).run(n, 700, threads=12)
+    drv.join()
+    quiesce(sy, 600)
+    head = call(sy.url('core') + '/head')[1]['head']
+    real = sy.q('core.db', "select count(*) from change_log where kind!='tick'")[0][0]
+    rows = sy.q('feed.db', "select count(*) from kv where k like 'row:%'")[0][0]
+    t0 = spine.clock()
+    sy.wipe('feed', ['feed.db', 'feed-delivery.db'])
+    while dict(sy.q('feed.db', 'select k,v from meta')).get('last') != head:
+        time.sleep(0.2)
+    took = spine.clock() - t0
+    NOTES.append((S, 'feed rebuilt from nothing', f'{real} changes ({rows} rows for {len(PEOPLE)} readers) in {took:.1f} s: {real / took:.0f} changes a second, ' + ('up to 100 changes per call' if os.environ.get('BATCH') == '1' else 'one change per call')))
+    t0 = spine.clock()
+    sy.wipe('search', ['search.db'])
+    sy.w('delivery.db', "update cursors set place=0, last_sent=0 where name='search'")
+    while sy.q('delivery.db', "select place from cursors where name='search'")[0][0] != head:
+        time.sleep(0.2)
+    NOTES.append((S, 'search refilled from nothing', f'{spine.clock() - t0:.1f} s'))
+    quiesce(sy, 600)
+    check(sy, drv, S)
+    sy.down()
+
+
 def s_mutations():
     mutation('search without the version rule, under late copies', 'search_noguard', 'search equals the truth',
              lambda sy: Driver(sy, 2).run(1500, 150), chaos=True)
@@ -666,7 +814,8 @@ def s_numbering_model():
 
 SCENARIOS = {'healthy': s_healthy, 'chaos': s_chaos, 'search-down': s_search_down, 'search-slow': s_search_slow, 'park': s_park,
              'kill-core': s_kill_core, 'kill-others': s_kill_others, 'rebuild': s_rebuild, 'hold': s_hold,
-             'fence': s_fence, 'mutations': s_mutations, 'numbering': s_numbering_model}
+             'fence': s_fence, 'agents': s_agents, 'mutations': s_mutations, 'numbering': s_numbering_model}
+EXTRA = {'rebuild-full': s_rebuild_full}      # run by name, with the sizes in the environment
 
 if __name__ == '__main__':
     random.seed(1)
@@ -674,7 +823,7 @@ if __name__ == '__main__':
     t0 = spine.clock()
     for n in names:
         print(f'[{spine.clock() - t0:5.0f} s] {n}', flush=True)
-        SCENARIOS[n]()
+        {**SCENARIOS, **EXTRA}[n]()
     lines, unexpected = [], 0
     for sc, name, ok, exp, detail in ROWS:
         verdict = ('holds' if ok else 'BROKEN') if exp else ('caught' if not ok else 'NOT CAUGHT')

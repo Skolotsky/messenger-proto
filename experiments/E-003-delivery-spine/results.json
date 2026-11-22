@@ -103,7 +103,7 @@
    "every acknowledged action is saved, once",
    true,
    true,
-   "2400 acknowledged, 2343 changes in the log"
+   "2400 acknowledged, 2344 changes in the log"
   ],
   [
    "search stopped for 5 s mid-burst",
@@ -124,7 +124,7 @@
    "the feed equals a clean replay of the log",
    true,
    true,
-   "0 of 3519 entries differ; 1586 notes against 1586"
+   "0 of 3520 entries differ; 1585 notes against 1585"
   ],
   [
    "search stopped for 5 s mid-burst",
@@ -173,7 +173,7 @@
    "the feed equals a clean replay of the log",
    true,
    true,
-   "0 of 2811 entries differ; 1158 notes against 1158"
+   "0 of 2811 entries differ; 1162 notes against 1162"
   ],
   [
    "search answers after 1.5 s (longer than the 1 s limit) for 4 s",
@@ -194,7 +194,7 @@
    "no due notification is missing",
    true,
    true,
-   "0 missing of 738 due"
+   "0 missing of 740 due"
   ],
   [
    "search refuses one delete, then refuses everything · while parked",
@@ -243,7 +243,7 @@
    "the feed equals a clean replay of the log",
    true,
    true,
-   "0 of 880 entries differ; 319 notes against 319"
+   "0 of 880 entries differ; 317 notes against 317"
   ],
   [
    "search refuses one delete, then refuses everything · after recovery",
@@ -264,14 +264,14 @@
    "no due notification is missing",
    true,
    true,
-   "0 missing of 219 due"
+   "0 missing of 218 due"
   ],
   [
    "the core killed five times mid-burst",
    "every acknowledged action is saved, once",
    true,
    true,
-   "1998 acknowledged, 1950 changes in the log"
+   "1998 acknowledged, 1949 changes in the log"
   ],
   [
    "the core killed five times mid-burst",
@@ -292,7 +292,7 @@
    "the feed equals a clean replay of the log",
    true,
    true,
-   "0 of 2819 entries differ; 1313 notes against 1313"
+   "0 of 2819 entries differ; 1319 notes against 1319"
   ],
   [
    "the core killed five times mid-burst",
@@ -313,7 +313,7 @@
    "no due notification is missing",
    true,
    true,
-   "0 missing of 826 due"
+   "0 missing of 829 due"
   ],
   [
    "delivery, feed, sender and search each killed mid-burst; the feed's place moved by mistake",
@@ -369,7 +369,7 @@
    "every acknowledged action is saved, once",
    true,
    true,
-   "2496 acknowledged, 2439 changes in the log"
+   "2496 acknowledged, 2438 changes in the log"
   ],
   [
    "the feed wiped mid-burst and rebuilt",
@@ -390,7 +390,7 @@
    "the feed equals a clean replay of the log",
    true,
    true,
-   "0 of 3650 entries differ; 1633 notes against 1633"
+   "0 of 3651 entries differ; 1633 notes against 1633"
   ],
   [
    "the feed wiped mid-burst and rebuilt",
@@ -446,7 +446,7 @@
    "none sent for what was read or deleted within the hold",
    false,
    false,
-   "83 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing"
+   "80 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing"
   ],
   [
    "hold \"arrival\" · the feed down for 3 s",
@@ -474,7 +474,7 @@
    "none sent for what was read or deleted within the hold",
    false,
    false,
-   "147 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing"
+   "148 sent wrongly out of 160 that were read or deleted in time; 0 due ones missing"
   ],
   [
    "hold \"watermark\" · the feed slower than the traffic",
@@ -495,7 +495,7 @@
    "outside the fences, the notification notes equal a clean replay",
    true,
    true,
-   "910 notes against 910"
+   "912 notes against 912"
   ],
   [
    "the feed cannot apply one edit and one dial change · while fenced",
@@ -516,7 +516,7 @@
    "the feed equals a clean replay of the log",
    false,
    false,
-   "48 of 2720 entries differ; 933 notes against 990"
+   "48 of 2720 entries differ; 935 notes against 992"
   ],
   [
    "the feed cannot apply one edit and one dial change · while fenced",
@@ -551,7 +551,7 @@
    "the feed equals a clean replay of the log",
    true,
    true,
-   "0 of 2720 entries differ; 990 notes against 990"
+   "0 of 2720 entries differ; 992 notes against 992"
   ],
   [
    "the feed cannot apply one edit and one dial change · after the fix and a rebuild",
@@ -565,7 +565,7 @@
    "no due notification is missing",
    true,
    true,
-   "0 missing of 674 due"
+   "0 missing of 675 due"
   ],
   [
    "the feed cannot apply one edit and one dial change · after the fix and a rebuild",
@@ -607,28 +607,126 @@
    "the feed equals a clean replay of the log",
    true,
    true,
-   "0 of 995 entries differ; 355 notes against 355"
+   "0 of 994 entries differ; 354 notes against 354"
   ],
   [
    "the feed cannot apply any edit · after the fix and a rebuild",
    "a notification is sent once",
    true,
    true,
-   "0 repeats among 158 sent"
+   "0 repeats among 157 sent"
   ],
   [
    "the feed cannot apply any edit · after the fix and a rebuild",
    "none sent for what was read or deleted within the hold",
    true,
    true,
-   "0 of 158 sent"
+   "0 of 157 sent"
   ],
   [
    "the feed cannot apply any edit · after the fix and a rebuild",
    "no due notification is missing",
    true,
    true,
-   "0 missing of 250 due"
+   "0 missing of 249 due"
+  ],
+  [
+   "scripted agents at the agent door",
+   "every agent received every event addressed to it, in order",
+   true,
+   true,
+   "a0: 62 events, read 73 times; a1: 61 events, read 78 times; a2: 60 events, read 72 times (a1 was away for 3 s)"
+  ],
+  [
+   "scripted agents at the agent door",
+   "a reply sent again after a crash is saved once, and none is missing",
+   true,
+   true,
+   "183 replies saved, 46 repeats recognised by their ID, 0 missing"
+  ],
+  [
+   "scripted agents at the agent door",
+   "text in progress reached no receiver; the finished reply reached search whole",
+   true,
+   true,
+   "59 replies written piece by piece; 0 unfinished ones sent to receivers; 0 differ in search"
+  ],
+  [
+   "scripted agents at the agent door",
+   "a piece sent twice appears once",
+   true,
+   true,
+   "49 finished replies, 0 with wrong text"
+  ],
+  [
+   "scripted agents at the agent door",
+   "a reply abandoned mid-way is closed as \"stopped\" with the text so far",
+   true,
+   true,
+   "10 abandoned, 0 not closed properly"
+  ],
+  [
+   "scripted agents at the agent door",
+   "two agents that always answer each other stop after three messages",
+   true,
+   true,
+   "3 agent messages in the thread"
+  ],
+  [
+   "scripted agents at the agent door",
+   "an agent posting too fast is told to slow down",
+   true,
+   true,
+   "20 of 45 accepted in one window (limit 20)"
+  ],
+  [
+   "scripted agents at the agent door · and the receivers",
+   "every acknowledged action is saved, once",
+   true,
+   true,
+   "1200 acknowledged, 1609 changes in the log"
+  ],
+  [
+   "scripted agents at the agent door · and the receivers",
+   "every saved change is in the log",
+   true,
+   true,
+   "0 of 875 messages have a change missing from the log"
+  ],
+  [
+   "scripted agents at the agent door · and the receivers",
+   "search equals the truth",
+   true,
+   true,
+   "0 of 875 messages differ"
+  ],
+  [
+   "scripted agents at the agent door · and the receivers",
+   "the feed equals a clean replay of the log",
+   true,
+   true,
+   "0 of 3066 entries differ; 884 notes against 884"
+  ],
+  [
+   "scripted agents at the agent door · and the receivers",
+   "a notification is sent once",
+   true,
+   true,
+   "0 repeats among 328 sent"
+  ],
+  [
+   "scripted agents at the agent door · and the receivers",
+   "none sent for what was read or deleted within the hold",
+   true,
+   true,
+   "0 of 328 sent"
+  ],
+  [
+   "scripted agents at the agent door · and the receivers",
+   "no due notification is missing",
+   true,
+   true,
+   "0 missing of 576 due"
   ],
   [
    "broken on purpose: search without the version rule, under late copies",
@@ -656,14 +754,14 @@
    "every saved change is in the log",
    false,
    false,
-   "4 of 635 messages have a change missing from the log"
+   "7 of 635 messages have a change missing from the log"
   ],
   [
    "numbering model (a model, not PostgreSQL)",
    "numbers taken before the save finishes: nothing stepped over",
    false,
    false,
-   "1221 of 2400 changes never seen by the reader"
+   "1226 of 2400 changes never seen by the reader"
   ],
   [
    "numbering model (a model, not PostgreSQL)",
@@ -682,17 +780,17 @@
   [
    "healthy burst",
    "save to search",
-   "median 6 ms, 19 in 20 within 11 ms, worst 69 ms (1980 changes)"
+   "median 6 ms, 19 in 20 within 11 ms, worst 71 ms (1980 changes)"
   ],
   [
    "healthy burst",
    "save to feed",
-   "median 7 ms, 19 in 20 within 12 ms, worst 69 ms (2941 changes)"
+   "median 7 ms, 19 in 20 within 13 ms, worst 73 ms (2941 changes)"
   ],
   [
    "healthy burst",
    "notification sent after its hold ended",
-   "median 29 ms, 19 in 20 within 89 ms, worst 127 ms (626 changes)"
+   "median 29 ms, 19 in 20 within 86 ms, worst 113 ms (626 changes)"
   ],
   [
    "healthy burst",
@@ -707,22 +805,22 @@
   [
    "repeats, lost answers and late copies on every hop",
    "time to level",
-   "48.1 s"
+   "45.8 s"
   ],
   [
    "search stopped for 5 s mid-burst",
    "feed freshness during the outage",
-   "median 7 ms, 19 in 20 within 12 ms, worst 19 ms (970 changes)"
+   "median 7 ms, 19 in 20 within 11 ms, worst 20 ms (971 changes)"
   ],
   [
    "search stopped for 5 s mid-burst",
    "search caught up with the backlog",
-   "1.1 s after it came back (660 changes)"
+   "1.6 s after it came back (661 changes)"
   ],
   [
    "search answers after 1.5 s (longer than the 1 s limit) for 4 s",
    "feed freshness meanwhile",
-   "median 6 ms, 19 in 20 within 11 ms, worst 20 ms (782 changes)"
+   "median 7 ms, 19 in 20 within 11 ms, worst 20 ms (782 changes)"
   ],
   [
    "search refuses one delete, then refuses everything",
@@ -732,12 +830,12 @@
   [
    "killothers",
    "feed place moved by mistake",
-   "from 2172 to 2212"
+   "from 2173 to 2213"
   ],
   [
    "the feed wiped mid-burst and rebuilt",
    "rebuild",
-   "1220 earlier changes replayed while new ones kept arriving; level again 1.3 s after the wipe"
+   "1219 earlier changes replayed while new ones kept arriving; level again 1.4 s after the wipe"
   ],
   [
    "then the notification sender wiped and refilled",
@@ -747,12 +845,22 @@
   [
    "then search wiped and its place set back to the start",
    "refilled",
-   "2439 changes in 1.4 s"
+   "2438 changes in 1.4 s"
+  ],
+  [
+   "scripted agents at the agent door",
+   "event written to received by a waiting agent",
+   "median 9 ms, 19 in 20 within 99 ms, worst 127 ms (73 changes)"
+  ],
+  [
+   "scripted agents at the agent door",
+   "agents told to slow down while catching up",
+   "10 times; each waited and sent again"
   ],
   [
    "mut",
    "feed place moved by mistake",
-   "from 510 to 550"
+   "from 511 to 551"
   ]
  ]
 }

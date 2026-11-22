@@ -30,7 +30,7 @@ Timings are scaled down: a delivery call may take 1 s (proposal: 3 s) and a noti
 
 ## Result
 
-Final run, 2026-11-22, Python 3.12, WSL2, 16 cores. Raw output: `results.txt`, `results.json`. **96 checks, none unexpected** (75 before the fence scenario was added).
+Final run, 2026-11-22, Python 3.12, WSL2, 16 cores. Raw output: `results.txt`, `results.json`. **110 checks, none unexpected** in the default run (75 at first; the fence and agent scenarios were added later the same day), plus 7 in the separate full-size run.
 
 ### What held
 
@@ -49,6 +49,8 @@ Final run, 2026-11-22, Python 3.12, WSL2, 16 cores. Raw output: `results.txt`, `
 | Then search wiped | 2,439 changes refilled in 1.6 s; equal to the truth |
 | The feed cannot apply one edit and one dial change (faults planted) | only that conversation and that reader are fenced: 51 rows inside, the other 452 rows and all 910 notification notes outside equal a clean replay; 38 of 1,772 changes set aside; after the fault is removed and the feed rebuilt, everything equals a clean replay and no notification repeats |
 | The feed cannot apply any edit | after five fences it stops instead of fencing everything; whole again after the fix and a rebuild |
+| Scripted agents at the agent door (three agents; one away for 3 s; each "crashing" now and then before noting its place; ordinary traffic meanwhile) | 183 events: none missed, in order; 183 replies saved, 46 repeats recognised by their ID, none missing; 59 replies written piece by piece, none sent to a receiver unfinished, all whole in search; a piece sent twice appears once; 10 abandoned replies closed as "stopped" with the text so far; two agents answering each other stopped after three messages; 20 of 45 accepted from an agent posting too fast; an event reaches a waiting agent in 10 ms (median); all seven receiver checks hold with agents in the mix |
+| Rebuild at the seeded team's size, run separately: 36 participants, 20 channels, 48,800 changes, 20,900 messages | equal to a clean replay; **feed rebuilt in 107 s one change per call, 80 s with up to 100 changes per call**; search refilled in 21 s |
 
 ### Each check seen to fail
 
@@ -77,6 +79,8 @@ The proposal's wording ("a withdrawal that reaches the sender inside the hold ca
 
 **4. A change the feed cannot apply can be contained** (added after the user asked for a smaller blast radius, 2026-11-22). The first design stopped the whole feed. Now the change is set aside and a fence goes up around the one conversation, or the one reader, it touches; later changes inside the fence wait with it; everything outside stays exact (table above). The price, measured: inside a fence nothing new notifies, and one notification that was already due went out although the person had answered within the hold, because the feed could no longer see that. Past five fences the feed stops: that is a broken feed, not one bad change. Repair is fixing the fault and rebuilding the feed from the log.
 
+**5. Rebuilding the feed at full size takes more than a minute in this build.** 80 to 107 seconds for 48,800 changes, against the "under a minute" proposed in D-007. The product will differ (TypeScript, PostgreSQL, the full rules), in which direction is not known. Two consequences are proposed: the target becomes "under two minutes at seeded size", and Reset in the control panel restores a saved copy of each receiver made once from a rebuild, with the rebuild kept as its own button and a test that the copy equals a rebuild. One unplanned observation while adding batch delivery: a slip in the test code made the feed fail on every change, and the fence rule did what it should: three fences, then a stop, no wrong rows.
+
 Not design findings: three false failures came from the harness itself (two threads creating one SQLite file, ports already used by other programs on this machine, a test fault overwritten by the worker) and were fixed in the harness.
 
 ## Conclusion
@@ -90,5 +94,5 @@ What this does not show:
 - **Speed in the real stack.** 6 to 12 ms is local HTTP with SQLite and a worker that looks every 10 ms. It says the 2 s target has a wide margin, not what the product will measure.
 - **The rules.** The feed rules here are a subset; E-001 is the evidence for the rules. Equality with a clean replay shows delivery faults do not change the outcome, not that the outcome is right.
 - **Screens.** No live connection, no browser, no catch-up after a dropped connection.
-- **Agents, streamed replies, the model-judged rules, and anything at larger size.**
+- **Real agents, the fast path for a reply in progress as seen on a screen, the model-judged rules, and anything larger than the seeded team.** The agent door was tried with scripted agents only, which is what the first version has (D-002).
 - One run per scenario, fixed seeds; the troublemaker's faults are random but seeded.

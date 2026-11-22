@@ -1,0 +1,7 @@
+<!doctype html><meta charset="utf-8"><title>E-005 one-way stream</title>
+<script>
+window.connected = false; window.got = 0;
+const es = new EventSource('/sse');
+es.onopen = () => { window.connected = true; };
+es.onmessage = () => { window.got++; };
+</script>

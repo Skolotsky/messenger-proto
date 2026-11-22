@@ -341,7 +341,7 @@ details > .stack { gap: 10px; }
     <div class="option">
       <header><h3>Screen → Conversations</h3><span class="chip you">what a person does</span></header>
       <dl>
-        <dt>Carries</dt><dd>Send, edit, delete, react, read up to here, watching this conversation, Keep, Done, a dial, a Focus rule. Each with an ID the screen chose.</dd>
+        <dt>Carries</dt><dd>Send, edit, delete, react, read up to here (opening a conversation, or Mark read on a row), watching this conversation, Keep, Done, a dial, a Focus rule, a Focus person removed or added back, the "Focus only" switch, Undo. Each with an ID the screen chose. And one question: "what would this change have moved in the last 7 days?" (D-020).</dd>
         <dt>Promise</dt><dd>Answered "saved" only after it is saved and logged. The same ID again changes nothing.</dd>
         <dt>On failure</dt><dd>The screen keeps the action as "not sent" and retries with the same ID.</dd>
         <dt>Evidence</dt><dd>E-003: core killed five times mid-burst; every acknowledged action saved once.</dd>
@@ -353,7 +353,7 @@ details > .stack { gap: 10px; }
         <dt>Carries</dt><dd>Numbered updates for what the screen shows: conversations, the person's feed rows, text of a reply being written.</dd>
         <dt>Promise</dt><dd>Within a second when connected. After any gap the screen ends equal to a fresh load.</dd>
         <dt>On failure</dt><dd>"Resume after number N", or "too far behind: reload".</dd>
-        <dt>Evidence</dt><dd><span class="chip risk">not tried yet</span> Needs a browser; planned with the first screens.</dd>
+        <dt>Evidence</dt><dd>E-005, in a real browser: connection cut five times, refused for 2 s, one update in twenty lost silently, away past the limit. The screen always ended equal to a fresh load. Two screens broken on purpose ended wrong. 12 tabs at once: all connected.</dd>
       </dl>
     </div>
     <div class="option">
@@ -377,7 +377,7 @@ details > .stack { gap: 10px; }
     <div class="option">
       <header><h3>Activity feed → Notification sender</h3></header>
       <dl>
-        <dt>Carries</dt><dd>"Due", "withdrawn" and clock ticks from the feed's own numbered log. A due note has a fixed name, the person, the reason and the text.</dd>
+        <dt>Carries</dt><dd>"Due", "changed", "withdrawn" and clock ticks from the feed's own numbered log. A due note has a fixed name, the person, the reason and the text. The sender's list is shown in the separate mock notification app (D-022), which reads the stand-in directly, not through the product.</dd>
         <dt>Promise</dt><dd>Never lost; a name is sent once; nothing is sent for what was read or deleted within the hold.</dd>
         <dt>On failure</dt><dd>Same waiting and retrying. Late notifications are sent late, marked "delayed" past ten minutes.</dd>
         <dt>Evidence</dt><dd>E-003: 0 of 160 wrongly sent with the feed down or overloaded; 565 entries before a wipe, the same 565 after.</dd>
@@ -388,8 +388,8 @@ details > .stack { gap: 10px; }
       <dl>
         <dt>Carries</dt><dd>To the agent: numbered events that address it. From the agent: a message with a level, a streamed reply (start, pieces, finish), a status.</dd>
         <dt>Promise</dt><dd>Events kept seven days, in order, possibly repeated with the same number. A post with the same ID is saved once.</dd>
-        <dt>On failure</dt><dd>An agent that is away reads on from its place. A reply with no new piece for a minute is closed as "stopped".</dd>
-        <dt>Evidence</dt><dd><span class="chip risk">not tried yet</span></dd>
+        <dt>On failure</dt><dd>An agent that is away reads on from its place. A reply with no new piece for a minute is closed as "stopped". An agent posting too fast is told to slow down and sends the same thing again later.</dd>
+        <dt>Evidence</dt><dd>E-003 with scripted agents: one away for 3 s, all crashing now and then before noting their place. 183 events, none missed, in order; 46 repeated replies saved once; 59 replies written piece by piece, none seen by a receiver before it was finished; 10 abandoned ones closed as "stopped"; two agents answering each other stopped after three.</dd>
       </dl>
     </div>
   </div>
@@ -478,6 +478,7 @@ server → screen   { "conversations": 4856, "kind": "message.changed", … }
       </dl>
     </div>
   </div>
+  <p class="note">The look-and-feel decisions added to what a reader does: removing a person from Focus and adding them back, the option that adds everyone who writes to you directly (D-021), Mark read on a row, Undo (D-020, D-023). The list of Focus people fills itself, so it is something worked out, like a thread's level: under A the feed works it out from the log and a rebuild gives the same list; under B the feed would have to keep it as an original.</p>
   <p class="note">Consequences of A: the feed keeps its own copy of what it needs (messages, who took part in which thread, each reader's settings), so it never has to ask Conversations for anything. The effective level of a thread dial, the reason on a row, the counts and the four history tabs are all answered by the feed. A person's screen also reports which conversation is open in front of them; that is a fact on the log too, so "arrived while they were watching" (D-015, rule 6) is known when the message is judged and makes no row and no notification. It ends when the screen's connection drops. Later, a language model's verdict on a text rule is handed to Conversations and saved as a fact, so a rebuild does not ask the model again; if the model is slow or fails, the row stays where it is.</p>
 </section>
 
@@ -601,7 +602,7 @@ answers:  200 applied · 200 already had it · 422 I refuse this one (→ parked
         <tr><td>Repeats and late arrivals change nothing.</td><td>end state identical</td><td>A troublemaker in front of each receiver that repeats every delivery and shuffles nearby ones.</td></tr>
         <tr><td>A notification appears once, late if need be.</td><td>1</td><td>Stop the sender for five minutes; stop it between sending and confirming; rebuild the feed while it runs. One sent more than ten minutes late must carry "delayed".</td></tr>
         <tr><td>An agent misses nothing and holds up nobody.</td><td>events kept 7 days, in order</td><td>An agent away for ten minutes; an agent that never reads. People and other agents see no delay.</td></tr>
-        <tr><td>A receiver can be rebuilt from nothing.</td><td>under 1 minute at seeded size; equal to before</td><td>Wipe the feed, then search, then the notification sender, while the team is active; compare with a copy taken before, and confirm the sender interrupted nobody while refilling its list.</td></tr>
+        <tr><td>A receiver can be rebuilt from nothing.</td><td>under 2 minutes at seeded size; equal to before. Measured on the test build: 80 s for the feed (48,800 changes, 36 readers), 21 s for search. "Under a minute", my first proposal, was not reached</td><td>Wipe the feed, then search, then the notification sender, while the team is active; compare with a copy taken before, and confirm the sender interrupted nobody while refilling its list.</td></tr>
         <tr><td>A screen that lost its connection ends right.</td><td>caught up 2 s after reconnecting; a silently lost update healed within 20 s; a reload past 500 missed updates</td><td>Cut the connection for 30 s during edits and deletes; swallow single updates on a live connection; keep a screen away past the limit. Each time compare with a fresh load.</td></tr>
         <tr><td>A slow or failing model breaks nothing (built last).</td><td>the row stays where it is</td><td>A model stand-in that times out or errors.</td></tr>
         <tr><td>A surface that is behind says so.</td><td>a notice when more than 10 s behind</td><td>Any of the outages above, looked at on the rendered page.</td></tr>
@@ -614,7 +615,7 @@ answers:  200 applied · 200 already had it · 422 I refuse this one (→ parked
     <div class="panel"><div class="label">Notifications delayed</div><p>They arrive late, once, and not for something deleted or read before they went out. One more than ten minutes late is marked "delayed".</p></div>
     <div class="panel"><div class="label">Conversations unreachable</div><p>"Reconnecting". The screen keeps what it shows; a new message waits as "not sent" and cannot post twice.</p></div>
   </div>
-  <p class="note">Rebuild is also how Reset works: the control panel empties every part, reloads the seeded truth, and the feed, search and then the notification sender refill from the logs, the sender in a quiet mode that fills the list with the original times and interrupts nobody. So the rebuild path runs at every reset. A rebuilt feed starts a new edition of its own log; screens seeing a new edition reload, and the sender reads it from the start, protected by its list of names. The 3-second answer is Slack's rule for its own Events API (R-002); Slack gives up after three retries, we do not.</p>
+  <p class="note">Reset in the control panel restores a saved copy of every part, taken once after a rebuild, because a rebuild at full size took over a minute in the experiment and a reset should take seconds. Rebuild stays as its own button, and a test proves a rebuilt receiver equals the saved copy. On a rebuild the feed, search and then the notification sender refill from the logs, the sender without interrupting anyone. A rebuilt feed starts a new edition of its own log; screens seeing a new edition reload, and the sender reads it from the start, protected by its list of names. The 3-second answer is Slack's rule for its own Events API (R-002); Slack gives up after three retries, we do not.</p>
 </section>
 
 <section id="d008">
@@ -678,9 +679,9 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
         <tr><td>10</td><td>"This conversation is open in front of me" is a fact on the log.</td><td>Deciding it at the moment of sending the notification.</td><td>The feed then knows at arrival that the message is read: no row, no notification (D-015, rule 6), and a rebuild gives the same answer.</td><td>part of E-003's rules</td></tr>
         <tr><td>11</td><td>Workers are woken by the database the moment something is saved, with a slow regular look as a fallback.</td><td>Looking every few milliseconds.</td><td>About 1 ms from save to fetched on PostgreSQL, with no idle load.</td><td><span class="chip ok">E-004</span></td></tr>
         <tr><td>12</td><td>Text of a reply in progress travels a fast path to open screens; only its start and finish go through the log.</td><td>Every piece through the log.</td><td>A reply of two hundred pieces is not two hundred deliveries to every receiver, and nothing unfinished can be indexed or notified.</td><td><span class="chip risk">no</span></td></tr>
-        <tr><td>13</td><td>A screen reads the feed, search and notifications through Conversations' door.</td><td>The browser calling each part.</td><td>One address for the web app; a part that is down becomes a notice, not a broken page.</td><td><span class="chip risk">no</span></td></tr>
+        <tr><td>13</td><td>A screen reads the feed and search through Conversations' door. Notifications are not in the product at all (D-022).</td><td>The browser calling each part.</td><td>One address for the web app; a part that is down becomes a notice, not a broken page.</td><td><span class="chip risk">no</span></td></tr>
         <tr><td>14</td><td>The screen shows the person's own action at once and does not wait for the feed.</td><td>Waiting for the round trip.</td><td>Reading a row goes through the log before the feed knows it; the person should not feel that.</td><td><span class="chip risk">no</span></td></tr>
-        <tr><td>15</td><td>Reset reloads the seeded truth and lets every receiver rebuild from the log.</td><td>Restoring saved copies of each part.</td><td>The rebuild path runs at every reset instead of only in an emergency.</td><td><span class="chip ok">E-003</span>, small size</td></tr>
+        <tr><td>15</td><td>Reset restores a saved copy of each part; Rebuild is a separate button, and a test proves the two give the same result. A backlog is delivered up to 100 changes per call.</td><td>Reset by rebuilding everything (my first choice).</td><td>At the seeded team's size a rebuild of the feed took 80 to 107 s on the test build. Too long for a reset during a demonstration.</td><td><span class="chip ok">E-003</span>, full size</td></tr>
         <tr><td>16</td><td>A language model's verdict on a text rule is saved as a fact.</td><td>Asking the model again on a rebuild.</td><td>A model does not answer the same way twice; the feed must rebuild to the same state.</td><td>built last</td></tr>
         <tr><td>17</td><td>A coding agent joins through a small connector over the agent door; acting as a person is off unless switched on at start.</td><td>A private side entrance.</td><td>What it verifies is then the product itself (D-002).</td><td><span class="chip risk">no</span></td></tr>
       </tbody>
@@ -702,7 +703,7 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
         <tr><td><strong>A sent notification cannot be recalled</strong></td><td>Someone is notified of a message deleted six seconds later.</td><td>A five-second hold catches typo fixes and quick deletes; afterwards the entry shows "message deleted".</td><td>Inherent. The hold length is yours (D-007).</td></tr>
         <tr><td><strong>Several programs instead of one</strong> (D-005)</td><td>More to start, watch and explain for a prototype.</td><td>One command starts all; the control panel shows each part's state; the tests run in this mode.</td><td>Slower tests. The price of outages that are real.</td></tr>
         <tr><td><strong>A row is written per reader for every post</strong></td><td>At thousands of people, one post in a big channel means thousands of writes.</td><td>Nothing at this size (channels of 30).</td><td>A known shortcut; large channels would be worked out when the feed is read.</td></tr>
-        <tr><td><strong>The log is kept forever and a rebuild replays all of it</strong></td><td>Rebuild time grows with history.</td><td>Two weeks of a 36-member team is small. E-003 replayed 2,400 changes in under two seconds with a subset of the rules.</td><td>Speed with the full rules and the full seed is not measured yet.</td></tr>
+        <tr><td><strong>The log is kept forever and a rebuild replays all of it</strong></td><td>Rebuild time grows with history.</td><td>Two weeks of a 36-member team is small. E-003 replayed 2,400 changes in under two seconds with a subset of the rules.</td><td>At the seeded team's size: 80 s on the test build with a subset of the rules. The product's own figure comes with the build.</td></tr>
         <tr><td><strong>The screen's catch-up is our own</strong></td><td>A fault there shows as a stale or wrong screen after a dropped connection.</td><td>Numbered updates, a "too far behind: reload" answer, a test that cuts the connection mid-burst.</td><td>Not tried yet.</td></tr>
         <tr><td><strong>The rule against agents setting each other off is ours</strong></td><td>Too strict: agents cannot cooperate. Too loose: a loop floods a channel.</td><td>A cap of three agents in a row and 20 messages a minute, both settings.</td><td>No vendor documents a rule to copy. Needs watching in use.</td></tr>
         <tr><td><strong>One copy of each part, one database</strong></td><td>If the database is lost, everything is.</td><td>Nothing; this is a local demonstration.</td><td>A known shortcut.</td></tr>
@@ -727,7 +728,29 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
       </tbody>
     </table>
   </div>
-  <p><span class="chip risk">Not verified</span> The live connection and catch-up on a real screen. Agents and streamed replies. The full feed rules inside this design (a subset was used; E-001 is the evidence for the rules). Speed with the full seeded team. A database on another machine. No independent verifier has looked at the two test harnesses.</p>
+  <div class="split">
+    <div class="panel"><div class="label">E-005 · the screen's side, in a real browser</div><p>A page that follows the numbered-update contract, with its connection cut five times, refused for two seconds, losing one update in twenty, and away past the limit: <strong>always equal to a fresh load</strong>. Two screens broken on purpose ended wrong. Twelve tabs at once all connected over WebSocket; the alternative stopped at six.</p></div>
+    <div class="panel"><div class="label">E-003, extended · the agent door, with scripted agents only</div><p>Three scripted agents, one away for three seconds, all crashing now and then: <strong>no event missed, every repeated reply saved once</strong>, text in progress never seen by a receiver, abandoned replies closed as "stopped", an agent loop stopped after three, a too-fast agent slowed down.</p></div>
+  </div>
+  <h3>Checked against the look-and-feel decisions (D-019 to D-023)</h3>
+  <p>Nothing in them changes the shape. Four things were added to the contracts, and two things turn out to live on the screen only.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Decided for the screens</th><th>What it asks of the architecture</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>The reason on a row shows what a change would have moved in the last 7 days (D-020)</td><td>The feed must answer a "what if" for one reader, including messages that never became a row.</td><td><span class="chip ok">fits</span> The feed keeps its own copy of every message. One question added to the screen's contract.</td></tr>
+        <tr><td>Focus people: a list that fills itself, an option, removals and add-backs (D-021)</td><td>More reader actions; a list that is worked out, not typed in.</td><td><span class="chip ok">fits</span> Added to D-017. It makes "Conversations owns the facts, the feed works things out" the more natural answer.</td></tr>
+        <tr><td>Notifications in a separate mock app, none in the product (D-022)</td><td>The sender's list is seen outside the product and must follow edits, deletes and reads.</td><td><span class="chip ok">fits</span> The app reads the stand-in directly. A "changed" note joins "due" and "withdrawn".</td></tr>
+        <tr><td>A row has no opened state; a click opens the conversation beside the feed at the first new message (D-023)</td><td>Read is "the conversation is open"; the conversation must open at the reader's position.</td><td><span class="chip ok">simpler</span> One way of reading instead of two; "watching" is the same signal.</td></tr>
+        <tr><td>Arrivals wait behind a "Show" button; a changed row moves only when the feed is opened again; read rows stay until you leave the feed (D-023, D-020, D-003)</td><td>Who remembers what is being held back?</td><td><span class="chip">screen only</span> Each screen holds its own; nothing is saved. Two devices may show different held rows; their counts agree.</td></tr>
+        <tr><td>Unread counts on history tabs, on buckets and on channels (D-019)</td><td>Three counts from two parts.</td><td><span class="chip ok">fits</span> All from the same read position. The feed's two may trail the channel marks by a few milliseconds.</td></tr>
+        <tr><td>A message with replies shows who replied, how many, when last (D-023)</td><td>A channel view changes when a reply arrives in a thread.</td><td><span class="chip ok">fits</span> One more kind of live update from Conversations.</td></tr>
+        <tr><td>Reactions on any message and from a row; Mark read; Keep after Done; Undo (D-023, D-020)</td><td>More actions through the door.</td><td><span class="chip ok">fits</span> Each is an action with an ID, saved as a fact.</td></tr>
+        <tr><td>Offline and failed-send states in the mock-up</td><td>A message that could not be sent waits and is retried.</td><td><span class="chip ok">fits</span> The same ID is sent again and saved once (E-003).</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><span class="chip risk">Not verified</span> The real screens on this design (the feed with held rows and the arrivals button). The fast path for a reply in progress on a screen. The full feed rules inside this design (a subset was used; E-001 is the evidence for the rules, and it does not yet have Focus people). Speeds in TypeScript with PostgreSQL. No independent verifier has looked at the test harnesses.</p>
 </section>
 
 <section id="rest">
@@ -737,7 +760,8 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
       <ul>
         <li><strong>Done: the spine (E-003).</strong> Loss, repeats, order, outages, parking and rebuild all behaved as promised on a small build without PostgreSQL.</li>
         <li><strong>Done: the log on PostgreSQL (E-004).</strong> No change stepped over with numbering one writer at a time; a worker is woken in about 1 ms.</li>
-        <li><strong>Rebuild at full size.</strong> Can the feed for the seeded team (two weeks, 36 participants) with the full rules be rebuilt in under a minute, so Reset can use it? E-003 rebuilt 2,400 changes in under two seconds with a subset of the rules.</li>
+        <li><strong>Done: the screen (E-005) and the agent door (E-003, scripted agents).</strong> Both contracts held under every interruption tried.</li>
+        <li><strong>Done: rebuild at full size (E-003).</strong> 80 s for the feed at the seeded team's size, so Reset restores a saved copy instead.</li>
         <li><strong>Text rules judged by a model</strong>, already planned for last (D-001).</li>
       </ul>
       <p class="note">Streamed text needs no experiment: keeping it off the log is a design choice, proven by tests.</p>

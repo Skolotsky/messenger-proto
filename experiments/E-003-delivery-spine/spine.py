@@ -11,7 +11,11 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 TIMEOUT = 1.0   # seconds a delivery call may take (proposal: 3 s)
 HOLD = 1.0      # seconds a notification is held before sending (proposal: 5 s)
 BREAK = set(filter(None, os.environ.get('BREAK', '').split(',')))   # deliberate faults in the design
-PEOPLE = [f'p{i}' for i in range(12)]
+PEOPLE = [f'p{i}' for i in range(int(os.environ.get('E003_PEOPLE', '12')))]
+AGENTS = ['a0', 'a1', 'a2']
+CHAIN_CAP = 3        # agents in a row before no further agent is told
+RATE, RATE_WINDOW = 20, 2.0   # messages per agent per window (proposal: 20 a minute)
+STREAM_IDLE = 1.5    # seconds without a piece before a reply in progress is closed (proposal: 60 s)
 # The wall clock on this machine steps backwards now and then (WSL2). CLOCK=wall reproduces what that does.
 clock = time.time if os.environ.get('CLOCK') == 'wall' else time.monotonic
 
@@ -325,8 +329,12 @@ def core(a):
     L = threading.Lock()
     c.executescript('''create table if not exists actions(id text primary key);
         create table if not exists messages(id text primary key, body text);
-        create table if not exists change_log(number integer primary key autoincrement, kind text, body text, saved_at real);''')
+        create table if not exists change_log(number integer primary key autoincrement, kind text, body text, saved_at real);
+        create table if not exists agent_events(agent text, number integer, body text, primary key(agent, number));
+        create table if not exists thread_agents(thread text, agent text, primary key(thread, agent));
+        create table if not exists streams(msg text primary key, text text, last real);''')
     crash = float(os.environ.get('CRASH', '0'))
+    posted = {a_: [] for a_ in AGENTS}
     busy = [0.0]
 
     def ticker():                                     # the log carries the clock: "it is now t, nothing earlier is missing"
@@ -357,6 +365,7 @@ def core(a):
             m = dict(id=o['msg'], version=1, conv=o['conv'], thread=o.get('thread'), author=o['author'], text=o['text'],
                      mentions=o['mentions'], level=o.get('level'), reactions=[], deleted=False)
             c.execute('insert into messages values(?,?)', (m['id'], json.dumps(m)))
+            tell('mentioned', m)
             return ('message.created', m), {}
         if k in ('edit', 'delete', 'react'):
             r = c.execute('select body from messages where id=?', (o['msg'],)).fetchone()
@@ -389,11 +398,116 @@ def core(a):
             body['upto'] = c.execute('select coalesce(max(number),0) from change_log').fetchone()[0]
         return ('reader.' + k, body), {}
 
+    # ---- the agent door -------------------------------------------------------------------
+    def tell(kind, m):
+        """Write an event for every agent this message addresses, in the same step as the message."""
+        chain, by_agent = m.get('chain', 0), m['author'] in AGENTS
+        for ag in AGENTS:
+            if ag == m['author']:
+                continue
+            named = ag in m['mentions']
+            if by_agent:
+                if not named or chain >= CHAIN_CAP:   # agents hear agents only when named, and only so many in a row
+                    continue
+            else:
+                in_thread = bool(m.get('thread') and c.execute('select 1 from thread_agents where thread=? and agent=?', (m['thread'], ag)).fetchone())
+                if not (named or in_thread):
+                    continue
+            n = c.execute('select coalesce(max(number),0)+1 from agent_events where agent=?', (ag,)).fetchone()[0]
+            c.execute('insert into agent_events values(?,?,?)', (ag, n, json.dumps(dict(kind=kind if named else 'reply', message=m, chain=chain, t=clock()))))
+
+    def agent_act(o):
+        ag, k = o['agent'], o['kind']
+        if k == 'piece':                               # text in progress: kept as "text so far", never logged
+            r = c.execute('select text from streams where msg=?', (o['msg'],)).fetchone()
+            if not r:
+                return 409, None, {'closed': True}
+            if o['at'] < len(r[0]):
+                return 200, None, {'had': True}        # a repeated piece adds nothing
+            if o['at'] > len(r[0]):
+                return 409, None, {'have': len(r[0])}  # a piece is missing: say how much we have
+            c.execute('update streams set text=?, last=? where msg=?', (r[0] + o['text'], clock(), o['msg']))
+            return 200, None, {}
+        if c.execute('select 1 from actions where id=?', (o['id'],)).fetchone():
+            return 200, None, {'dup': True}
+        if k in ('post', 'start'):
+            now = clock()
+            posted[ag][:] = [t for t in posted[ag] if now - t < RATE_WINDOW]
+            if len(posted[ag]) >= RATE:
+                return 429, None, {'slow_down': True}
+            posted[ag].append(now)
+            chain = 1
+            if o.get('cause'):
+                r = c.execute('select body from agent_events where agent=? and number=?', (ag, o['cause'])).fetchone()
+                chain = (json.loads(r[0])['chain'] if r else 0) + 1
+            m = dict(id=o['msg'], version=1, conv=o['conv'], thread=o.get('thread'), author=ag, text=o.get('text', ''),
+                     mentions=o.get('mentions', []), level=o.get('level'), reactions=[], deleted=False, chain=chain, finished=k == 'post')
+            c.execute('insert into actions values(?)', (o['id'],))
+            c.execute('insert into messages values(?,?)', (m['id'], json.dumps(m)))
+            if m['thread']:
+                c.execute('insert or ignore into thread_agents values(?,?)', (m['thread'], ag))
+            if k == 'start':
+                c.execute('insert into streams values(?,?,?)', (m['id'], '', clock()))
+                return 200, ('stream.started', dict(id=m['id'], conv=m['conv'], thread=m['thread'], author=ag)), {}
+            tell('mentioned', m)
+            return 200, ('message.created', m), {}
+        if k == 'finish':
+            c.execute('insert into actions values(?)', (o['id'],))
+            return 200, close_stream(o['msg'], o.get('level'), o.get('mentions', []), False), {}
+        return 404, None, {}
+
+    def close_stream(msg, level, mentions, stopped):
+        r = c.execute('select text from streams where msg=?', (msg,)).fetchone()
+        if not r:
+            return None
+        m = json.loads(c.execute('select body from messages where id=?', (msg,)).fetchone()[0])
+        m.update(text=r[0], version=2, level=level, mentions=mentions, finished=True, stopped=stopped)
+        c.execute('update messages set body=? where id=?', (json.dumps(m), msg))
+        c.execute('delete from streams where msg=?', (msg,))
+        tell('mentioned', m)
+        return ('message.created', m)                  # receivers first hear of it now, whole
+
+    def sweeper():                                     # an agent that went silent mid-reply
+        while True:
+            time.sleep(0.2)
+            with L:
+                for (msg,) in c.execute('select msg from streams where ? - last > ?', (clock(), STREAM_IDLE)).fetchall():
+                    c.execute('begin immediate')
+                    ev = close_stream(msg, None, [], True)
+                    log(ev[0], ev[1], 'stopped-' + msg)
+                    busy[0] = clock()
+                    c.execute('commit')
+    threading.Thread(target=sweeper, daemon=True).start()
+
     def h(path, o):
         u = urllib.parse.urlparse(path)
         if u.path == '/ping':
             return 200, {}
+        if u.path == '/agent/events':                  # the agent asks: what is there for me after N?
+            q = urllib.parse.parse_qs(u.query)
+            ag, after, until = q['agent'][0], int(q['after'][0]), clock() + float(q.get('wait', ['0'])[0])
+            while True:
+                with L:
+                    rows = c.execute('select number,body from agent_events where agent=? and number>? order by number limit 50', (ag, after)).fetchall()
+                if rows or clock() >= until:
+                    return 200, {'events': [dict(json.loads(b), number=n) for n, b in rows]}
+                time.sleep(0.02)
         with L:
+            if u.path == '/stream':
+                r = c.execute('select text from streams where msg=?', (urllib.parse.parse_qs(u.query)['msg'][0],)).fetchone()
+                return 200, {'text': r[0] if r else None}
+            if u.path == '/agent/act':
+                c.execute('begin immediate')
+                try:
+                    st, ev, out = agent_act(o)
+                    if ev:
+                        log(ev[0], ev[1], o['id'])
+                        busy[0] = clock()
+                    c.execute('commit')
+                    return st, out
+                except Exception:
+                    c.execute('rollback')
+                    raise
             if u.path == '/head':
                 return 200, {'head': c.execute('select coalesce(max(number),0) from change_log').fetchone()[0]}
             if u.path == '/act':
@@ -425,6 +539,7 @@ class Worker(threading.Thread):
         super().__init__(daemon=True)
         self.src, self.table, self.name, self.url, self.ddb = src, table, name, url, ddb
         self.prefix, self.strict, self.extra = prefix, strict, extra
+        self.batch = os.environ.get('BATCH') == '1' and name == 'feed'
 
     def run(self):
         src, d = db(self.src), db(self.ddb)
@@ -451,6 +566,19 @@ class Worker(threading.Thread):
                 time.sleep(0.01)
                 continue
             ext.pop('wm', None)
+            if self.batch and self.strict and len(rows) >= 20:   # far behind: hand over many changes in one call
+                chunk, prev, items = rows[:100], last, []
+                for number, kind, body, at in chunk:
+                    items.append(dict(ext, number=number, prev=prev, kind=kind, body=json.loads(body), at=at))
+                    prev = number
+                st, out = call(self.url + '/batch', {'changes': items}, timeout=TIMEOUT * 5)
+                if st == 200 and getc() == (place, last):
+                    setc(prev, prev)
+                    continue
+                if st == 409:
+                    setc(out['at'], out['at'])
+                    continue
+                rows = rows[:1]                        # anything else: go on one at a time, with the usual patience
             for number, kind, body, at in rows:
                 if getc() != (place, last):          # an operator (or a test) moved the place
                     break
@@ -582,6 +710,12 @@ def feed(a):
 
     def h(path, o):
         if path == '/ping':
+            return 200, {}
+        if path == '/batch':
+            for one in o['changes']:
+                code, answer = h('/changes', one)
+                if code != 200:
+                    return code, answer
             return 200, {}
         with L:
             last = meta('last')

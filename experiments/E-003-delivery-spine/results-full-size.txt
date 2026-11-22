@@ -1,0 +1,9 @@
+holds                  | rebuild at the seeded team's size: 36 participants, 20 channels | every acknowledged action is saved, once | 49992 acknowledged, 48827 changes in the log
+holds                  | rebuild at the seeded team's size: 36 participants, 20 channels | every saved change is in the log | 0 of 20912 messages have a change missing from the log
+holds                  | rebuild at the seeded team's size: 36 participants, 20 channels | search equals the truth | 0 of 20912 messages differ
+holds                  | rebuild at the seeded team's size: 36 participants, 20 channels | the feed equals a clean replay of the log | 0 of 71441 entries differ; 40186 notes against 40186
+holds                  | rebuild at the seeded team's size: 36 participants, 20 channels | a notification is sent once | 0 repeats among 19426 sent
+holds                  | rebuild at the seeded team's size: 36 participants, 20 channels | none sent for what was read or deleted within the hold | 0 of 19426 sent
+holds                  | rebuild at the seeded team's size: 36 participants, 20 channels | no due notification is missing | 0 missing of 25021 due
+measured | rebuild at the seeded team's size: 36 participants, 20 channels | feed rebuilt from nothing | 48827 changes (12359 rows for 36 readers) in 79.7 s: 613 changes a second, one change per call
+measured | rebuild at the seeded team's size: 36 participants, 20 channels | search refilled from nothing | 20.9 s
