@@ -83,6 +83,10 @@ Confidence: moderate. It rests on one seeded moment, on the agent's own reading 
 
 The user chose the **Slack-like** direction on 2026-11-22, against the recommendation above ("People used to it. We can reuse habits."), and asked for unread counts and marks in the history tabs. Both are recorded in D-019 and the pages now show the counts and marks. The other two pages stay as a record.
 
+### Follow-up asked by the user: why is this row here, and how do I stop it
+
+Three variants live in the Slack-like page behind the address ending `#why=a`, `#why=b` or `#why=c` (without it the page is unchanged): (a) the reason line opens a small panel on the row; (b) the explanation sits inside the expanded row; (c) a "Why? Change…" link on every row opens a side panel with the whole path through the buckets. Each says what the item is, what put it in the bucket, where it would go otherwise, and offers to remove the deciding rule or change the deciding dial, with the count of what that would have moved. `why.py` takes the screenshots (`screenshots/why-*.png`). The page also gained one entry point for feed and notification settings (the sliders button beside the bell). Not covered by `check.py`.
+
 ### What this does not show
 
 - No person other than the agent has used the pages. The user's review is the real test.

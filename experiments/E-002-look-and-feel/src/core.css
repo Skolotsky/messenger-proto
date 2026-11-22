@@ -211,3 +211,27 @@ h1,h2,h3,p{margin:0}
 .tab.on .h-count{color:var(--text)}
 .hrow.unread .row-preview{font-weight:600}
 .hrow .dot{margin-right:2px}
+/* why-is-this-here variants */
+.why-btn{color:inherit;font-size:inherit;display:inline-flex;align-items:center;gap:2px;border-bottom:1px dotted currentColor;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.why-btn .ic{width:12px;height:12px}
+.why-btn:hover{color:var(--text)}
+.why-btn.c{margin-left:auto;border:0;color:var(--accent);font-weight:600;flex:none;padding-left:8px}
+.row{position:relative}
+.why-pop{position:absolute;left:62px;top:46px;z-index:25;width:min(380px,calc(100% - 74px));background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:12px 14px}
+.why-pop h3,.why-q{font-size:13px;display:block;margin-bottom:6px}
+.why-steps{display:grid;gap:6px;font-size:13.5px}
+.why-steps>div{display:flex;gap:8px;align-items:flex-start}
+.why-steps i{font-style:normal;font-size:11px;font-weight:700;width:18px;height:18px;border-radius:50%;background:var(--panel2);color:var(--muted);display:grid;place-items:center;flex:none;margin-top:1px}
+.why-steps span{display:flex;flex-direction:column}
+.why-steps b{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+.why-acts{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.why-act{display:flex;flex-direction:column;align-items:flex-start;gap:2px;margin-bottom:8px}
+.why-act small,.why-off{font-size:12.5px;color:var(--muted)}
+.why-inline{padding:10px 12px;margin:8px 0;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+.why-path{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:4px}
+.why-path li{display:flex;gap:8px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:13.5px;color:var(--muted)}
+.why-path li b{width:150px;flex:none}
+.why-path li.hit{border-color:var(--focus);color:var(--text);background:color-mix(in srgb,var(--focus) 8%,transparent)}
+@media (max-width:760px){.why-pop{left:12px;width:calc(100% - 24px)}.why-path li{flex-direction:column;gap:0}}
+.sw-in{border:0;margin:0;padding:0;font-size:13px}
+.sw-link{margin-left:auto}

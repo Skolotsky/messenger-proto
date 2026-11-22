@@ -219,6 +219,30 @@ h1,h2,h3,p{margin:0}
 .tab.on .h-count{color:var(--text)}
 .hrow.unread .row-preview{font-weight:600}
 .hrow .dot{margin-right:2px}
+/* why-is-this-here variants */
+.why-btn{color:inherit;font-size:inherit;display:inline-flex;align-items:center;gap:2px;border-bottom:1px dotted currentColor;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.why-btn .ic{width:12px;height:12px}
+.why-btn:hover{color:var(--text)}
+.why-btn.c{margin-left:auto;border:0;color:var(--accent);font-weight:600;flex:none;padding-left:8px}
+.row{position:relative}
+.why-pop{position:absolute;left:62px;top:46px;z-index:25;width:min(380px,calc(100% - 74px));background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:12px 14px}
+.why-pop h3,.why-q{font-size:13px;display:block;margin-bottom:6px}
+.why-steps{display:grid;gap:6px;font-size:13.5px}
+.why-steps>div{display:flex;gap:8px;align-items:flex-start}
+.why-steps i{font-style:normal;font-size:11px;font-weight:700;width:18px;height:18px;border-radius:50%;background:var(--panel2);color:var(--muted);display:grid;place-items:center;flex:none;margin-top:1px}
+.why-steps span{display:flex;flex-direction:column}
+.why-steps b{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+.why-acts{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.why-act{display:flex;flex-direction:column;align-items:flex-start;gap:2px;margin-bottom:8px}
+.why-act small,.why-off{font-size:12.5px;color:var(--muted)}
+.why-inline{padding:10px 12px;margin:8px 0;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+.why-path{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:4px}
+.why-path li{display:flex;gap:8px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:13.5px;color:var(--muted)}
+.why-path li b{width:150px;flex:none}
+.why-path li.hit{border-color:var(--focus);color:var(--text);background:color-mix(in srgb,var(--focus) 8%,transparent)}
+@media (max-width:760px){.why-pop{left:12px;width:calc(100% - 24px)}.why-path li{flex-direction:column;gap:0}}
+.sw-in{border:0;margin:0;padding:0;font-size:13px}
+.sw-link{margin-left:auto}
 
 /* The agent's own: a calm page. The reason leads every row, and a row's size says how much attention it asks for. */
 :root{--bg:#faf8f4;--panel:#fff;--panel2:#f1eee7;--line:#e4dfd4;--hover:#f3f0e9;--accent:#1f4f46;--accent-soft:#e1ece9;--serif:ui-serif,Georgia,"Times New Roman",serif}
@@ -536,6 +560,34 @@ function dialCtl(c, ctx) {
   }
   return '';
 }
+/* ---- "why is this here, and I do not want it here": three ways to show it, picked with #why=a, b or c (E-002 follow-up) ---- */
+const WHY = (location.hash.match(/why=([abc])/) || [])[1] || '';
+function explain(r) {
+  const c = conv(r.conv), rule = id => S.rules.find(x => x.id === id), acts = [];
+  const off = S.off && S.off[r.id];
+  let what = r.why, by = r.reason, alt = '';
+  if (r.kept === 'you') { what = 'You pressed Keep on this row.'; by = 'Kept by you'; alt = 'It stays until you press Done, reply or react.'; }
+  else if (r.rule === 'flag') {
+    const x = rule('flag'); what = `${pn(r.by)} flagged this message and named you.`; by = 'Your rule "Flags that name you"'; alt = 'Without the rule it would be in Needs you, as a direct mention.';
+    if (x) acts.push({ label: 'Stop putting flags in Focus', act: 'rmRuleId', d: `data-id="flag" data-row="${r.id}" data-to="Needs you"`, note: `Removes the rule. ${x.n} items in the last 7 days would have gone to Needs you instead.` });
+  } else if (r.rule === 'dm') {
+    const x = rule('dm'); what = `A direct message from ${pn(r.by)}, a person.`; by = 'Your rule "Direct messages from people"'; alt = 'Without the rule it would be in Needs you.';
+    if (x) acts.push({ label: 'Stop putting direct messages in Focus', act: 'rmRuleId', d: `data-id="dm" data-row="${r.id}" data-to="Needs you"`, note: `Removes the rule. ${x.n} items in the last 7 days would have gone to Needs you instead.` });
+  } else if (r.drive === 'channel') {
+    what = `${r.items.length} new posts in #${c.name}. None of them names you.`; by = `You set #${c.name} to Focus`; alt = 'At Default they would not be in your feed at all.';
+    acts.push({ label: `Set #${c.name} to All activity`, act: 'dialFrom', d: `data-c="${c.id}" data-l="all" data-row="${r.id}" data-to="For your information"`, note: `${CVOL[c.name] || 20} posts in the last 7 days would have gone to For your information.` });
+    acts.push({ label: `Set #${c.name} to Default`, act: 'dialFrom', d: `data-c="${c.id}" data-l="default" data-row="${r.id}" data-to="nowhere in your feed"`, note: 'Only what names you, and your own threads, would reach you from it.' });
+  }
+  if (r.kept && !r.done) acts.unshift({ label: 'Done with this one', act: 'done', d: `data-id="${r.id}"`, note: 'Releases this row only. The rule stays.' });
+  return { what, by, alt, acts, off };
+}
+function whyBody(r, full) {
+  const e = explain(r), b = BK[r.bucket][0];
+  const path = full ? `<ol class="why-path">${['focus', 'needs', 'fyi'].map(k => `<li class="${k === r.bucket ? 'hit' : ''}"><b>${BK[k][0]}</b><span>${k === r.bucket ? esc(e.by) + ' — decided here' : (['focus', 'needs', 'fyi'].indexOf(k) < ['focus', 'needs', 'fyi'].indexOf(r.bucket) ? 'no rule of yours matched' : k === 'needs' ? esc(e.alt || 'not reached') : 'not reached')}</span></li>`).join('')}</ol>` : '';
+  const done = e.off ? `<p class="why-off">Changed. From the next time you open the feed, rows like this land in ${esc(e.off)}. <button class="link" data-act="modal" data-m="rules">See your rules</button></p>` : '';
+  const acts = e.off ? '' : e.acts.map(a => `<div class="why-act"><button class="btn sm" data-act="${a.act}" ${a.d}>${esc(a.label)}</button><small>${esc(a.note)}</small></div>`).join('');
+  return `<div class="why-steps"><div><i>1</i><span><b>What it is</b>${esc(e.what)}</span></div><div><i>2</i><span><b>What put it in ${b}</b>${esc(e.by)}</span></div>${e.alt && !full ? `<div><i>3</i><span><b>Otherwise</b>${esc(e.alt)}</span></div>` : ''}</div>${path}${acts || done ? `<div class="why-acts"><b class="why-q">Not what you want in ${b}?</b>${acts}${done}</div>` : ''}`;
+}
 function rowHTML(r) {
   const c = conv(r.conv), ms = r.items.map(i => S.msgs[i]), last = ms[ms.length - 1], exp = S.exp.has(r.id);
   const k = 'row:' + last.id, L = S.lock[k] || {};
@@ -552,17 +604,17 @@ function rowHTML(r) {
   if (exp) {
     const mine = r.replies.map(i => msgHTML(i, 'exp')).join('');
     const kd = r.kept && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : r.done ? '' : `<button class="btn sm" data-act="keep" data-id="${r.id}">Keep</button>`;
-    x = `<div class="row-exp"><p class="why"><b>Why it is here.</b> ${esc(r.why)}</p>${r.items.map(i => msgHTML(i, 'exp')).join('')}${mine}
+    x = `<div class="row-exp">${WHY === 'b' ? `<div class="why-inline">${whyBody(r)}</div>` : `<p class="why"><b>Why it is here.</b> ${esc(r.why)}</p>`}${r.items.map(i => msgHTML(i, 'exp')).join('')}${mine}
       <div class="acts"><span class="quick">${['👍', '✅', '👀', '🎉'].map(e => `<button class="rx-btn" data-act="react" data-id="${r.id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}</span>${kd}<button class="btn sm" data-act="openConv" data-c="${r.conv}" data-id="${r.id}">Open conversation</button>${dialCtl(c, r.id)}<button class="btn sm" data-act="ruleFor" data-c="${r.conv}" data-by="${r.by}">Add to Focus…</button></div>
       <form class="reply" data-form="reply" data-id="${r.id}"><input name="t" autocomplete="off" aria-label="Reply" placeholder="Reply ${c.kind === 'dm' ? 'to ' + first(c.with) : 'in ' + where}…"><button class="btn pri">Send</button></form></div>`;
   }
   return `<article class="row b-${r.bucket} ${r.read ? 'read' : 'unread'}${exp ? ' expanded' : ''}${r.sec === 'kept' ? ' kept' : ''}${r.done ? ' done' : ''}" data-row="${r.id}">
     <div class="row-main" role="button" tabindex="0" data-act="toggle" data-id="${r.id}" aria-expanded="${exp}">${av(r.chan ? '#' : r.kind === 'rx' ? r.by : last.by)}
       <div class="row-text"><div class="row-head"><span class="row-title">${esc(title)}</span>${sub ? `<span class="row-sub">${sub}</span>` : ''}${marks}${cnt}<span class="row-time">${r.t}${last.edited ? ' · edited' : ''}</span></div>
-        <div class="row-reason"><span class="why-dot"></span>${esc(r.reason)}${r.note ? ` · <em>${r.note}</em>` : ''}</div>
+        <div class="row-reason"><span class="why-dot"></span>${WHY === 'a' ? `<button class="why-btn" data-act="why" data-id="${r.id}" aria-expanded="${S.whyOpen === r.id}">${esc(r.reason)} ${ic('chev')}</button>` : esc(r.reason)}${r.note ? ` · <em>${r.note}</em>` : ''}${WHY === 'c' ? `<button class="why-btn c" data-act="whySheet" data-id="${r.id}">Why? Change…</button>` : ''}</div>
         <div class="row-preview" data-k="${k}"${lockS}><b>${last.by === ME ? 'You' : first(last.by)}:</b> ${rich(last.text)}</div>
         ${r.kind !== 'rx' && last.rx.length ? rxHTML(last) : ''}</div>
-      <div class="row-side">${state}${badge}${r.sec === 'kept' && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : ''}<span class="row-chev">${ic('chev')}</span></div></div>${x}</article>`;
+      <div class="row-side">${state}${badge}${r.sec === 'kept' && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}">Done</button>` : ''}<span class="row-chev">${ic('chev')}</span></div></div>${WHY === 'a' && S.whyOpen === r.id ? `<div class="why-pop" data-stop="1"><h3>Why this is in ${BK[r.bucket][0]}</h3>${whyBody(r)}</div>` : ''}${x}</article>`;
 }
 const SUN = '<svg class="ill" viewBox="0 0 120 64" aria-hidden="true"><path d="M8 52h104" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M36 52a24 24 0 0 1 48 0" fill="currentColor" opacity=".18"/><path d="M60 14v8M30 26l6 6M90 26l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M20 60h30M62 60h38" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".4"/></svg>';
 function bucketHTML(b) {
@@ -629,10 +681,13 @@ function modalHTML() {
       const who = e.as || msg.by;
       return `<button class="tray-e${read ? ' read' : ''}" data-act="openConv" data-c="${msg.conv}" data-id="${e.row}">${av(who, 'xs')}<span class="tray-t"><b>${pn(who)}</b> <small>${where} · ${BK[e.bucket][0]} · ${e.at || msg.t}</small><span>${msg.deleted ? '<em>Message deleted</em>' : esc(e.lead || '') + rich(msg.text) + (msg.edited ? ' <em>(edited)</em>' : '')}</span></span></button>`;
     }).join('');
-    h = `<h2>Notifications</h2><p class="sheet-note">Stands in for push. One per row, sent when a row becomes unread in Focus or Needs you. For your information never notifies.</p><label class="switch"><input type="checkbox" data-act="focusOnly"${S.focusOnly ? ' checked' : ''}> Notify me for Focus only</label>${es}`;
+    h = `<h2>Notifications</h2><p class="sheet-note">Stands in for push. One per row, sent when a row becomes unread in Focus or Needs you. For your information never notifies.</p><label class="switch"><input type="checkbox" data-act="focusOnly"${S.focusOnly ? ' checked' : ''}> Notify me for Focus only <button class="link sw-link" data-act="modal" data-m="rules">Feed and notification settings</button></label>${es}`;
   } else if (m.type === 'rules') {
-    h = `<h2>Focus rules</h2><p class="sheet-note">Focus holds what matches these, and nothing else. Changes apply the next time you open the feed.</p>${S.rules.map((r, i) => `<div class="rule"><span><b>${esc(r.label)}</b><small>${r.n} items in the last 7 days${r.start ? ' · starting rule' : ''}</small></span><button class="btn sm" data-act="rmRule" data-i="${i}">Remove</button></div>`).join('')}
-      <h3>Suggested</h3>${S.rules.some(r => r.id === 'mention') ? '' : `<div class="rule"><span><b>Any direct mention</b><small>Would have pulled in 23 items in the last 7 days. They are in Needs you today.</small></span><button class="btn sm pri" data-act="addRule" data-id="mention" data-label="Any direct mention" data-n="23">Add</button></div>`}<p class="sheet-note">Add a person, a channel or a thread from "Add to Focus…" wherever you see it.</p>`;
+    h = `<h2>Feed and notifications</h2><h3>Focus rules</h3><p class="sheet-note">Focus holds what matches these, and nothing else. Changes apply the next time you open the feed.</p>${S.rules.map((r, i) => `<div class="rule"><span><b>${esc(r.label)}</b><small>${r.n} items in the last 7 days${r.start ? ' · starting rule' : ''}</small></span><button class="btn sm" data-act="rmRule" data-i="${i}">Remove</button></div>`).join('')}
+      <h3>Suggested</h3>${S.rules.some(r => r.id === 'mention') ? '' : `<div class="rule"><span><b>Any direct mention</b><small>Would have pulled in 23 items in the last 7 days. They are in Needs you today.</small></span><button class="btn sm pri" data-act="addRule" data-id="mention" data-label="Any direct mention" data-n="23">Add</button></div>`}<p class="sheet-note">Add a person, a channel or a thread from "Add to Focus…" wherever you see it.</p>
+      <h3>Channel dials</h3><p class="sheet-note">Channels that are not at Default. Change a dial from the channel itself.</p>${CH.map(([n, d]) => [n, (S.convs['ch-' + n] && S.convs['ch-' + n].dial) || d]).filter(x => x[1] !== 'default').map(([n, d]) => `<div class="rule"><span><b>#${n}</b><small>${DIAL[d][0]}: ${DIAL[d][1]}</small></span><button class="btn sm" data-act="openConv" data-c="ch-${n}">Open</button></div>`).join('')}
+      <h3 id="set-notif">Notifications</h3><p class="sheet-note">A notification is sent once per row, when it becomes unread in a bucket that notifies. There are no notification settings per channel: the dials above decide through the bucket.</p>
+      <div class="rule"><span><b>Focus</b><small>Always notifies</small></span></div><div class="rule"><span><b>Needs you</b><small>${S.focusOnly ? 'Does not notify' : 'Notifies'}</small></span><label class="switch sw-in"><input type="checkbox" data-act="focusOnly"${S.focusOnly ? ' checked' : ''}> Focus only</label></div><div class="rule"><span><b>For your information</b><small>Never notifies</small></span></div>`;
   } else if (m.type === 'rule') {
     const c = conv(m.conv), opts = [];
     if (m.by && m.by !== ME) opts.push(['p:' + m.by, `Everything that reaches you from ${pn(m.by)}`, RCOUNT[m.by] || 5, 'person', m.by]);
@@ -641,6 +696,7 @@ function modalHTML() {
     if (c.kind === 'thread') opts.push(['th:' + c.id, `Every reply in "${c.title}"`, c.msgs.length, 'thread', c.id]);
     h = `<h2>Add to Focus</h2><p class="sheet-note">Each rule shows what it would have pulled into Focus over the last 7 days, before you save it.</p>${opts.map(o => { const has = S.rules.some(r => r.id === o[0]); return `<div class="rule"><span><b>${esc(o[1])}</b><small class="rule-n">${o[2]} items in the last 7 days${o[2] > 30 ? `, about ${Math.round(o[2] / 7)} a day. That would make Focus a long list.` : ''}</small></span><button class="btn sm pri" ${has ? 'disabled' : ''} data-act="addRule" data-id="${o[0]}" data-label="${esc(o[1])}" data-n="${o[2]}" data-kind="${o[3]}" data-target="${o[4]}">${has ? 'Added' : 'Add rule'}</button></div>`; }).join('')}`;
   }
+  if (m.type === 'why') { const r = row(m.id); h = r ? `<h2>Why this is in ${BK[r.bucket][0]}</h2><p class="sheet-note">${esc(r.title || (conv(r.conv).kind === 'dm' ? pn(conv(r.conv).with) : conv(r.conv).title || '#' + conv(r.conv).name))} · ${r.t}. Every row is tested against the buckets from the top; the first that matches holds it.</p>${whyBody(r, true)}` : ''; }
   return `<div class="scrim" data-act="closeModal"><div class="sheet" role="dialog" aria-modal="true" data-stop="1"><button class="icon-btn close" data-act="closeModal" aria-label="Close">×</button>${h}</div></div>`;
 }
 const OTHER = { 'slack-like': 'Slack-like', 'telegram-like': 'Telegram-like', 'own': 'The agent\'s own' };
@@ -726,6 +782,10 @@ const A = {
   addRule(d) { S.rules.push({ id: d.id, label: d.label, n: +d.n, kind: d.kind, target: d.target }); if (d.kind === 'channel') { const c = conv('ch-' + d.target); if (c) c.dial = 'focus'; } },
   rmRule(d) { const r = S.rules.splice(+d.i, 1)[0]; if (r.kind === 'channel') { const c = conv('ch-' + r.target); if (c) c.dial = 'default'; } },
   closeModal() { S.modal = null; },
+  why(d) { S.whyOpen = S.whyOpen === d.id ? null : d.id; },
+  whySheet(d) { S.modal = { type: 'why', id: d.id }; },
+  rmRuleId(d) { S.rules = S.rules.filter(x => x.id !== d.id); (S.off = S.off || {})[d.row] = d.to; },
+  dialFrom(d) { conv(d.c).dial = d.l; S.rules = S.rules.filter(x => x.id !== 'ch:' + conv(d.c).name); (S.off = S.off || {})[d.row] = d.to; },
   focusOnly() { S.focusOnly = !S.focusOnly; },
   openMsg(d) { S.open.add(d.k); },
   keepH(d) { if (S.kept.has(d.k)) S.kept.delete(d.k); else S.kept.add(d.k); },
@@ -776,7 +836,7 @@ function search(q) {
 }
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]');
-  if (!el) { if (S.menu && !e.target.closest('.pop')) { S.menu = null; render(); } return; }
+  if (!el) { if ((S.menu && !e.target.closest('.pop')) || (S.whyOpen && !e.target.closest('.why-pop'))) { S.menu = null; S.whyOpen = null; render(); } return; }
   if (el.dataset.act === 'closeModal' && el.classList.contains('scrim') && e.target.closest('[data-stop]')) return;
   if (el.tagName === 'INPUT' && el.type !== 'checkbox') return;
   const skip = A[el.dataset.act](el.dataset);
