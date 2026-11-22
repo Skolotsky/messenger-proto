@@ -216,7 +216,7 @@ def run(browser, slug, size, vp, scale):
     ok("tray lists notifications and shows the current truth", pg.locator(".sheet .tray-e").count() >= 10 and "Message deleted" in t and "For your information ·" not in t)
     shot("12-notification-tray")
     click('.sheet [data-act="closeModal"]'); click(".demo-btn")
-    click('[data-act="modal"][data-m="rules"]'); pg.locator('.sheet input[data-act="focusOnly"]').check(); click('.sheet [data-act="closeModal"]')
+    click('[data-act="modal"][data-m="rules"]'); click('.sheet [data-act="setSec"][data-s="notif"]'); pg.locator('.sheet input[data-act="focusOnly"]').check(); click('.sheet [data-act="closeModal"]')
     click(".demo-btn"); click('.demo [data-act="modal"][data-m="tray"]')
     ok('"Focus only", set in the product, narrows what the notification app receives', all("Focus" in x for x in pg.locator(".sheet .tray-e small").all_inner_texts()))
     click('.sheet [data-act="closeModal"]'); click(".demo-btn")
@@ -377,6 +377,40 @@ def bursts(browser, slug, size, vp, scale):
     ok("one click on the row opens the conversation at the first new message", pg.locator(".conv .newline").count() == 1 and pg.locator(".conv .newline").is_visible() and pg.locator('article[data-row="r-anna"] .row-exp').count() == 0)
     ctx.close()
 
+def chrome(browser, slug, size, vp, scale):
+    """Slack-like only: one settings screen, the person's own menu, closing and reopening Activity (user, 2026-11-22)."""
+    if slug != "slack-like": return
+    ctx = browser.new_context(viewport=vp, device_scale_factor=scale, has_touch=size == "phone")
+    pg = ctx.new_page(); pg.goto(f"file://{here.resolve()}/{slug}.html")
+    def ok(name, cond, detail=""):
+        results.append({"page": slug, "width": size, "check": name, "pass": bool(cond), "detail": str(detail)})
+        if not cond: failures.append(f"{slug} @ {size}: {name} {detail}")
+    def vis(sel): return pg.locator(sel).locator("visible=true")
+    vis('[data-act="modal"][data-m="rules"]').first.click()
+    ok("settings is one screen with sections, opened on Activity feed when reached from the feed", pg.locator(".settings .set-item").count() == 4 and pg.locator(".settings .set-item.on").inner_text() == "Activity feed" and pg.locator(".settings .rule.person").count() == 5)
+    pg.screenshot(path=str(shots / f"{slug}-{size}-24-settings.jpg"), type="jpeg", quality=80)
+    pg.locator('.settings [data-s="notif"]').click()
+    ok("notifications are a section of the same screen", "Focus only" in pg.locator(".settings .set-body").inner_text())
+    pg.locator('.settings [data-act="closeModal"]').click()
+    if size == "phone": ctx.close(); return
+    pg.locator(".me-btn").click()
+    ok("the sidebar has the person's own menu, leading to settings", "Maya Okafor" in pg.locator(".me-btn").inner_text() and pg.locator('.me-pop [data-s="account"]').count() == 1)
+    pg.screenshot(path=str(shots / f"{slug}-{size}-25-own-menu.jpg"), type="jpeg", quality=80)
+    pg.locator('.me-pop [data-s="account"]').click()
+    ok("from there settings opens on Account", pg.locator(".settings .set-item.on").inner_text() == "Account")
+    pg.locator('.settings [data-act="closeModal"]').click()
+    pg.locator('.side [data-act="openConv"][data-c="ch-launch"]').click()
+    w0 = pg.locator(".pane").bounding_box()["width"]
+    pg.locator(".act-close").click()
+    ok("Activity has a close button; the conversation takes the room", pg.locator(".main").is_hidden() and pg.locator(".pane").bounding_box()["width"] > w0 + 300)
+    ok("the count stays on the sidebar while Activity is closed", pg.locator(".side-item .badge").is_visible())
+    pg.screenshot(path=str(shots / f"{slug}-{size}-26-activity-closed.jpg"), type="jpeg", quality=80)
+    pg.locator(".side-item").click()
+    ok("clicking Activity in the sidebar opens it again", pg.locator(".main").is_visible())
+    pg.locator(".side-item").click()
+    ok("and clicking it once more closes it", pg.locator(".main").is_hidden())
+    ctx.close()
+
 def hist_unread(browser, slug, size, vp, scale):
     """History tabs carry an unread count, and unread entries a mark; opening one clears both (user, 2026-11-22)."""
     ctx = browser.new_context(viewport=vp, device_scale_factor=scale, has_touch=size == "phone")
@@ -405,6 +439,7 @@ with sync_playwright() as p:
                 run(b, slug, size, vp, scale)
                 conv_edit(b, slug, size, vp, scale)
                 hist_unread(b, slug, size, vp, scale)
+                chrome(b, slug, size, vp, scale)
                 bursts(b, slug, size, vp, scale)
                 why_and_people(b, slug, size, vp, scale)
             except Exception as e:

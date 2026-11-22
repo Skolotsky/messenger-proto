@@ -366,7 +366,7 @@ function chats() {
   return `<div class="chats"><h3>Channels <small>${CH.length}</small></h3>${ch}<h3>Direct messages</h3>${dm}</div>`;
 }
 function convPane() {
-  if (!S.conv) return `<div class="conv none"><div class="empty">${SUN}<p>Open a row to read the conversation here, next to the feed.</p></div></div>`;
+  if (!S.conv) return `<div class="conv none"><div class="empty">${SUN}<p>${S.actOpen === false ? 'Choose a channel or a person on the left. Activity is closed; its count stays in the sidebar.' : 'Open a row to read the conversation here, next to the feed.'}</p></div></div>`;
   const c = conv(S.conv);
   const title = c.kind === 'dm' ? pn(c.with) : c.kind === 'channel' ? '#' + c.name : c.title;
   const sub = c.kind === 'dm' ? P[c.with][1] + (isAgent(c.with) ? ' · agent' : '') : c.kind === 'channel' ? `Channel · ${c.people} people` : `Thread in #${c.where}`;
@@ -405,6 +405,12 @@ function modalHTML() {
     if (c.kind === 'thread') opts.push(['th:' + c.id, `Every reply in "${c.title}"`, c.msgs.length, 'thread', c.id]);
     h = `<h2>Add to Focus</h2><p class="sheet-note">Each rule shows what it would have pulled into Focus over the last 7 days, before you save it.</p>${opts.map(o => { const has = S.rules.some(r => r.id === o[0]); return `<div class="rule"><span><b>${esc(o[1])}</b><small class="rule-n">${o[2]} items in the last 7 days${o[2] > 30 ? `, about ${Math.round(o[2] / 7)} a day. That would make Focus a long list.` : ''}</small></span><button class="btn sm pri" ${has ? 'disabled' : ''} data-act="addRule" data-id="${o[0]}" data-label="${esc(o[1])}" data-n="${o[2]}" data-kind="${o[3]}" data-target="${o[4]}">${has ? 'Added' : 'Add rule'}</button></div>`; }).join('')}`;
   }
+  if (m.type === 'rules') {
+    const [feedPart, rest] = h.replace('<h2>Feed and notifications</h2>', '').split('<h3>Channel dials</h3>'), [chPart, nPart] = rest.split('<h3 id="set-notif">Notifications</h3>');
+    const acct = `<div class="rule person">${av(ME)}<span><b>${pn(ME)}</b><small>${P[ME][1]} · Larkspur</small></span></div><p class="sheet-note">You are looking at the product as ${first(ME)}. Switching to another person, and signing out, belong to the running product; the first version has a person switcher in place of sign-in.</p>`;
+    const secs = { account: ['Account', acct], feed: ['Activity feed', feedPart], notif: ['Notifications', nPart], channels: ['Channels', chPart] }, cur = S.setSec || 'feed';
+    return `<div class="scrim center" data-act="closeModal"><div class="sheet settings" role="dialog" aria-modal="true" aria-label="Settings" data-stop="1"><button class="icon-btn close" data-act="closeModal" aria-label="Close">×</button><nav class="set-nav"><h2>Settings</h2>${Object.keys(secs).map(k => `<button class="set-item${k === cur ? ' on' : ''}" data-act="setSec" data-s="${k}">${secs[k][0]}</button>`).join('')}</nav><div class="set-body"><h2>${secs[cur][0]}</h2>${secs[cur][1]}</div></div></div>`;
+  }
   if (m.type === 'why') { const r = row(m.id); h = r ? `<h2>Why this is in ${BK[r.bucket][0]}</h2><p class="sheet-note">${esc(r.title || (conv(r.conv).kind === 'dm' ? pn(conv(r.conv).with) : conv(r.conv).title || '#' + conv(r.conv).name))} · ${r.t}. Every row is tested against the buckets from the top; the first that matches holds it.</p>${whyBody(r, true)}` : ''; }
   return `<div class="scrim" data-act="closeModal"><div class="sheet" role="dialog" aria-modal="true" data-stop="1"><button class="icon-btn close" data-act="closeModal" aria-label="Close">×</button>${h}</div></div>`;
 }
@@ -424,6 +430,7 @@ const h = {
   bell() { return ''; },
   bellOld() { const n = S.tray.filter(e => { const r = S.rows.find(x => x.id === e.row); return r && !r.read && (!S.focusOnly || e.bucket === 'focus'); }).length; return `<button class="icon-btn bell" data-act="modal" data-m="tray" aria-label="Notifications">${ic('bell')}${n ? `<span class="badge">${n}</span>` : ''}</button>`; },
   search() { return `<div class="search">${ic('search')}<input type="search" data-search="1" aria-label="Search messages" placeholder="Search messages" value="${esc(S.q)}"><div class="sr" id="sr"></div></div>`; },
+  me() { const open = S.menu === 'me'; return `<div class="me"><button class="me-btn" data-act="menu" data-key="me" aria-expanded="${open}" aria-label="Your account menu">${av(ME)}<span><b>${pn(ME)}</b><small>${P[ME][1]}</small></span>${ic('chev')}</button>${open ? `<div class="pop me-pop"><button class="opt" data-act="modal" data-m="rules" data-s="account"><b>Settings</b><span>Account, activity feed, notifications, channels</span></button><button class="opt" data-act="modal" data-m="rules" data-s="feed"><b>Activity feed settings</b><span>Focus people and rules</span></button><div class="pop-f">Switch person and Sign out come with the running product.</div></div>` : ''}</div>`; },
   nav(v, label, icon, extra) { return `<button class="nav${S.view === v ? ' on' : ''}" data-act="view" data-v="${v}">${ic(icon)}<span>${label}</span>${extra || ''}</button>`; }
 };
 
@@ -492,7 +499,9 @@ const A = {
   setDial(d) { conv(d.c).dial = d.l; S.menu = null; S.note = 'Dial changed. Unread rows are re-sorted the next time the feed is opened.'; },
   setT(d) { const c = conv(d.c); c.tdial = d.l; c.tset = true; S.menu = null; },
   follow(d) { const c = conv(d.c); c.tdial = c.tdial === 'off' ? 'fyi' : 'off'; c.tset = true; S.menu = null; },
-  modal(d) { S.modal = { type: d.m }; S.menu = null; },
+  modal(d) { S.modal = { type: d.m }; S.menu = null; if (d.m === 'rules') S.setSec = d.s || 'feed'; },
+  setSec(d) { S.setSec = d.s; },
+  actToggle() { if (S.actOpen === false) { S.actOpen = true; S.view = 'feed'; } else { if (S.view === 'feed') settle(); S.actOpen = false; } S.menu = null; },
   ruleFor(d) { S.modal = { type: 'rule', conv: d.c, by: d.by }; S.menu = null; },
   addRule(d) { S.rules.push({ id: d.id, label: d.label, n: +d.n, kind: d.kind, target: d.target }); if (d.kind === 'channel') { const c = conv('ch-' + d.target); if (c) c.dial = 'focus'; } },
   rmRule(d) { const r = S.rules.splice(+d.i, 1)[0]; if (r.kind === 'channel') { const c = conv('ch-' + r.target); if (c) c.dial = 'default'; } },

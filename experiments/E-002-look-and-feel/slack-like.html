@@ -334,6 +334,33 @@ button.rx:hover{border-color:var(--accent)}
 }
 @media (max-width:760px){.demo-btn{right:auto;left:0;top:auto;bottom:76px;border-radius:0 6px 6px 0;border:1px solid #666;border-left:0}}
 @media (max-width:760px){.demo{bottom:122px}}
+/* one settings screen */
+.scrim.center{justify-content:center;align-items:center}
+.sheet.settings{width:min(880px,94vw);height:min(660px,90vh);display:grid;grid-template-columns:210px 1fr;padding:0;border-radius:12px;overflow:hidden}
+.set-nav{background:var(--panel2);padding:18px 8px;display:flex;flex-direction:column;gap:2px;border-right:1px solid var(--line)}
+.set-nav h2{padding:0 10px 10px}
+.set-item{padding:8px 10px;border-radius:6px;font-size:14.5px}
+.set-item:hover{background:var(--hover)}
+.set-item.on{background:var(--accent);color:var(--on-accent);font-weight:600}
+.set-body{padding:18px 22px 24px;overflow-y:auto}
+.set-body>h2{margin-bottom:8px}
+.set-body>h3:first-of-type{margin-top:6px}
+/* the person's own menu in the sidebar */
+.me{position:relative;border-top:1px solid var(--line);padding:8px}
+.me-btn{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px;border-radius:8px}
+.me-btn:hover{background:var(--hover)}
+.me-btn>span:not(.av){display:flex;flex-direction:column;flex:1;min-width:0;line-height:1.2}
+.me-btn>.av{flex:none;width:32px;height:32px}
+.me-btn small{color:var(--muted);font-size:12px}
+.me-pop{top:auto;bottom:calc(100% + 4px);left:8px;--panel:#fff;--text:#1c1d1f;--muted:#62666d;--line:#e3e3df;--hover:#f1f1ee;color:#1c1d1f}
+.act-close{font-size:22px}
+@media (max-width:760px){
+  .sheet.settings{width:100%;height:100dvh;max-height:none;border-radius:0;grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .set-nav{flex-direction:row;overflow-x:auto;padding:12px 8px 8px;border-right:0;border-bottom:1px solid var(--line);align-items:center}
+  .set-nav h2{padding:0 8px 0 4px;font-size:16px}
+  .set-item{white-space:nowrap}
+  .act-close{display:none}
+}
 
 /* Slack-like: dark sidebar, dense rows, square avatars, flat messages. Own colours, no borrowed marks. */
 :root{--accent:#0f6e64;--side:#1d2b2a;--side-text:#cfdcda;--side-hover:#2a3d3b}
@@ -378,6 +405,10 @@ button.rx:hover{border-color:var(--accent)}
 .sk .msg.is-flag>.msg-self{padding-left:10px}
 .sk .msg.deleted>.msg-self{padding-left:54px}
 .sk .msg-tools{right:6px;top:4px}
+/* Activity can be closed on a wide screen: the conversation takes the room */
+@media (min-width:761px){.sk.act-closed{grid-template-columns:250px 1fr}.sk.act-closed .main{display:none}.sk.act-closed .pane{border-left:0}}
+.sk .side .me{--line:#34494699}
+.sk .side .me-btn{color:#fff}
 </style>
 </head>
 <body>
@@ -386,11 +417,11 @@ button.rx:hover{border-color:var(--accent)}
 /* Direction 1: the conventions of a work messenger. Sidebar of channels, dense list, activity as one view among others. */
 window.Skin = { file: 'slack-like', title: 'Slack-like', buckets: 'stack', pillTop: true, shell(h) {
   const S = h.S;
-  return `<div class="app sk v-${S.view}${S.conv ? ' has-conv' : ''}">
+  return `<div class="app sk v-${S.view}${S.conv ? ' has-conv' : ''}${S.actOpen === false ? ' act-closed' : ''}">
   <aside class="side"><div class="ws"><b>Larkspur</b><small>Maya Okafor · Product</small></div>${h.search()}
-    <button class="side-item${S.view !== 'chats' ? ' on' : ''}" data-act="view" data-v="feed">${h.ic('bell')}<span>Activity</span>${h.badge()}</button>
-    <div class="side-scroll" data-scroll="side">${h.chats()}</div></aside>
-  <main class="main"><header class="top"><h1>Activity</h1>${h.pill()}<button class="icon-btn" data-act="modal" data-m="rules" aria-label="Feed and notification settings" title="Feed and notification settings">${h.ic('rules')}</button>${h.bell()}</header>
+    <button class="side-item${S.view !== 'chats' && S.actOpen !== false ? ' on' : ''}" data-act="actToggle" aria-pressed="${S.actOpen !== false}" title="Open or close Activity">${h.ic('bell')}<span>Activity</span>${h.badge()}</button>
+    <div class="side-scroll" data-scroll="side">${h.chats()}</div>${h.me()}</aside>
+  <main class="main"><header class="top"><h1>Activity</h1>${h.pill()}<button class="icon-btn" data-act="modal" data-m="rules" aria-label="Feed and notification settings" title="Feed and notification settings">${h.ic('rules')}</button>${h.bell()}<button class="icon-btn act-close" data-act="actToggle" aria-label="Close Activity" title="Close Activity">×</button></header>
     <nav class="tabs"><button class="tab${S.view !== 'history' ? ' on' : ''}" data-act="view" data-v="feed">Feed ${h.badge()}</button><span class="tabs-sep">History</span>${h.histTabs(true)}</nav>
     ${S.view === 'history' ? h.history() : h.feed()}</main>
   <section class="pane">${h.conv()}</section>
@@ -765,7 +796,7 @@ function chats() {
   return `<div class="chats"><h3>Channels <small>${CH.length}</small></h3>${ch}<h3>Direct messages</h3>${dm}</div>`;
 }
 function convPane() {
-  if (!S.conv) return `<div class="conv none"><div class="empty">${SUN}<p>Open a row to read the conversation here, next to the feed.</p></div></div>`;
+  if (!S.conv) return `<div class="conv none"><div class="empty">${SUN}<p>${S.actOpen === false ? 'Choose a channel or a person on the left. Activity is closed; its count stays in the sidebar.' : 'Open a row to read the conversation here, next to the feed.'}</p></div></div>`;
   const c = conv(S.conv);
   const title = c.kind === 'dm' ? pn(c.with) : c.kind === 'channel' ? '#' + c.name : c.title;
   const sub = c.kind === 'dm' ? P[c.with][1] + (isAgent(c.with) ? ' · agent' : '') : c.kind === 'channel' ? `Channel · ${c.people} people` : `Thread in #${c.where}`;
@@ -804,6 +835,12 @@ function modalHTML() {
     if (c.kind === 'thread') opts.push(['th:' + c.id, `Every reply in "${c.title}"`, c.msgs.length, 'thread', c.id]);
     h = `<h2>Add to Focus</h2><p class="sheet-note">Each rule shows what it would have pulled into Focus over the last 7 days, before you save it.</p>${opts.map(o => { const has = S.rules.some(r => r.id === o[0]); return `<div class="rule"><span><b>${esc(o[1])}</b><small class="rule-n">${o[2]} items in the last 7 days${o[2] > 30 ? `, about ${Math.round(o[2] / 7)} a day. That would make Focus a long list.` : ''}</small></span><button class="btn sm pri" ${has ? 'disabled' : ''} data-act="addRule" data-id="${o[0]}" data-label="${esc(o[1])}" data-n="${o[2]}" data-kind="${o[3]}" data-target="${o[4]}">${has ? 'Added' : 'Add rule'}</button></div>`; }).join('')}`;
   }
+  if (m.type === 'rules') {
+    const [feedPart, rest] = h.replace('<h2>Feed and notifications</h2>', '').split('<h3>Channel dials</h3>'), [chPart, nPart] = rest.split('<h3 id="set-notif">Notifications</h3>');
+    const acct = `<div class="rule person">${av(ME)}<span><b>${pn(ME)}</b><small>${P[ME][1]} · Larkspur</small></span></div><p class="sheet-note">You are looking at the product as ${first(ME)}. Switching to another person, and signing out, belong to the running product; the first version has a person switcher in place of sign-in.</p>`;
+    const secs = { account: ['Account', acct], feed: ['Activity feed', feedPart], notif: ['Notifications', nPart], channels: ['Channels', chPart] }, cur = S.setSec || 'feed';
+    return `<div class="scrim center" data-act="closeModal"><div class="sheet settings" role="dialog" aria-modal="true" aria-label="Settings" data-stop="1"><button class="icon-btn close" data-act="closeModal" aria-label="Close">×</button><nav class="set-nav"><h2>Settings</h2>${Object.keys(secs).map(k => `<button class="set-item${k === cur ? ' on' : ''}" data-act="setSec" data-s="${k}">${secs[k][0]}</button>`).join('')}</nav><div class="set-body"><h2>${secs[cur][0]}</h2>${secs[cur][1]}</div></div></div>`;
+  }
   if (m.type === 'why') { const r = row(m.id); h = r ? `<h2>Why this is in ${BK[r.bucket][0]}</h2><p class="sheet-note">${esc(r.title || (conv(r.conv).kind === 'dm' ? pn(conv(r.conv).with) : conv(r.conv).title || '#' + conv(r.conv).name))} · ${r.t}. Every row is tested against the buckets from the top; the first that matches holds it.</p>${whyBody(r, true)}` : ''; }
   return `<div class="scrim" data-act="closeModal"><div class="sheet" role="dialog" aria-modal="true" data-stop="1"><button class="icon-btn close" data-act="closeModal" aria-label="Close">×</button>${h}</div></div>`;
 }
@@ -823,6 +860,7 @@ const h = {
   bell() { return ''; },
   bellOld() { const n = S.tray.filter(e => { const r = S.rows.find(x => x.id === e.row); return r && !r.read && (!S.focusOnly || e.bucket === 'focus'); }).length; return `<button class="icon-btn bell" data-act="modal" data-m="tray" aria-label="Notifications">${ic('bell')}${n ? `<span class="badge">${n}</span>` : ''}</button>`; },
   search() { return `<div class="search">${ic('search')}<input type="search" data-search="1" aria-label="Search messages" placeholder="Search messages" value="${esc(S.q)}"><div class="sr" id="sr"></div></div>`; },
+  me() { const open = S.menu === 'me'; return `<div class="me"><button class="me-btn" data-act="menu" data-key="me" aria-expanded="${open}" aria-label="Your account menu">${av(ME)}<span><b>${pn(ME)}</b><small>${P[ME][1]}</small></span>${ic('chev')}</button>${open ? `<div class="pop me-pop"><button class="opt" data-act="modal" data-m="rules" data-s="account"><b>Settings</b><span>Account, activity feed, notifications, channels</span></button><button class="opt" data-act="modal" data-m="rules" data-s="feed"><b>Activity feed settings</b><span>Focus people and rules</span></button><div class="pop-f">Switch person and Sign out come with the running product.</div></div>` : ''}</div>`; },
   nav(v, label, icon, extra) { return `<button class="nav${S.view === v ? ' on' : ''}" data-act="view" data-v="${v}">${ic(icon)}<span>${label}</span>${extra || ''}</button>`; }
 };
 
@@ -891,7 +929,9 @@ const A = {
   setDial(d) { conv(d.c).dial = d.l; S.menu = null; S.note = 'Dial changed. Unread rows are re-sorted the next time the feed is opened.'; },
   setT(d) { const c = conv(d.c); c.tdial = d.l; c.tset = true; S.menu = null; },
   follow(d) { const c = conv(d.c); c.tdial = c.tdial === 'off' ? 'fyi' : 'off'; c.tset = true; S.menu = null; },
-  modal(d) { S.modal = { type: d.m }; S.menu = null; },
+  modal(d) { S.modal = { type: d.m }; S.menu = null; if (d.m === 'rules') S.setSec = d.s || 'feed'; },
+  setSec(d) { S.setSec = d.s; },
+  actToggle() { if (S.actOpen === false) { S.actOpen = true; S.view = 'feed'; } else { if (S.view === 'feed') settle(); S.actOpen = false; } S.menu = null; },
   ruleFor(d) { S.modal = { type: 'rule', conv: d.c, by: d.by }; S.menu = null; },
   addRule(d) { S.rules.push({ id: d.id, label: d.label, n: +d.n, kind: d.kind, target: d.target }); if (d.kind === 'channel') { const c = conv('ch-' + d.target); if (c) c.dial = 'focus'; } },
   rmRule(d) { const r = S.rules.splice(+d.i, 1)[0]; if (r.kind === 'channel') { const c = conv('ch-' + r.target); if (c) c.dial = 'default'; } },

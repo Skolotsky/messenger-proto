@@ -415,6 +415,62 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "settings is one screen with sections, opened on Activity feed when reached from the feed",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "notifications are a section of the same screen",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the sidebar has the person's own menu, leading to settings",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "from there settings opens on Account",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Activity has a close button; the conversation takes the room",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the count stays on the sidebar while Activity is closed",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "clicking Activity in the sidebar opens it again",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "and clicking it once more closes it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "ten messages are one row that says so",
   "pass": true,
   "detail": "AL\nAnna Lindqvist\n10 new\n10:41\nIn Focus: direct message from"
@@ -985,6 +1041,20 @@
   "check": "opening an entry clears its mark and lowers the count; the entry stays",
   "pass": true,
   "detail": "7"
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "settings is one screen with sections, opened on Activity feed when reached from the feed",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "notifications are a section of the same screen",
+  "pass": true,
+  "detail": ""
  },
  {
   "page": "slack-like",

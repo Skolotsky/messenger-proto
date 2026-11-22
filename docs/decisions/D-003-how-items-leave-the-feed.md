@@ -1,6 +1,6 @@
 # D-003: How an item leaves the feed
 
-- Status: accepted; superseded in part (how a flagged row leaves: D-011)
+- Status: accepted; superseded in part (how a flagged row leaves: D-011; the Earlier list: D-016; expanding in place on a phone: D-023)
 - Level: product
 - Date: 2026-11-22 (proposed, reshaped by the user and accepted the same day)
 - Decided by: user
