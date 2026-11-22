@@ -10,7 +10,7 @@ _Nothing in progress._
 
 ## Waiting on user
 
-- **T-007** `decide` D-001: accept the record as it now stands (three buckets, flags, starting rules with direct mentions in Needs you). Brief: `docs/visuals/D-001-product-hypothesis.html`
+- **T-007** `decide` D-001: accept the record as it now stands (three buckets, starting rules, channel dial, Focus for channels and threads, Flag and Info). Brief: `docs/visuals/D-001-product-hypothesis.html`
 
 ## Next
 

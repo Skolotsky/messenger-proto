@@ -166,7 +166,7 @@ details > .stack { gap: 10px; }
 
 <div class="ask">
   <div class="label">Needs you</div>
-  <p><strong>Accept this as the product hypothesis?</strong> It holds everything we settled, including flags. Direct mentions start in Needs you, with “any direct mention” one click away as a Focus rule.</p>
+  <p><strong>Accept this as the product hypothesis?</strong> It holds everything we settled: the three buckets, the starting rules, the channel dial, what Focus means for a channel or thread, and the sender's Flag and Info.</p>
 </div>
 
 <section>
@@ -197,10 +197,51 @@ details > .stack { gap: 10px; }
         <li><strong>Reactions to your messages,</strong> grouped.<br>“Priya, Marco and 3 others reacted to your update.”</li>
         <li><strong>Mentions of a whole channel or group.</strong></li>
         <li><strong>Activity in threads you only follow.</strong></li>
+        <li><strong>Messages marked Info</strong> that concern you.</li>
       </ul>
     </div>
   </div>
-  <p class="note"><strong>Never in the feed:</strong> an agent's in-progress output, and ordinary channel traffic you were not addressed in.</p>
+  <p class="note"><strong>Never in the feed:</strong> agent text that is still streaming in, and ordinary channel traffic you were not addressed in.</p>
+</section>
+
+<section>
+  <h2>Tuning it: one dial per channel</h2>
+  <p>The starting rules are defaults. Each channel has a single dial, changed in one click from the channel.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Level</th><th>What reaches your feed from the channel</th></tr></thead>
+      <tbody>
+        <tr><td><span class="chip you">Focus</span></td><td>Every new top-level message and everything addressed to you, in Focus.</td></tr>
+        <tr><td><strong>All activity</strong></td><td>The same items, with the unaddressed ones in For your information.</td></tr>
+        <tr><td><strong>Default</strong></td><td>The starting rules above.</td></tr>
+        <tr><td><strong>Muted</strong></td><td>Only what names you: direct mentions and flags that mention you.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Whatever the level, a direct mention or a flag that names you always gets through, and the item says so: “#launch is set to All activity”.</p>
+</section>
+
+<section>
+  <h2>What Focus means for a channel and for a thread</h2>
+  <p>People focus a channel when they are on call, in a crunch, when every post matters, or when they are the one who answers. All of them want every post, not only what names them.</p>
+  <div class="split">
+    <div class="panel you">
+      <div class="label">A channel in Focus</div>
+      <ul>
+        <li>Every new top-level message lands in Focus, plus everything addressed to you there.</li>
+        <li>Replies in threads you are not part of stay out, so one busy thread cannot flood it.</li>
+        <li>Shown as one row: “#incidents · 6 new”, which expands. The count updates in place.</li>
+      </ul>
+    </div>
+    <div class="panel you">
+      <div class="label">A thread in Focus</div>
+      <ul>
+        <li>Every new reply lands in Focus, also as one row.</li>
+        <li>For work handed to an agent, that means its results and flags. Progress updates stay one bucket down.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="note">Reactions never land in Focus. An end date on a Focus rule was considered and set aside for now.</p>
 </section>
 
 <section>
@@ -213,8 +254,14 @@ details > .stack { gap: 10px; }
 </section>
 
 <section>
-  <h2>Flags: how a sender says “this needs attention”</h2>
-  <p>A flag is stronger than a mention and is not always a request. Who it is for follows from the message itself.</p>
+  <h2>What the sender can say: Flag and Info</h2>
+  <p>One control with three positions, the same for people and agents. Almost every message carries neither.</p>
+  <div class="split">
+    <div class="panel you"><div class="label">Flag</div><p>“This needs attention.” Stronger than a mention, and not always a request.</p></div>
+    <div class="panel"><div class="label">Nothing</div><p>The feed's rules decide.</p></div>
+    <div class="panel"><div class="label">Info</div><p>“For the record, do not disturb anyone.” Never lands higher than For your information, even if it mentions you or the channel is in Focus. No notification.</p></div>
+  </div>
+  <p>Who a flag is for follows from the message itself.</p>
   <div class="table-wrap">
     <table>
       <thead><tr><th>A flagged message…</th><th>Is for</th><th>Lands in</th><th>Closes when</th></tr></thead>
@@ -229,11 +276,11 @@ details > .stack { gap: 10px; }
   <div class="split">
     <div class="panel">
       <div class="label">Agents: always</div>
-      <p>An agent working on a task sometimes has to stop for a human: an approval, a choice between two options, a missing detail. Whenever it stops, it flags that message. Everything else it writes is unflagged, and its in-progress output never reaches the feed.</p>
+      <p>An agent working on a task sometimes has to stop for a human: an approval, a choice between two options, a missing detail. Whenever it stops, it flags that message. Finished progress updates are Info, results carry no level, and text still streaming in never reaches the feed.</p>
     </div>
     <div class="panel">
       <div class="label">People: when they choose</div>
-      <p>A person can flag a message the same way when a mention is not strong enough. Most messages stay unflagged. An AI suggesting a flag is a later idea, outside this scope.</p>
+      <p>A person can flag a message when a mention is not strong enough, or mark it Info for a note or a courtesy mention. Most messages carry neither. An AI suggesting a flag is a later idea, outside this scope.</p>
     </div>
   </div>
   <p class="note">In the proof of concept the agents in the seeded team follow a script (post, work, stop and ask) so a demo runs the same way every time. Whether a real model drives them is decision D-002.</p>

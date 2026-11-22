@@ -24,11 +24,12 @@ The first version of this option had two tiers. The user leaned to A and added t
 
 - **Focus** is the top bucket and belongs to the person. It holds what matches their own rules. Some people will use it as the one place to start. Rules are of two kinds:
   - exact rules: a person, a direct conversation, a channel, a thread, a kind of item. Added in one click from wherever the thing is. Before a rule is saved, the product shows how many items it would have pulled in recently.
+  - what focusing a conversation means: a channel in Focus brings every new top-level message there, plus everything addressed to you there (mentions, replies in your threads, flags). Replies in threads you are not part of stay out; a thread is focused on its own, and then every new reply lands in Focus. Reactions never land in Focus. This follows from why people focus a channel: being on call, a crunch period, a low-volume channel where every post matters, being the one who answers. All of them want every post, not only what names them.
   - text rules, judged by a language model: "anything about pricing or contracts". The model may only move an item up into Focus, never hide or lower one, and it runs after the item is already in the feed, so a slow or unavailable model delays a promotion and breaks nothing.
 - **Needs you** is the system's judgement that something is directed at you. Fixed rules, the same for everyone, each item saying why it is there.
 - **For your information** is what concerns you without waiting on you.
 - **One item, one place.** Focus wins over Needs you, which wins over For your information. Every item says why it is where it is ("In Focus: direct message from Anna").
-- **The sender can flag a message.** A flag says "this needs attention", which is stronger than a mention and not always a request. Who it is for follows from the message itself:
+- **The sender can set a level on a message: Flag, nothing, or Info.** The same control for people and agents; almost every message carries neither. A flag says "this needs attention", which is stronger than a mention and not always a request. Who it is for follows from the message itself:
 
   | A flagged message… | Is for | Lands in | Closes when |
   |---|---|---|---|
@@ -37,6 +38,21 @@ The first version of this option had two tiers. The user leaned to A and added t
   | that mentions nobody | everyone in the thread, or in the channel for a top-level message | Needs you | anyone responds |
 
   The sender can withdraw a flag at any time. Agents flag whenever they stop and wait for a human (an approval, a choice, a clarification) and leave everything else unflagged; people flag when they choose to. An AI suggesting a flag to a person is a later idea, out of scope. What counts as responding is settled in D-003.
+
+  Info says "for the record, do not disturb anyone". An Info message never lands higher than For your information, even when it mentions you and even in a channel or thread you put in Focus, and it sends no notification. A mention inside it is a polite copy. Agents use it for finished progress updates; people use it for notes and courtesy mentions. The sender's Info wins over the reader's Focus rule: the message stays visible one bucket down, so nothing is hidden.
+
+  For agents this gives four cases: text still streaming in is not a finished message and never reaches the feed; a finished progress update is Info; a result carries no level; a stop for a human is flagged.
+- **One row per conversation.** In Focus, new items from the same channel or thread collapse into one entry ("#incidents · 6 new") that expands, and the count updates in place. A focused channel must not turn a short list into a long one.
+- **Each channel has one dial**, changed in one click from the channel, so the fixed rules can be tuned without a grid of switches:
+
+  | Level | What reaches your feed from the channel |
+  |---|---|
+  | Focus | Every new top-level message and everything addressed to you, in Focus. The same thing as a "this channel" Focus rule |
+  | All activity | The same items, with the unaddressed ones in For your information |
+  | Default | The starting rules below |
+  | Muted | Only what names you: direct mentions and flags that mention you |
+
+  Whatever the level, a direct mention or a flag that names you always gets through, and every item's reason includes the channel's level ("#launch is set to All activity").
 - **Nothing jumps.** An edit or a delete never changes the size or position of what is on screen. A longer edit sits behind an expander, a shorter one keeps its space, a deleted message leaves a marker in its place, and emptied space is filled with care (an illustration, not a gap). The feed still always shows the current truth. Detail belongs to D-004.
 
 Starting rules, so that Focus is useful before anyone configures anything (recommended; the user proposed "any direct message" and "any direct mention", see the note below):
@@ -45,8 +61,8 @@ Starting rules, so that Focus is useful before anyone configures anything (recom
 |---|---|
 | Focus (your rules, both removable) | Direct messages from people, one to one. Flagged messages that mention you or are sent to you directly, from a person or an agent |
 | Needs you (fixed) | Direct mentions of you. Replies in threads you started or replied in. Flagged messages that mention nobody, in your threads and channels |
-| For your information (fixed) | Reactions to your messages, grouped. Mentions of a whole channel or group. Activity in threads you only follow |
-| Never in the feed | In-progress agent output. Ordinary channel traffic you were not addressed in |
+| For your information (fixed) | Reactions to your messages, grouped. Mentions of a whole channel or group. Activity in threads you only follow. Messages marked Info that concern you |
+| Never in the feed | Agent text that is still streaming in. Ordinary channel traffic you were not addressed in |
 
 Note on the difference from the user's proposal: direct mentions start in Needs you, not Focus. Mentions are frequent and often a courtesy ("thanks @sam"), and with them in Focus the Needs you bucket is left almost empty and Focus becomes Needs you under another name. "Any direct mention" is offered as a suggested rule, one click to add.
 
@@ -86,7 +102,7 @@ Where A as shaped goes beyond that practice: text rules judged by a model add a 
 
 **A as described above**, with the starting rules in the table.
 
-Locks in: three buckets with one item in one place; Focus is defined only by the person's rules; fixed, explained rules for the other two; the sender's flag; agents are participants in conversations; text rules judged by a model are in scope, built last, after an experiment; nothing jumps on edit or delete.
+Locks in: three buckets with one item in one place; Focus is defined only by the person's rules; fixed, explained rules for the other two; the sender's level on a message (Flag, Info); one dial per channel; one row per conversation in Focus; agents are participants in conversations; text rules judged by a model are in scope, built last, after an experiment; nothing jumps on edit or delete.
 
 Order of building: the three buckets with exact rules and flags first; text rules last.
 
@@ -96,7 +112,7 @@ No second opinion was sought: nothing is built yet, so changing course costs lit
 
 ## Decision
 
-_Open._ Settled in discussion so far (user, 2026-11-22): option A; Focus as a third, top bucket defined by the person's rules; one item in one place with Focus winning; a count before a rule is saved; text rules judged by a model stay in scope, promote-only and after the item is shown, with experiment and build postponed until the rest is done; nothing jumps on edit or delete; the sender's mark is called a flag, is for whoever the message mentions, and for everyone in scope when it mentions nobody. Still to confirm: the record as a whole, including the starting rules.
+_Open._ Settled in discussion so far (user, 2026-11-22): option A; Focus as a third, top bucket defined by the person's rules; one item in one place with Focus winning; a count before a rule is saved; text rules judged by a model stay in scope, promote-only and after the item is shown, with experiment and build postponed until the rest is done; nothing jumps on edit or delete; the sender's mark is called a flag, is for whoever the message mentions, and for everyone in scope when it mentions nobody. the starting rules are good as defaults, with one dial per channel to tune them (Focus, All activity, Default, Muted); a channel or thread in Focus brings every new post or reply, shown as one row per conversation; senders can also mark a message Info. Set aside for now, to keep it simple: an end date on a Focus rule. Still to confirm: the record as a whole.
 
 ## Consequences
 
