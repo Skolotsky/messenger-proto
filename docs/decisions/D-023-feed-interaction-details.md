@@ -1,6 +1,6 @@
 # D-023: How the feed is used day to day in the chosen layout
 
-- Status: accepted (the points under "Decided"); proposed (the points under "Still the agent's proposal")
+- Status: accepted
 - Level: product
 - Date: 2026-11-22
 - Decided by: user
@@ -72,13 +72,13 @@ As listed under "Decided"; where the agent had built something else first, the r
 
 31. **The organization you are in is always shown; there is no switcher between organizations.** "Organization should be shown as well, cause such systems are always multi-tenant, so it matters in which organization I am. We'll not build the switcher between organizations, it's out of scope." It is named at the top of the sidebar, above the title on a phone's first screen, in the person's menu and on the Account page. It is a label, not a control. This answers the question D-026 left open: the product shows no second organization.
 
-### Still the agent's proposal, shown in the mock-up, awaiting the user's word
+### Proposed by the agent, accepted with the design sign-off ("Yes, finalize", 2026-11-22)
 
 - Lapsed with point 21: context above the new messages in an opened row, and how a long burst is shown there. The conversation shows the whole exchange with a "New" line at the first new message.
 - **The arrivals button is called "Show"**, and the control names how many arrived in Focus and Needs you.
 - **Which swipe is which:** the user set the pair; that right is read and left is keep is the agent's pick.
 - **On a phone the reply box is not given the cursor automatically**, since that opens the keyboard.
-- **The settings sections** are Account, Activity feed (with Focus people and Channel levels under it) and Notifications. Sign out and switching person are named in the menu but not built: the first version has a person switcher in place of sign-in (D-009).
+- **The settings sections** are Account, Activity feed (with Focus people and Channel levels under it) and Notifications. There is no Sign out; Switch account stands in for sign-in (D-009).
 - **The Notifications page** asks one question, "What should send you a notification?", with two choices and their daily figures from E-001. The user disliked the first form and did not understand the first Channels page; both were redrawn and not yet reviewed.
 
 ## Consequences
@@ -89,5 +89,5 @@ As listed under "Decided"; where the agent had built something else first, the r
 
 ## Follow-ups
 
-- The proposal points need a yes or changes; then they move up.
+- What the prototype only approximates is in `tasks/T-038-build-acceptance-from-e002.md`.
 - One word for one thing: the interface and the user say "organization", D-026 and the architecture say "team". To settle when the architecture is reviewed.

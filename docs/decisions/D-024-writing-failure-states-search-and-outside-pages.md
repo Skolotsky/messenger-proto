@@ -65,6 +65,10 @@ The results say how many messages were found, mark the match, show "edited" wher
 - **What a bucket means is a tooltip on its name**, not a line of text beside it ("these explanations may be just tooltips").
 - **An agent is marked by a robot on the corner of its avatar**, not by a text label. This is the visible agent mark D-002 asks for, in another form.
 
+### Added at the design sign-off, 2026-11-22 (the user: "Yes, finalize")
+
+Accepted with the sign-off: an agent's answer appears as it is written and reaches no feed until finished; a channel is created from a "+" with a name and people; an empty Focus offers three rules to start with. Found missing by the independent review and added: any channel message can start a thread (Reply in thread); a draft survives anything that redraws the screen and stays with its conversation.
+
 ## Consequences
 
 - Easier: every part of the brief now has a designed surface, and the reliability story can be shown by one person with three windows: the product, the control panel, the notification app.

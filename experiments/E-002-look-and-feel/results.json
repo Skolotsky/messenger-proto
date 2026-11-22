@@ -590,6 +590,34 @@
  {
   "page": "slack-like",
   "width": "desktop",
+  "check": "and the row's own line says the same",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Keep from History is real for every entry",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a thread already kept shows as kept, and cannot be kept twice",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Undo does not make a row you read unread again",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
   "check": "the offline notice does not cover the title",
   "pass": true,
   "detail": "({'x': 266, 'y': 20.953125, 'width': 203.15625, 'height': 26.09375}, {'x': 479.15625, 'y': 20.9375, 'width': 162.84375, 'height': 26.125})"
@@ -1844,6 +1872,34 @@
   "page": "slack-like",
   "width": "phone",
   "check": "while a change waits, the panel still gives the true cause",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "and the row's own line says the same",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "Keep from History is real for every entry",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "a thread already kept shows as kept, and cannot be kept twice",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "Undo does not make a row you read unread again",
   "pass": true,
   "detail": ""
  },

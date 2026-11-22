@@ -50,7 +50,7 @@ const CH = [ // name, dial, unread, people
 ];
 const DMS = ['anna', 'sam', 'marco', 'lena', 'tomas', 'ship', 'triage'];
 const BG = { // ordinary traffic in conversations that carry no situation
-  'ch-pricing': [['omar', 'Yesterday 14:10', 'Team plan stays at €79 per location through launch. We revisit in January.'], ['jonas', 'Yesterday 14:32', 'Good. Two pilots already have that number in their contracts.']],
+  'ch-pricing': [['maya', 'Yesterday 11:40', 'Vote: do we keep the Team plan name?', [], [['✅', ['omar', 'jonas', 'anna', 'dele']], ['❌', ['priya']]]], ['omar', 'Yesterday 14:10', 'Team plan stays at €79 per location through launch. We revisit in January.'], ['jonas', 'Yesterday 14:32', 'Good. Two pilots already have that number in their contracts.']],
   'ch-mobile': [['kofi', '09:05', 'iOS build 412 is on TestFlight. Android 388 follows after lunch.', [['yuki', '09:40', 'Smoke run on 412 is clean.'], ['lena', '09:44', 'The new tab bar looks right on a small phone.']]], ['kofi', '09:50', 'Does anyone still have an Android 11 device?', [['yuki', '09:52', 'QA has one. Desk by the window.']]]],
   'ch-frontend': [['ines', '09:15', 'Storybook is updated for the new date picker.'], ['lena', '09:22', 'Looks right. The focus ring is finally visible on dark.']],
   'ch-backend': [['tomas', 'Yesterday 18:20', 'Migration 0412 adds the location index. Dry run took 41 seconds on a copy of prod.'], ['marco', 'Yesterday 18:31', 'Run it before the freeze tonight.']],
@@ -61,7 +61,7 @@ const BG = { // ordinary traffic in conversations that carry no situation
   'ch-releases': [['yuki', 'Fri 15:02', '1.9.4 is verified on all three browsers.', [['marco', 'Fri 15:10', 'Shipping it at 16:00.'], ['ship', 'Fri 16:04', '1.9.4 is live. No errors in the first 500 sessions.']]], 'rc1', ['yuki', 'Yesterday 17:14', 'QA is ready for rc3 in the morning.']],
   'ch-research': [['dele', 'Mon 10:02', 'Interview notes from the six pilot clinics are in the shared folder.', [['lena', 'Mon 10:20', 'Reading them before the empty-state work.'], ['maya', 'Mon 10:44', 'The note on double bookings is worth a ticket.']]], 'p1'],
   'ch-design': ['k1', ['lena', 'Mon 16:05', 'Does anyone have the old illustration files? The ones from the 1.0 site.', [['priya', 'Mon 16:20', 'In the marketing drive, folder "2023 site".'], ['lena', 'Mon 16:22', 'Found them. Thank you.']]], 'e1', ['ines', 'Yesterday 15:44', 'Starting the web side of the empty states this afternoon.']],
-  'ch-product': ['c1', ['dele', 'Mon 11:30', 'Dashboards will be ready for the Wednesday review.', [['omar', 'Mon 11:41', 'Include revenue per location, please.'], ['dele', 'Mon 11:50', 'It is in.']]], ['jonas', 'Yesterday 09:20', 'Two pilots asked whether recurring appointments make it into 2.0.', [['maya', 'Yesterday 09:31', 'Yes, weekly and monthly. Custom patterns come later.'], ['jonas', 'Yesterday 09:33', 'That is enough for both.'], ['ruth', 'Yesterday 10:02', 'I will tell Brightwell too.']]]],
+  'ch-product': ['c1', ['maya', 'Mon 15:10', 'Roadmap review moves to Wednesday 10:00.', [], [['👍', ['lena', 'tomas']]]], ['dele', 'Mon 11:30', 'Dashboards will be ready for the Wednesday review.', [['omar', 'Mon 11:41', 'Include revenue per location, please.'], ['dele', 'Mon 11:50', 'It is in.']]], ['jonas', 'Yesterday 09:20', 'Two pilots asked whether recurring appointments make it into 2.0.', [['maya', 'Yesterday 09:31', 'Yes, weekly and monthly. Custom patterns come later.'], ['jonas', 'Yesterday 09:33', 'That is enough for both.'], ['ruth', 'Yesterday 10:02', 'I will tell Brightwell too.']]]],
   'ch-data': [['dele', 'Mon 09:12', 'Weekly refresh is running. Thread below.'], ['omar', 'Mon 09:40', 'I need the revenue one by Wednesday noon.']],
   'dm-marco': [['marco', 'Yesterday 17:40', 'Freeze is at 20:00 tonight, not 18:00.'], ['maya', 'Yesterday 17:42', 'Noted. I will tell marketing.']],
   'dm-lena': [['lena', 'Mon 15:02', 'Sent you the v3 file for the empty states.'], ['maya', 'Mon 15:30', 'Much better. One comment on the mascot.']],
@@ -190,7 +190,7 @@ function seed() {
 let S = seed();
 function conv(id) {
   if (!S.convs[id] && BG[id]) {
-    const list = BG[id].map((x, i) => { if (typeof x === 'string') return x; const mid = id + '-' + i; S.msgs[mid] = { id: mid, by: x[0], t: x[1], text: x[2], rx: [], conv: id, replies: (x[3] || []).map((y, j) => { const rid = mid + '-' + j; S.msgs[rid] = { id: rid, by: y[0], t: y[1], text: y[2], rx: [], conv: id }; return rid; }) }; return mid; });
+    const list = BG[id].map((x, i) => { if (typeof x === 'string') return x; const mid = id + '-' + i; S.msgs[mid] = { id: mid, by: x[0], t: x[1], text: x[2], rx: x[4] || [], conv: id, replies: (x[3] || []).map((y, j) => { const rid = mid + '-' + j; S.msgs[rid] = { id: rid, by: y[0], t: y[1], text: y[2], rx: [], conv: id }; return rid; }) }; return mid; });
     S.convs[id] = id.startsWith('dm-') ? { id, kind: 'dm', title: '', with: id.slice(3), msgs: list } : { id, kind: 'channel', title: '', name: id.slice(3), msgs: list };
   }
   const c = S.convs[id];
@@ -262,6 +262,12 @@ function dialCtl(c, ctx) {
 }
 /* ---- "why is this here, and I do not want it here": three ways to show it, picked with #why=a, b or c (E-002 follow-up) ---- */
 const ruleOn = r => r.rule === 'dm' ? S.dmPeople.includes(conv(r.conv).with) : S.rules.some(x => x.id === r.rule);
+function stale(r) { // the row was sorted before a change that applies the next time the feed is opened
+  if (r.kept || r.sec === 'kept') return ''; const c = conv(r.conv);
+  if (r.rule === 'dm' && (r.bucket === 'focus') !== S.dmPeople.includes(c.with)) return `Sorted before you changed ${first(c.with)}'s place in Focus`;
+  if (r.drive === 'channel' && c.dial !== (r.bucket === 'focus' ? 'focus' : 'all')) return `Sorted before you changed the level of #${c.name}`;
+  return '';
+}
 function explain(r) {
   const c = conv(r.conv), rule = id => S.rules.find(x => x.id === id), acts = [];
   const off = S.off[r.id];
@@ -271,10 +277,10 @@ function explain(r) {
     const x = rule('flag'); what = `${pn(r.by)} flagged this message and named you.`; by = x ? 'Your rule "Flags that name you"' : `${first(r.by)} flagged it for you`; alt = 'Without the rule it would be in Needs you, as a direct mention.';
     if (x) acts.push({ label: 'Stop putting flags in Focus', act: 'rmRuleId', d: `data-id="flag" data-rid="${r.id}" data-to="Needs you"`, note: `Removes the rule. ${x.n} items in the last 7 days would have gone to Needs you instead.` });
   } else if (r.rule === 'dm') { // Focus people: one entry per person who wrote to you directly (D-021)
-    const p = c.with; what = `A direct message from ${pn(p)}, a person.`; const inF = S.dmPeople.includes(p); const here = r.bucket === 'focus'; by = here === inF ? (inF ? `${first(p)} is one of your Focus people${S.dmAuto ? ', added the first time they wrote to you' : ''}` : `${first(p)} is not one of your Focus people`) : `${first(p)} ${here ? 'was' : 'was not'} one of your Focus people when this arrived`; alt = here !== inF ? `It moves to ${inF ? 'Focus' : 'Needs you'} the next time you open the feed.` : inF ? 'A direct message from someone who is not one of them lands in Needs you.' : 'Add them back under Focus people and their direct messages land in Focus.';
+    const p = c.with; what = `A direct message from ${pn(p)}, a person.`; const inF = S.dmPeople.includes(p); const here = r.bucket === 'focus'; by = stale(r) || (inF ? `${first(p)} is one of your Focus people${S.dmAuto ? ', added the first time they wrote to you' : ''}` : `${first(p)} is not one of your Focus people`); alt = here !== inF ? `It moves to ${inF ? 'Focus' : 'Needs you'} the next time you open the feed.` : inF ? 'A direct message from someone who is not one of them lands in Needs you.' : 'Add them back under Focus people and their direct messages land in Focus.';
     if (S.dmPeople.includes(p)) acts.push({ label: `Remove ${first(p)} from Focus`, act: 'rmPerson', d: `data-p="${p}" data-rid="${r.id}"`, note: `Only ${first(p)}; everyone else stays. ${RCOUNT[p] || 5} items in the last 7 days would have gone to Needs you instead.` });
   } else if (r.drive === 'channel') {
-    what = `${r.items.length} new posts in #${c.name}. None of them names you.`; const lv = r.bucket === 'focus' ? 'focus' : 'all'; by = c.dial === lv ? `#${c.name} is set to ${DIAL[lv][0]}` : `#${c.name} was set to ${DIAL[lv][0]} when this arrived`; alt = c.dial !== lv ? 'It moves the next time you open the feed.' : 'At Default they would not be in your feed at all.';
+    what = `${r.items.length} new posts in #${c.name}. None of them names you.`; const lv = r.bucket === 'focus' ? 'focus' : 'all'; by = stale(r) || `#${c.name} is set to ${DIAL[lv][0]}`; alt = c.dial !== lv ? 'It moves the next time you open the feed.' : 'At Default they would not be in your feed at all.';
     if (c.dial !== 'all') acts.push({ label: `Set #${c.name} to All activity`, act: 'dialFrom', d: `data-c="${c.id}" data-l="all" data-rid="${r.id}" data-to="For your information"`, note: `${CVOL[c.name] || 20} posts in the last 7 days would have gone to For your information.` });
     if (c.dial !== 'default') acts.push({ label: `Set #${c.name} to Default`, act: 'dialFrom', d: `data-c="${c.id}" data-l="default" data-rid="${r.id}" data-to="nowhere in your feed"`, note: 'Only what names you, and your own threads, would reach you from it.' });
   }
@@ -305,7 +311,7 @@ function rowHTML(r) {
     <div class="sw-under" aria-hidden="true"><span class="sw-l">${ic('check')} ${r.kept && !r.done ? 'Done' : 'Mark read'}</span><span class="sw-k">${r.kept && !r.done ? 'Kept' : r.done ? 'Keep again' : 'Keep'} ${ic('pin')}</span></div>
     <div class="row-main" role="button" tabindex="0" data-act="toggle" data-id="${r.id}">${av(r.chan ? '#' : r.kind === 'rx' ? r.by : last.by)}
       <div class="row-text"><div class="row-head"><span class="row-title">${esc(title)}</span>${sub ? `<span class="row-sub">${sub}</span>` : ''}${marks}${cnt}<span class="row-time">${r.t}${last.edited ? ' · edited' : ''}</span></div>
-        <div class="row-reason"><span class="why-dot"></span><button class="why-btn" data-tip="Why is this here?" data-act="why" data-id="${r.id}" aria-expanded="${S.whyOpen === r.id}">${esc(r.reason)} ${ic('chev')}</button>${r.note ? ` · <em>${r.note}</em>` : ''}</div>
+        <div class="row-reason"><span class="why-dot"></span><button class="why-btn" data-tip="Why is this here?" data-act="why" data-id="${r.id}" aria-expanded="${S.whyOpen === r.id}">${esc(stale(r) ? BK[r.bucket][0] + ': ' + stale(r).toLowerCase().replace(/#/, '#') : r.reason)} ${ic('chev')}</button>${r.note ? ` · <em>${r.note}</em>` : ''}</div>
         <div class="row-preview" data-k="${k}"${lockS}><b>${last.by === ME ? 'You' : first(last.by)}:</b> ${rich(last.text)}</div>
         ${r.kind !== 'rx' && last.rx.length ? rxHTML(last) : ''}</div>
       <div class="row-side">${state}${badge}<span class="row-btns"><button class="rx-pick" data-act="pick" data-m="${last.id}" aria-label="React without opening" data-tip="React to the latest message without opening">${ic('smile')}</button>${!r.read ? `<button class="mark-read" data-act="read" data-id="${r.id}" aria-label="Mark read without opening" data-tip="Mark read without opening">${ic('check')}</button>` : ''}${r.kept && !r.done ? '' : `<button class="keep-btn" data-act="keep" data-id="${r.id}" aria-label="${r.done ? 'Keep again' : 'Keep'}" data-tip="${r.done ? 'Keep again: undo Done' : 'Keep until you press Done'}">${ic('pin')}</button>`}</span>${r.kept && !r.done ? `<button class="btn sm pri" data-act="done" data-id="${r.id}" data-tip="Done: release this row">Done</button>` : ''}</div></div>${S.whyOpen === r.id ? `<div class="why-pop" data-stop="1"><h3>Why this is in ${BK[r.bucket][0]}</h3>${whyBody(r)}</div>` : ''}</article>`;
@@ -341,16 +347,18 @@ const hUnread = e => !!e[2] && !S.msgs[e[2]].deleted && S.rows.some(r => !r.read
 function histTabs(short) { // each tab counts its unread entries; the count is quiet, so the feed's badge stays the one that calls
   return Object.keys(HT).map(t => { const n = HIST[t].filter(hUnread).length; return `<button class="tab${S.view === 'history' && S.htab === t ? ' on' : ''}" data-act="htab" data-t="${t}" data-tip="History of your ${HT[t].toLowerCase()}. Nothing leaves it by being read." aria-label="${HT[t]}${n ? ', ' + n + ' unread' : ''}">${short && t === 'dms' ? 'DMs' : HT[t]}${n ? `<span class="h-count">${n}</span>` : ''}</button>`; }).join('');
 }
-const isKept = k => { const m = S.msgs[k.slice(k.indexOf(':') + 1)]; return m ? S.rows.some(r => r.items.includes(m.id) && r.kept && !r.done) : S.kept.has(k); };
+const hMid = e => e[2] || conv(e[0]).msgs.find(id => e[3] && e[3].includes(S.msgs[id].text));
+const rowFor = m => S.rows.find(r => r.items.includes(m.id)) || (conv(m.conv).kind !== 'channel' ? S.rows.find(r => r.conv === m.conv) : null); // one row per conversation
+const isKept = k => { const m = S.msgs[k.slice(k.indexOf(':') + 1)], r = m && rowFor(m); return !!(r && r.kept && !r.done); };
 function history() {
   const list = HIST[S.htab].filter(e => !e[2] || !S.msgs[e[2]].deleted).map(e => {
-    const [cid, by, mid, text, when, where] = e, c = conv(cid), m = mid && S.msgs[mid];
+    const [cid, by, , rawText, when, where] = e, c = conv(cid), mid = hMid(e), m = mid && S.msgs[mid], text = rawText.replace(/: ".*"$/, '');
     const unread = hUnread(e);
     const title = S.htab === 'threads' ? c.title : S.htab === 'reactions' ? '' : pn(by);
     const body = S.htab === 'reactions' ? esc(text) + (m ? `<span class="h-quote">${rich(m.text)}</span>` : '') : `${S.htab === 'threads' ? `<b>${first(by)}:</b> ` : ''}${rich(m ? m.text : text)}`;
     const extra = S.htab === 'threads' ? `<span class="row-sub">#${c.where} · ${TDIAL[c.tdial][0]}</span>` : where ? `<span class="row-sub">${where}</span>` : '';
     const kk = cid + ':' + (mid || text);
-    return `<article class="row hrow${unread ? ' unread' : ''}"><div class="row-main" role="button" tabindex="0" data-act="openConv" data-c="${cid}">${av(by)}<div class="row-text"><div class="row-head">${unread ? '<span class="dot" data-tip="Unread"></span>' : ''}${title ? `<span class="row-title">${esc(title)}</span>` : ''}${extra}${m && m.flag ? '<span class="tag flag">⚑</span>' : ''}${m && m.info ? '<span class="tag info">Info</span>' : ''}<span class="row-time">${when}${m && m.edited ? ' · edited' : ''}</span></div><div class="row-preview">${body}</div></div><div class="row-side"><button class="btn sm${isKept(kk) ? ' on' : ''}" data-act="keepH" data-k="${esc(kk)}">${isKept(kk) ? 'Kept' : 'Keep'}</button></div></div></article>`;
+    return `<article class="row hrow${unread ? ' unread' : ''}"><div class="row-main" role="button" tabindex="0" data-act="openConv" data-c="${cid}">${av(by)}<div class="row-text"><div class="row-head">${unread ? '<span class="dot" data-tip="Unread"></span>' : ''}${title ? `<span class="row-title">${esc(title)}</span>` : ''}${extra}${m && m.flag ? '<span class="tag flag">⚑</span>' : ''}${m && m.info ? '<span class="tag info">Info</span>' : ''}<span class="row-time">${when}${m && m.edited ? ' · edited' : ''}</span></div><div class="row-preview">${body}</div></div><div class="row-side"><button class="btn sm${isKept(kk) ? ' on' : ''}" data-act="keepH" data-k="${esc(kk)}"${m && rowFor(m) && rowFor(m).kept === 'flag' && isKept(kk) ? ' data-tip="Flagged for you. Press Done in the feed to release it."' : ''}>${isKept(kk) ? 'Kept' : 'Keep'}</button></div></div></article>`;
   }).join('');
   return `<div class="feed-wrap"><div class="feed-scroll" data-scroll="hist"><p class="hist-note">History, for finding things again. Newest first, read and unread together; a dot marks what you have not read yet. Nothing here is sorted by buckets, and nothing leaves by being read.</p>${list}</div></div>`;
 }
@@ -504,11 +512,11 @@ function answered(cid) { // a message really sent in a direct conversation or a 
   S.rows.forEach(r => { if (r.conv === cid || (c.kind === 'thread' && r.items.includes(c.msgs[0]))) { act(r); r.items.forEach(i => { if (S.msgs[i].status === 'Waiting on Maya') S.msgs[i].status = 'Continuing'; }); } });
 }
 function settle() { // the person leaves the feed: read rows go, kept rows move to Kept, rule and dial changes apply
-  if (S.fyiSeen) S.rows.forEach(r => { if (r.bucket === 'fyi') r.read = true; });
+  if (S.fyiSeen) S.rows.forEach(r => { if (r.bucket === 'fyi' && !r.read) { r.read = true; r.autoRead = true; } });
   S.rows = S.rows.filter(r => {
     if (r.items.every(i => S.msgs[i].deleted) && (r.kept !== 'you' || r.done)) return false;
     if (r.done) return false;
-    if (r.read && r.kept) { r.bucket = 'focus'; r.sec = 'kept'; r.keptNow = false; if (r.kept === 'you') r.reason = 'Kept by you'; else r.reason = 'Flagged by ' + first(r.by); return true; }
+    if (r.read && r.kept) { r.orig = r.orig || { bucket: r.bucket, reason: r.reason }; r.bucket = 'focus'; r.sec = 'kept'; r.keptNow = false; if (r.kept === 'you') r.reason = 'Kept by you'; else r.reason = 'Flagged by ' + first(r.by); return true; }
     return !r.read;
   });
   S.rows = S.rows.filter(r => {
@@ -536,7 +544,7 @@ function below(rid) { const el = document.querySelector(`[data-row="${rid}"]`); 
 function onScreen(rid) { const el = document.querySelector(`[data-row="${rid}"]`); if (!el) return false; const b = el.getBoundingClientRect(); return b.bottom > 0 && b.top < innerHeight; }
 function measured(rid, fn, what) { const a = below(rid); fn(); render(); const b = below(rid); S.note = a === null || b === null ? what + ' The row was not on screen.' : `${what} The row below moved by ${Math.abs(b - a).toFixed(1)} px.`; render(); }
 function setLevel(c, v) { c.dial = v; const id = 'ch:' + c.name; S.rules = S.rules.filter(r => r.id !== id); S.gone = S.gone.filter(r => r.id !== id); if (v === 'focus') S.rules.push({ id, label: `Every new post in #${c.name}`, n: CVOL[c.name] || 20, kind: 'channel', target: c.name }); }
-const undoSnap = id => { const r = row(id); return { row: r, snap: { bucket: r.bucket, reason: r.reason, read: r.read, sec: r.sec } }; };
+const undoSnap = id => { const r = row(id); return { row: r, snap: { bucket: r.bucket, reason: r.reason, sec: r.sec }, wasRead: r.read }; };
 const dropUndo = test => Object.keys(S.undo).forEach(k => { if (test(S.undo[k])) { delete S.undo[k]; delete S.off[k]; } }); // the same setting was changed elsewhere: this Undo no longer means anything
 const A = {
   openConv(d) { S.back = null; S.thread = null; if (S.conv !== d.c) S.lock = Object.fromEntries(Object.entries(S.lock).filter(([k]) => !k.startsWith('conv:'))); S.conv = d.c; conv(d.c); S.menu = null; S.modal = null; S.rows.forEach(r => { if (r.conv === d.c && (!d.id || r.id === d.id || conv(d.c).kind !== 'channel')) r.read = true; }); const sr = document.getElementById('sr'); if (sr) sr.innerHTML = ''; S.q = ''; },
@@ -605,7 +613,7 @@ const A = {
   closeModal() { S.modal = null; },
   why(d) { S.whyOpen = S.whyOpen === d.id ? null : d.id; },
   ruleToggle(d) { dropUndo(u => u.rule && u.rule.id === d.id); const DEF = { flag: ['Flags that name you', 6, 1], mention: ['Any direct mention', 23, 0] }; if (S.rules.some(r => r.id === d.id)) S.rules = S.rules.filter(r => r.id !== d.id); else S.rules.push({ id: d.id, label: DEF[d.id][0], n: DEF[d.id][1], start: DEF[d.id][2] }); },
-  undoChange(d) { const u = S.undo[d.rid]; if (u.rule && !S.rules.some(x => x.id === u.rule.id)) { S.rules.push(u.rule); S.gone = S.gone.filter(x => x.id !== u.rule.id); } if (u.dial) setLevel(conv(u.c), u.dial); Object.assign(u.row, u.snap); if (!S.rows.includes(u.row)) S.rows.push(u.row); delete S.undo[d.rid]; delete S.off[d.rid]; },
+  undoChange(d) { const u = S.undo[d.rid]; if (u.rule && !S.rules.some(x => x.id === u.rule.id)) { S.rules.push(u.rule); S.gone = S.gone.filter(x => x.id !== u.rule.id); } if (u.dial) setLevel(conv(u.c), u.dial); Object.assign(u.row, u.snap); if (u.row.autoRead) { u.row.read = u.wasRead; u.row.autoRead = false; } if (!S.rows.includes(u.row)) S.rows.push(u.row); delete S.undo[d.rid]; delete S.off[d.rid]; },
   rmRuleId(d) { const was = S.rules.find(x => x.id === d.id); if (d.rid && was) S.undo[d.rid] = { rule: was, ...undoSnap(d.rid) }; S.gone.push(...S.rules.filter(x => x.id === d.id)); S.rules.filter(x => x.id === d.id && x.kind === 'channel').forEach(x => { const c = conv('ch-' + x.target); if (c) c.dial = 'default'; }); S.rules = S.rules.filter(x => x.id !== d.id); if (d.rid) S.off[d.rid] = d.to; },
   rmPerson(d) { S.dmPeople = S.dmPeople.filter(x => x !== d.p); if (!S.dmRemoved.includes(d.p)) S.dmRemoved.push(d.p); if (d.rid) S.off[d.rid] = { p: d.p, msg: `${first(d.p)} is removed from Focus. Direct messages from ${first(d.p)} land in Needs you, starting the next time you open the feed.` }; },
   undoPerson(d) { Object.keys(S.off).forEach(k => { if (S.off[k] && S.off[k].p === d.p) delete S.off[k]; }); if (!S.dmPeople.includes(d.p)) S.dmPeople.push(d.p); S.dmRemoved = S.dmRemoved.filter(x => x !== d.p); delete S.off[d.rid]; },
@@ -616,11 +624,13 @@ const A = {
   focusOnly() { S.focusOnly = !S.focusOnly; },
   openMsg(d) { S.open.add(d.k); },
   keepH(d) {
-    const mid = d.k.slice(d.k.indexOf(':') + 1), m = S.msgs[mid], on = isKept(d.k);
-    if (on) S.kept.delete(d.k); else S.kept.add(d.k);
-    if (!m) return;
-    const r = S.rows.find(x => x.items.includes(mid));
-    if (on) { if (r && r.kept === 'you') { if (r.fromHistory) S.rows = S.rows.filter(x => x !== r); else { r.kept = null; r.keptNow = false; r.sec = 'new'; } } return; }
+    const mid = d.k.slice(d.k.indexOf(':') + 1), m = S.msgs[mid]; if (!m) return;
+    const r = rowFor(m);
+    if (isKept(d.k)) { // only your own Keep can be taken back here; a flag is released by Done in the feed
+      if (r.kept !== 'you') return;
+      if (r.fromHistory) S.rows = S.rows.filter(x => x !== r); else { r.kept = null; r.keptNow = false; r.sec = 'new'; if (r.orig) { Object.assign(r, r.orig); delete r.orig; } else r.reason = 'No longer kept'; }
+      return;
+    }
     if (r) A.keep({ id: r.id }); else S.rows.push({ id: 'r-h-' + mid, conv: d.k.slice(0, d.k.indexOf(':')), bucket: 'focus', sec: 'kept', items: [mid], by: m.by, t: m.t.replace(/^.* /, ''), reason: 'Kept by you', why: 'You kept this from History.', read: true, kept: 'you', done: false, replies: [], fromHistory: 1 });
   },
   level(d) { S.levels[d.fc] = S.levels[d.fc] === d.l ? '' : d.l; },

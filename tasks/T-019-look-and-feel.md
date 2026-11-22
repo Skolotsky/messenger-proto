@@ -59,6 +59,8 @@ The same content in all three, from the seeded team (D-010), viewed as the produ
 - 2026-11-22: task prepared. Not started.
 - 2026-11-22: picked up in a separate session. The user confirmed the browser download (Playwright image, about 920 MB); `scripts/browser` and `tools/browser/Dockerfile` set up, which settles T-004. Three pages built from one shared script, clicked through at both widths, written up. Waiting for the user's review.
 
+- 2026-11-22: the user signed off the design; the phase closed under T-035. What the prototype only approximates: T-038.
+
 ## Evidence
 
 - Criterion 1: `slack-like.html`, `telegram-like.html`, `own.html` in `experiments/E-002-look-and-feel/`; 53 checks per page and width cover every item of the list; all 318 pass (`results.json`).

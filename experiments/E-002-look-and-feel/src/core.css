@@ -574,3 +574,8 @@ body.resizing{cursor:col-resize;user-select:none}
 @media (max-width:760px){.msg-head{padding-right:76px}.msg.mine .msg-head{padding-right:140px}}
 .row.gone .row-main{position:relative}
 @media (max-width:760px){.row-side .state:has(~ [data-act="done"]){display:none}}
+/* read rows: quieter through colour, not transparency, so the text stays readable in both themes */
+.row.read .row-main,.row.read .row-main>*{opacity:1}
+.row.read:not(.kept) .row-title,.row.read:not(.kept) .row-preview,.row.read:not(.kept) .row-preview b{color:var(--muted);font-weight:400}
+.row.read:not(.kept) .row-main>.av{opacity:.6}
+@container (max-width:400px){.cbar .levels small{display:none}}
