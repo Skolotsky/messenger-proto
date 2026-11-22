@@ -1,0 +1,60 @@
+=== early
+lena: Design critique tomorrow at 14:00. We are looking at the waiting list and the new navigation. Bring opinions, not solutions.
+> theo: I have both, sorry.
+> zoe: I will bring the words.
+
+=== early
+theo: The waiting list needs an empty state that tells a clinic what it is for. Right now it just says "No entries", which is true and useless.
+> zoe: "When a slot opens, the next person on this list is offered it." That is the whole explanation.
+> lena: Love it. Illustration or no illustration?
+> theo: No illustration. It is a list. Let it be a list. {+💯 zoe,lena}
+
+=== early
+ines: Is the 13px grey on the day view still passing contrast? It looks fainter on the clinic laptops.
+> lena: It passes on paper. The screens in those rooms are awful, so let us go one step darker.
+> ines: Done. Token updated.
+
+=== early
+zoe: Word audit: we say "patient", "client" and "customer" for the same person across the app. Physios say client, dentists say patient. Proposal: "patient" everywhere, with a setting later.
+> maya: Yes. A setting is a 2.1 problem.
+> lena: Thank you for doing this. It was making me twitch.
+
+=== early
+camila: The drag handle on appointments is 4 pixels tall. On a touch tablet that is basically a rumour.
+> lena: Let us make the whole bottom edge the handle, 12 px on touch.
+> camila: On it. {+😂 theo}
+
+=== mid
+lena: New navigation is in the file: Calendar, Waiting list, Patients, Reports. Settings moves to the corner where people expect it.
+> theo: Do we lose anything by demoting Settings?
+> maya: Only the people who lived there, and they will find it.
+
+=== mid
+theo: Colours for appointment status are tested with the three common forms of colour blindness. "Confirmed" and "arrived" were indistinguishable for one of them, so arrived now also gets a small tick.
+> ines: Good. I will put the tick in the component so it comes everywhere for free.
+
+=== mid
+zoe: The cancel dialog said "Are you sure?" Replaced it with "Cancel Maria's appointment on Tuesday at 10:00? She will get a text." People should know what is about to happen.
+> lena: This is the best diff of the week. {+❤️ lena,theo,maya}
+
+=== mid
+kofi: On the phone layout the week view is a lie. Seven columns at 360 px wide is not a calendar, it is a barcode.
+> lena: Agreed. On a phone it opens on the day view, and you swipe.
+> kofi: That I can build by Friday.
+
+=== mid
+priya: Could I borrow someone for an hour to make the launch page hero less stocky? It currently looks like every other health startup.
+> lena: Send me what you have. I think a real day-list screenshot beats any illustration.
+> priya: Sent. {edit: Sent, the file called hero-v4. Ignore v3, we do not speak of v3.}
+
+=== late
+lena: Final design QA pass is today. I am going through every screen at both sizes with Inès. If you see something ugly, it goes on the 2.0.1 list unless it is broken.
+> ines: So far the score is 14 ugly, 0 broken.
+
+=== late
+theo: Handing over the design files for the waiting list to Inès and Camila. Everything has states, spacing and copy. If you need to guess at anything, that is my mistake, so ask me.
+> camila: This is the cleanest handoff I have had. Thank you.
+
+=== late
+zoe: The in-app "what's new" for 2.0 is down to five sentences. It took three days to remove the other forty.
+> maya: Worth it.

@@ -1,0 +1,20 @@
+=== early
+kofi: iOS build 412 is in beta testing. Android 388 follows after lunch.
+> yuki: Smoke run on 412 is clean.
+> lena: The new tab bar looks right on a small phone.
+
+=== early
+kofi: Does anyone still have an Android 11 device?
+> yuki: QA has one. Desk by the window.
+
+=== mid
+hana: Fixed the logout on app start. If you were signed out every Monday morning, you were not imagining it.
+> leila: Verified on both platforms after a 14-hour gap.
+
+=== mid
+kofi: Store review for 2.0 is submitted. Usually two days. I have not slept well since submitting it, which has never made it faster.
+> hana: Approved already. {+🎉 kofi,leila,lena}
+
+=== late
+hana: Push notification permission prompt now comes after the first booking, not at first launch. Acceptance in beta went from 41 to 68 percent.
+> marco: That is a big jump for moving one screen.

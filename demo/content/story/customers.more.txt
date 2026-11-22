@@ -1,0 +1,39 @@
+=== early
+ruth: Quarterly check-in with Marrowgate. Happy overall, one complaint: the invoice arrives on the 1st and their bookkeeper wants it on the 25th.
+> omar: That is one setting. Done from next month.
+> ruth: Thank you. You may have just renewed them.
+
+=== early
+greta: Fennimoor's new practice manager started this week and nobody showed her anything. Can someone do an intro?
+> sofia: I will call her today.
+
+=== early
+owen: Hethersett asked whether we have anything for reminders by email as well as text. Older clients do not read texts, apparently.
+> sam: We do, it's a tick-box under Reminders.
+> owen: We should probably tell people that. {+😅 sam,ruth}
+
+=== mid
+sofia: Penhallow is thinking of leaving. They had two bad weeks with the reminders in October. I would like someone senior to call them.
+> anna: I will do it this afternoon. Give me the background first.
+> sofia: Sent to you. The office manager's name is at the top.
+> anna: Good call, they are staying. They mainly wanted to hear that someone had noticed. {+🙏 sofia,ruth,sam}
+
+=== mid
+ruth: Wexhollow would like to be a reference customer for the launch. I said I'd check what that involves on our side.
+> jonas: Not much. A quote and maybe a call or two a quarter.
+> ruth: Lovely, telling them yes.
+
+=== mid
+mateo: Cobbleford has asked for the fifth time about colour-coding by treatment type. Do we have an answer or should I keep being charming?
+> maya: Keep being charming. It is on the list for 2.1.
+
+=== mid
+omar: Orrinvale paid the renewal invoice two days after it went out. I just wanted to say it out loud because that never happens.
+
+=== late
+sofia: Pilot clinics got the "what to expect on Thursday" note. Quillfield replied with a photo of the team giving a thumbs up. It is now my desktop background.
+> ruth: Please share it, I need it for morale. {+❤️ ruth,sam,maya}
+
+=== late
+sam: For Thursday: if a customer calls about anything other than a bug, put them through to Ruth or Sofia. Support stays free for the things that stop a clinic from working.
+> ruth: Understood.

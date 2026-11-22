@@ -1,0 +1,88 @@
+=== early
+maya: What I want from the first week after launch: fewer than 20 support tickets a day about recurring appointments, and at least 30 clinics using the waiting list. Those two numbers will tell us if 2.0 worked.
+> dele: I can have both on a dashboard by Friday.
+> sam: 20 a day is ambitious, but I would rather aim there.
+
+=== early
+theo: Interesting from the Quillfield session: they book a course of six physio sessions and then think of it as one thing. Our recurring editor treats them as six separate appointments the moment you change one.
+> maya: Is that a 2.0 problem or a 2.1 idea?
+> theo: 2.1. I just want it written down before we forget.
+> maya: Written down. Good catch.
+
+=== early
+ruth: A clinic asked me if the waiting list can offer a slot to two patients at once and take whoever answers first. My instinct says no, that sounds like a way to annoy people.
+> maya: Agree. One at a time, with a short hold. Dele, do we know how fast patients answer?
+> dele: Mostly within 20 minutes, from the pilot data.
+> maya: Then a 30-minute hold, and we revisit it with real numbers.
+
+=== early
+noor: Pulled the no-show rate by clinic size. Small clinics are at 8.1 percent, the large ones at 5.4. The biggest difference between them is whether they send a second reminder.
+> maya: That is a stronger argument for a default than anything I could write.
+> zoe: Should the default be 48 hours plus 2 hours then?
+> maya: Yes, with a one-line explanation of why.
+
+=== early
+omar: Reminder from finance that "free" SMS reminders are not free. If a clinic sends two per appointment by default, what is that per month?
+> dele: About €31 for the median clinic.
+> omar: So we either include it in the plan or say it very clearly. Pick one before the price page is final.
+> maya: Included up to a cap. I will bring it to #pricing.
+
+=== early
+yuki: From QA's point of view the riskiest thing in 2.0 is moving a recurring series across the clock change. Do we have a product answer for what should happen?
+> maya: The appointment keeps its local time. 09:00 stays 09:00.
+> tomas: That is what the code does, now that we store the zone.
+> yuki: Great, I will write the cases from that sentence.
+
+=== early
+lena: Do we need a "print my day" button in 2.0? The research keeps coming back to paper day lists.
+> maya: We have the print view already, it is just hidden in a menu. Can we move it next to the date?
+> lena: Trivial. Doing it.
+
+=== mid
+maya: Roadmap review is Wednesday 10:00. I would like each team to bring one thing they would stop doing, not only what they want to add.
+> anna: I will bring two. {+😂 maya,marco}
+
+=== mid
+jonas: Two pilots asked whether recurring appointments make it into 2.0. I keep saying yes. Please tell me I can keep saying yes.
+> maya: Yes, weekly and monthly. Custom patterns come later.
+> jonas: That is enough for both.
+> ruth: I will tell Orrinvale too.
+
+=== mid
+dele: Early look at beta usage: 71 percent of clinics used the new week view in the last seven days, but only 12 percent have touched the waiting list.
+> maya: That second number worries me. Do they not find it, or not need it?
+> theo: From the sessions: they do not find it. It sits under Settings.
+> maya: Then it moves to the main navigation before launch. Lena, can we fit it?
+> lena: Yes. Small change, big difference. {+💯 maya,theo}
+
+=== mid
+sam: Top three themes in support this week: where did the report go, how do I add a part-time person, and why is the reminder time different from last month.
+> zoe: The first and third are copy problems. I can fix those without engineering.
+> maya: Please do. The part-time one is real, I will look at the permissions.
+
+=== mid
+theo: Usability test on the recurring editor, 5 receptionists: all 5 completed the booking, 2 got stuck when editing "this and following". The sentence on the button is the problem.
+> zoe: Try "Change this and later ones".
+> theo: Trying it with the next two tomorrow.
+> theo: Both got it first time. {+🎉 zoe,maya,lena}
+
+=== mid
+anna: From the board conversation: they asked what we would do with another two engineers. I said make the waiting list smarter. Tell me if I was wrong.
+> maya: You were not wrong, but I would have said reliability first and then the waiting list.
+> marco: Seconded.
+> anna: Noted for next time. {+👍 maya}
+
+=== late
+maya: Post-launch plan so nobody has to guess: Friday we read the numbers, Monday we pick the top three fixes, and 2.0.1 ships the week after with XLSX and whatever the first days teach us.
+> dele: The dashboard will be ready for the Friday read.
+> sam: I will bring the ticket themes.
+
+=== late
+ruth: Quick win from a call with Marrowgate: they want the patient's phone number visible on the day list. It is already there if you widen the column. Nobody knows that.
+> lena: Hm. Make it the default width then?
+> maya: Yes, for 2.0.1. {+👍 ruth}
+
+=== late
+noor: The launch dashboard is live. Sign-ups, activation, reminders sent and support volume, refreshing every five minutes. Link is in the #data topic.
+> anna: Beautiful. I promise not to look at it every five minutes.
+> noor: Everyone says that.

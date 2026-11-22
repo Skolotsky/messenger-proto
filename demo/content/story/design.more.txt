@@ -1,0 +1,50 @@
+=== early
+theo: Sketches for the recurring editor. Option one asks "this or all" up front. Option two lets you make the change and then asks what it should apply to, showing the dates.
+> lena: Two. You cannot decide what a change applies to before you have made it.
+> zoe: Two also gives me somewhere to explain it in plain words.
+> theo: Two it is. {edit: Two it is. I will test it with receptionists next week before anyone builds it.}
+
+=== early
+lena: Reminder that the grid is 4 px and we are not negotiating with it. I found a 7 in the appointment card.
+> camila: That 7 was mine. It was a dark time.
+
+=== early
+zoe: Should error messages apologise? Mine currently say "Sorry, we could not save this". A receptionist with a patient in front of her wants to know what to do, not how we feel.
+> lena: Lose the sorry, keep the next step.
+> zoe: "Not saved. Check your connection and press Save again."
+
+=== early
+kofi: Can I get the icon set as a single font or does it have to be separate files for mobile?
+> theo: Separate SVGs, exported at one size. I will drop them in the shared folder today.
+> kofi: You are a gentleman.
+
+=== mid
+theo: Testing the "offer this slot" button with a real waiting list made one thing obvious: people want to see who is next before they press it.
+> lena: So the button says the name. "Offer to Ana Silva".
+> maya: Yes. Nobody should be surprised by who gets the text.
+
+=== mid
+ines: The new status tick is clashing with the recurring icon on very short appointments. Do we drop one?
+> lena: Drop the recurring icon below 20 minutes. Status is what they need at a glance.
+
+=== mid
+priya: For the launch video, can I have the calendar animation without the UI chrome? Just the appointments sliding into place.
+> lena: I can render that. Give me until tomorrow.
+> priya: You are the best. {delete}
+
+=== mid
+zoe: Going through every empty state in the app. Found one that says "Nothing to see here", which is a bit rude for a clinic that has just lost all its bookings for the day.
+> theo: How did that survive this long?
+> zoe: Nobody ever sees it, except on the worst day. Rewritten.
+
+=== mid
+camila: Is the hover state on the day list intentional? It flickers when you move across rows quickly.
+> lena: Not intentional. It should only change background, nothing else.
+> camila: Found it, a border was adding a pixel. Fixed.
+
+=== late
+lena: Everyone who helped on the design QA list, thank you. 47 small things fixed in two days, and the app feels noticeably calmer for it. {+❤️ ines,camila,theo,zoe}
+
+=== late
+theo: Screenshotting every state of the waiting list for the help centre. If you are about to change anything visible there, please tell me first.
+> ines: Nothing from me, I am only touching the print view.

@@ -1,0 +1,21 @@
+=== early
+maya: Vote: do we keep the Team plan name? {+✅ omar,jonas,anna,dele} {+❌ owen}
+> owen: I think it sounds small. But I can live with it.
+
+=== early
+omar: Proposal on SMS: every plan includes 200 reminders per practitioner per month, then €0.04 each. It covers the median clinic with room to spare.
+> dele: 83 percent of clinics stay under that.
+> jonas: Easy to explain. I like it.
+> anna: Approved.
+
+=== mid
+omar: Team plan stays at €79 per location through launch. We revisit in January.
+> jonas: Good. Two pilots already have that number in their contracts.
+
+=== mid
+owen: What do I say to a clinic with one practitioner who thinks €79 is steep?
+> jonas: The Solo plan, €29. It has no waiting list, and honestly they don't need it.
+> maya: Agreed. I would rather have them happy on Solo than unhappy on Team.
+
+=== late
+omar: Price list is final and locked in billing for Thursday 09:00. If anybody changes a number now, I will find them. {+😂 anna,jonas}

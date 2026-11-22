@@ -1,0 +1,22 @@
+=== early
+omar: I need revenue per location for the board by the 11th. Who should I ask?
+> dele: Me. Do you want it with or without the pilot discounts?
+> omar: Both, please. The difference is the interesting part.
+
+=== early
+noor: Careful with last week's no-show number. One clinic imported three years of old appointments and it counted them as this week.
+> dele: Good catch. Can you exclude imports from the metric?
+> noor: Already done, the chart is corrected.
+
+=== mid
+jonas: Can we see which sign-ups came from the teaser post versus from referrals?
+> noor: Referrals are clean. The teaser is a guess, since half of them come in with no source at all.
+> jonas: A guess is fine, as long as it's labelled as one.
+
+=== mid
+dele: Weekly refresh has been failing silently since Sunday because of a changed column name. Fixed, and it now shouts when it fails.
+> marco: Shouting is the correct behaviour.
+
+=== late
+noor: For launch day I set up an alert if sign-ups drop to zero for 30 minutes during office hours. It will almost certainly be a tracking problem, but I would rather know.
+> dele: Agreed. Send it to the #incidents folks as well.

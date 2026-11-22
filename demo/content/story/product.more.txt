@@ -1,0 +1,56 @@
+=== early
+maya: Writing the one-pager for the waiting list so everyone describes it the same way. In one sentence: when a slot frees up, the next patient is offered it by text, and the clinic does nothing.
+> ruth: "And the clinic does nothing" is the bit they will love.
+> jonas: Can I put that on a slide?
+> maya: Please do.
+
+=== early
+dele: Reminder open rates by time of day, in case it is useful for the default: 09:00 and 17:30 are best, anything after 20:00 falls off a cliff.
+> zoe: So we should never send one after 20:00, even if the clinic asks?
+> maya: Default no, setting yes. It is their patients.
+
+=== early
+sam: Can we stop calling it a "soft delete" in the admin UI? A clinic manager asked me what a hard delete feels like.
+> zoe: "Archived". Fixing.
+
+=== early
+theo: I watched someone at Dunmarrow book an appointment using only the keyboard, faster than I can with a mouse. We should not break whatever she is doing.
+> ines: Which shortcuts?
+> theo: Tab, type a name, enter. That's it, but it means focus order is a feature.
+
+=== mid
+omar: What is the plan for clinics on the old annual contract who want the new features before renewal?
+> maya: They get 2.0 like everyone. Plans change at renewal.
+> jonas: That will make those conversations a lot easier.
+
+=== mid
+noor: Week-on-week the waiting list fills about 46 percent of cancelled slots in clinics that use it. Those clinics' empty chair time is down by roughly a fifth.
+> anna: That is the headline for the board.
+> maya: With the caveat that these are the keen clinics. I would say "early".
+
+=== mid
+ruth: A pilot asked what happens to the waiting list when a practitioner is off sick and all their slots vanish at once. I did not have a good answer.
+> maya: Neither do I. Honest answer for now: nothing is offered, the clinic handles it by hand.
+> theo: That is a whole design problem. Adding it to 2.1. {+👍 ruth,maya}
+
+=== mid
+ines: If a patient's name is very long the day list truncates it in the middle of the surname. Should we truncate the first name instead?
+> zoe: Yes, receptionists search by surname.
+> ines: Simple enough.
+
+=== mid
+lena: I keep being asked for a colour for "needs attention" on the day list. I would like to resist adding a fifth status colour. Any objection?
+> maya: None. If everything is highlighted, nothing is. {+💯 lena,theo,zoe}
+
+=== late
+maya: Reading through everything we said we would do for 2.0 back in September. We did 11 of 14, moved 2, and dropped 1 on purpose. I am more than fine with that.
+> anna: That is better than any launch I have been part of.
+
+=== late
+tomas: For the "what changed" email: the export now includes the notes column in full. Someone at Cobbleford has been complaining about that for a year, I would like them to know.
+> ruth: I will tell them personally. They will be unbearable about it.
+
+=== late
+dele: I would like to agree now on what would make us call the launch a failure, before we are looking at the numbers and tempted to explain them away.
+> maya: Activation under 15 clinics in the first week, or more than 40 support tickets a day for three days running.
+> anna: I can live with those.

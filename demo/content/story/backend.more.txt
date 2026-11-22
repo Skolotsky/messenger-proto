@@ -1,0 +1,47 @@
+=== early
+nadia: Why does the patient search hit the database twice for every keystroke?
+> arjun: One query for the results, one for the count. The count is only used for a label nobody reads.
+> nadia: Removing the label. Search just got twice as fast.
+
+=== early
+felix: Reminder worker and export jobs share one queue. An export running long can delay a reminder. I would like to split them before Thursday week.
+> marco: Agreed. Small change, big protection.
+> arjun: I will do it tomorrow.
+
+=== early
+tomas: For anyone touching appointments: every write now has to go through the conflict check. There is a lint rule so you cannot forget, and it is very unforgiving.
+> nadia: It told me off twice already. It was right both times.
+
+=== early
+bram: Staging is down for 20 minutes at 13:00 while I resize it. Please don't start a long test at 12:55.
+> yuki: Too late, but I will restart it.
+
+=== mid
+arjun: Export jobs and reminders now have separate queues. I tested it by running a giant export while a reminder batch went out. The batch did not notice.
+> felix: Lovely. {+🎉 felix,nadia}
+
+=== mid
+nadia: I keep seeing timeouts from the SMS provider at around 3 seconds, and we wait 10. Lowering our timeout so a slow provider cannot hold up the whole worker.
+> tomas: What do we do when it times out?
+> nadia: Retry with backoff. The dedupe table makes it safe.
+
+=== mid
+tomas: The audit trail design is in a doc. It is not for 2.0, but I want comments while the problem is fresh in everyone's head.
+> arjun: I left some. Main one: store who changed it, not just what changed.
+> tomas: Yes, obviously, thanks.
+
+=== mid
+felix: Primary upgrade done. 38 seconds of read-only, nobody noticed, no tickets.
+> marco: Boring. Exactly how I like it. {+👍 tomas,bram}
+
+=== mid
+arjun: Is there a reason our health endpoint checks the database on every call? It is getting polled four times a second.
+> bram: Historical. Make it cache for five seconds and nobody will ever know.
+
+=== d15
+tomas: Index for the waiting list view is built on production, concurrently, no locks. The view went from 900 ms to single digits.
+> marco: Thanks. That was a good one to catch this late.
+
+=== late
+nadia: Checked what happens if the reminder worker dies at 07:01 on Thursday: another picks it up within 30 seconds and nothing is sent twice. Tested three times this morning.
+> felix: I will sleep slightly better.

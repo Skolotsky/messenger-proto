@@ -1,0 +1,24 @@
+=== early
+anna: Before we finalise: what would it take for a five-room clinic to feel Team is a bargain rather than just fair?
+> maya: If the waiting list refills two slots a month, it has paid for itself.
+> dele: For the median clinic it is closer to five slots a month.
+> anna: Then that is the sentence for the page.
+
+=== early
+owen: Do we charge per location or per practitioner? Clinics ask and I give a slightly different answer each time.
+> omar: Per location. Practitioners are unlimited on Team.
+> owen: Writing that on my hand.
+
+=== mid
+jonas: A clinic on the old plan pays €52. Moving them to €79 at renewal is a 50 percent jump. What is the plan?
+> omar: Old price held for 12 months for anyone who renews before March.
+> anna: Fair, and it gives Jonas a reason to call them early.
+
+=== mid
+dele: If we hold the old price for 12 months, it costs about €41,000 in the first year against the new list price. We keep roughly all of those clinics.
+> omar: I can live with that. {edit: I can live with that, and the board has already seen it in the forecast.}
+
+=== late
+maya: The pricing page says "unlimited appointments". Is that actually true on Solo?
+> omar: Yes, the limit is on reminders only.
+> maya: Good. Keep it.

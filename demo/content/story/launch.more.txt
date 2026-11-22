@@ -1,0 +1,68 @@
+=== early
+sofia: Are we telling pilot clinics that their data carries over to 2.0, or is that too obvious to say?
+> maya: Say it. The obvious thing is the first thing they worry about.
+> zoe: First line of the email, then.
+
+=== early
+priya: Teaser is scheduled for the 10th. It says nothing about features, only "Something useful is coming to your front desk on the 19th".
+> anna: Is "useful" the strongest word we have?
+> priya: It is the most honest. Clinic managers are allergic to "revolutionary".
+> anna: Keep it.
+
+=== early
+noor: I need a definition of "activated clinic" before we can count it for launch. Is it signed up, booked one appointment, or used it for a full week?
+> maya: Ten real appointments in the first seven days.
+> dele: That matches where retention starts to separate in the old data.
+> noor: Ten in seven it is.
+
+=== early
+leila: Does anyone have a list of which browsers our clinics actually use? I would like QA to test what people have rather than what we like.
+> dele: 62 percent one browser, 28 another, the rest a long tail. I will send you the split.
+
+=== mid
+kofi: Mobile 2.0 is approved in both stores and is waiting for us to press the button on the 19th.
+> maya: First time we are ahead of the web on something. Enjoy it. {+🎉 hana,kofi,lena}
+
+=== mid
+ruth: A worry from the pilots: "will the reminders change on the day?" Worth one sentence in the email saying nothing changes unless they choose it.
+> maya: Yes. That is also true, which helps.
+
+=== mid
+theo: Can we agree that the launch announcement inside the app is dismissible on the first click? Front desks have patients in front of them.
+> lena: Yes. And never on top of the calendar.
+> maya: Agreed, a small banner at the top and that is all.
+
+=== mid
+owen: One of my prospects found the teaser and asked if it means prices go up. What do I tell them?
+> jonas: "We will share pricing on the 19th." Nothing more.
+> owen: Understood. {edit: Understood. I told them we will have news on the 19th and that their quote holds until then.}
+
+=== mid
+paula: We have a photographer for an hour on Thursday afternoon, for the website team page. Opt out if you would rather not be on it, no explanation needed.
+> bram: Does the dog count as staff?
+> paula: The dog has been approved.
+
+=== mid
+sam: I wrote up the five questions clinics are most likely to ask on launch day with the answers. It is in the support notes, but everyone in a customer-facing role should read it.
+> jonas: Read it, it is good. I had the third one wrong.
+
+=== late
+marco: Go/no-go is Wednesday at 16:00. It is short: Yuki says if the build is good, Felix says if production is ready, Sam says if support is ready, Maya decides.
+> anna: And if Maya says no?
+> maya: Then we move what's broken, not the date.
+
+=== late
+ewan: The launch page is staged and hidden behind a flag. Password in the marketing channel for anyone who wants to proofread it. Last call today at 17:00.
+> zoe: Found two typos and a "seamlessly". Fixed.
+
+=== late
+dele: Baseline numbers saved for Friday's comparison: 8,940 appointments per weekday, 34 percent online, no-show rate 6.3 percent.
+> maya: Thank you. Now we can tell if anything actually moved.
+
+=== late
+hana: Random launch-week observation: the office has eaten 41 bananas since Monday.
+> paula: I am ordering more.
+
+=== d15
+priya: Journalists have the embargo reminder. One has already asked for an interview with a clinic owner, so the Marrowgate quote is doing its job.
+> anna: Good. I will make time for anyone Priya sends my way on Thursday.

@@ -1,0 +1,284 @@
+[
+  {
+    "id": "flag-names-you-from-a-person",
+    "title": "Anna flags a decision for Maya",
+    "outcome": "For Maya the row is new in Focus, stays there as kept after she reads it, and leaves when she answers.",
+    "covers": "a flag that names you, from a person",
+    "viewer": "maya",
+    "steps": [
+      {"after_s": 0, "who": "anna", "do": "post", "as": "ask", "in": "#launch", "level": "flag",
+       "text": "@Maya the press embargo lifts at 09:00 on Thursday. Do we hold the pricing page until then, or publish it tonight with the rest of the site? I need your call before Priya schedules it.",
+       "expect": [{"for": "maya", "of": "ask", "where": "focus_new", "why": "A flag that names you lands in Focus (D-001, D-011)"}]},
+      {"after_s": 8, "who": "maya", "do": "read", "to": "ask",
+       "expect": [{"for": "maya", "of": "ask", "where": "focus_kept", "why": "Read but unanswered, it is kept for you automatically (D-011)"}]},
+      {"after_s": 12, "who": "maya", "do": "reply", "to": "ask", "as": "answer",
+       "text": "Hold it until 09:00. Two pilots still have the old price in their contracts and I would rather they hear it from Jonas first.",
+       "expect": [{"for": "maya", "of": "ask", "where": "history", "why": "Replying releases the row; it is found again in the history tabs (D-011, D-016)"}]}
+    ]
+  },
+  {
+    "id": "flag-names-you-from-an-agent",
+    "title": "Deployer stops and waits for Maya's approval",
+    "outcome": "For Maya the agent's stop is new in Focus and is released when she approves it in the thread.",
+    "covers": "a flag that names you, from an agent waiting for approval",
+    "viewer": "maya",
+    "steps": [
+      {"after_s": 0, "who": "ship", "do": "post", "as": "stop", "in": "#releases", "level": "flag",
+       "text": "@Maya 2.0.0-rc.8 is ready for production, but the release notes still say 'practitioner' in four places and the content check is set to block. Approve as it is, or wait for a fix?",
+       "expect": [{"for": "maya", "of": "stop", "where": "focus_new", "why": "A flag naming you lands in Focus whoever sent it, and an agent that stopped waits for that person (D-001, D-011)"}]},
+      {"after_s": 15, "who": "maya", "do": "reply", "to": "stop", "as": "ok",
+       "text": "Wait for the fix. Zoe has the corrected notes, it should take ten minutes.",
+       "expect": [{"for": "maya", "of": "stop", "where": "history", "why": "Her answer releases the row (D-011)"}]}
+    ]
+  },
+  {
+    "id": "flag-names-nobody",
+    "title": "A flag for the whole channel, answered by someone else",
+    "outcome": "For Maya it is an ordinary row in Needs you; Marco's answer changes nothing for her, and it leaves when she reads it.",
+    "covers": "a flag that names nobody and closes when someone else answers (D-011: it has no state, so it leaves each person's feed when they read it)",
+    "viewer": "maya",
+    "steps": [
+      {"after_s": 0, "who": "tomas", "do": "post", "as": "open", "in": "#launch", "level": "flag",
+       "text": "Does anyone know who owns the DNS change for the new booking domain? It has to be in by Wednesday noon or the certificates will not be ready.",
+       "expect": [{"for": "maya", "of": "open", "where": "needs_you", "why": "A flag that names nobody lands in Needs you for everyone in the channel (D-011)"}]},
+      {"after_s": 20, "who": "marco", "do": "reply", "to": "open", "as": "taken",
+       "text": "Felix has it, the ticket is with the registrar since this morning.",
+       "expect": [{"for": "maya", "of": "open", "where": "needs_you", "why": "Someone else's answer changes nothing for you (D-011)"}]},
+      {"after_s": 10, "who": "maya", "do": "read", "to": "open",
+       "expect": [{"for": "maya", "of": "open", "where": "history", "why": "It is not kept automatically, so reading it is enough (D-003, D-011)"}]}
+    ]
+  },
+  {
+    "id": "direct-mention",
+    "title": "Marco mentions Maya",
+    "outcome": "For Maya a direct mention lands in Needs you.",
+    "covers": "a direct mention",
+    "viewer": "maya",
+    "steps": [
+      {"after_s": 0, "who": "marco", "do": "post", "as": "m", "in": "#product",
+       "text": "@Maya the recurring editor is in rc.7. Can you try moving a series across the clock change before we call it done?",
+       "expect": [{"for": "maya", "of": "m", "where": "needs_you", "why": "Direct mentions start in Needs you (D-001)"}]}
+    ]
+  },
+  {
+    "id": "mention-added-by-edit",
+    "title": "Lena edits her message to bring Maya in",
+    "outcome": "Maya sees nothing at first; when the edit names her, it reaches her as new in Needs you.",
+    "covers": "a mention added by a later edit",
+    "viewer": "maya",
+    "steps": [
+      {"after_s": 0, "who": "lena", "do": "post", "as": "m", "in": "#design",
+       "text": "The waiting list empty state is ready for review, frames are in the shared file.",
+       "expect": [{"for": "maya", "of": "m", "where": "nothing", "why": "Ordinary channel traffic at the Default dial does not reach the feed (D-001)"}]},
+      {"after_s": 25, "who": "lena", "do": "edit", "to": "m",
+       "text": "The waiting list empty state is ready for review, frames are in the shared file. @Maya can you check the wording before Theo hands it over?",
+       "expect": [{"for": "maya", "of": "m", "where": "needs_you", "why": "An edit that adds a mention reaches the person as new (D-004)"}]}
+    ]
+  },
+  {
+    "id": "mention-removed-by-edit",
+    "title": "Jonas takes his mention of Maya back",
+    "outcome": "The row appears in Maya's Needs you and disappears without a trace when the edit removes her name before she has read it.",
+    "covers": "a mention removed by an edit",
+    "viewer": "maya",
+    "steps": [
+      {"after_s": 0, "who": "jonas", "do": "post", "as": "m", "in": "#sales",
+       "text": "@Maya Hethersett Vets are asking whether the 2.0 price applies to their renewal in January.",
+       "expect": [{"for": "maya", "of": "m", "where": "needs_you", "why": "A direct mention lands in Needs you (D-001)"}]},
+      {"after_s": 18, "who": "jonas", "do": "edit", "to": "m",
+       "text": "Hethersett Vets are asking whether the 2.0 price applies to their renewal in January. Never mind, Omar already answered them.",
+       "expect": [{"for": "maya", "of": "m", "where": "nothing", "why": "Taken back before it was seen, it leaves no marker (D-004)"}]}
+    ]
+  },
+  {
+    "id": "edited-to-another-length",
+    "title": "Tomás turns a short question into a long one",
+    "outcome": "The row stays where it is in Maya's Needs you, unread, with the new text; nothing moves.",
+    "covers": "a message that reached your feed and is then edited to a different length",
+    "viewer": "maya",
+    "steps": [
+      {"after_s": 0, "who": "tomas", "do": "post", "as": "m", "in": "#engineering",
+       "text": "@Maya the export API can't ship both CSV and XLSX by Thursday. Which one matters for launch?",
+       "expect": [{"for": "maya", "of": "m", "where": "needs_you", "why": "A direct mention lands in Needs you (D-001)"}]},
+      {"after_s": 40, "who": "tomas", "do": "edit", "to": "m",
+       "text": "@Maya the export API can't ship both CSV and XLSX by Thursday. Which one matters for launch? Update: I measured it. CSV is done today. XLSX needs the streaming writer, which is two more days plus a QA pass, so it would land the Monday after launch. Fennimoor Dental and two other pilot clinics asked for XLSX by name; everyone else is fine with CSV. My suggestion: ship CSV on Thursday and announce XLSX for the week after.",
+       "expect": [{"for": "maya", "of": "m", "where": "needs_you", "why": "An edit that only changes the text updates the row in place, with no jump (D-001, D-004)"}]}
+    ]
+  },
+  {
+    "id": "deleted-after-reaching-the-feed",
+    "title": "Priya deletes a message Maya has read and Lena has not",
+    "outcome": "Maya, who read it, keeps a marker in her history; Lena, who never saw it, is left with nothing.",
+    "covers": "a message that reached your feed and is then deleted",
+    "viewer": "maya",
+    "steps": [
+      {"after_s": 0, "who": "priya", "do": "post", "as": "m", "in": "#marketing",
+       "text": "@Maya @Lena the launch video goes out with the old logo unless someone stops it today. Can one of you look at the last frame?",
+       "expect": [
+         {"for": "maya", "of": "m", "where": "needs_you", "why": "A direct mention lands in Needs you (D-001)"},
+         {"for": "lena", "of": "m", "where": "needs_you", "why": "A direct mention lands in Needs you (D-001)"}
+       ]},
+      {"after_s": 10, "who": "maya", "do": "read", "to": "m",
+       "expect": [{"for": "maya", "of": "m", "where": "history", "why": "Read, it leaves the feed (D-003)"}]},
+      {"after_s": 25, "who": "priya", "do": "delete", "to": "m",
+       "expect": [
+         {"for": "maya", "of": "m", "where": "history", "why": "She had seen it, so a marker stays where it was (D-004)"},
+         {"for": "lena", "of": "m", "where": "nothing", "why": "She never saw it, so nothing is left (D-004)"}
+       ]}
+    ]
+  },
+  {
+    "id": "pile-of-reactions",
+    "title": "The team reacts to Maya's announcement",
+    "outcome": "For Maya the reactions are one grouped row in For your information, showing the split by emoji.",
+    "covers": "a pile of reactions on your message",
+    "viewer": "maya",
+    "steps": [
+      {"after_s": 0, "who": "maya", "do": "post", "as": "m", "in": "#general",
+       "text": "Beta feedback is in: 41 of the 48 pilot clinics say they would be disappointed to lose Larkmere. Thank you all, that number is yours."},
+      {"after_s": 4, "who": "anna", "do": "react", "to": "m", "emoji": "🎉"},
+      {"after_s": 3, "who": "marco", "do": "react", "to": "m", "emoji": "🎉"},
+      {"after_s": 2, "who": "lena", "do": "react", "to": "m", "emoji": "❤️"},
+      {"after_s": 5, "who": "sam", "do": "react", "to": "m", "emoji": "🎉"},
+      {"after_s": 2, "who": "jonas", "do": "react", "to": "m", "emoji": "🚀"},
+      {"after_s": 3, "who": "dele", "do": "react", "to": "m", "emoji": "🎉",
+       "expect": [{"for": "maya", "of": "m", "where": "fyi", "why": "Reactions from people you did not address stay grouped in For your information (D-014)"}]}
+    ]
+  },
+  {
+    "id": "reaction-taken-back",
+    "title": "Sam reacts to Maya's question, then takes it back",
+    "outcome": "Sam's reaction lands in Maya's Needs you as an answer; when he takes it back before she has seen it, the row is gone.",
+    "covers": "a reaction taken back",
+    "viewer": "maya",
+    "steps": [
+      {"after_s": 0, "who": "maya", "do": "post", "as": "m", "in": "#support",
+       "text": "@Sam can your team cover the phones on Thursday morning while everyone is in the launch call?"},
+      {"after_s": 12, "who": "sam", "do": "react", "to": "m", "emoji": "✅",
+       "expect": [{"for": "maya", "of": "m", "where": "needs_you", "why": "A reaction from someone you addressed is an answer (D-014)"}]},
+      {"after_s": 9, "who": "sam", "do": "unreact", "to": "m", "emoji": "✅",
+       "expect": [{"for": "maya", "of": "m", "where": "nothing", "why": "Taken back before it was seen, it leaves nothing (D-004, D-014)"}]}
+    ]
+  },
+  {
+    "id": "replies-in-a-thread-you-started",
+    "title": "Replies arrive in Maya's own thread",
+    "outcome": "For Maya the thread is one row in Needs you, however many replies come in.",
+    "covers": "replies in a thread you started",
+    "viewer": "maya",
+    "steps": [
+      {"after_s": 0, "who": "maya", "do": "post", "as": "m", "in": "#product",
+       "text": "Roadmap review moves to Wednesday 10:00. Anything that should not wait until then?"},
+      {"after_s": 15, "who": "dele", "do": "reply", "to": "m", "as": "r1",
+       "text": "The no-show dashboard, if you want it in the board deck.",
+       "expect": [{"for": "maya", "of": "m", "where": "needs_you", "why": "A reply in a thread you started lands in Needs you (D-001)"}]},
+      {"after_s": 20, "who": "noor", "do": "reply", "to": "m", "as": "r2",
+       "text": "Revenue per location too, please. Same deck.",
+       "expect": [{"for": "maya", "of": "m", "where": "needs_you", "why": "One row per conversation, not one per message (D-001)"}]}
+    ]
+  },
+  {
+    "id": "replies-in-a-thread-you-follow",
+    "title": "Replies in a thread Maya chose to follow",
+    "outcome": "For Maya the replies land in For your information, because she set the thread to that level.",
+    "covers": "replies in a thread you follow",
+    "viewer": "maya",
+    "steps": [
+      {"after_s": 0, "who": "marco", "do": "post", "as": "m", "in": "#engineering",
+       "text": "Proposal: freeze main at 20:00 tonight instead of 18:00, so the reminder fix can land with a full test run."},
+      {"after_s": 5, "who": "maya", "do": "dial", "in": "#engineering", "to": "m", "dial": "fyi"},
+      {"after_s": 30, "who": "nadia", "do": "reply", "to": "m", "as": "r",
+       "text": "Works for me. The fix is in review, Arjun has it.",
+       "expect": [{"for": "maya", "of": "m", "where": "fyi", "why": "The thread dial decides where its replies land (D-001)"}]}
+    ]
+  },
+  {
+    "id": "replies-in-a-thread-you-turned-off",
+    "title": "Maya turns a noisy thread off",
+    "outcome": "Replies no longer reach Maya, until one names her: what names you gets through any dial.",
+    "covers": "replies in a thread you turned off",
+    "viewer": "maya",
+    "steps": [
+      {"after_s": 0, "who": "maya", "do": "post", "as": "m", "in": "#design",
+       "text": "Which of the two illustrations do we use for the waiting list?"},
+      {"after_s": 5, "who": "maya", "do": "dial", "in": "#design", "to": "m", "dial": "off"},
+      {"after_s": 20, "who": "theo", "do": "reply", "to": "m", "as": "r1",
+       "text": "The second one. The first looks like a queue at a post office.",
+       "expect": [{"for": "maya", "of": "m", "where": "nothing", "why": "A thread set to Off sends nothing (D-001)"}]},
+      {"after_s": 25, "who": "lena", "do": "reply", "to": "m", "as": "r2",
+       "text": "@Maya we picked the second. Shout if you disagree, otherwise it goes in tonight.",
+       "expect": [{"for": "maya", "of": "m", "where": "needs_you", "why": "What names you gets through any dial (D-001)"}]}
+    ]
+  },
+  {
+    "id": "incident-burst-at-three-dials",
+    "title": "A burst in #incidents, seen at Focus, Default and Muted",
+    "outcome": "Maya at Focus gets one row in Focus for the whole burst; Tomás at Default and Priya at Muted get nothing, until a message names them, which reaches both in Needs you.",
+    "covers": "a burst in the incidents channel, seen with the dial at Focus, Default and Muted",
+    "viewer": "maya",
+    "steps": [
+      {"after_s": 0, "who": "maya", "do": "dial", "in": "#incidents", "dial": "focus"},
+      {"after_s": 0, "who": "tomas", "do": "dial", "in": "#incidents", "dial": "default"},
+      {"after_s": 0, "who": "priya", "do": "dial", "in": "#incidents", "dial": "muted"},
+      {"after_s": 2, "who": "watch", "do": "post", "as": "a1", "in": "#incidents",
+       "text": "booking-write error rate at 38 per thousand for the last five minutes."},
+      {"after_s": 6, "who": "watch", "do": "post", "as": "a2", "in": "#incidents",
+       "text": "p95 latency on calendar-read is 1,940 ms, threshold 800."},
+      {"after_s": 9, "who": "felix", "do": "post", "as": "a3", "in": "#incidents",
+       "text": "Looking. Connection pool on the primary is full."},
+      {"after_s": 7, "who": "watch", "do": "post", "as": "a4", "in": "#incidents",
+       "text": "reminder-worker queue depth is 4,212 and rising."},
+      {"after_s": 12, "who": "bram", "do": "post", "as": "a5", "in": "#incidents",
+       "text": "It started with the 10:30 import job. Pausing it now."},
+      {"after_s": 10, "who": "felix", "do": "post", "as": "a6", "in": "#incidents",
+       "text": "Pool is draining, errors are dropping.",
+       "expect": [
+         {"for": "maya", "of": "a1", "where": "focus_new", "why": "A channel at Focus brings its posts to Focus, as one row (D-001)"},
+         {"for": "maya", "of": "a6", "where": "focus_new", "why": "The whole burst is the same row (D-001)"},
+         {"for": "tomas", "of": "a1", "where": "nothing", "why": "At Default, ordinary posts stay in the channel (D-001)"},
+         {"for": "priya", "of": "a1", "where": "nothing", "why": "Muted sends nothing that does not name you (D-001, D-013)"}
+       ]},
+      {"after_s": 15, "who": "felix", "do": "post", "as": "a7", "in": "#incidents",
+       "text": "@Tomás can you check whether any writes were lost between 10:31 and 10:36? @Priya hold the customer note until we know.",
+       "expect": [
+         {"for": "tomas", "of": "a7", "where": "needs_you", "why": "A direct mention lands in Needs you (D-001)"},
+         {"for": "priya", "of": "a7", "where": "needs_you", "why": "What names you gets through a muted channel (D-001, D-013)"}
+       ]}
+    ]
+  },
+  {
+    "id": "agent-progress-result-and-stop",
+    "title": "Researcher works, reports and stops for Maya",
+    "outcome": "For Maya the progress and the result stay in For your information on one row; when the agent stops for her, that row rises to Focus.",
+    "covers": "an agent's progress updates as Info, its result, and its stop for a human",
+    "viewer": "maya",
+    "steps": [
+      {"after_s": 0, "who": "field", "do": "post", "as": "run", "in": "#research", "level": "info",
+       "text": "@Maya starting the pilot review you asked for: 31 interview transcripts. I will post progress here.",
+       "expect": [{"for": "maya", "of": "run", "where": "fyi", "why": "Info never lands above For your information (D-001)"}]},
+      {"after_s": 10, "who": "field", "do": "reply", "to": "run", "as": "p1", "level": "info",
+       "text": "12 of 31 read. So far the strongest theme is trust in the day list at 8 am.",
+       "expect": [{"for": "maya", "of": "run", "where": "fyi", "why": "Progress marked Info stays in For your information (D-001)"}]},
+      {"after_s": 12, "who": "field", "do": "reply", "to": "run", "as": "p2", "level": "info",
+       "text": "27 of 31 read. Nothing new in the last ten, I expect the themes to hold."},
+      {"after_s": 10, "who": "field", "do": "reply", "to": "run", "as": "result",
+       "text": "Done. Three themes: the paper backup habit, waiting lists refilling half of cancellations, and owners never opening the front desk view. Summary is in the shared folder.",
+       "expect": [{"for": "maya", "of": "run", "where": "fyi", "why": "A reply in a thread that mentioned you follows the thread at For your information (D-001)"}]},
+      {"after_s": 8, "who": "field", "do": "reply", "to": "run", "as": "stop", "level": "flag",
+       "text": "@Maya two transcripts include a patient's full name. I stopped before adding them to the summary. Should I redact them, or leave those two out?",
+       "expect": [{"for": "maya", "of": "run", "where": "focus_new", "why": "A flag naming you lands in Focus: the agent is waiting for a person (D-001, D-011)"}]}
+    ]
+  },
+  {
+    "id": "courtesy-mention-info",
+    "title": "Priya copies Maya in, marked Info",
+    "outcome": "For Maya a mention marked Info lands in For your information and sends no notification.",
+    "covers": "a courtesy mention marked Info",
+    "viewer": "maya",
+    "steps": [
+      {"after_s": 0, "who": "priya", "do": "post", "as": "m", "in": "#launch", "level": "info",
+       "text": "Launch email is scheduled for Thursday 09:15, final copy attached to the brief. @Maya no action needed, just so you know it is set.",
+       "expect": [{"for": "maya", "of": "m", "where": "fyi", "why": "Info keeps a mention in For your information, and Info never notifies (D-001, D-012)"}]}
+    ]
+  }
+]

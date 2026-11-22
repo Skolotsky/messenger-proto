@@ -1,0 +1,48 @@
+=== early
+greta: Quillfield wants to know if they can export a patient's full history for a transfer. I said yes, but where is it?
+> mateo: Patient, three dots, Export record. It is very well hidden.
+> greta: Found it, thank you. Should that be more visible?
+> sam: Note it for the 2.0.1 list.
+
+=== early
+mateo: Fennimoor's receptionist asked whether the system "knows" when she is on holiday. Took me a moment. She wanted her name off the rota, not a feature.
+> greta: Honestly it would be a good feature.
+
+=== early
+sofia: Do we have anything written on what the reminder text looks like to the patient? A clinic wants to see it before turning it on.
+> sam: In the help centre under Reminders, with a screenshot.
+> sofia: Perfect, sending.
+
+=== early
+greta: Tallowbrook again. This time their printer. I have explained that we do not make printers.
+> mateo: How did that go?
+> greta: They asked if we could recommend one. {+😂 mateo,sam,sofia}
+
+=== mid
+mateo: Getting a run of questions about the new navigation in the beta. Mostly "where did Settings go". Should I reply one by one or put up a notice?
+> sam: A small notice in the beta. Zoe, can you write it?
+> mateo: She is already on it, I asked her earlier. {delete}
+> sam: Good. Then one reply macro until it lands.
+
+=== d9
+sofia: Kilbrennan's onboarding starts on the 23rd. 14 locations, around 60 staff. I am putting together a plan with Ruth. Anyone done one this size?
+> ruth: Nobody has, which is why we are writing it down.
+> sam: Support can run two training calls in the first week.
+
+=== mid
+greta: We have had three clinics ask whether 2.0 will change their reminder wording. The answer is no, right?
+> maya: Right. Only if they edit it.
+> greta: Thanks, adding that to the launch notes.
+
+=== d9
+yuki: Could support try the release candidate for an hour before launch? You will click on things in a way QA does not.
+> sam: Yes. We will do a bug-bash on Friday afternoon, Greta and Mateo.
+> mateo: I am very good at breaking things by accident.
+
+=== d14
+mateo: Bug-bash results: nine small things, one good catch on the cancel dialog where the patient name was wrong after a quick switch between days.
+> yuki: That one is real. Thank you. Filed and with Inès already.
+
+=== late
+sofia: All seven walkthroughs done. Common thread: people are nervous until they see the week view is where they left it, and then they relax.
+> ruth: Exactly what we hoped for. {+🙏 sam,sofia}

@@ -1,0 +1,28 @@
+=== early
+hana: Should the mobile app show the whole clinic's day or just mine? Practitioners only care about their own.
+> lena: Default to mine, with a switch to see everyone.
+> kofi: That is easy, the filter already exists.
+
+=== early
+leila: On the small Android phone the time labels overlap when the font size is set to large.
+> hana: I can reproduce it. Switching those labels to scale with the row.
+> leila: Better. Passing it. {+👍 hana}
+
+=== mid
+kofi: The app size went from 48 MB to 31 by removing an analytics library we stopped using a year ago.
+> marco: Why did we still have that?
+> kofi: Nobody wanted to be the one to remove it. I have made peace with being that person.
+
+=== mid
+yuki: Push notifications arrive with the clinic's name but not the patient's, right? That is deliberate?
+> kofi: Yes. Lock screens are public. No patient names in a push.
+> yuki: Good, I will add a test so it stays that way.
+
+=== mid
+hana: Swipe between days is in. It's slightly too sensitive, so a scroll that starts sideways changes the day. Tuning it.
+> lena: Try requiring about 40 px before it commits.
+> hana: 40 feels right. Thanks.
+
+=== late
+kofi: Both store listings have the new screenshots and description. Release is set to manual, so nothing goes out until I press the button at 09:00 on Thursday.
+> marco: Please do not lean on anything.

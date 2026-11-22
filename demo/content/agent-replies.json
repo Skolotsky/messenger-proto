@@ -1,0 +1,65 @@
+{
+  "ship": [
+    "Nice, that is the first clean one this week.",
+    "Thanks. I will start the regression pass on this build.",
+    "Good, the reminder fix is in that one.",
+    "Can someone check the print view on this build? It looked off yesterday.",
+    "Clean run. Taking that as a good omen.",
+    "Does this include the date picker change?",
+    "Trying it on the clinic laptop now.",
+    "Smoke results look right to me.",
+    "I will tell support this is the build to test against.",
+    "Good timing, I was about to ask.",
+    "Waiting list flow works on this one, I just tried it.",
+    "That was quicker than yesterday's run."
+  ],
+  "watch": [
+    "That is the nightly export again. I will move it.",
+    "Seen it. Nothing customer-facing.",
+    "This one keeps coming back around nine. Worth a look after the freeze.",
+    "Fine now, I checked the graphs.",
+    "Probably the batch job, ignoring for now.",
+    "I would raise this threshold, it is noisy.",
+    "Ticket filed so we do not forget it.",
+    "Same pattern as Tuesday."
+  ],
+  "triage": [
+    "I know this clinic, I will take it.",
+    "That is the third one like this today.",
+    "Closing the loop with them now.",
+    "Can you link the earlier ticket as well?",
+    "Answered, it was a settings issue.",
+    "This one needs a phone call rather than an email.",
+    "Adding it to the launch day notes.",
+    "Good routing, thanks.",
+    "They wrote in about this last month as well.",
+    "I will check this against the beta build."
+  ],
+  "ledger": [
+    "Online share keeps creeping up. Nice.",
+    "Can we see this one split by clinic size?",
+    "The no-show rate is the number I care about here.",
+    "Monday always looks like this, ignore the spike.",
+    "Thanks, this goes in the board deck.",
+    "Is the stalled number including the two we lost last week?",
+    "Pipeline looks healthier than last month.",
+    "I will chase the stalled ones this afternoon."
+  ],
+  "field": [
+    "This matches what we heard at Quillfield.",
+    "Useful. Can you pull the quotes behind this?",
+    "That one should go into the 2.1 discussion.",
+    "I did not expect that, thanks.",
+    "Putting this in the research doc.",
+    "Worth testing with the waiting list copy.",
+    "This changes how I would write the onboarding.",
+    "How many clinics is that based on?"
+  ],
+  "scribe": [
+    "Small correction: I finished the review yesterday.",
+    "Thanks, these notes save me a meeting.",
+    "I am unblocked since this morning, for the record.",
+    "That item is done, it just was not merged yet.",
+    "Please add that I am out on Friday afternoon."
+  ]
+}

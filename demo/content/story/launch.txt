@@ -1,0 +1,143 @@
+# The 2.0 launch, Thursday 19 November. Each === is one exchange.
+
+=== early
+anna: Two weeks and a bit to 2.0. I would like this channel to be the one place where launch questions get answered, so if you find yourself asking in a DM, ask here instead. {+👍 maya,marco,priya,jonas,sam}
+> maya: I will keep the checklist pinned and post what moved every morning.
+> priya: Can we agree on one name for the date? Half the drafts say "mid-November".
+> anna: Thursday the 19th. Say it out loud.
+
+=== early
+maya: Launch checklist v1 is up. 64 items, 21 done, 9 have no owner yet. If you see your team's name next to something you did not agree to, tell me today rather than on the 18th.
+> marco: The "load test the Monday peak" one is ours, put Felix on it.
+> felix: Fine by me. I need a copy of production from a real Monday though.
+> dele: I can give you the shape of the traffic, not the data itself.
+> felix: Shape is all I want.
+
+=== early
+priya: Question for everyone who talks to customers: what do we call the thing that used to be "Smart Slots"? I have seen three names this week.
+> sam: Clinics call it the waiting list. They have never once said smart slots to me.
+> jonas: Same on sales calls.
+> zoe: Then it is the waiting list. I will fix the help centre and the app strings. {+💯 priya,sam}
+
+=== early
+jonas: Reminder that Fennimoor and Quillfield both signed on the promise of recurring appointments in 2.0. If that slips I need to know before they do. {+👀 maya,marco}
+> maya: It is not slipping. Weekly and monthly are in. Custom patterns are not, and I told both of them that in October.
+> jonas: Perfect, that is what I remember too.
+
+=== early
+ewan: Draft of the launch page is in review. I need someone who is not in marketing to read it and tell me where it sounds like marketing.
+> tomas: "Reimagined" appears twice in the first screen.
+> ewan: Noted. It is gone.
+> lena: The hero image shows a calendar we do not ship anymore.
+> ewan: Also noted. This is why I asked. {+😂 tomas,lena}
+
+=== early
+anna: For the avoidance of doubt: we do not move the date to fit more in. We move things out of the release to keep the date.
+> marco: Understood. I will come back Friday with what I would cut first.
+
+=== early
+marco: What I would cut if we had to, in order: the XLSX export, the patient merge tool, dark mode on the day view. Nothing else is optional. {edit: What I would cut if we had to, in order: the XLSX export, the patient merge tool, dark mode on the day view. Nothing else is optional in my view, but @Maya has the final word.}
+> maya: Agree on the order. I would fight for the merge tool only if support says it is a daily pain.
+> sam: It is weekly, not daily. You can cut it.
+
+=== early
+paula: Launch day logistics: we are all in the office on Thursday if you can be. Lunch is on us, so tell me about allergies by next Friday. {+🎉 anna,priya,hana,kofi,owen}
+> hana: Coming in from the Brno side, I will be there by nine.
+> greta: Nut allergy here, please.
+> paula: Written down.
+
+=== mid
+maya: Checklist this morning: 41 of 64 done. Red items are the DNS change, the migration rehearsal and the press embargo wording.
+> felix: DNS is with the registrar. They quote 24 to 48 hours.
+> tomas: Rehearsal is booked for Wednesday night.
+> priya: Embargo wording is with Anna.
+
+=== mid
+anna: Embargo wording agreed: nothing about 2.0 goes public before 09:00 on the 19th, including the pricing page and the customer emails. {+👍 priya,ewan,jonas}
+> jonas: Does that include telling pilots who ask directly?
+> anna: You can tell pilots the date. Not the price.
+> jonas: Clear.
+
+=== mid
+priya: We have a slot on a healthcare operations podcast the week after launch. They want someone who can tell the story of a clinic switching. @Anna you or @Ruth?
+> anna: Ruth. She has actually been in the room when it happens.
+> ruth: Happy to. Can I bring a customer?
+> priya: Please do.
+
+=== mid
+yuki: Regression status for rc.2: 212 of 240 cases passed, 19 blocked by the calendar bug, 9 real failures. Full list in #qa.
+> marco: Which of the 9 would you hold the release for?
+> yuki: Two. Reminders firing twice after a move, and the waiting list skipping a patient.
+> marco: Both have owners as of now.
+
+=== mid
+sam: Support readiness: macros for all the renamed things are done, the help centre has 14 of 19 new articles, and we have a rota for launch day through to 20:00.
+> maya: What are the missing five?
+> sam: All recurring appointments. I want to write them against the real thing, not the mock-up.
+> zoe: I can pair on those on Friday.
+
+=== mid
+omar: Finance view of the launch: the new plans go live in billing on the 19th at 09:00. If anything about the price changes after Monday, it costs me a day of rework and an apology to the auditors.
+> anna: It will not change after Monday.
+> omar: I will hold you to that in writing, which this now is. {+😂 anna,maya,jonas}
+
+=== mid
+lena: New screenshots for the launch page and the app store listing are in the shared folder. All of them are real product, nothing retouched except the patient names.
+> priya: They look great. Can I get the week view at 2x?
+> lena: Uploading now.
+
+=== mid
+owen: Three prospects want a demo of 2.0 on launch day itself. Is that wise or should I push them to the Monday after?
+> maya: Monday. Launch day staging will be busy and I would not want a demo to be the thing that finds a bug.
+> owen: Pushing them. {+👍 jonas}
+
+=== mid
+marco: Freeze for the release branch moves to next Monday 18:00. Anything that is not merged by then waits for 2.0.1, no exceptions, including mine.
+> arjun: The reminder retry fix is close. Should make it.
+> ines: Date picker a11y fixes are in review.
+> kofi: Mobile is frozen already, we need the store review time.
+
+=== d9
+maya: Decision from this morning, so it is written down: XLSX export is out of 2.0 and ships the week after. CSV goes out on launch day. {+👍 tomas,marco,sam}
+> jonas: Do I tell Fennimoor?
+> maya: I will call them today. They were the ones who asked for it by name.
+
+=== mid
+ewan: Launch email goes to 1,940 contacts. Do we split it by plan, or does everyone get the same note?
+> priya: Same note, one paragraph that changes by plan. Anything more clever and we will send the wrong one to somebody.
+> ewan: Boring and correct, I like it.
+
+=== d14
+maya: Three days out. 58 of 64 done. What is left is mostly people waiting for one another, so I am going to go through it in person this morning rather than post another list.
+> marco: Come to me first, I hold three of them.
+
+=== d14
+anna: Whatever happens on Thursday, I want to say that the last month has been the best work I have seen from this company. Now please go home at a normal hour tonight. {+❤️ maya,lena,sam,priya,yuki,marco,ruth}
+> kofi: Define normal.
+> anna: Before the cleaners.
+
+=== late
+felix: DNS for the new booking domain is live and the certificates are issued. One red item fewer. {+🎉 maya,tomas,priya,marco}
+
+=== late
+tomas: Migration rehearsal on the production copy: 41 seconds, longest lock 180 ms, rollback tested. I am comfortable with it.
+> marco: Good. Run it again on Wednesday with the final branch and we are done.
+
+=== d14
+priya: Press pack is final. Embargo reminder goes to the four journalists tomorrow morning. @Anna your quote is the one from Friday, unless you have second thoughts.
+> anna: No second thoughts. Maybe lose the word "delighted".
+> priya: Gone. {edit: Gone. Nobody has ever been delighted in a press release anyway.}
+
+=== d15
+yuki: rc.6 regression is clean apart from one cosmetic issue on the print view. I would ship this.
+> marco: Then we ship this, unless something new turns up by Wednesday noon.
+> leila: I am running the Monday-morning script one more time overnight to be sure.
+
+=== late
+sam: Launch day rota is final. Greta and Mateo open, I am on from 10, Ruth and Sofia take the calls from pilot clinics directly.
+> greta: Can we have a shared note for anything that repeats more than twice?
+> sam: Yes, I will start it in #support.
+
+=== late
+jonas: Fennimoor took the XLSX news well. They asked for a date, I said the week after launch, Maya confirmed.
+> maya: If it slips I will be the one calling them.

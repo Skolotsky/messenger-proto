@@ -1,0 +1,25 @@
+=== early
+paula: Two new starters on the 1st of December, one in support and one in sales. Omar, can you set up payroll? Felix, laptops and accounts?
+> omar: Yes. Send me the contracts.
+> felix: Two laptops ordered.
+
+=== early
+anna: Lease on the office is up in June. I would like us to think about whether we stay or look for somewhere with a working lift.
+> paula: I have a spreadsheet.
+> anna: Of course you do.
+
+=== mid
+omar: Quarterly VAT is filed. For once, nobody had to find a receipt from a taxi in September. {+🎉 paula,anna}
+
+=== mid
+felix: Security questionnaire from Kilbrennan is 180 questions. I have answered 140 of them from the last one. Can somebody check the data retention answers?
+> omar: Send them to me, I will check them against the contract wording.
+> marco: I can do the access control section.
+
+=== mid
+paula: Heating is fixed on the second floor. The engineer said it had been "basically decorative" since March.
+
+=== late
+omar: Budget for next year goes to the board on the 10th. Team leads, your headcount numbers by the end of this month please. I know it's a terrible time to ask.
+> marco: After Thursday, I promise.
+> omar: That is the answer I expected.

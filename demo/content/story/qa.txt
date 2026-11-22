@@ -1,0 +1,23 @@
+=== early
+yuki: Flaky test of the week: calendar drag on the slower browser. Fails one run in ten.
+> ines: It is the animation timing. Fix is in review.
+
+=== early
+leila: Writing test cases for recurring appointments. If you can think of a nasty one, tell me now. So far I have the clock change, a holiday and a practitioner leaving.
+> tomas: A series that crosses a price change.
+> kofi: Editing one from a phone while someone edits it on desktop.
+> leila: You are all horrible, thank you.
+
+=== mid
+yuki: Regression pass for rc.3 starts as soon as Deployer posts the build.
+> kofi: I can cover the two oldest phones if you send me the list.
+> ines: The slower browser is mine, as usual.
+
+=== mid
+leila: Waiting list bug: if two slots open at the same minute the second offer goes to the same patient. Reproducible every time.
+> tomas: Oh, that is mine. Fixing it today.
+> leila: Retested on the next build, fixed. {+🙏 tomas,yuki}
+
+=== late
+yuki: Final regression list has 248 cases. Everything that was red a week ago is green, or has a named reason why it can wait.
+> marco: Thank you, both of you.
