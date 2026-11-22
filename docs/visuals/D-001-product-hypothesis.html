@@ -166,7 +166,7 @@ details > .stack { gap: 10px; }
 
 <div class="ask">
   <div class="label">Needs you</div>
-  <p><strong>Do these starting rules look right?</strong> One difference from your proposal: I start direct mentions in Needs you, not Focus, because with them in Focus the middle bucket is left almost empty. “Any direct mention” stays one click away.</p>
+  <p><strong>Accept this as the product hypothesis?</strong> It holds everything we settled, including flags. Direct mentions start in Needs you, with “any direct mention” one click away as a Focus rule.</p>
 </div>
 
 <section>
@@ -178,15 +178,16 @@ details > .stack { gap: 10px; }
       <p class="note">Two starting rules, both removable. Add more in one click from any person, channel, thread or message.</p>
       <ul>
         <li><strong>Direct messages from people.</strong><br>“Anna: can you look at the pricing page before 3?”<br><span class="chip you">Direct message from Anna</span></li>
-        <li><strong>Anything marked as needing you,</strong> by a person or an agent.<br>“Release agent: staging is ready. Approve the deploy to production?”<br><span class="chip you">Marked as needing you</span></li>
+        <li><strong>Flagged messages that mention you,</strong> from a person or an agent.<br>“Release agent: staging is ready. Approve the deploy to production?”<br><span class="chip you">Flagged for you by Release agent</span></li>
       </ul>
     </div>
     <div class="panel">
       <div class="label">Needs you · fixed rules</div>
-      <p class="note">Directed at you, but nobody said it is urgent.</p>
+      <p class="note">Directed at you, but not flagged for you.</p>
       <ul>
         <li><strong>Direct mentions of you.</strong><br>“@you does this copy work for the launch email?”<br><span class="chip">Mentioned you in #launch</span></li>
         <li><strong>Replies in threads you started or replied in.</strong><br>“Marco replied: the numbers are from last week.”<br><span class="chip">Reply in your thread</span></li>
+        <li><strong>Flagged messages that mention nobody,</strong> in your threads and channels.<br>“Build agent: who can approve the new API key?”<br><span class="chip">Flagged for everyone in #infra</span></li>
       </ul>
     </div>
     <div class="panel">
@@ -212,16 +213,27 @@ details > .stack { gap: 10px; }
 </section>
 
 <section>
-  <h2>“This needs you”: the mark, and what agents do with it</h2>
-  <p>A sender can mark a message as needing a response from a named person. The mark stays open until that person responds or the sender withdraws it.</p>
+  <h2>Flags: how a sender says “this needs attention”</h2>
+  <p>A flag is stronger than a mention and is not always a request. Who it is for follows from the message itself.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>A flagged message…</th><th>Is for</th><th>Lands in</th><th>Closes when</th></tr></thead>
+      <tbody>
+        <tr><td>in a direct conversation</td><td>The other person</td><td><span class="chip you">Focus</span></td><td>They respond</td></tr>
+        <tr><td>that mentions people</td><td>Each person mentioned</td><td><span class="chip you">Focus</span></td><td>Each responds, for themselves</td></tr>
+        <tr><td>that mentions nobody</td><td>Everyone in the thread or channel</td><td><span class="chip">Needs you</span></td><td>Anyone responds</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">The sender can withdraw a flag at any time.</p>
   <div class="split">
     <div class="panel">
       <div class="label">Agents: always</div>
-      <p>An agent working on a task sometimes has to stop for a human: an approval, a choice between two options, a missing detail. Whenever it stops, it marks the message for the person it is waiting on. Everything else it writes is unmarked, and its in-progress output never reaches the feed.</p>
+      <p>An agent working on a task sometimes has to stop for a human: an approval, a choice between two options, a missing detail. Whenever it stops, it flags that message. Everything else it writes is unflagged, and its in-progress output never reaches the feed.</p>
     </div>
     <div class="panel">
       <div class="label">People: when they choose</div>
-      <p>A person can mark a message the same way when a mention is not strong enough. Most messages stay unmarked. An AI suggesting the mark is a later idea, outside this scope.</p>
+      <p>A person can flag a message the same way when a mention is not strong enough. Most messages stay unflagged. An AI suggesting a flag is a later idea, outside this scope.</p>
     </div>
   </div>
   <p class="note">In the proof of concept the agents in the seeded team follow a script (post, work, stop and ask) so a demo runs the same way every time. Whether a real model drives them is decision D-002.</p>
@@ -235,7 +247,7 @@ details > .stack { gap: 10px; }
       <tbody>
         <tr><td>Item types: mentions, thread replies, reactions; who is notified of a reply</td><td>Slack</td><td>Sorted into buckets by purpose instead of filtered by type</td></tr>
         <tr><td>A personal priority view</td><td>Slack VIP filter, Linear Priority, Gmail priority inbox</td><td>The rules are visible, yours, one click to add, and show their effect before saving</td></tr>
-        <tr><td>An agent's “waiting” status</td><td>Slack</td><td>It becomes a feed item, and people can use the same mark</td></tr>
+        <tr><td>An agent's “waiting” status</td><td>Slack</td><td>It becomes a flag, which people can use too</td></tr>
         <tr><td>In-progress agent output notifies nobody</td><td>Teams</td><td>Kept as is</td></tr>
         <tr><td>Smart filtering by a model</td><td>Nobody in the feed itself yet</td><td>Promote-only, after the item is shown, with the matching rule named</td></tr>
       </tbody>
@@ -249,7 +261,7 @@ details > .stack { gap: 10px; }
     <ul>
       <li><strong>A rule puts something important too low.</strong> We lower, never hide, and each item shows its reason.</li>
       <li><strong>A broad rule floods Focus</strong> (“everything in #launch”). The product shows how many items the rule would have pulled in before you save it.</li>
-      <li><strong>The mark is overused,</strong> like the high-importance flag in email. It names one person, closes when they respond, and the starting rule can be removed.</li>
+      <li><strong>Flags are overused,</strong> like the high-importance flag in email. A flag closes when answered; one that mentions nobody lands a bucket lower and closes for everyone at the first response; the starting rule can be removed.</li>
       <li><strong>A text rule gets it wrong in the top bucket,</strong> where a mistake costs the most trust. Promote-only, the rule is named on the item, and an experiment comes before the build.</li>
     </ul>
     <p><strong>What early access should show:</strong> people clear the feed daily; how many add a Focus rule; how many start from Focus; items in higher buckets get acted on clearly more often.</p>

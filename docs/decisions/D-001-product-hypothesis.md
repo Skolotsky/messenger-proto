@@ -28,27 +28,35 @@ The first version of this option had two tiers. The user leaned to A and added t
 - **Needs you** is the system's judgement that something is directed at you. Fixed rules, the same for everyone, each item saying why it is there.
 - **For your information** is what concerns you without waiting on you.
 - **One item, one place.** Focus wins over Needs you, which wins over For your information. Every item says why it is where it is ("In Focus: direct message from Anna").
-- **The sender can say "this needs you".** A message can be marked as needing a response from a named person. Agents do this whenever they stop and wait for a human (an approval, a choice, a clarification); people can do it when they choose to. The mark is open until that person responds or the sender withdraws it. An AI suggesting the mark to a person is a later idea, out of scope.
+- **The sender can flag a message.** A flag says "this needs attention", which is stronger than a mention and not always a request. Who it is for follows from the message itself:
+
+  | A flagged message… | Is for | Lands in | Closes when |
+  |---|---|---|---|
+  | in a direct conversation | the other person | Focus | they respond |
+  | that mentions people | each person mentioned | Focus | each responds, for themselves |
+  | that mentions nobody | everyone in the thread, or in the channel for a top-level message | Needs you | anyone responds |
+
+  The sender can withdraw a flag at any time. Agents flag whenever they stop and wait for a human (an approval, a choice, a clarification) and leave everything else unflagged; people flag when they choose to. An AI suggesting a flag to a person is a later idea, out of scope. What counts as responding is settled in D-003.
 - **Nothing jumps.** An edit or a delete never changes the size or position of what is on screen. A longer edit sits behind an expander, a shorter one keeps its space, a deleted message leaves a marker in its place, and emptied space is filled with care (an illustration, not a gap). The feed still always shows the current truth. Detail belongs to D-004.
 
 Starting rules, so that Focus is useful before anyone configures anything (recommended; the user proposed "any direct message" and "any direct mention", see the note below):
 
 | Bucket | What lands there from day one |
 |---|---|
-| Focus (your rules, both removable) | Direct messages from people, one to one. Anything marked as needing a response from you, by a person or an agent |
-| Needs you (fixed) | Direct mentions of you. Replies in threads you started or replied in |
+| Focus (your rules, both removable) | Direct messages from people, one to one. Flagged messages that mention you or are sent to you directly, from a person or an agent |
+| Needs you (fixed) | Direct mentions of you. Replies in threads you started or replied in. Flagged messages that mention nobody, in your threads and channels |
 | For your information (fixed) | Reactions to your messages, grouped. Mentions of a whole channel or group. Activity in threads you only follow |
 | Never in the feed | In-progress agent output. Ordinary channel traffic you were not addressed in |
 
 Note on the difference from the user's proposal: direct mentions start in Needs you, not Focus. Mentions are frequent and often a courtesy ("thanks @sam"), and with them in Focus the Needs you bucket is left almost empty and Focus becomes Needs you under another name. "Any direct mention" is offered as a suggested rule, one click to add.
 
 - Borrowed: Slack's item types (mentions, thread replies, reactions) and its thread rules; the idea of a personal priority view (Slack's VIP filter, Linear's Priority tab, Gmail's priority inbox); Slack's "agent is waiting" status; Teams' rule that in-progress agent output notifies nobody.
-- Changed: buckets by purpose instead of filters by type; the top bucket is the person's own and its rules are visible; a waiting agent and a sender's request are first-class items; every item explains its place; nothing jumps on edit or delete.
+- Changed: buckets by purpose instead of filters by type; the top bucket is the person's own and its rules are visible; a flagged message, from a waiting agent or a person, is a first-class item; every item explains its place; nothing jumps on edit or delete.
 - Upside: it answers the question every feed has to answer (what deserves attention and what does not) and gives the person the last word.
 - Risks:
   - A wrong rule puts something important low and people stop trusting the feed. Reduced by lowering, never hiding, and by the reason shown on each item.
   - A broad rule ("everything in #launch") turns Focus into an unread list. Reduced by the count shown before saving.
-  - The "needs you" mark is overused, like the high-importance flag in email. Reduced by the mark naming a person and closing when they respond; the person can also remove the starting rule.
+  - Flags are overused, like the high-importance flag in email, or a flag with no mention reaches a whole large channel. Reduced by: a flag closes when answered; one with no mention lands a bucket lower and closes for everyone at the first response; the sender can withdraw it; the person can remove the starting rule.
   - Text rules are not deterministic and a wrong call in the top bucket costs the most trust. Reduced by promote-only, by showing which rule matched, and by an experiment before they are built. The user judges the gain larger than the risk (2026-11-22).
 - EAP signals: people clear the feed daily; the share of people who add a Focus rule; the share who start from Focus; items in higher buckets are acted on clearly more often than those below.
 
@@ -78,9 +86,9 @@ Where A as shaped goes beyond that practice: text rules judged by a model add a 
 
 **A as described above**, with the starting rules in the table.
 
-Locks in: three buckets with one item in one place; Focus is defined only by the person's rules; fixed, explained rules for the other two; the sender's "needs you" mark; agents are participants in conversations; text rules judged by a model are in scope, built last, after an experiment; nothing jumps on edit or delete.
+Locks in: three buckets with one item in one place; Focus is defined only by the person's rules; fixed, explained rules for the other two; the sender's flag; agents are participants in conversations; text rules judged by a model are in scope, built last, after an experiment; nothing jumps on edit or delete.
 
-Order of building: the three buckets with exact rules and the mark first; text rules last.
+Order of building: the three buckets with exact rules and flags first; text rules last.
 
 Reversibility: cheap today, moderate once the feed is built. The starting rules stay cheap to change.
 
@@ -88,7 +96,7 @@ No second opinion was sought: nothing is built yet, so changing course costs lit
 
 ## Decision
 
-_Open._ Settled in discussion so far (user, 2026-11-22): option A; Focus as a third, top bucket defined by the person's rules; one item in one place with Focus winning; a count before a rule is saved; text rules judged by a model stay in scope, promote-only and after the item is shown, with experiment and build postponed until the rest is done; nothing jumps on edit or delete. Still to confirm: the starting rules.
+_Open._ Settled in discussion so far (user, 2026-11-22): option A; Focus as a third, top bucket defined by the person's rules; one item in one place with Focus winning; a count before a rule is saved; text rules judged by a model stay in scope, promote-only and after the item is shown, with experiment and build postponed until the rest is done; nothing jumps on edit or delete; the sender's mark is called a flag, is for whoever the message mentions, and for everyone in scope when it mentions nobody. Still to confirm: the record as a whole, including the starting rules.
 
 ## Consequences
 
@@ -96,6 +104,6 @@ _Filled in when accepted._
 
 ## Follow-ups
 
-- D-009 (which surfaces the PoC includes) and D-002 to D-004 open once this is accepted. D-002 inherits the mark and "agents are participants"; D-003 inherits the buckets and rules; D-004 inherits "nothing jumps", plus the open question of how long a deleted message's marker stays and whether it counts as needing you.
+- D-009 (which surfaces the PoC includes) and D-002 to D-004 open once this is accepted. D-002 inherits flags and "agents are participants"; D-003 inherits the buckets and rules; D-004 inherits "nothing jumps", plus the open question of how long a deleted message's marker stays and whether it counts as needing you.
 - An experiment on text rules, run after the rest is built: can a plain-text rule sort our seeded messages well enough and fast enough? It needs a real model, which becomes a system-shape question at that point.
 - The PoC must be able to explain, in the product and in writing: what earns a person's attention and what does not; what was borrowed from existing products and what was changed; what a stale, edited or deleted entry looks like; how a message reaches the feed; what is guaranteed; and where corners were knowingly cut. A "known shortcuts" list starts with the first implementation task.
