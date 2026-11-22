@@ -311,6 +311,29 @@ button.rx:hover{border-color:var(--accent)}
 .newpill small{font-weight:400;opacity:.85;overflow:hidden;text-overflow:ellipsis}
 .newpill button{background:var(--on-accent);color:var(--accent);border-radius:99px;padding:4px 14px;font-weight:700;font-size:13px}
 .newpill button:hover{opacity:.9}
+/* arrivals bar beside the title */
+.top .newpill{position:static;transform:none;box-shadow:none;flex:none;max-width:none;height:32px;padding:0 3px 0 12px;font-size:13px}
+.top .newpill button{padding:3px 12px}
+.top{min-height:60px}
+/* phone: swipe layers */
+.sw-under{display:none;position:absolute;inset:0;align-items:stretch}
+.sw-l{flex:1;display:flex;align-items:center;gap:8px;padding:0 18px;background:var(--accent);color:var(--on-accent);font-weight:600}
+.sw-r{display:flex}
+.sw-r button{width:72px;display:grid;place-items:center;align-content:center;gap:3px;color:#fff;font-size:12px;font-weight:600}
+.sw-r button:first-child{background:#3d5a80}.sw-r button:last-child{background:#9a5b13}
+@media (max-width:760px){
+  .row-btns,.row-chev{display:none}
+  .sw-under{display:flex}
+  .row-main{touch-action:pan-y;position:relative;z-index:1;background:var(--bg);transition:transform .16s}
+  .row-main:hover{background:var(--bg)}
+  .row.read .row-main{opacity:1}.row.read .row-main>*{opacity:.58}
+  .row.kept.read .row-main>*,.hrow .row-main>*{opacity:1}
+  .row.gone .row-main{background:var(--panel2)}
+  .top .newpill small{display:none}
+  .top .newpill{padding-left:12px;gap:8px}
+}
+@media (max-width:760px){.demo-btn{right:auto;left:0;top:auto;bottom:76px;border-radius:0 6px 6px 0;border:1px solid #666;border-left:0}}
+@media (max-width:760px){.demo{bottom:122px}}
 
 /* The agent's own: a calm page. The reason leads every row, and a row's size says how much attention it asks for. */
 :root{--bg:#faf8f4;--panel:#fff;--panel2:#f1eee7;--line:#e4dfd4;--hover:#f3f0e9;--accent:#1f4f46;--accent-soft:#e1ece9;--serif:ui-serif,Georgia,"Times New Roman",serif}
@@ -685,6 +708,7 @@ function whyBody(r, full) {
   const acts = e.off ? '' : e.acts.map(a => `<div class="why-act"><button class="btn sm" data-act="${a.act}" ${a.d}>${esc(a.label)}</button><small>${esc(a.note)}</small></div>`).join('');
   return `<div class="why-steps"><div><i>1</i><span><b>What it is</b>${esc(e.what)}</span></div><div><i>2</i><span><b>What put it in ${b}</b>${esc(e.by)}</span></div>${e.alt && !full ? `<div><i>3</i><span><b>Otherwise</b>${esc(e.alt)}</span></div>` : ''}</div>${path}${acts || done ? `<div class="why-acts"><b class="why-q">Not what you want in ${b}?</b>${acts}${done}</div>` : ''}`;
 }
+const isPhone = () => matchMedia('(max-width:760px)').matches;
 const CAP = 6; // a long burst shows its newest messages by the reply box; the earlier new ones are one click above them
 const left = r => r.read ? 0 : r.items.length;
 function ctxFor(r) { // context is what the new messages answer: the message before them in a direct conversation, or the start of the thread
@@ -716,7 +740,8 @@ function rowHTML(r) {
       <form class="reply" data-form="reply" data-id="${r.id}"><input name="t" autocomplete="off" aria-label="Reply" placeholder="Reply ${c.kind === 'dm' ? 'to ' + first(c.with) : 'in ' + where}…"><button class="btn pri">Send</button></form></div>`;
   }
   return `<article class="row b-${r.bucket} ${r.read ? 'read' : 'unread'}${exp ? ' expanded' : ''}${r.fresh ? ' fresh' : ''}${r.sec === 'kept' ? ' kept' : ''}${r.done ? ' done' : ''}" data-row="${r.id}">
-    <div class="row-main" role="button" tabindex="0" data-act="toggle" data-id="${r.id}" aria-expanded="${exp}">${av(r.chan ? '#' : r.kind === 'rx' ? r.by : last.by)}
+    <div class="sw-under" aria-hidden="true"><span class="sw-l">${ic('check')} ${r.sec === 'kept' ? 'Done' : 'Mark read'}</span><span class="sw-r"><button data-act="pick" data-m="${last.id}">${ic('smile')}<small>React</small></button><button data-act="${r.kept && !r.done ? 'done' : 'keep'}" data-id="${r.id}">${ic('check')}<small>${r.kept && !r.done ? 'Done' : 'Keep'}</small></button></span></div>
+    <div class="row-main" role="button" tabindex="0" data-act="toggle" data-id="${r.id}" aria-expanded="${exp}"${S.swipe === r.id ? ' style="transform:translateX(-144px)"' : ''}>${av(r.chan ? '#' : r.kind === 'rx' ? r.by : last.by)}
       <div class="row-text"><div class="row-head"><span class="row-title">${esc(title)}</span>${sub ? `<span class="row-sub">${sub}</span>` : ''}${marks}${cnt}<span class="row-time">${r.t}${last.edited ? ' · edited' : ''}</span></div>
         <div class="row-reason"><span class="why-dot"></span>${WHY === 'a' ? `<button class="why-btn" data-act="why" data-id="${r.id}" aria-expanded="${S.whyOpen === r.id}">${esc(r.reason)} ${ic('chev')}</button>` : esc(r.reason)}${r.note ? ` · <em>${r.note}</em>` : ''}${WHY === 'c' ? `<button class="why-btn c" data-act="whySheet" data-id="${r.id}">Why? Change…</button>` : ''}</div>
         <div class="row-preview" data-k="${k}"${lockS}>${r.replies.length ? `<b>You:</b> ${rich(S.msgs[r.replies[r.replies.length - 1]].text)}` : `<b>${last.by === ME ? 'You' : first(last.by)}:</b> ${rich(last.text)}`}</div>
@@ -733,10 +758,14 @@ function bucketHTML(b) {
   return `<section class="bucket b-${b}" data-b="${b}"><header class="bk-head"><h2>${BK[b][0]}</h2>${cnt}<span class="bk-desc">${BK[b][1]}</span><span class="bk-acts">${b === 'focus' ? `<button class="btn sm" data-act="modal" data-m="rules">Rules · ${S.rules.length + S.dmPeople.length}</button>` : ''}<button class="btn sm" data-act="markAll" data-b="${b}">Mark all read</button></span></header>${body}</section>`;
 }
 const counts = () => ({ focus: S.rows.filter(r => r.bucket === 'focus' && r.sec !== 'kept' && !r.read).length, needs: S.rows.filter(r => r.bucket === 'needs' && !r.read).length, fyi: S.rows.filter(r => r.bucket === 'fyi' && !r.read).length });
+function pillHTML() {
+  if (!S.pending || S.view !== 'feed') return '';
+  const pb = b => S.pending.filter(x => x.row.bucket === b).length;
+  return `<div class="newpill" role="status"><span><b>${S.pending.length} new</b>${pb('focus') || pb('needs') ? `<small>${[pb('focus') ? pb('focus') + ' in Focus' : '', pb('needs') ? pb('needs') + ' need you' : ''].filter(Boolean).join(' · ')}</small>` : ''}</span><button data-act="applyNew">Show</button></div>`;
+}
 function feed() {
   const bs = Skin.buckets === 'tabs' ? [S.btab] : ['focus', 'needs', 'fyi'];
-  const pb = b => S.pending.filter(x => x.row.bucket === b).length;
-  const pill = S.pending ? `<div class="newpill" role="status"><span><b>${S.pending.length} new</b>${pb('focus') || pb('needs') ? `<small>${[pb('focus') ? pb('focus') + ' in Focus' : '', pb('needs') ? pb('needs') + ' need you' : ''].filter(Boolean).join(' · ')}</small>` : ''}</span><button data-act="applyNew">Show</button></div>` : '';
+  const pill = Skin.pillTop ? '' : pillHTML();
   return `<div class="feed-wrap">${pill}<div class="feed-scroll" data-scroll="feed">${bs.map(bucketHTML).join('')}</div></div>`;
 }
 function bucketTabs() {
@@ -820,7 +849,7 @@ function demoHTML() {
   return `<button class="demo-btn" data-act="demo" aria-expanded="${S.demo}">Demo</button>${panel}`;
 }
 const h = {
-  get S() { return S; }, feed, history, chats, conv: convPane, bucketTabs, histTabs, counts, ic, HT, BK,
+  get S() { return S; }, pill: pillHTML, feed, history, chats, conv: convPane, bucketTabs, histTabs, counts, ic, HT, BK,
   badge() { const c = counts(), n = c.focus + c.needs; return n ? `<span class="badge">${n}</span>` : ''; },
   bell() { return ''; },
   bellOld() { const n = S.tray.filter(e => { const r = S.rows.find(x => x.id === e.row); return r && !r.read && (!S.focusOnly || e.bucket === 'focus'); }).length; return `<button class="icon-btn bell" data-act="modal" data-m="tray" aria-label="Notifications">${ic('bell')}${n ? `<span class="badge">${n}</span>` : ''}</button>`; },
@@ -957,13 +986,38 @@ function search(q) {
   const hits = Object.values(S.msgs).filter(m => !m.deleted && m.conv && m.text.toLowerCase().includes(q.trim().toLowerCase())).slice(0, 7);
   sr.innerHTML = `<div class="sr-box">${hits.length ? hits.map(m => { const c = conv(m.conv); return `<button class="tray-e" data-act="openConv" data-c="${m.conv}">${av(m.by, 'xs')}<span class="tray-t"><b>${pn(m.by)}</b> <small>${c.kind === 'dm' ? 'Direct message' : '#' + (c.name || c.where)} · ${m.t}${m.edited ? ' · edited' : ''}</small><span>${rich(m.text)}</span></span></button>`; }).join('') : '<p class="sheet-note">Nothing found. Deleted messages are not searchable.</p>'}</div>`;
 }
+/* swipe on a phone: right marks read (Done on a kept row), left uncovers React and Keep. The row itself never leaves under the finger. */
+let sw = null, swallow = false;
+document.addEventListener('pointerdown', e => {
+  swallow = false;
+  if (!isPhone() || e.target.closest('button')) return;
+  const m = e.target.closest('.row-main'), a = m && m.closest('article[data-row]');
+  if (a && !a.classList.contains('gone')) sw = { m, id: a.dataset.row, x: e.clientX, y: e.clientY, dx: 0, on: false };
+});
+document.addEventListener('pointermove', e => {
+  if (!sw) return; sw.dx = e.clientX - sw.x;
+  if (!sw.on && Math.abs(sw.dx) > 8 && Math.abs(sw.dx) > Math.abs(e.clientY - sw.y)) sw.on = true;
+  if (sw.on) { sw.m.style.transition = 'none'; sw.m.style.transform = `translateX(${Math.max(-150, Math.min(120, sw.dx))}px)`; }
+});
+const swEnd = () => {
+  if (!sw) return; const w = sw; sw = null; if (!w.on) return;
+  swallow = true; setTimeout(() => { swallow = false; }, 60); const r = row(w.id); // eat only the click this drag itself produces
+  if (w.dx < -50) S.swipe = w.id; else { S.swipe = null; if (w.dx > 70 && r) { if (r.sec === 'kept') r.done = true; r.read = true; } }
+  render();
+};
+document.addEventListener('pointerup', swEnd); document.addEventListener('pointercancel', swEnd);
 document.addEventListener('click', e => {
+  if (swallow) { swallow = false; return; }
   const el = e.target.closest('[data-act]');
   if (S.pick && !e.target.closest('.picker') && !(el && el.dataset.act === 'pick')) { S.pick = null; if (!el) { render(); return; } }
   if (!el) { if ((S.menu && !e.target.closest('.pop')) || (S.whyOpen && !e.target.closest('.why-pop'))) { S.menu = null; S.whyOpen = null; render(); } return; }
   if (el.dataset.act === 'closeModal' && el.classList.contains('scrim') && e.target.closest('[data-stop]')) return;
   if (el.tagName === 'INPUT' && el.type !== 'checkbox') return;
-  const skip = A[el.dataset.act](el.dataset, e);
+  let an = el.dataset.act, ad = el.dataset;
+  if (an === 'toggle' && isPhone()) { an = 'openConv'; ad = { c: row(ad.id).conv, id: ad.id }; } // on a phone a tap goes straight to the conversation
+  if (S.swipe && !e.target.closest('.sw-under')) { S.swipe = null; if (an === 'openConv' && isPhone()) { render(); return; } }
+  if (e.target.closest('.sw-under')) S.swipe = null;
+  const skip = A[an](ad, e);
   if (!skip) render();
   if (el.dataset.act === 'toggle' && S.exp.has(el.dataset.id)) { // an opened row is ready to answer: its reply box is on screen and, where there is a keyboard, has the cursor
     const inp = document.querySelector(`article[data-row="${el.dataset.id}"] .reply input`);
@@ -971,7 +1025,7 @@ document.addEventListener('click', e => {
   }
   if (el.dataset.act === 'pick' && S.pick && matchMedia('(hover:hover)').matches) { const pi = document.querySelector('.picker input'); if (pi) pi.focus(); }
   if (el.dataset.act === 'applyNew') { const sc = document.querySelector('.feed-scroll'); if (sc) sc.scrollTop = 0; } // you asked for them: go to where they are
-  if (el.dataset.act === 'openConv') { const nl = document.querySelector('.conv .newline'); if (nl) nl.scrollIntoView({ block: 'start' }); }
+  if (an === 'openConv') { const nl = document.querySelector('.conv .newline'); if (nl) nl.scrollIntoView({ block: 'start' }); }
 });
 document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"]')) { e.preventDefault(); e.target.click(); } if (e.key === 'Escape' && (S.modal || S.menu || S.pick)) { S.modal = null; S.menu = null; S.pick = null; render(); } });
 document.addEventListener('submit', e => { e.preventDefault(); submit(e.target); });

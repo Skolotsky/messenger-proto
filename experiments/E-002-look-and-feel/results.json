@@ -632,23 +632,23 @@
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "row expands in place with its six posts",
+  "check": "on a phone a tap opens the conversation at the first new message, and nothing expands",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "expanding marks the row read",
+  "check": "opening the conversation reads the row",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "sending a reply from the row closes the row and shows the reply on it",
+  "check": "a reply in the conversation reads the row",
   "pass": true,
-  "detail": "AL\nAnna Lindqvist\n10:41\nIn Focus: direct message from Anna\nYou: Yes to 3 pm. Legal cleared the terms page yesterday.\nREPLIED"
+  "detail": ""
  },
  {
   "page": "slack-like",
@@ -660,7 +660,14 @@
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "reacting from the row releases the flagged row",
+  "check": "replying releases the flagged row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "phone",
+  "check": "and the row is done",
   "pass": true,
   "detail": ""
  },
@@ -744,7 +751,7 @@
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "expanded row shows the full edit",
+  "check": "the conversation shows the full edit",
   "pass": true,
   "detail": ""
  },
@@ -982,91 +989,42 @@
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "ten messages are one row that says so",
-  "pass": true,
-  "detail": "AL\nAnna Lindqvist\n10 new\n10:41\nIn Focus: direct message from"
- },
- {
-  "page": "slack-like",
-  "width": "phone",
-  "check": "an opened row has its reply box on screen",
-  "pass": true,
-  "detail": "{'x': 12, 'y': 753.5, 'width': 299.765625, 'height': 39.75}"
- },
- {
-  "page": "slack-like",
-  "width": "phone",
-  "check": "expanding shows the six newest messages, after the one before the burst",
+  "check": "no row toolbar on a phone",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "the four earlier new ones are one click above, and the row is read",
+  "check": "a tap opens the conversation at the first new message",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "showing the earlier ones gives all ten in order",
+  "check": "a swipe to the right marks the row read without opening it, and the row stays in place",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "a thread row shows the message that started the thread and the reply before the new ones",
+  "check": "a swipe to the left uncovers React and Keep",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "a reaction can be put on any message in the row",
+  "check": "React from the swipe puts the reaction on the row's message",
   "pass": true,
   "detail": ""
  },
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "clicking your reaction takes it back",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "slack-like",
-  "width": "phone",
-  "check": "the full emoji picker opens from a message, with a search box",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "slack-like",
-  "width": "phone",
-  "check": "searching the picker narrows it",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "slack-like",
-  "width": "phone",
-  "check": "an emoji from the picker lands on that message",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "slack-like",
-  "width": "phone",
-  "check": "a collapsed row takes a reaction without being expanded",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "slack-like",
-  "width": "phone",
-  "check": "one click on the row opens the conversation at the first new message",
+  "check": "Keep from the swipe keeps the row",
   "pass": true,
   "detail": ""
  },
@@ -1759,23 +1717,23 @@
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "row expands in place with its six posts",
+  "check": "on a phone a tap opens the conversation at the first new message, and nothing expands",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "expanding marks the row read",
+  "check": "opening the conversation reads the row",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "sending a reply from the row closes the row and shows the reply on it",
+  "check": "a reply in the conversation reads the row",
   "pass": true,
-  "detail": "AL\nAnna Lindqvist\n10:41\nIn Focus: direct message from Anna\nYou: Yes to 3 pm. Legal cleared the terms page yesterday.\nREPLIED"
+  "detail": ""
  },
  {
   "page": "telegram-like",
@@ -1787,7 +1745,14 @@
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "reacting from the row releases the flagged row",
+  "check": "replying releases the flagged row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "telegram-like",
+  "width": "phone",
+  "check": "and the row is done",
   "pass": true,
   "detail": ""
  },
@@ -1871,7 +1836,7 @@
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "expanded row shows the full edit",
+  "check": "the conversation shows the full edit",
   "pass": true,
   "detail": ""
  },
@@ -2109,91 +2074,42 @@
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "ten messages are one row that says so",
-  "pass": true,
-  "detail": "AL\nAnna Lindqvist\n10:41\nIn Focus: direct message from Anna\nA"
- },
- {
-  "page": "telegram-like",
-  "width": "phone",
-  "check": "an opened row has its reply box on screen",
-  "pass": true,
-  "detail": "{'x': 12, 'y': 735.953125, 'width': 299.765625, 'height': 45.1875}"
- },
- {
-  "page": "telegram-like",
-  "width": "phone",
-  "check": "expanding shows the six newest messages, after the one before the burst",
+  "check": "no row toolbar on a phone",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "the four earlier new ones are one click above, and the row is read",
+  "check": "a tap opens the conversation at the first new message",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "showing the earlier ones gives all ten in order",
+  "check": "a swipe to the right marks the row read without opening it, and the row stays in place",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "a thread row shows the message that started the thread and the reply before the new ones",
+  "check": "a swipe to the left uncovers React and Keep",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "a reaction can be put on any message in the row",
+  "check": "React from the swipe puts the reaction on the row's message",
   "pass": true,
   "detail": ""
  },
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "clicking your reaction takes it back",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "telegram-like",
-  "width": "phone",
-  "check": "the full emoji picker opens from a message, with a search box",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "telegram-like",
-  "width": "phone",
-  "check": "searching the picker narrows it",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "telegram-like",
-  "width": "phone",
-  "check": "an emoji from the picker lands on that message",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "telegram-like",
-  "width": "phone",
-  "check": "a collapsed row takes a reaction without being expanded",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "telegram-like",
-  "width": "phone",
-  "check": "one click on the row opens the conversation at the first new message",
+  "check": "Keep from the swipe keeps the row",
   "pass": true,
   "detail": ""
  },
@@ -2886,23 +2802,23 @@
  {
   "page": "own",
   "width": "phone",
-  "check": "row expands in place with its six posts",
+  "check": "on a phone a tap opens the conversation at the first new message, and nothing expands",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "phone",
-  "check": "expanding marks the row read",
+  "check": "opening the conversation reads the row",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "phone",
-  "check": "sending a reply from the row closes the row and shows the reply on it",
+  "check": "a reply in the conversation reads the row",
   "pass": true,
-  "detail": "AL\nAnna Lindqvist\n10:41\nIn Focus: direct message from Anna\nYou: Yes to 3 pm. Legal cleared the terms page yesterday.\nREPLIED"
+  "detail": ""
  },
  {
   "page": "own",
@@ -2914,7 +2830,14 @@
  {
   "page": "own",
   "width": "phone",
-  "check": "reacting from the row releases the flagged row",
+  "check": "replying releases the flagged row",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "own",
+  "width": "phone",
+  "check": "and the row is done",
   "pass": true,
   "detail": ""
  },
@@ -2998,7 +2921,7 @@
  {
   "page": "own",
   "width": "phone",
-  "check": "expanded row shows the full edit",
+  "check": "the conversation shows the full edit",
   "pass": true,
   "detail": ""
  },
@@ -3236,91 +3159,42 @@
  {
   "page": "own",
   "width": "phone",
-  "check": "ten messages are one row that says so",
-  "pass": true,
-  "detail": "AL\nAnna Lindqvist\n10 new\n10:41\nIn Focus: direct message from"
- },
- {
-  "page": "own",
-  "width": "phone",
-  "check": "an opened row has its reply box on screen",
-  "pass": true,
-  "detail": "{'x': 32, 'y': 751.453125, 'width': 262.765625, 'height': 39.75}"
- },
- {
-  "page": "own",
-  "width": "phone",
-  "check": "expanding shows the six newest messages, after the one before the burst",
+  "check": "no row toolbar on a phone",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "phone",
-  "check": "the four earlier new ones are one click above, and the row is read",
+  "check": "a tap opens the conversation at the first new message",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "phone",
-  "check": "showing the earlier ones gives all ten in order",
+  "check": "a swipe to the right marks the row read without opening it, and the row stays in place",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "phone",
-  "check": "a thread row shows the message that started the thread and the reply before the new ones",
+  "check": "a swipe to the left uncovers React and Keep",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "phone",
-  "check": "a reaction can be put on any message in the row",
+  "check": "React from the swipe puts the reaction on the row's message",
   "pass": true,
   "detail": ""
  },
  {
   "page": "own",
   "width": "phone",
-  "check": "clicking your reaction takes it back",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "own",
-  "width": "phone",
-  "check": "the full emoji picker opens from a message, with a search box",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "own",
-  "width": "phone",
-  "check": "searching the picker narrows it",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "own",
-  "width": "phone",
-  "check": "an emoji from the picker lands on that message",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "own",
-  "width": "phone",
-  "check": "a collapsed row takes a reaction without being expanded",
-  "pass": true,
-  "detail": ""
- },
- {
-  "page": "own",
-  "width": "phone",
-  "check": "one click on the row opens the conversation at the first new message",
+  "check": "Keep from the swipe keeps the row",
   "pass": true,
   "detail": ""
  },

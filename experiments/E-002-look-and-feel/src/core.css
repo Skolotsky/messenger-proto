@@ -303,3 +303,26 @@ button.rx:hover{border-color:var(--accent)}
 .newpill small{font-weight:400;opacity:.85;overflow:hidden;text-overflow:ellipsis}
 .newpill button{background:var(--on-accent);color:var(--accent);border-radius:99px;padding:4px 14px;font-weight:700;font-size:13px}
 .newpill button:hover{opacity:.9}
+/* arrivals bar beside the title */
+.top .newpill{position:static;transform:none;box-shadow:none;flex:none;max-width:none;height:32px;padding:0 3px 0 12px;font-size:13px}
+.top .newpill button{padding:3px 12px}
+.top{min-height:60px}
+/* phone: swipe layers */
+.sw-under{display:none;position:absolute;inset:0;align-items:stretch}
+.sw-l{flex:1;display:flex;align-items:center;gap:8px;padding:0 18px;background:var(--accent);color:var(--on-accent);font-weight:600}
+.sw-r{display:flex}
+.sw-r button{width:72px;display:grid;place-items:center;align-content:center;gap:3px;color:#fff;font-size:12px;font-weight:600}
+.sw-r button:first-child{background:#3d5a80}.sw-r button:last-child{background:#9a5b13}
+@media (max-width:760px){
+  .row-btns,.row-chev{display:none}
+  .sw-under{display:flex}
+  .row-main{touch-action:pan-y;position:relative;z-index:1;background:var(--bg);transition:transform .16s}
+  .row-main:hover{background:var(--bg)}
+  .row.read .row-main{opacity:1}.row.read .row-main>*{opacity:.58}
+  .row.kept.read .row-main>*,.hrow .row-main>*{opacity:1}
+  .row.gone .row-main{background:var(--panel2)}
+  .top .newpill small{display:none}
+  .top .newpill{padding-left:12px;gap:8px}
+}
+@media (max-width:760px){.demo-btn{right:auto;left:0;top:auto;bottom:76px;border-radius:0 6px 6px 0;border:1px solid #666;border-left:0}}
+@media (max-width:760px){.demo{bottom:122px}}

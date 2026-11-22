@@ -38,6 +38,9 @@ def run(browser, slug, size, vp, scale):
         click('[data-act="view"][data-v="feed"]')
     def close_conv():
         if phone and pg.locator(".has-conv").count(): click('[data-act="closeConv"]')
+    def swipe(rid, dx):  # a finger drag across a row, started on its avatar
+        bb = pg.locator(f'article[data-row="{rid}"] .row-main').bounding_box(); x, y = bb["x"] + 30, bb["y"] + 26
+        pg.mouse.move(x, y); pg.mouse.down(); pg.mouse.move(x + dx / 2, y, steps=4); pg.mouse.move(x + dx, y, steps=4); pg.mouse.up()
     def no_overflow(name): ok(f"no sideways scroll: {name}", pg.evaluate("document.documentElement.scrollWidth <= innerWidth"))
 
     # 1. the feed: three buckets, a reason on every row, Focus with New and Kept
@@ -57,32 +60,46 @@ def run(browser, slug, size, vp, scale):
     no_overflow("feed")
 
     # mark one row read without opening it (user, 2026-11-22)
-    bucket("needs"); pg.locator('[data-row="r-triage"] .row-main').hover()
-    click('[data-row="r-triage"] .mark-read')
+    bucket("needs")
+    if phone: pg.locator('article[data-row="r-triage"]').scroll_into_view_if_needed(); swipe("r-triage", 110)
+    else: pg.locator('[data-row="r-triage"] .row-main').hover(); click('[data-row="r-triage"] .mark-read')
     r = pg.locator('[data-row="r-triage"]')
     ok("a row can be marked read without opening it", "read" in r.get_attribute("class").split() and "expanded" not in r.get_attribute("class") and pg.locator(".has-conv").count() == 0)
     bucket("focus")
     # 2. one row per conversation, expanded in place; reply and react from the row
     ok("#incidents is one row for six posts", "6 new" in pg.locator('[data-row="r-inc"]').inner_text() or pg.locator('[data-row="r-inc"] .row-badge').inner_text() == "6")
-    click('[data-row="r-inc"] .row-main')
-    ok("row expands in place with its six posts", pg.locator('[data-row="r-inc"] .row-exp .msg').count() == 6)
-    ok("expanding marks the row read", "read" in pg.locator('[data-row="r-inc"]').get_attribute("class").split())
-    click('[data-row="r-inc"] .row-main')
-    click('[data-row="r-anna"] .row-main')
-    pg.locator('[data-row="r-anna"] .reply input').fill("Yes to 3 pm. Legal cleared the terms page yesterday.")
-    shot("02-row-expanded")
-    pg.locator('[data-row="r-anna"] .reply button').click()
-    ra = pg.locator('article[data-row="r-anna"]')
-    ok("sending a reply from the row closes the row and shows the reply on it", ra.locator(".row-exp").count() == 0 and "Legal cleared" in ra.locator(".row-preview").inner_text() and "replied" in ra.inner_text().lower() and "read" in ra.get_attribute("class").split(), ra.inner_text()[:160])
-    shot("02b-replied")
+    if phone:  # a tap goes straight to the conversation; nothing expands
+        click('[data-row="r-inc"] .row-main')
+        ok("on a phone a tap opens the conversation at the first new message, and nothing expands", pg.locator(".has-conv").count() == 1 and pg.locator(".row-exp").count() == 0 and pg.locator(".conv .newline").is_visible())
+        shot("02-row-expanded"); close_conv()
+        ok("opening the conversation reads the row", "read" in pg.locator('article[data-row="r-inc"]').get_attribute("class").split())
+        click('[data-row="r-anna"] .row-main'); pg.locator(".composer input").fill("Yes to 3 pm. Legal cleared the terms page yesterday."); pg.locator(".composer .reply button").click(); close_conv()
+        ok("a reply in the conversation reads the row", "read" in pg.locator('article[data-row="r-anna"]').get_attribute("class").split())
+        click('[data-row="r-rc"] .row-main'); t = pg.locator(".conv").inner_text()
+        ok("agent flag asks for approval and shows it is waiting", "approval" in t and "Waiting on Maya" in t)
+        pg.locator(".composer input").fill("Approved. Roll it out."); pg.locator(".composer .reply button").click()
+        ok("replying releases the flagged row", "Continuing" in pg.locator(".conv").inner_text()); close_conv()
+        ok("and the row is done", "done" in pg.locator('article[data-row="r-rc"]').get_attribute("class").split())
+    else:
+        click('[data-row="r-inc"] .row-main')
+        ok("row expands in place with its six posts", pg.locator('[data-row="r-inc"] .row-exp .msg').count() == 6)
+        ok("expanding marks the row read", "read" in pg.locator('[data-row="r-inc"]').get_attribute("class").split())
+        click('[data-row="r-inc"] .row-main')
+        click('[data-row="r-anna"] .row-main')
+        pg.locator('[data-row="r-anna"] .reply input').fill("Yes to 3 pm. Legal cleared the terms page yesterday.")
+        shot("02-row-expanded")
+        pg.locator('[data-row="r-anna"] .reply button').click()
+        ra = pg.locator('article[data-row="r-anna"]')
+        ok("sending a reply from the row closes the row and shows the reply on it", ra.locator(".row-exp").count() == 0 and "Legal cleared" in ra.locator(".row-preview").inner_text() and "replied" in ra.inner_text().lower() and "read" in ra.get_attribute("class").split(), ra.inner_text()[:160])
+        shot("02b-replied")
 
-    # 4. an agent's flag asking for approval; react from the row releases it
-    click('[data-row="r-rc"] .row-main')
-    t = pg.locator('[data-row="r-rc"] .row-exp').inner_text()
-    ok("agent flag asks for approval and shows it is waiting", "approval" in t and "Waiting on Maya" in t and pg.locator('[data-row="r-rc"] .tag.flag').count() > 0)
-    click('[data-row="r-rc"] [data-act="react"][data-e="✅"]')
-    ok("reacting from the row releases the flagged row", "done" in pg.locator('[data-row="r-rc"]').get_attribute("class").split() and "Continuing" in pg.locator('[data-row="r-rc"] .row-exp').inner_text())
-    click('[data-row="r-rc"] .row-main')
+        # 4. an agent's flag asking for approval; react from the row releases it
+        click('[data-row="r-rc"] .row-main')
+        t = pg.locator('[data-row="r-rc"] .row-exp').inner_text()
+        ok("agent flag asks for approval and shows it is waiting", "approval" in t and "Waiting on Maya" in t and pg.locator('[data-row="r-rc"] .tag.flag').count() > 0)
+        click('[data-row="r-rc"] [data-act="react"][data-e="✅"]')
+        ok("reacting from the row releases the flagged row", "done" in pg.locator('[data-row="r-rc"]').get_attribute("class").split() and "Continuing" in pg.locator('[data-row="r-rc"] .row-exp').inner_text())
+        click('[data-row="r-rc"] .row-main')
 
     # 3. a flag that names the viewer, read and therefore kept; Done on it
     r = pg.locator('[data-row="r-go"]')
@@ -116,9 +133,10 @@ def run(browser, slug, size, vp, scale):
     shot("04-edited-and-deleted")
     # the longer text sits behind an expander that never opens by itself
     click('[data-row="r-export"] .row-main')
-    body = pg.locator('[data-row="r-export"] .row-exp .msg-body')
-    ok("expanded row shows the full edit", "streaming writer" in body.inner_text())
-    click('[data-row="r-export"] [data-act="openConv"]')
+    if phone: ok("the conversation shows the full edit", "streaming writer" in pg.locator('[data-k="conv:t1"] .msg-body').inner_text())
+    else:
+        ok("expanded row shows the full edit", "streaming writer" in pg.locator('[data-row="r-export"] .row-exp .msg-body').inner_text())
+        click('[data-row="r-export"] [data-act="openConv"]')
     # the same edit watched inside a conversation is checked on a fresh page in conv_edit below
     close_conv()
 
@@ -126,7 +144,7 @@ def run(browser, slug, size, vp, scale):
     feed(); bucket("focus")
     n = pg.locator(".row").count(); y = top(".row")
     demo("playNew")
-    ok('"3 new" appears and nothing in the list moves', vis(".newpill b").inner_text() == "3 new" and "1 in Focus" in vis(".newpill").inner_text() and vis(".newpill button").inner_text() == "Show" and pg.locator(".row").count() == n and abs(top(".row") - y) < 0.5)
+    ok('"3 new" appears and nothing in the list moves', vis(".newpill b").inner_text() == "3 new" and ("1 in Focus" in vis(".newpill").inner_text() or (phone and slug == "slack-like")) and vis(".newpill button").inner_text() == "Show" and pg.locator(".row").count() == n and abs(top(".row") - y) < 0.5)
     shot("05-three-new")
     click(".newpill button")
     shot("05b-new-applied")
@@ -283,6 +301,33 @@ def bursts(browser, slug, size, vp, scale):
     def ok(name, cond, detail=""):
         results.append({"page": slug, "width": size, "check": name, "pass": bool(cond), "detail": str(detail)})
         if not cond: failures.append(f"{slug} @ {size}: {name} {detail}")
+    if size == "phone":  # no expanding on a phone: a tap opens the conversation, a swipe gives the quick actions
+        def drag(rid, dx, release=True):
+            pg.evaluate("id => document.querySelector(`article[data-row='${id}']`).scrollIntoView({block: 'center'})", rid)
+            bb = pg.locator(f'article[data-row="{rid}"] .row-main').bounding_box(); x, y = bb["x"] + 30, bb["y"] + 26
+            pg.mouse.move(x, y); pg.mouse.down(); pg.mouse.move(x + dx / 2, y, steps=4); pg.mouse.move(x + dx, y, steps=4)
+            if release: pg.mouse.up()
+        ok("no row toolbar on a phone", pg.locator(".row-btns").locator("visible=true").count() == 0)
+        pg.locator('article[data-row="r-anna"] .row-main').click(position={"x": 24, "y": 24})
+        ok("a tap opens the conversation at the first new message", pg.locator(".has-conv").count() == 1 and pg.locator(".conv .newline").is_visible() and pg.locator(".row-exp").count() == 0)
+        pg.locator('[data-act="closeConv"]').locator("visible=true").first.click()
+        if slug == "telegram-like": pg.locator('[data-act="btab"][data-b="needs"]').click()
+        pg.evaluate("document.querySelector(`article[data-row='r-check']`).scrollIntoView({block: 'center'})")
+        y0 = pg.locator('article[data-row="r-export"]').bounding_box()["y"]
+        drag("r-check", 100, release=False)
+        pg.screenshot(path=str(shots / f"{slug}-{size}-22-swipe-right.jpg"), type="jpeg", quality=80)
+        pg.mouse.up()
+        r = pg.locator('article[data-row="r-check"]')
+        ok("a swipe to the right marks the row read without opening it, and the row stays in place", "read" in r.get_attribute("class").split() and pg.locator(".has-conv").count() == 0 and abs(pg.locator('article[data-row="r-export"]').bounding_box()["y"] - y0) < 0.5)
+        drag("r-export", -120)
+        ok("a swipe to the left uncovers React and Keep", pg.locator('article[data-row="r-export"] .sw-r button').locator("visible=true").count() == 2 and "unread" in pg.locator('article[data-row="r-export"]').get_attribute("class").split())
+        pg.screenshot(path=str(shots / f"{slug}-{size}-23-swipe-left.jpg"), type="jpeg", quality=80)
+        pg.locator('article[data-row="r-export"] .sw-r [data-act="pick"]').click()
+        pg.locator('.picker [data-e="👍"]').first.click()
+        ok("React from the swipe puts the reaction on the row's message", "You" in pg.locator('article[data-row="r-export"] .rxs').inner_text() and pg.locator(".has-conv").count() == 0)
+        drag("r-sso", -120); pg.locator('article[data-row="r-sso"] .sw-r [data-act="keep"]').click()
+        ok("Keep from the swipe keeps the row", "Kept" in pg.locator('article[data-row="r-sso"]').inner_text() or "KEPT" in pg.locator('article[data-row="r-sso"]').inner_text())
+        ctx.close(); return
     row = pg.locator('article[data-row="r-anna"]')
     ok("ten messages are one row that says so", pg.locator('article[data-row="r-anna"]').count() == 1 and ("10 new" in row.inner_text() or row.locator(".row-badge").inner_text() == "10"), row.inner_text()[:60])
     row.locator(".row-main").click(position={"x": 24, "y": 24})
