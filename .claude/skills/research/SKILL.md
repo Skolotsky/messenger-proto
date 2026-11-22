@@ -1,7 +1,6 @@
 ---
 name: research
 description: Research phase. Investigate a question (established practice, prior art, constraints, options) before experimenting or deciding, and file the findings as a short sourced note in docs/research/. Use when the user asks to research, look into or find out something, or when a decision lacks evidence.
-argument-hint: "<question to investigate>"
 ---
 
 # Research

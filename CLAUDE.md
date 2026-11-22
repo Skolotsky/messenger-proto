@@ -3,7 +3,7 @@
 A prototype of a real-time team messaging system: the messaging experience, an activity feed, and reliable delivery of message changes to independent systems.
 
 - **The goal, verbatim:** `docs/brief.md`. Every proposal is measured against it. It changes only with the user's approval.
-- **Current state:** the board, decision index and guardrails are imported at the bottom of this file. Trust them over recollection of earlier sessions.
+- **Current state:** the brief, board, decision index and guardrails are imported at the bottom of this file. Trust them over recollection of earlier sessions.
 
 ## Working agreement
 
@@ -41,7 +41,7 @@ The `board` skill shows where things stand and manages tasks, for example when t
 
 - `tasks/board.md` is the only place task status lives: Now, Waiting on user, Next, Backlog. Order is priority. Finished work moves to `tasks/done.md` with how it was verified.
 - Every piece of work the user would want to know about is a `T-nnn` item tagged with its phase. Small steps inside a task are not.
-- One item in Now per agent. Finish it or park it before starting another.
+- One item in Now per agent. Finish it, or park it (move it back to Next with a note on where it stopped), before starting another.
 - Update the board when work starts, when it becomes blocked on the user, and when it is done, not at the end of the session.
 - A task that touches a contract, a guarantee or a user-facing flow gets a detail file `tasks/T-nnn-slug.md` (outcome, acceptance criteria, verification plan, log, evidence) before coding starts. A smaller task states its acceptance check in its board line.
 - Everything traces: task → decision → research or experiment; guardrail → decision → check.
@@ -77,6 +77,7 @@ WSL2 Ubuntu. Present as of 2026-11-22: git, Docker, Python 3.12, gh, jq, make. N
 
 ## Current state
 
+@docs/brief.md
 @tasks/board.md
 @docs/decisions/README.md
 @docs/guardrails.md

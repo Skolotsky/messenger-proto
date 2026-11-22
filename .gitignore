@@ -16,15 +16,6 @@ Thumbs.db
 .claude/worktrees/
 CLAUDE.local.md
 
-# Dependencies and build output (extend once the stack is chosen)
-node_modules/
-dist/
-build/
-coverage/
-__pycache__/
-*.pyc
-.venv/
-.pytest_cache/
 
 # Logs and scratch
 *.log

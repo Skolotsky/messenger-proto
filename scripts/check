@@ -17,6 +17,15 @@ for f in CLAUDE.md docs/brief.md tasks/board.md tasks/done.md docs/decisions/REA
   if [ -s "$f" ]; then pass "$f present"; else fail "$f is missing or empty"; fi
 done
 
+# The brief is the fixed yardstick (G-001). It changes only with the user's approval.
+brief_sum="bf6c51f7b6a434d4b84b1a284277e3f52ba485676699e49da08840a8c4c598cb"
+if [ "$(sha256sum docs/brief.md 2>/dev/null | cut -d' ' -f1)" = "$brief_sum" ]; then pass "the brief is unchanged"; else fail "docs/brief.md differs from the approved text. Restore it, or with the user's approval update brief_sum in scripts/check"; fi
+
+# The pre-commit hook is switched on in this clone (G-002).
+if [ -d .git ] || [ -f .git ]; then
+  if [ "$(git config core.hooksPath 2>/dev/null)" = ".githooks" ]; then pass "pre-commit hook is switched on"; else fail "pre-commit hook is off. Run: git config core.hooksPath .githooks"; fi
+fi
+
 # A task lives in exactly one place: the board or the done log.
 dupes=$(cat tasks/board.md tasks/done.md 2>/dev/null | grep -oE '\*\*T-[0-9]+\*\*' | sort | uniq -d | tr -d '*' | tr '\n' ' ')
 if [ -z "$dupes" ]; then pass "task IDs are unique across board and done log"; else fail "task listed more than once: $dupes"; fi
@@ -64,8 +73,8 @@ done
 [ "$broken" -eq 0 ] && pass "skills and agents have frontmatter"
 
 # Visuals must open anywhere: no external scripts or stylesheets.
-external=$(grep -lE '<script[^>]+src=|<link[^>]+rel="?stylesheet' docs/visuals/*.html 2>/dev/null | tr '\n' ' ')
-if [ -z "$external" ]; then pass "visuals are self-contained"; else fail "visuals load external scripts or stylesheets: $external"; fi
+external=$(grep -liE "(src|href)=[\"']?(https?:)?//|url\\([\"']?(https?:)?//|@import" docs/visuals/*.html 2>/dev/null | tr '\n' ' ')
+if [ -z "$external" ]; then pass "visuals are self-contained"; else fail "visuals reference external files (scripts, styles, images, links): $external. Inline them; put source links in the research note instead"; fi
 
 # ---------------------------------------------------------------------------
 # Product checks (lint, types, tests, guardrail tests) are added here once the

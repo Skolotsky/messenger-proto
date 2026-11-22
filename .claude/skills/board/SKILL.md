@@ -1,7 +1,6 @@
 ---
 name: board
 description: Show where the project stands and manage tasks - current phase, what is in progress, what is waiting on the user, what is next, recent results. Use when the user asks for status, what is next, what is open or blocked, where we are, or wants to add, reorder, park or drop tasks.
-argument-hint: "[what to show or change]"
 ---
 
 # Board

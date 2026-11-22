@@ -1,7 +1,6 @@
 ---
 name: visual
 description: Build a self-contained HTML visual that makes complexity and choices visible to the user - system maps, flows, step-by-step walk-throughs, option comparisons, decision briefs, annotated snippets. Use whenever an explanation has structure (a flow, a boundary, a trade-off, steps over time), before asking for a decision, or when the user asks to see, show, draw or explain something.
-argument-hint: "<what to make visible>"
 ---
 
 # Visual

@@ -1,7 +1,6 @@
 ---
 name: decide
 description: Decision phase. Prepare one decision for the user (why now, options, risks, best practice, recommendation), get their call, and record it in docs/decisions/. Use when a choice about product behaviour, system shape, a contract between services or a quality guarantee is needed, when something expensive to reverse comes up, or when the user asks what the options are.
-argument-hint: "<the decision to prepare>"
 ---
 
 # Decide
@@ -28,8 +27,8 @@ The user decides product behaviour, system shape, contracts and qualities. Your 
    - what best practice says
    - your recommendation, the reason, and what it locks in
 
-   Then ask one question. Move the board item to "Waiting on user".
-5. **Record the outcome.** Set status `accepted`, write down the user's choice and their reasoning (in their words where it differs from yours), update the index line, and list the follow-ups: guardrails to form, tasks to add.
+   Then ask one question. Set the index line to `proposed` and move the board item to "Waiting on user".
+5. **Record the outcome.** Set status `accepted`, write down the user's choice and their reasoning (in their words where it differs from yours), update the index line, and list the follow-ups: guardrails to form, tasks to add. Move the board item to `tasks/done.md`.
 6. **If they choose against your recommendation,** state the risk once, then commit to their choice fully.
 
 ## Standards

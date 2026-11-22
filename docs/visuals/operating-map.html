@@ -125,7 +125,7 @@ code { font: 0.88em var(--mono); background: var(--sunken); border: 1px solid va
 figure { margin: 0; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
 figcaption { font-size: 13px; color: var(--ink-3); max-width: 68ch; }
 .diagram .scroll { overflow-x: auto; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; }
-.diagram svg { display: block; min-width: 560px; width: 100%; height: auto; color: var(--ink-3); font-family: var(--font); }
+.diagram svg { display: block; min-width: 680px; width: 100%; height: auto; color: var(--ink-3); font-family: var(--font); }
 .diagram .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
 .diagram .box-you { fill: var(--you-soft); stroke: var(--you); stroke-width: 1.25; }
 .diagram .box-agent { fill: var(--agent-soft); stroke: var(--agent); stroke-width: 1.25; }
@@ -171,7 +171,7 @@ details > .stack { gap: 10px; }
     <div class="head first">Phase · you might say</div><div class="head you">You</div><div class="head agent">Agent</div>
 
     <div class="phase"><strong>Research</strong><span class="say">“Look into how others handle this”</span></div>
-    <div class="you">Name the question, or approve one the agent proposes.</div>
+    <div class="you">Name the question. Read a short answer.</div>
     <div class="agent">Reads primary sources, separates established practice from opinion, files a one-page note with sources.</div>
 
     <div class="phase"><strong>Experiment</strong><span class="say">“Try it and measure”</span></div>
@@ -230,13 +230,13 @@ details > .stack { gap: 10px; }
 
 <section>
   <h2>What a decision request looks like</h2>
-  <p>Always one topic, always the same five parts. This is a real one: the first decision the agent needs from you.</p>
+  <p>Always one topic, always the same five parts. This is a real one, decided on 2026-11-22.</p>
   <div class="brief">
-    <div class="label">Example · how commits happen</div>
-    <p><strong>Why now.</strong> The repository is initialised and nothing is committed yet. Once work starts, something will be finished and verified many times a day.</p>
+    <div class="label">Example · how commits happen · decided: A</div>
+    <p><strong>Why now.</strong> Once work starts, something will be finished and verified many times a day.</p>
     <div class="options">
       <div class="option pick">
-        <header><h3>A. The agent commits at verified checkpoints</h3><span class="chip ok">Recommended</span></header>
+        <header><h3>A. The agent commits at verified checkpoints</h3><span class="chip ok">Chosen</span></header>
         <dl>
           <dt>Upside</dt><dd>Every verified step is a restore point. You are not interrupted about code you do not review.</dd>
           <dt>Risk</dt><dd>A commit lands without your eyes on it. Limited by the check that must pass first, and nothing is pushed without asking.</dd>
@@ -306,7 +306,7 @@ details > .stack { gap: 10px; }
         <tr><td>Acceptance criteria are agreed before building</td><td>Success declared against a moving target</td></tr>
         <tr><td>Tests sit at service boundaries and inject the failure</td><td>Reliability that only works on a good day</td></tr>
         <tr><td>A separate verifier agent checks significant work</td><td>The builder grading its own work</td></tr>
-        <tr><td>Rules live in tooling: <code>./scripts/check</code> runs on every commit, and the brief cannot be edited without your approval</td><td>Rules that depend on the agent remembering them</td></tr>
+        <tr><td>Rules live in tooling: <code>./scripts/check</code> runs on every commit, and the project check fails if the brief's text changes</td><td>Rules that depend on the agent remembering them</td></tr>
         <tr><td>Every report says what was verified, what was not, and what was skipped</td><td>Silent gaps</td></tr>
       </tbody>
     </table>
@@ -357,7 +357,7 @@ details > .stack { gap: 10px; }
 </details>
 
 <footer class="foot">
-  <span>Source of truth: <code>CLAUDE.md</code>. This page is a snapshot and is redrawn when the way of working changes.</span>
+  <span>Source of truth: <code>CLAUDE.md</code>. This page is a snapshot of 2026-11-22.</span>
   <span>Practices behind this setup: <code>docs/research/R-001-agentic-development-practices.md</code></span>
 </footer>
 </main>

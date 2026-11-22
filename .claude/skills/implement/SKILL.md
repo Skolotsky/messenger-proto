@@ -1,7 +1,6 @@
 ---
 name: implement
 description: Implementation phase. Build one task to its acceptance criteria - agree what done looks like, write the checks, implement in small steps, verify against the real system, record evidence, commit. Use when the user asks to build, implement, fix or change product code, or to pick up the next task from the board.
-argument-hint: "<task ID, or what to build>"
 ---
 
 # Implement

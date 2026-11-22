@@ -6,5 +6,5 @@ Types: `quality` (a measurable target) · `contract` (what one service promises 
 
 | ID | Type | Guardrail | From | Enforced by | Status |
 |----|------|-----------|------|-------------|--------|
-| G-001 | process | The brief (`docs/brief.md`) changes only with the user's approval | setup | `permissions.ask` rule in `.claude/settings.json` (not yet seen working: T-003) | pending |
-| G-002 | process | Every commit passes `./scripts/check` | setup | git pre-commit hook in `.githooks/` | enforced |
+| G-001 | process | The brief (`docs/brief.md`) changes only with the user's approval | setup | checksum of the brief in `./scripts/check`; also a `permissions.ask` rule in `.claude/settings.json` (not yet seen working: T-003) | enforced |
+| G-002 | process | Every commit passes `./scripts/check` | setup | git pre-commit hook in `.githooks/`; `./scripts/check` fails if the hook is not switched on | enforced |

@@ -1,7 +1,6 @@
 ---
 name: guardrails
 description: Guardrails phase. Turn accepted decisions into enforceable checks before implementation (contracts between services, invariants, measurable quality targets, architecture rules), each tied to a test or hook that fails when it is broken. Use after decisions are accepted and before building, or when the user asks how a guarantee or quality will be protected.
-argument-hint: "<decision IDs or the area to protect>"
 ---
 
 # Guardrails
@@ -12,7 +11,7 @@ A decision the code can silently drift away from is only a wish. A guardrail mak
 
 ## Procedure
 
-1. **Collect** the accepted decisions in scope and what each one promises: a contract between services, an invariant, a quality target, a structural rule.
+1. **Collect** the accepted decisions in scope (add a board item, `T-nnn` `guardrails`, and move it to `tasks/done.md` when the user has reviewed the list) and what each one promises: a contract between services, an invariant, a quality target, a structural rule.
 2. **Write the contract** for each service boundary in `docs/contracts/` (format in `docs/contracts/README.md`). Plain language first, schema second.
 3. **State each guardrail** as one checkable sentence a non-coder can read. For example: "a payment is never charged twice, even when the request is retried".
 4. **Choose the strongest enforcement that fits,** in this order:

@@ -1,7 +1,6 @@
 ---
 name: validate
 description: Validation phase. Independently check what has been built against the brief, the contracts and the guardrails, using the real running system, and turn the findings into tasks. Use after a milestone or a group of tasks, before showing the product to anyone, or when the user asks whether something really works, asks for a quality review, or wants a validation iteration.
-argument-hint: "<scope: a task, a flow, a contract, or all>"
 ---
 
 # Validate
@@ -14,7 +13,7 @@ Implementation proves the builder's own understanding. Validation asks a differe
 
 1. **Define the round.** The scope, and the yardsticks in play: lines of the brief, contracts, guardrails, acceptance criteria. Add a board item (`T-nnn` `validate`) under Now.
 2. **Run `./scripts/check` first.** If it fails, that is the first finding.
-3. **Hand to the `verifier` agent** with the scope, the yardstick files and how to run the system. Do not pass on your implementation reasoning or your opinion of what works. It judges against the yardsticks and skips style. For a broad scope, run several verifiers in parallel on separate angles:
+3. **Hand to the `verifier` agent** with the scope, the yardstick files and how to run the system. Do not pass on your implementation reasoning or your opinion of what works. It judges against the yardsticks and skips style. If that agent type is not available in the session, give a general agent the same hand-over and have it read `.claude/agents/verifier.md` first. For a broad scope, run several verifiers in parallel on separate angles:
    - the product as a person would use it: flows, edge cases, craft
    - contracts and guarantees under failure: slow, down, duplicate, out of order
    - the brief line by line: met, partly met, not met

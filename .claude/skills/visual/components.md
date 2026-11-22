@@ -112,7 +112,7 @@ Size by `viewBox`. Text 11 to 13px. Label every arrow with what moves or happens
 <figure class="snippet">
   <pre><code>{
   "id": "evt_01",
-  <mark>"idempotency_key": "msg_42:v3"</mark>
+  <mark>"retry_after_seconds": 30</mark>
 }</code></pre>
   <figcaption>What the highlighted line is for.</figcaption>
 </figure>

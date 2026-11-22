@@ -1,7 +1,6 @@
 ---
 name: experiment
 description: Experiment phase. Run a small, time-boxed spike that settles one uncertain technical or product question with evidence, in an isolated folder under experiments/. Use when research leaves a question only trying it can answer, or when the user asks to try, prototype, measure or compare something.
-argument-hint: "<question to settle>"
 ---
 
 # Experiment
