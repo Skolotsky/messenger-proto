@@ -19,6 +19,7 @@ Every place the design knowingly cuts a corner, with what the full answer would 
 | After a fenced change is fixed, the whole feed is rebuilt, not only the fenced part | Seconds at this size, and exact | Rebuild one conversation or one reader in place |
 | A rebuild replays the whole log | Fast at this size (to be measured) | Snapshots and replay from a checkpoint |
 | One copy of each part | A local demonstration | Several, with failover |
+| One PostgreSQL is a single point of failure. Not built | A local demonstration; nothing saved is lost while its disk survives, but everything waits while it is down | A standby that confirms each write and takes over automatically |
 | Every post writes a feed row per affected reader | Channels of 30 | Work out large channels when the feed is read |
 | No encryption between parts, no rate limits except on agents | Everything is local | Both |
 | Edit history, undoing a delete, snooze, do-not-disturb, email, digests (D-003, D-004, D-012) | Outside the bet | Product work |

@@ -98,6 +98,7 @@ Order on the board is priority. "Needs" is what must be merged first. Packages i
 
 **T-053 Conversations: live connection, reading through the door, housekeeping.** Needs T-046. The WebSocket with numbered updates, `after`, `last_sent`, resume, "too far behind"; the door's questions to the feed and to search with notices when behind; the 5-second check; watching per connection with leases; clock ticks; the nudge's receiving end.
 - Guardrails owned: G-024 (watching), the server half of G-015 and G-019.
+- Acceptance (architecture note, 2026-11-22): a copy of Conversations pushes to screens only what it reads from the organization's change log, in number order, with one reader per organization. The handler that saved a change only wakes that reader and never hands it the update. Reason: two saves commit in order but can reach the hub swapped, and a screen ignores a lower number, which loses a message silently. G-015's test gets a case that forces two saves of one organization to reach the hub out of order; it must fail for a hub that sends what handlers hand it.
 
 **T-054 Conversations: the agent door.** Needs T-046. Events per agent kept 7 days; posts with IDs; replies in progress (start, pieces, finish, closed as "stopped"); the limits.
 - Guardrails owned: G-016, G-017, G-018.
@@ -107,6 +108,7 @@ Order on the board is priority. "Needs" is what must be merged first. Packages i
 
 **T-056 Web app: writing, going wrong, search, staying current.** Needs T-050. Mentions, edit in place, delete that asks; offline, waiting and failed actions with IDs and order; search results; the live client: numbered updates, resume, reload when too far behind.
 - Guardrails owned: the screen half of G-015; tests for D-024 and T-038 points 20 to 26.
+- Acceptance (architecture note, 2026-11-22): the reconnect pause (0.1 s doubling to 1 s) gets random variation, so a whole organization does not reconnect in the same instant when a copy dies. The varied pause never exceeds its step, so the contract's 1 s ceiling and the 2 s catch-up still hold. Test with a seeded random source.
 
 ### Wave 3, joining up
 
