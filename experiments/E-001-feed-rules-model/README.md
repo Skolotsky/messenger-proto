@@ -1,8 +1,10 @@
 # E-001: Do the accepted feed rules hold together, and does Focus stay short in a busy team?
 
+_Three runs on 2026-11-22. The first found a hole and a list of unstated cases, which became D-011 and D-013. The second confirmed the hole closed. The third added D-012, D-014, D-015 and D-016. `results.txt` and `results.json` hold the third run; this note reports it and keeps the first run's key numbers as the evidence for those decisions._
+
 - Date: 2026-11-22
 - Time box: one working session
-- Feeds: the product decisions D-001, D-003, D-004 (are they complete and free of contradictions?); its findings became D-011, D-012 and D-013
+- Feeds: the product decisions D-001, D-003, D-004 and D-011 to D-016 (are they complete and free of contradictions?); its findings became D-011, D-012 and D-013
 - Visual: `docs/visuals/E-001-feed-rules-model.html`
 
 ## Hypothesis
@@ -33,70 +35,89 @@ The traffic numbers (messages per person, how often people mention, flag, edit, 
 
 ## Result
 
-**Read this first.** The findings below led to two decisions the same day, D-011 (a flag has no state of its own) and D-013 (the readings the model needed). The model, the scenarios and the simulation were then changed to match and rerun; `results.txt` and `results.json` hold that second run. The section "After D-011 and D-013" at the end gives its numbers. Everything between here and there describes the first run, under the rules as first accepted, and is kept because it is the evidence for those two decisions.
-
-Run on 2026-11-22, Python 3.12, `./experiments/E-001-feed-rules-model/run.sh`, about 40 seconds. Raw output: `results.txt`, `results.json`. Two runs give identical output.
+Third run, 2026-11-22, Python 3.12, `./experiments/E-001-feed-rules-model/run.sh`, about a minute. Two runs give identical output.
 
 ### Do the rules hold together?
 
-- **92 scripted cases** behave as the decision records say (`scenarios.py`).
-- **No invariant broken** in six variants and five further seeds, about 150,000 events in all: one item in one place; your own messages never; Info never above For your information; streaming text never; a deleted message never shown live; what names you always gets through; an open flag that names you always in Focus; an open flag for everyone present for everyone in scope; reactions never above For your information; no marker for something never seen; every delete and every text-only edit matches the D-004 table. One invariant was seen failing during development (an edit turning a read message into Info left it above For your information), which was a fault in the model, since fixed.
-- **One hole: a flag nobody answers never leaves.** D-003 gives a flagged row one way out, the flag closing. In the base run 19 flags that named nobody and 18 that named a person were never answered in ten days. The first kind sits in Needs you for everyone in scope: the average person had 4.4 such rows by day ten (2.5 to 4.8 across seeds), and the Needs you list a person meets grows from 3.3 rows (days 1-2) to 7.2 (days 9-10). With the single change "a flag that names nobody leaves once read" it stays flat, 2.9 to 3.3. The second kind sits in Focus under "waiting on you": one person reached 17 (10 to 22 across seeds). The person has no way to say "not mine".
-- **Behaviours the decisions do not state**, which the model had to invent. Each is named in `model.py` (`RULING_TEXT`) and counted. In the base run, most frequent first: where a read, still-open flag sits in Focus (R17, 560 times); whether any reply in the thread answers a flag (R07, 248); reactions to your message when the thread is off or the channel muted (R18, 172); new activity on a kept row (R16, 160); what "All activity" does with items addressed to you (R26, 91); whether deleting your own message removes you from its thread (R27, 42). Rarer ones: R03, R04, R05, R06, R08, R09, R10, R12, R13, R19, R22 to R25, R28 to R33.
-- **One stated rule worth confirming.** D-001 says a muted channel lets through "only what names you". As written, that silences replies in threads you started or replied in there. It came up 306 times in the base run (N01).
-- **Not modelled because nothing is decided:** which feed items send a notification, and where a sender sees the state of a flag they sent.
+- **123 scripted cases** behave as the decision records say.
+- **No invariant broken** in five variants and five further seeds, about 130,000 events. Checked: one item in one place; your own messages never; Info never above For your information; streaming text never; a deleted message never shown live; what names you always arrives; a row kept by a flag only while that flag exists and names you; reactions never put a row in Focus; an answer by reaction always in Needs you; no marker for something never seen; no notification for a For your information item or an Info message; every delete matches the D-004 table; a text-only edit moves nothing; someone else's message never releases a row a flag kept for you; a dial or rule change never moves a row already read.
+- **The invariants are weaker than that list suggests.** The second independent check changed the model in seven wrong ways in a copy (for example "Info notifies", "another person's reply clears your flag"), and the simulation's invariants caught none; the scripted cases caught five. Four invariants were added afterwards and not tested the same way. Treat the scripted cases as the stronger evidence.
+- **The hole found in the first run is closed** (D-011). Then: a flag nobody answered never left, and the Needs you list a person met grew from 3.3 rows to 7.2 over ten days. Now it is 3.5 (days 1-2), 3.9 (days 5-6), 4.4 (days 9-10); across seeds its mean is 3.7 to 3.9 and nine visits in ten show 8 rows or fewer. The slight rise in this seed is within what other seeds show.
 
 ### Does Focus stay short?
 
-Base run: 13,466 messages in ten working days, 35% written by agents.
+Base run: 13,442 messages in ten working days, 35% written by agents.
 
-| Per person | Focus | Needs you | For your information | One single list |
+| Per person | Focus | Needs you | For your information |
+|---|---|---|---|
+| Rows that first arrive there, per day | 4.4 | 19.8 | 14.6 |
+| of which from agents | 0.2 | 2.2 | 2.9 |
+| Waiting at a visit, mean | 0.5 new, 1.1 kept | 3.9 | 2.2 |
+| Waiting at a visit, 9 visits in 10 at most | 1 new, 3 kept | 9 | 5 |
+
+- A single list would get 38.8 rows a day; Focus gets about one in nine (4.2 to 4.5 against 37.3 to 38.4 across seeds).
+- Kept in Focus, by the person or by a flag: 1.1 rows on average, 7 at most. This assumes a person presses Done within a day or two on a flag they will not answer.
+- The on-call support person with two channels in Focus meets about 3 new Focus rows at a visit, because a burst of alerts is one row.
+- Without Info (agents post progress as ordinary messages), rows arriving in Needs you from agents roughly double.
+- With "any direct mention" as a starting Focus rule, Focus gets about 7 rows a day.
+
+### Notifications (D-012)
+
+Per person per day, counting one notification when a row becomes unread in a notifying bucket and one more if it moves up into Focus:
+
+| Policy | Base | Across seeds | Half traffic | Double traffic |
 |---|---|---|---|---|
-| New rows per day | 4.4 | 15.5 | 17.8 | 37.7 |
-| of which from agents | 0.2 | 2.0 | 2.9 | |
-| Waiting at a visit, mean | 0.5 new, 0.7 waiting, 1.0 kept | 5.5 | 3.0 | |
-| Waiting at a visit, 9 visits in 10 at most | 2 new | 14 | 7 | |
+| Everything | 41.2 | | 20.7 | 77.8 |
+| Focus and Needs you (accepted default) | 29.3 | 27.6 to 29.0 | 14.6 | 54.3 |
+| Focus only (the personal switch) | 5.3 | 5.0 to 5.2 | 2.7 | 10.0 |
 
-- Focus receives about one row in nine of what a single list would hold (4.3 to 4.6 against 36.9 to 38.5 across seeds).
-- The on-call support person with two channels in Focus gets 17.5 Focus rows a day and meets 2.7 new ones at a visit (10 at most), because a burst of 15 alerts is one row.
-- Agents write a third of the messages and cause 0.2 of the 4.4 new Focus rows a day. Without Info (agents post progress as ordinary messages) agent items in Needs you go from 1,074 to 4,738 over the run, and new Needs you rows per person per day from 15.5 to 18.6.
-- With "any direct mention" as a starting Focus rule (the user's first proposal) Focus receives 7.1 rows a day instead of 4.4, and a person meets 1.1 new rows instead of 0.5.
-- Needs you is the long bucket, not Focus. 43% of its items are replies in threads the person started, 36% replies in threads they only replied in, 15% mentions, 7% flags for everyone. At double the traffic a person meets 10 rows on average and 24 on a bad visit.
+**The default gives about 29 a day, not the "about 21" quoted when D-012 was put to the user.** That estimate counted rows by the bucket of their first item. A row that first arrives in For your information and later receives a reply still notifies, and a row the person has read notifies again on its next reply. With mentions starting in Focus, "Focus only" rises to 9.1.
 
-### Independent check
+### Reactions as answers (D-014)
 
-A fresh verifier agent, given only the decision records and the code, probed the model with its own scripts. It found six places where the model contradicted the decision text (a withdrawn flag on a message that still mentions you; an answered flag for everyone deleting a post that belonged in the feed anyway; a text-only edit re-delivering or moving a row; replying in a turned-off thread inside a muted channel; a mention inside a Focus channel landing in Needs you; replying not releasing a kept channel row), eleven behaviours decided without being marked, six "inventions" that the decisions do in fact state, weak invariants, and two skews in the simulation (one random stream shared by traffic and behaviour; replies to mentions only generated from Needs you). All were corrected before the numbers above were taken. The corrections were not re-verified by a second independent pass.
+- Answers by reaction are 13% of the items landing in Needs you: 10% in direct conversations and 3% in channels. In a direct conversation every reaction from the other person is an answer by the rule, and the simulation lets people react to direct messages as often as to channel messages, so the 10% is probably high.
+- Why items land in Needs you: replies in threads the person started 44%, replies in threads they only replied in 30%, answers by reaction 13%, flags for everyone 9%, a mention and nothing else 4%. Most mentions come inside threads the person is already in.
 
-### After D-011 and D-013
+### Read at once (D-015, rule 6)
 
-Rerun on 2026-11-22 with the model changed to match: a flag that names you keeps the row for you until you press Done, reply or react; a flag that names nobody is an ordinary row; removing a flag releases what it kept; a muted channel does not silence your own threads; All activity leaves addressed items as at Default; a dial or rule change re-sorts unread rows.
+460 arrivals were read at once because the person had written in that conversation within the last three minutes. That is a rough stand-in for "has it open in front of them" and says little about how often the rule will apply.
 
-- 98 scripted cases behave as the decisions say. No invariant broken in five variants and five further seeds.
-- **The hole is closed.** The Needs you list a person meets stays flat over the ten days: 3.1 rows (days 1-2), 3.4 (days 5-6), 3.5 (days 9-10), against 3.3, 5.8, 7.2 before. Across seeds its mean is 3.4 to 3.6 and nine visits in ten show 8 rows or fewer.
-- Focus, kept (by the person or by a flag): 1.0 row on average at a visit, 5 at most (5 to 7 across seeds), against 17 unanswered flags for one person before. This depends on the assumption that a person presses Done on a flag they will not answer within a day or two.
-- Focus still receives about one row in nine of a single list: 4.5 new rows a day against 38.2.
-- The behaviours the model still has to invent are down to the small list recorded in D-013: R22, R18, R16, R27, R13, R06 came up in the base run.
-- This second version of the model was not checked by an independent verifier.
+### Still open after this run
+
+Behaviours the model has to choose that no decision states. In the base run, most frequent first:
+
+- R38 (149): new activity on a row that sits in Focus because it is kept notifies by the bucket the new item earns, not as Focus.
+- R42 (56): a reply releases everything kept on that row; a reaction releases the flag on that message and the person's own Keep.
+- R43 (31): a reaction to a flag that names nobody is ordinary applause for its author, not an answer.
+- R35 (9): an answer by reaction reaches you from a muted channel; ordinary reactions from a muted channel do not.
+- R41 (5): in a channel put in Focus, replies in a thread you were only mentioned in are lifted to Focus too.
+- R44 (2): when a mention of you is edited away or deleted, the thread stops following you.
+- R34, R37, R40 did not come up in the base run: an agent's reaction stays in For your information; a row kept by a flag sits in Focus even without the "flags" starting rule; a row lifted into Focus by your own rule change does not notify.
+- D-016's Threads tab is modelled as "threads whose dial is not Off", which is the agent's reading recorded in D-016, to be confirmed.
+
+Not modelled: the notification tray's contents, search, a read position inside a row (a row is read or not), showing reactions on a row, and the phone-sized screen.
+
+### Independent checks
+
+Two fresh verifier agents, each given only the decision records and the code, probed the model with their own scripts.
+
+- The first (after run one) found six places where the model contradicted the decisions, eleven behaviours decided without being marked, six "inventions" the decisions did state, weak invariants, and two skews in the simulation. All corrected before run one's numbers were taken.
+- The second (after the third version) found six more contradictions (removing Info was not "as if new"; Keep did not mark read; a flagged direct message that mentions anyone was not kept; a reply inside a direct conversation reached nobody; a finished stream ignored replies made while it streamed; later reactions ignored "watching"), an undercount of the "everything" notification policy, a misleading breakdown of Needs you, eleven more unmarked behaviours, and the weakness of the invariants described above. All corrected or listed above before these numbers were taken.
+- The corrections made after the second check have not been checked by a third.
 
 ## Conclusion
 
-**The foundation holds. The one hole found is closed by D-011, and the points to confirm are settled by D-013, apart from notifications (D-012).** The three buckets, the dials, Flag and Info, Keep and Done, and the edit and delete rules can be written as one procedure that gives every person one answer for every message, and its promises survive a simulated busy team. Hypothesis 2 holds under the assumed traffic: Focus stays short and agents stay out of it unless they are waiting on someone.
+**The rules hold together as one procedure, and Focus stays short under the assumed traffic.** Two rounds of independent checking each found real faults in the model, which is a reason to trust the decisions more than the model: every fault was the model departing from a decision, not two decisions contradicting each other. The one contradiction-level problem in the decisions themselves, the flag that could never leave, was found in run one and is closed.
 
-Hypothesis 1 was partly false, as expected. What needs the user before building:
+What the user should know before building:
 
-1. A way out for a flag nobody answers (the hole).
-2. Whether a muted channel should silence replies in your own threads.
-3. Where a read, still-open flag sits in Focus, and whether it is counted.
-4. What "All activity" does with items addressed to you (the record's sentence reads two ways).
-5. Whether changing a dial or a rule re-sorts rows already in the feed.
-6. Whether a reaction from anyone closes a flag for everyone.
-7. What sends a notification (not modelled; needed before the delivery guarantees).
-
-The rest of the invented behaviours are small and are listed for confirmation in one batch.
+1. The notification default is about 29 a day in this team, not 21. "Focus only" is about 5.
+2. Needs you is the long bucket and thread replies are three quarters of it.
+3. Nine small behaviours are still the model's choice (listed above).
 
 What this does not show:
-- The traffic rates are assumptions. The comparisons between variants are sound; the absolute numbers are not predictions. Agents wrote 35% of messages here, below the 50% Salesforce reports for Slack.
-- People in the simulation read and answer at fixed probabilities. Real people do not.
+- The traffic rates are assumptions. Variants share a seed and rates but not identical traffic, because what people read changes who replies; differences inside the spread across seeds are noise. Agents wrote 35% of messages here, below the 50% Salesforce reports for Slack.
+- People in the simulation read, reply and react at fixed probabilities.
 - Text rules judged by a model are not in it.
 - Nothing about performance, storage or delivery: this is a model of rules, not of the system.
-- The model was written and corrected by one agent and checked once by another. A behaviour both misread from the records would not have been caught.
+- A behaviour that the modelling agent and both verifiers misread the same way would not have been caught.

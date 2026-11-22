@@ -2,15 +2,15 @@
 
 Work in flight. Order inside a section is priority. Finished work moves to `done.md`. Rules: CLAUDE.md, section "Tasks".
 
-**Where we are:** The product scope is decided (2026-11-22). Accepted: D-001 the three-bucket feed; D-002 scripted participants; D-003 reading is enough, with Keep and Done; D-004 edits and deletes; D-009 the first-version surfaces; D-010 the large seeded team with a control panel; D-011 a flag has no state of its own; D-012 notifications follow the bucket; D-013 readings from E-001; D-014 reactions; D-015 what read means; D-016 history tabs. In progress: rerunning the E-001 model with the latest decisions. Next: the look-and-feel experiment in a separate session, then the technical decisions (D-005 to D-008), which the user holds until the product scope is final and the experiments are agreed. Text rules judged by a model are in scope but built last, after an experiment.
+**Where we are:** The product scope is decided (2026-11-22). Accepted: D-001 the three-bucket feed; D-002 scripted participants; D-003 reading is enough, with Keep and Done; D-004 edits and deletes; D-009 the first-version surfaces; D-010 the large seeded team with a control panel; D-011 a flag has no state of its own; D-012 notifications follow the bucket; D-013 readings from E-001; D-014 reactions; D-015 what read means; D-016 history tabs. E-001 was rerun with all of them and checked independently twice: the rules hold together, and the notification default comes to about 29 a day in the simulated team. Next: the look-and-feel experiment in a separate session, then the technical decisions (D-005 to D-008), which the user holds until the product scope is final and the experiments are agreed. Text rules judged by a model are in scope but built last, after an experiment.
 
 ## Now
 
-- **T-018** `experiment` Rerun E-001 with D-012, D-014 and D-015 in the model: measure how many rows "a reaction from someone you addressed" adds to Needs you and how many notifications a person gets a day; have a fresh verifier check the model again. Also covers the history tabs (D-016)
+_Nothing in progress._
 
 ## Waiting on user
 
-_Nothing._
+- **T-021** `decide` Nine small behaviours the E-001 model still chooses on its own (list in `experiments/E-001-feed-rules-model/README.md`, "Still open after this run"), and whether about 29 notifications a day changes the user's choice of default in D-012
 
 ## Next
 

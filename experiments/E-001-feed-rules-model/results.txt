@@ -194,101 +194,171 @@ ok   …what names you stays
        -> Needs you   [D-001 names you gets through]
 ok   You raise a followed thread to Focus: its unread reply moves up
        -> Focus/new   [D-013]
+ok   You flag Marco; he reacts: an answer, in Needs you, with his name
+       -> ('Needs you', 'marco reacted check to your message')   [D-014]
+ok   …Anna's reaction on the same message stays grouped in For your information, not counting Marco
+       -> 1 reacted to your message   [D-014]
+ok   …Marco takes his reaction back before you saw it
+       -> False   [D-004]
+ok   Anna reacts to your direct message: an answer
+       -> Needs you   [D-014]
+ok   An answer by reaction in a channel you put in Focus still lands in Needs you
+       -> Needs you   [D-014 reactions never land in Focus]
+ok   An agent you mentioned reacts: grouped, in For your information
+       -> FYI   [R34]
+ok   A reply arrives in a thread open in front of you: read at once, no feed row
+       -> Earlier   [D-015]
+ok   …and no notification
+       -> 0   [D-015 + D-012]
+ok   Two replies in your thread before you read it: one notification, not two
+       -> 1   [D-012 one per row]
+ok   …then a flag for you in the same unread thread: the row moves up to Focus and notifies once more
+       -> 2   [D-012]
+ok   …you read it, then a new reply: a new notification
+       -> 3   [D-012]
+ok   Reactions, a whole-channel mention and an Info mention: no notification
+       -> []   [D-012 FYI never; D-001 Info none]
+ok   An edit adds a mention of you: it notifies like a new message
+       -> 1   [R36]
+ok   Mentions tab: read and unread together, from any channel, without the deleted one
+       -> [2, 1]   [D-016]
+ok   Direct messages tab
+       -> [4]   [D-016]
+ok   Threads tab: replies in threads you follow
+       -> [6]   [D-016]
+ok   Reactions tab: your messages that got reactions
+       -> [5]   [D-016]
+ok   An edit removes Info from a mention you had read: it comes back as new, and notifies
+       -> ('Needs you', 1)   [D-013 as if new]
+ok   Keeping a row marks it read
+       -> True   [D-015 acting implies read]
+ok   A flagged direct message that also mentions an agent is still kept for you
+       -> Focus/kept   [D-011]
+ok   A reply under a message in a direct conversation reaches you
+       -> Focus/new   [D-001]
+ok   An agent's reply finishes streaming after you replied in the thread: it reaches you
+       -> Needs you   [D-001]
+ok   Two reactions arrive while the thread is open in front of you: both read at once
+       -> Earlier   [D-015]
+ok   An Info reply, then an ordinary one, in your unread thread: the ordinary one notifies
+       -> 1   [D-012 + D-001]
+ok   A rule change leaves a row you already read where it was
+       -> Earlier   [D-013]
 
-98 of 98 cases behave as the decisions say
-invented behaviours exercised by the scenarios: R03, R04, R06, R13, R22, R27
+123 of 123 cases behave as the decisions say
+invented behaviours exercised by the scenarios: R03, R04, R06, R12, R13, R22, R27, R34, R38, R40, R42
 
 == base: the accepted rules
-   13324 messages, 35% by agents, 22150 events, invariant violations: 0
+   13442 messages, 35% by agents, 22343 events, invariant violations: 0
    rows waiting when a person opens the feed (mean / p90 / max):
-     Focus, new                         0.5 /   1 /  14
-     Focus, kept (by you or a flag)     1.0 /   2 /   5
-     Needs you                          3.5 /   8 /  20
-     For your information               2.8 /   6 /  22
-   new rows per person per day: Focus 4.5 (from agents 0.3), Needs you 16.5 (from agents 2.2), FYI 17.4 (from agents 2.9); one single list: 38.2
-   Needs you at a visit, mean, as the run goes on: days 1-2: 3.1, days 5-6: 3.4, days 9-10: 3.5
+     Focus, new                         0.5 /   1 /  11
+     Focus, kept (by you or a flag)     1.1 /   3 /   7
+     Needs you                          3.9 /   9 /  23
+     For your information               2.2 /   5 /  20
+   new rows per person per day: Focus 4.4 (from agents 0.2), Needs you 19.8 (from agents 2.2), FYI 14.6 (from agents 2.9); one single list: 38.8
+   notifications per person per day: everything 41.2, Focus and Needs you 29.3 (accepted default), Focus only 5.3
+   arrivals read at once because the person had just written in that conversation (a rough stand-in for 'watching'): 460
+   Needs you at a visit, mean, as the run goes on: days 1-2: 3.5, days 5-6: 3.9, days 9-10: 4.4
    rows kept by a flag at the end (per person, mean): 0.1
-   rows kept by the person at the end (per person, mean): 1.0
+   rows kept by the person at the end (per person, mean): 1.2
    markers left in conversations: 4
 
 == mentions start in Focus
-   13318 messages, 35% by agents, 22141 events, invariant violations: 0
+   13343 messages, 35% by agents, 22246 events, invariant violations: 0
    rows waiting when a person opens the feed (mean / p90 / max):
-     Focus, new                         1.1 /   3 /  15
-     Focus, kept (by you or a flag)     0.9 /   2 /   5
-     Needs you                          2.8 /   7 /  17
-     For your information               2.8 /   6 /  18
-   new rows per person per day: Focus 7.0 (from agents 0.6), Needs you 13.7 (from agents 1.9), FYI 17.3 (from agents 2.8); one single list: 38.0
-   Needs you at a visit, mean, as the run goes on: days 1-2: 2.4, days 5-6: 2.7, days 9-10: 2.9
+     Focus, new                         1.0 /   3 /  13
+     Focus, kept (by you or a flag)     1.0 /   2 /   6
+     Needs you                          3.1 /   7 /  19
+     For your information               2.3 /   5 /  16
+   new rows per person per day: Focus 7.0 (from agents 0.5), Needs you 15.9 (from agents 1.6), FYI 14.5 (from agents 2.8); one single list: 37.5
+   notifications per person per day: everything 40.4, Focus and Needs you 28.5 (accepted default), Focus only 9.1
+   arrivals read at once because the person had just written in that conversation (a rough stand-in for 'watching'): 489
+   Needs you at a visit, mean, as the run goes on: days 1-2: 2.8, days 5-6: 3.1, days 9-10: 3.2
    rows kept by a flag at the end (per person, mean): 0.2
-   rows kept by the person at the end (per person, mean): 1.0
-   markers left in conversations: 4
+   rows kept by the person at the end (per person, mean): 0.6
+   markers left in conversations: 2
 
 == agents do not use Info
-   13427 messages, 35% by agents, 22286 events, invariant violations: 0
+   13410 messages, 35% by agents, 22422 events, invariant violations: 0
    rows waiting when a person opens the feed (mean / p90 / max):
-     Focus, new                         0.5 /   2 /  10
-     Focus, kept (by you or a flag)     1.0 /   3 /   8
-     Needs you                          3.7 /   8 /  20
-     For your information               2.7 /   6 /  20
-   new rows per person per day: Focus 4.7 (from agents 0.3), Needs you 19.1 (from agents 4.8), FYI 14.9 (from agents 0.0); one single list: 38.7
-   Needs you at a visit, mean, as the run goes on: days 1-2: 3.1, days 5-6: 3.7, days 9-10: 3.8
+     Focus, new                         0.5 /   1 /  11
+     Focus, kept (by you or a flag)     1.0 /   2 /   6
+     Needs you                          4.0 /   8 /  21
+     For your information               2.1 /   5 /  11
+   new rows per person per day: Focus 4.4 (from agents 0.3), Needs you 21.9 (from agents 4.9), FYI 12.2 (from agents 0.0); one single list: 38.6
+   notifications per person per day: everything 42.1, Focus and Needs you 30.0 (accepted default), Focus only 5.2
+   arrivals read at once because the person had just written in that conversation (a rough stand-in for 'watching'): 446
+   Needs you at a visit, mean, as the run goes on: days 1-2: 3.6, days 5-6: 4.1, days 9-10: 4.0
    rows kept by a flag at the end (per person, mean): 0.1
    rows kept by the person at the end (per person, mean): 0.9
-   markers left in conversations: 4
+   markers left in conversations: 5
 
 == half the traffic
-   6755 messages, 35% by agents, 12163 events, invariant violations: 0
+   6674 messages, 35% by agents, 12060 events, invariant violations: 0
    rows waiting when a person opens the feed (mean / p90 / max):
-     Focus, new                         0.3 /   1 /   6
-     Focus, kept (by you or a flag)     0.5 /   1 /   4
-     Needs you                          1.8 /   4 /  15
-     For your information               1.6 /   4 /  10
-   new rows per person per day: Focus 2.3 (from agents 0.2), Needs you 8.6 (from agents 0.9), FYI 9.6 (from agents 1.4); one single list: 20.4
-   Needs you at a visit, mean, as the run goes on: days 1-2: 1.6, days 5-6: 1.7, days 9-10: 2.2
-   rows kept by a flag at the end (per person, mean): 0
-   rows kept by the person at the end (per person, mean): 0.4
+     Focus, new                         0.3 /   1 /   7
+     Focus, kept (by you or a flag)     0.5 /   2 /   4
+     Needs you                          2.0 /   5 /  16
+     For your information               1.2 /   3 /   8
+   new rows per person per day: Focus 2.3 (from agents 0.2), Needs you 9.8 (from agents 1.1), FYI 7.4 (from agents 1.4); one single list: 19.5
+   notifications per person per day: everything 20.7, Focus and Needs you 14.6 (accepted default), Focus only 2.7
+   arrivals read at once because the person had just written in that conversation (a rough stand-in for 'watching'): 180
+   Needs you at a visit, mean, as the run goes on: days 1-2: 1.7, days 5-6: 2.2, days 9-10: 2.0
+   rows kept by a flag at the end (per person, mean): 0.1
+   rows kept by the person at the end (per person, mean): 0.5
    markers left in conversations: 0
 
 == double the traffic
-   26793 messages, 35% by agents, 42790 events, invariant violations: 0
+   26740 messages, 35% by agents, 43268 events, invariant violations: 0
    rows waiting when a person opens the feed (mean / p90 / max):
-     Focus, new                         1.0 /   2 /  21
+     Focus, new                         1.0 /   2 /  17
      Focus, kept (by you or a flag)     1.9 /   4 /   8
-     Needs you                          6.7 /  15 /  39
-     For your information               5.2 /  11 /  27
-   new rows per person per day: Focus 8.4 (from agents 0.5), Needs you 31.4 (from agents 4.0), FYI 33.2 (from agents 6.2); one single list: 72.9
-   Needs you at a visit, mean, as the run goes on: days 1-2: 5.9, days 5-6: 7.1, days 9-10: 7.1
-   rows kept by a flag at the end (per person, mean): 0.4
-   rows kept by the person at the end (per person, mean): 1.5
-   markers left in conversations: 12
+     Needs you                          7.2 /  15 /  38
+     For your information               4.5 /   9 /  28
+   new rows per person per day: Focus 8.3 (from agents 0.4), Needs you 36.1 (from agents 4.1), FYI 29.0 (from agents 6.0); one single list: 73.4
+   notifications per person per day: everything 77.8, Focus and Needs you 54.3 (accepted default), Focus only 10.0
+   arrivals read at once because the person had just written in that conversation (a rough stand-in for 'watching'): 1371
+   Needs you at a visit, mean, as the run goes on: days 1-2: 6.5, days 5-6: 7.1, days 9-10: 7.4
+   rows kept by a flag at the end (per person, mean): 0.1
+   rows kept by the person at the end (per person, mean): 1.6
+   markers left in conversations: 18
 
 == personas, base rules: new rows per day, and Focus rows at a visit (mean / max)
-   Product manager (default viewer)   Focus   3.7  Needs you  16.2  FYI  23.2  single list  43.1   Focus new at a visit 0.6 / 3
-   Founder                            Focus   4.7  Needs you  16.0  FYI  15.3  single list  36.0   Focus new at a visit 0.5 / 3
-   Engineer                           Focus   3.8  Needs you  21.2  FYI  14.3  single list  39.3   Focus new at a visit 0.5 / 3
-   Support, on call                   Focus  19.5  Needs you   9.1  FYI  15.2  single list  43.8   Focus new at a visit 2.9 / 14
+   Product manager (default viewer)   Focus   3.9  Needs you  18.4  FYI  21.5  single list  43.8   Focus new at a visit 0.5 / 5
+   Founder                            Focus   3.6  Needs you  17.9  FYI  13.1  single list  34.6   Focus new at a visit 0.2 / 2
+   Engineer                           Focus   3.4  Needs you  23.1  FYI  12.2  single list  38.7   Focus new at a visit 0.4 / 2
+   Support, on call                   Focus  18.5  Needs you  14.0  FYI  13.7  single list  46.2   Focus new at a visit 2.8 / 11
 
 == why items land in Needs you, base rules (items, not rows)
-   Reply in a thread you started              3448  43%
-   Reply in a thread you only replied in      2669  33%
-   Mentioned you                              1149  14%
-   Flag that names nobody                      813  10%
+   Reply in a thread you started              3978  44%
+   Reply in a thread you only replied in      2732  30%
+   Reaction from someone you addressed, in a direct conversation    924  10%
+   Flag that names nobody                      787  9%
+   Mentioned you, nothing else                 391  4%
+   Reaction from someone you addressed, in a channel    257  3%
 
 == behaviours the model had to invent, and how often each came up in the base run
-   R22 x 43580  A person who is not a member of a channel gets nothing from it except what names them
-   R18 x   178  Reactions to your message follow the thread: none when the thread is Off or the channel Muted
-   R16 x   155  New activity on a kept row shows inside the Kept section; it does not move the row back to New
-   R27 x    25  Deleting your own message does not remove you from its thread: later replies still reach you
-   R13 x    11  An edit that lowers a message you have not read moves it down quietly
-   R06 x     3  An Info message that mentions you in a muted channel still arrives, in For your information
+   R38 x   149  STILL OPEN  New activity on a row sitting in Focus because it is kept notifies by the bucket the new item earns, not as Focus
+   R42 x    56  STILL OPEN  A reply releases everything kept on that row; a reaction releases the flag on that message and your own Keep
+   R43 x    31  STILL OPEN  A reaction to a flag that names nobody is ordinary applause for its author, not an answer
+   R35 x     9  STILL OPEN  An answer by reaction reaches you from a muted channel, like a reply in your own thread; ordinary reactions from a muted channel do not
+   R41 x     5  STILL OPEN  In a channel you put in Focus, replies in a thread you were only mentioned in are lifted to Focus too
+   R44 x     2  STILL OPEN  When a mention of you is edited away or deleted, the thread stops following you
+   R22 x 42686  accepted in D-013  A person who is not a member of a channel gets nothing from it except what names them
+   R16 x   191  accepted in D-013  New activity on a kept row shows inside the Kept section; it does not move the row back to New
+   R18 x   176  accepted in D-013  Reactions to your message follow the thread: none when the thread is Off or the channel Muted
+   R27 x    45  accepted in D-013  Deleting your own message does not remove you from its thread: later replies still reach you
+   R36 x     9  accepted in D-013  An edit that newly names you sends a notification, like a new message would
+   R13 x     4  accepted in D-013  An edit that lowers a message you have not read moves it down quietly
 
 == how much the base numbers move with the random seed (five other seeds)
-   new Focus rows per person per day:       4.2 to 4.6
-   one single list, rows per person per day: 37.5 to 38.4
+   new Focus rows per person per day:       4.2 to 4.5
+   one single list, rows per person per day: 37.3 to 38.4
    Focus, new, at a visit (mean):            0.5 to 0.5
-   Needs you at a visit (mean):              3.4 to 3.6
-   Needs you at a visit (p90):               7 to 8
-   Focus, kept, at a visit (mean):           0.9 to 1.1
-   Focus, kept, at a visit (max):            5 to 7
+   Needs you at a visit (mean):              3.7 to 3.9
+   Needs you at a visit (p90):               8 to 8
+   Focus, kept, at a visit (mean):           1.0 to 1.1
+   Focus, kept, at a visit (max):            5 to 6
+   notifications a day, accepted default:    27.6 to 29.0
+   notifications a day, Focus only:          5.0 to 5.2
    invariant violations:                     0 to 0

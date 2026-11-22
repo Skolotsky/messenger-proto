@@ -1,9 +1,9 @@
 [
  {
   "variant": "base: the accepted rules",
-  "messages": 13324,
+  "messages": 13442,
   "share written by agents": 0.35,
-  "events": 22150,
+  "events": 22343,
   "violations": 0,
   "violation samples": [],
   "rows at a visit": {
@@ -11,114 +11,591 @@
     "mean": 0.5,
     "median": 0,
     "p90": 1,
-    "max": 14
+    "max": 11
    },
    "focus_kept": {
-    "mean": 1.0,
+    "mean": 1.1,
     "median": 1,
-    "p90": 2,
-    "max": 5
+    "p90": 3,
+    "max": 7
    },
    "needs": {
-    "mean": 3.5,
+    "mean": 3.9,
     "median": 3,
-    "p90": 8,
-    "max": 20
+    "p90": 9,
+    "max": 23
    },
    "fyi": {
-    "mean": 2.8,
+    "mean": 2.2,
     "median": 2,
-    "p90": 6,
-    "max": 22
+    "p90": 5,
+    "max": 20
    }
   },
   "Needs you at a visit over time": {
-   "days 1-2": 3.1,
-   "days 5-6": 3.4,
-   "days 9-10": 3.5
+   "days 1-2": 3.5,
+   "days 5-6": 3.9,
+   "days 9-10": 4.4
   },
   "new rows per person per day": {
    "all": {
     "Focus from persons": 4.2,
-    "Focus from agents": 0.3,
-    "Needs you from persons": 14.3,
+    "Focus from agents": 0.2,
+    "Needs you from persons": 17.6,
     "Needs you from agents": 2.2,
-    "FYI from persons": 14.5,
+    "FYI from persons": 11.7,
     "FYI from agents": 2.9,
-    "single list": 38.2,
-    "Focus": 4.5
+    "single list": 38.8,
+    "Focus": 4.4
    },
    "p02": {
-    "Focus from persons": 3.7,
+    "Focus from persons": 3.9,
     "Focus from agents": 0.0,
-    "Needs you from persons": 15.1,
-    "Needs you from agents": 1.1,
-    "FYI from persons": 20.2,
-    "FYI from agents": 3.0,
-    "single list": 43.1,
-    "Focus": 3.7
+    "Needs you from persons": 17.4,
+    "Needs you from agents": 1.0,
+    "FYI from persons": 17.9,
+    "FYI from agents": 3.6,
+    "single list": 43.8,
+    "Focus": 3.9
    },
    "p01": {
-    "Focus from persons": 4.7,
+    "Focus from persons": 3.6,
     "Focus from agents": 0.0,
-    "Needs you from persons": 15.8,
-    "Needs you from agents": 0.2,
-    "FYI from persons": 13.7,
-    "FYI from agents": 1.6,
-    "single list": 36.0,
-    "Focus": 4.7
+    "Needs you from persons": 17.4,
+    "Needs you from agents": 0.5,
+    "FYI from persons": 11.3,
+    "FYI from agents": 1.8,
+    "single list": 34.6,
+    "Focus": 3.6
    },
    "p04": {
-    "Focus from persons": 3.8,
+    "Focus from persons": 3.4,
     "Focus from agents": 0.0,
-    "Needs you from persons": 14.7,
-    "Needs you from agents": 6.5,
-    "FYI from persons": 11.2,
-    "FYI from agents": 3.1,
-    "single list": 39.3,
-    "Focus": 3.8
+    "Needs you from persons": 16.3,
+    "Needs you from agents": 6.8,
+    "FYI from persons": 8.6,
+    "FYI from agents": 3.6,
+    "single list": 38.7,
+    "Focus": 3.4
    },
    "p09": {
-    "Focus from persons": 12.2,
-    "Focus from agents": 7.3,
-    "Needs you from persons": 9.1,
+    "Focus from persons": 12.0,
+    "Focus from agents": 6.5,
+    "Needs you from persons": 14.0,
     "Needs you from agents": 0.0,
-    "FYI from persons": 12.9,
-    "FYI from agents": 2.3,
-    "single list": 43.8,
-    "Focus": 19.5
+    "FYI from persons": 11.9,
+    "FYI from agents": 1.8,
+    "single list": 46.2,
+    "Focus": 18.5
    }
   },
   "personas at a visit": {
    "p02": {
     "focus_new": {
-     "mean": 0.6,
+     "mean": 0.5,
      "median": 0,
-     "p90": 2,
-     "max": 3
+     "p90": 1,
+     "max": 5
     },
     "focus_kept": {
-     "mean": 0.9,
+     "mean": 0.8,
      "median": 1,
      "p90": 2,
      "max": 3
     },
     "needs": {
-     "mean": 3.4,
-     "median": 3,
-     "p90": 7,
-     "max": 16
-    },
-    "fyi": {
-     "mean": 3.6,
+     "mean": 3.7,
      "median": 3,
      "p90": 8,
-     "max": 12
+     "max": 14
+    },
+    "fyi": {
+     "mean": 3.2,
+     "median": 3,
+     "p90": 7,
+     "max": 9
     }
    },
    "p01": {
     "focus_new": {
-     "mean": 0.5,
+     "mean": 0.2,
+     "median": 0,
+     "p90": 1,
+     "max": 2
+    },
+    "focus_kept": {
+     "mean": 0.3,
+     "median": 0,
+     "p90": 1,
+     "max": 1
+    },
+    "needs": {
+     "mean": 3.5,
+     "median": 3,
+     "p90": 8,
+     "max": 15
+    },
+    "fyi": {
+     "mean": 1.7,
+     "median": 1,
+     "p90": 4,
+     "max": 7
+    }
+   },
+   "p04": {
+    "focus_new": {
+     "mean": 0.4,
+     "median": 0,
+     "p90": 1,
+     "max": 2
+    },
+    "focus_kept": {
+     "mean": 1.3,
+     "median": 1,
+     "p90": 3,
+     "max": 4
+    },
+    "needs": {
+     "mean": 4.3,
+     "median": 3,
+     "p90": 10,
+     "max": 20
+    },
+    "fyi": {
+     "mean": 1.7,
+     "median": 1,
+     "p90": 4,
+     "max": 6
+    }
+   },
+   "p09": {
+    "focus_new": {
+     "mean": 2.8,
+     "median": 3,
+     "p90": 7,
+     "max": 11
+    },
+    "focus_kept": {
+     "mean": 1.4,
+     "median": 1,
+     "p90": 4,
+     "max": 4
+    },
+    "needs": {
+     "mean": 2.5,
+     "median": 2,
+     "p90": 7,
+     "max": 11
+    },
+    "fyi": {
+     "mean": 3.4,
+     "median": 2,
+     "p90": 10,
+     "max": 20
+    }
+   }
+  },
+  "items by bucket and author": {
+   "Focus / person": 1429,
+   "Focus / agent": 341,
+   "Needs you / person": 7922,
+   "Needs you / agent": 1147,
+   "FYI / person": 4655,
+   "FYI / agent": 4012
+  },
+  "why items land in Needs you": {
+   "Reply in a thread you started": 3978,
+   "Reply in a thread you only replied in": 2732,
+   "Reaction from someone you addressed, in a direct conversation": 924,
+   "Flag that names nobody": 787,
+   "Mentioned you, nothing else": 391,
+   "Reaction from someone you addressed, in a channel": 257
+  },
+  "notifications per person per day": {
+   "A": 41.2,
+   "B": 29.3,
+   "C": 5.3
+  },
+  "read at once while watching": 460,
+  "end of run": {
+   "rows kept by a flag at the end (per person, mean)": 0.1,
+   "rows kept by the person at the end (per person, mean)": 1.2,
+   "markers left in conversations": 4
+  },
+  "rulings": {
+   "R13": 4,
+   "R16": 191,
+   "R18": 176,
+   "R22": 42686,
+   "R27": 45,
+   "R35": 9,
+   "R36": 9,
+   "R38": 149,
+   "R41": 5,
+   "R42": 56,
+   "R43": 31,
+   "R44": 2
+  },
+  "notes": {}
+ },
+ {
+  "variant": "mentions start in Focus",
+  "messages": 13343,
+  "share written by agents": 0.35,
+  "events": 22246,
+  "violations": 0,
+  "violation samples": [],
+  "rows at a visit": {
+   "focus_new": {
+    "mean": 1.0,
+    "median": 1,
+    "p90": 3,
+    "max": 13
+   },
+   "focus_kept": {
+    "mean": 1.0,
+    "median": 1,
+    "p90": 2,
+    "max": 6
+   },
+   "needs": {
+    "mean": 3.1,
+    "median": 2,
+    "p90": 7,
+    "max": 19
+   },
+   "fyi": {
+    "mean": 2.3,
+    "median": 2,
+    "p90": 5,
+    "max": 16
+   }
+  },
+  "Needs you at a visit over time": {
+   "days 1-2": 2.8,
+   "days 5-6": 3.1,
+   "days 9-10": 3.2
+  },
+  "new rows per person per day": {
+   "all": {
+    "Focus from persons": 6.5,
+    "Focus from agents": 0.5,
+    "Needs you from persons": 14.3,
+    "Needs you from agents": 1.6,
+    "FYI from persons": 11.7,
+    "FYI from agents": 2.8,
+    "single list": 37.5,
+    "Focus": 7.0
+   },
+   "p02": {
+    "Focus from persons": 5.4,
+    "Focus from agents": 0.3,
+    "Needs you from persons": 15.6,
+    "Needs you from agents": 0.3,
+    "FYI from persons": 17.4,
+    "FYI from agents": 3.2,
+    "single list": 42.2,
+    "Focus": 5.7
+   },
+   "p01": {
+    "Focus from persons": 6.4,
+    "Focus from agents": 0.2,
+    "Needs you from persons": 14.1,
+    "Needs you from agents": 0.1,
+    "FYI from persons": 11.2,
+    "FYI from agents": 1.2,
+    "single list": 33.2,
+    "Focus": 6.6
+   },
+   "p04": {
+    "Focus from persons": 5.9,
+    "Focus from agents": 0.2,
+    "Needs you from persons": 16.2,
+    "Needs you from agents": 5.3,
+    "FYI from persons": 7.8,
+    "FYI from agents": 2.9,
+    "single list": 38.3,
+    "Focus": 6.1
+   },
+   "p09": {
+    "Focus from persons": 14.7,
+    "Focus from agents": 6.4,
+    "Needs you from persons": 11.7,
+    "Needs you from agents": 0.0,
+    "FYI from persons": 12.8,
+    "FYI from agents": 2.9,
+    "single list": 48.5,
+    "Focus": 21.1
+   }
+  },
+  "personas at a visit": {
+   "p02": {
+    "focus_new": {
+     "mean": 1,
+     "median": 1,
+     "p90": 3,
+     "max": 5
+    },
+    "focus_kept": {
+     "mean": 1.2,
+     "median": 1,
+     "p90": 2,
+     "max": 3
+    },
+    "needs": {
+     "mean": 3.1,
+     "median": 3,
+     "p90": 7,
+     "max": 17
+    },
+    "fyi": {
+     "mean": 3.6,
+     "median": 3,
+     "p90": 7,
+     "max": 16
+    }
+   },
+   "p01": {
+    "focus_new": {
+     "mean": 0.8,
+     "median": 0,
+     "p90": 3,
+     "max": 3
+    },
+    "focus_kept": {
+     "mean": 0.7,
+     "median": 1,
+     "p90": 2,
+     "max": 3
+    },
+    "needs": {
+     "mean": 2.8,
+     "median": 2,
+     "p90": 6,
+     "max": 10
+    },
+    "fyi": {
+     "mean": 2.7,
+     "median": 2,
+     "p90": 7,
+     "max": 12
+    }
+   },
+   "p04": {
+    "focus_new": {
+     "mean": 1.0,
+     "median": 1,
+     "p90": 3,
+     "max": 5
+    },
+    "focus_kept": {
+     "mean": 0.8,
+     "median": 1,
+     "p90": 2,
+     "max": 3
+    },
+    "needs": {
+     "mean": 4.0,
+     "median": 3,
+     "p90": 9,
+     "max": 16
+    },
+    "fyi": {
+     "mean": 1.4,
+     "median": 1,
+     "p90": 4,
+     "max": 6
+    }
+   },
+   "p09": {
+    "focus_new": {
+     "mean": 3.3,
+     "median": 3,
+     "p90": 7,
+     "max": 13
+    },
+    "focus_kept": {
+     "mean": 0.7,
+     "median": 0,
+     "p90": 3,
+     "max": 4
+    },
+    "needs": {
+     "mean": 2.1,
+     "median": 2,
+     "p90": 4,
+     "max": 12
+    },
+    "fyi": {
+     "mean": 2.3,
+     "median": 2,
+     "p90": 6,
+     "max": 13
+    }
+   }
+  },
+  "items by bucket and author": {
+   "Focus / person": 2266,
+   "Focus / agent": 615,
+   "Needs you / person": 6812,
+   "Needs you / agent": 764,
+   "FYI / person": 4709,
+   "FYI / agent": 3913
+  },
+  "why items land in Needs you": {
+   "Reply in a thread you started": 3327,
+   "Reply in a thread you only replied in": 2507,
+   "Reaction from someone you addressed, in a direct conversation": 866,
+   "Flag that names nobody": 617,
+   "Reaction from someone you addressed, in a channel": 259
+  },
+  "notifications per person per day": {
+   "A": 40.4,
+   "B": 28.5,
+   "C": 9.1
+  },
+  "read at once while watching": 489,
+  "end of run": {
+   "rows kept by a flag at the end (per person, mean)": 0.2,
+   "rows kept by the person at the end (per person, mean)": 0.6,
+   "markers left in conversations": 2
+  },
+  "rulings": {
+   "R06": 1,
+   "R13": 11,
+   "R16": 91,
+   "R18": 168,
+   "R22": 42774,
+   "R27": 33,
+   "R35": 10,
+   "R36": 13,
+   "R38": 162,
+   "R42": 42,
+   "R43": 19,
+   "R44": 7
+  },
+  "notes": {}
+ },
+ {
+  "variant": "agents do not use Info",
+  "messages": 13410,
+  "share written by agents": 0.35,
+  "events": 22422,
+  "violations": 0,
+  "violation samples": [],
+  "rows at a visit": {
+   "focus_new": {
+    "mean": 0.5,
+    "median": 0,
+    "p90": 1,
+    "max": 11
+   },
+   "focus_kept": {
+    "mean": 1.0,
+    "median": 1,
+    "p90": 2,
+    "max": 6
+   },
+   "needs": {
+    "mean": 4.0,
+    "median": 3,
+    "p90": 8,
+    "max": 21
+   },
+   "fyi": {
+    "mean": 2.1,
+    "median": 2,
+    "p90": 5,
+    "max": 11
+   }
+  },
+  "Needs you at a visit over time": {
+   "days 1-2": 3.6,
+   "days 5-6": 4.1,
+   "days 9-10": 4.0
+  },
+  "new rows per person per day": {
+   "all": {
+    "Focus from persons": 4.1,
+    "Focus from agents": 0.3,
+    "Needs you from persons": 17.0,
+    "Needs you from agents": 4.9,
+    "FYI from persons": 12.2,
+    "FYI from agents": 0.0,
+    "single list": 38.6,
+    "Focus": 4.4
+   },
+   "p02": {
+    "Focus from persons": 3.1,
+    "Focus from agents": 0.1,
+    "Needs you from persons": 18.2,
+    "Needs you from agents": 4.1,
+    "FYI from persons": 18.8,
+    "FYI from agents": 0.0,
+    "single list": 44.3,
+    "Focus": 3.2
+   },
+   "p01": {
+    "Focus from persons": 3.5,
+    "Focus from agents": 0.0,
+    "Needs you from persons": 15.6,
+    "Needs you from agents": 2.5,
+    "FYI from persons": 10.9,
+    "FYI from agents": 0.0,
+    "single list": 32.5,
+    "Focus": 3.5
+   },
+   "p04": {
+    "Focus from persons": 3.5,
+    "Focus from agents": 0.1,
+    "Needs you from persons": 17.5,
+    "Needs you from agents": 8.9,
+    "FYI from persons": 7.8,
+    "FYI from agents": 0.0,
+    "single list": 37.8,
+    "Focus": 3.6
+   },
+   "p09": {
+    "Focus from persons": 12.6,
+    "Focus from agents": 9.8,
+    "Needs you from persons": 12.5,
+    "Needs you from agents": 0.0,
+    "FYI from persons": 11.3,
+    "FYI from agents": 0.0,
+    "single list": 46.2,
+    "Focus": 22.4
+   }
+  },
+  "personas at a visit": {
+   "p02": {
+    "focus_new": {
+     "mean": 0.3,
+     "median": 0,
+     "p90": 1,
+     "max": 3
+    },
+    "focus_kept": {
+     "mean": 0.9,
+     "median": 0,
+     "p90": 3,
+     "max": 4
+    },
+    "needs": {
+     "mean": 4.0,
+     "median": 4,
+     "p90": 8,
+     "max": 12
+    },
+    "fyi": {
+     "mean": 2.9,
+     "median": 2,
+     "p90": 6,
+     "max": 9
+    }
+   },
+   "p01": {
+    "focus_new": {
+     "mean": 0.4,
      "median": 0,
      "p90": 1,
      "max": 3
@@ -127,33 +604,33 @@
      "mean": 0.8,
      "median": 1,
      "p90": 2,
-     "max": 2
+     "max": 3
     },
     "needs": {
-     "mean": 3.4,
+     "mean": 3.5,
      "median": 3,
      "p90": 8,
-     "max": 11
+     "max": 12
     },
     "fyi": {
-     "mean": 2.3,
-     "median": 2,
-     "p90": 5,
-     "max": 8
+     "mean": 1.6,
+     "median": 1,
+     "p90": 4,
+     "max": 9
     }
    },
    "p04": {
     "focus_new": {
      "mean": 0.5,
      "median": 0,
-     "p90": 2,
+     "p90": 1,
      "max": 3
     },
     "focus_kept": {
      "mean": 1.4,
-     "median": 2,
-     "p90": 3,
-     "max": 3
+     "median": 1,
+     "p90": 4,
+     "max": 6
     },
     "needs": {
      "mean": 4.5,
@@ -162,521 +639,87 @@
      "max": 16
     },
     "fyi": {
-     "mean": 2.3,
-     "median": 2,
-     "p90": 7,
-     "max": 10
-    }
-   },
-   "p09": {
-    "focus_new": {
-     "mean": 2.9,
-     "median": 2,
-     "p90": 6,
-     "max": 14
-    },
-    "focus_kept": {
      "mean": 1.4,
      "median": 1,
      "p90": 4,
-     "max": 5
-    },
-    "needs": {
-     "mean": 1.8,
-     "median": 1,
-     "p90": 5,
-     "max": 8
-    },
-    "fyi": {
-     "mean": 2.2,
-     "median": 2,
-     "p90": 5,
-     "max": 10
+     "max": 9
     }
-   }
-  },
-  "items by bucket and author": {
-   "Focus / person": 1368,
-   "Focus / agent": 334,
-   "Needs you / person": 6936,
-   "Needs you / agent": 1143,
-   "FYI / person": 5563,
-   "FYI / agent": 3842
-  },
-  "why items land in Needs you": {
-   "Reply in a thread you started": 3448,
-   "Reply in a thread you only replied in": 2669,
-   "Mentioned you": 1149,
-   "Flag that names nobody": 813
-  },
-  "end of run": {
-   "rows kept by a flag at the end (per person, mean)": 0.1,
-   "rows kept by the person at the end (per person, mean)": 1.0,
-   "markers left in conversations": 4
-  },
-  "rulings": {
-   "R06": 3,
-   "R13": 11,
-   "R16": 155,
-   "R18": 178,
-   "R22": 43580,
-   "R27": 25
-  },
-  "notes": {}
- },
- {
-  "variant": "mentions start in Focus",
-  "messages": 13318,
-  "share written by agents": 0.35,
-  "events": 22141,
-  "violations": 0,
-  "violation samples": [],
-  "rows at a visit": {
-   "focus_new": {
-    "mean": 1.1,
-    "median": 1,
-    "p90": 3,
-    "max": 15
-   },
-   "focus_kept": {
-    "mean": 0.9,
-    "median": 1,
-    "p90": 2,
-    "max": 5
-   },
-   "needs": {
-    "mean": 2.8,
-    "median": 2,
-    "p90": 7,
-    "max": 17
-   },
-   "fyi": {
-    "mean": 2.8,
-    "median": 2,
-    "p90": 6,
-    "max": 18
-   }
-  },
-  "Needs you at a visit over time": {
-   "days 1-2": 2.4,
-   "days 5-6": 2.7,
-   "days 9-10": 2.9
-  },
-  "new rows per person per day": {
-   "all": {
-    "Focus from persons": 6.4,
-    "Focus from agents": 0.6,
-    "Needs you from persons": 11.8,
-    "Needs you from agents": 1.9,
-    "FYI from persons": 14.5,
-    "FYI from agents": 2.8,
-    "single list": 38.0,
-    "Focus": 7.0
-   },
-   "p02": {
-    "Focus from persons": 6.0,
-    "Focus from agents": 0.5,
-    "Needs you from persons": 13.2,
-    "Needs you from agents": 0.7,
-    "FYI from persons": 19.5,
-    "FYI from agents": 3.0,
-    "single list": 42.9,
-    "Focus": 6.5
-   },
-   "p01": {
-    "Focus from persons": 7.1,
-    "Focus from agents": 0.1,
-    "Needs you from persons": 13.1,
-    "Needs you from agents": 0.1,
-    "FYI from persons": 13.7,
-    "FYI from agents": 1.5,
-    "single list": 35.6,
-    "Focus": 7.2
-   },
-   "p04": {
-    "Focus from persons": 6.0,
-    "Focus from agents": 0.4,
-    "Needs you from persons": 12.5,
-    "Needs you from agents": 6.2,
-    "FYI from persons": 11.2,
-    "FYI from agents": 2.8,
-    "single list": 39.1,
-    "Focus": 6.4
    },
    "p09": {
-    "Focus from persons": 13.0,
-    "Focus from agents": 7.1,
-    "Needs you from persons": 7.5,
-    "Needs you from agents": 0.0,
-    "FYI from persons": 13.4,
-    "FYI from agents": 2.6,
-    "single list": 43.6,
-    "Focus": 20.1
-   }
-  },
-  "personas at a visit": {
-   "p02": {
     "focus_new": {
-     "mean": 1.2,
-     "median": 1,
-     "p90": 3,
-     "max": 7
-    },
-    "focus_kept": {
-     "mean": 1.2,
-     "median": 1,
-     "p90": 3,
-     "max": 3
-    },
-    "needs": {
-     "mean": 2.8,
-     "median": 2,
-     "p90": 7,
-     "max": 12
-    },
-    "fyi": {
-     "mean": 3.8,
-     "median": 4,
-     "p90": 7,
-     "max": 10
-    }
-   },
-   "p01": {
-    "focus_new": {
-     "mean": 1.0,
-     "median": 1,
-     "p90": 3,
-     "max": 5
-    },
-    "focus_kept": {
-     "mean": 0.9,
-     "median": 1,
-     "p90": 2,
-     "max": 3
-    },
-    "needs": {
-     "mean": 3.0,
+     "mean": 3,
      "median": 3,
      "p90": 6,
-     "max": 9
-    },
-    "fyi": {
-     "mean": 3.2,
-     "median": 3,
-     "p90": 8,
      "max": 11
-    }
-   },
-   "p04": {
-    "focus_new": {
+    },
+    "focus_kept": {
      "mean": 1.1,
      "median": 1,
-     "p90": 3,
-     "max": 5
-    },
-    "focus_kept": {
-     "mean": 0.8,
-     "median": 1,
-     "p90": 2,
-     "max": 4
-    },
-    "needs": {
-     "mean": 3.6,
-     "median": 3,
-     "p90": 9,
-     "max": 14
-    },
-    "fyi": {
-     "mean": 2.1,
-     "median": 2,
-     "p90": 6,
-     "max": 10
-    }
-   },
-   "p09": {
-    "focus_new": {
-     "mean": 3.2,
-     "median": 3,
-     "p90": 6,
-     "max": 15
-    },
-    "focus_kept": {
-     "mean": 0.9,
-     "median": 1,
      "p90": 2,
      "max": 3
     },
     "needs": {
-     "mean": 1.6,
-     "median": 1,
-     "p90": 5,
-     "max": 8
+     "mean": 2.1,
+     "median": 2,
+     "p90": 4,
+     "max": 11
     },
     "fyi": {
-     "mean": 2.2,
-     "median": 2,
-     "p90": 5,
-     "max": 11
+     "mean": 1.9,
+     "median": 1,
+     "p90": 6,
+     "max": 9
     }
    }
   },
   "items by bucket and author": {
-   "Focus / person": 2238,
-   "Focus / agent": 610,
-   "Needs you / person": 6006,
-   "Needs you / agent": 867,
-   "FYI / person": 5578,
-   "FYI / agent": 3842
+   "Focus / person": 1372,
+   "Focus / agent": 510,
+   "Needs you / person": 7815,
+   "Needs you / agent": 4885,
+   "FYI / person": 4812,
+   "FYI / agent": 12
   },
   "why items land in Needs you": {
-   "Reply in a thread you started": 3435,
-   "Reply in a thread you only replied in": 2625,
-   "Flag that names nobody": 813
+   "Reply in a thread you started": 7594,
+   "Reply in a thread you only replied in": 2907,
+   "Reaction from someone you addressed, in a direct conversation": 873,
+   "Flag that names nobody": 666,
+   "Mentioned you, nothing else": 382,
+   "Reaction from someone you addressed, in a channel": 278
   },
-  "end of run": {
-   "rows kept by a flag at the end (per person, mean)": 0.2,
-   "rows kept by the person at the end (per person, mean)": 1.0,
-   "markers left in conversations": 4
+  "notifications per person per day": {
+   "A": 42.1,
+   "B": 30.0,
+   "C": 5.2
   },
-  "rulings": {
-   "R06": 3,
-   "R13": 12,
-   "R16": 105,
-   "R18": 178,
-   "R22": 43560,
-   "R27": 26
-  },
-  "notes": {}
- },
- {
-  "variant": "agents do not use Info",
-  "messages": 13427,
-  "share written by agents": 0.35,
-  "events": 22286,
-  "violations": 0,
-  "violation samples": [],
-  "rows at a visit": {
-   "focus_new": {
-    "mean": 0.5,
-    "median": 0,
-    "p90": 2,
-    "max": 10
-   },
-   "focus_kept": {
-    "mean": 1.0,
-    "median": 1,
-    "p90": 3,
-    "max": 8
-   },
-   "needs": {
-    "mean": 3.7,
-    "median": 3,
-    "p90": 8,
-    "max": 20
-   },
-   "fyi": {
-    "mean": 2.7,
-    "median": 2,
-    "p90": 6,
-    "max": 20
-   }
-  },
-  "Needs you at a visit over time": {
-   "days 1-2": 3.1,
-   "days 5-6": 3.7,
-   "days 9-10": 3.8
-  },
-  "new rows per person per day": {
-   "all": {
-    "Focus from persons": 4.4,
-    "Focus from agents": 0.3,
-    "Needs you from persons": 14.3,
-    "Needs you from agents": 4.8,
-    "FYI from persons": 14.9,
-    "FYI from agents": 0.0,
-    "single list": 38.7,
-    "Focus": 4.7
-   },
-   "p02": {
-    "Focus from persons": 4.3,
-    "Focus from agents": 0.0,
-    "Needs you from persons": 12.7,
-    "Needs you from agents": 4.8,
-    "FYI from persons": 19.3,
-    "FYI from agents": 0.0,
-    "single list": 41.1,
-    "Focus": 4.3
-   },
-   "p01": {
-    "Focus from persons": 3.3,
-    "Focus from agents": 0.0,
-    "Needs you from persons": 14.7,
-    "Needs you from agents": 2.0,
-    "FYI from persons": 14.0,
-    "FYI from agents": 0.0,
-    "single list": 34.0,
-    "Focus": 3.3
-   },
-   "p04": {
-    "Focus from persons": 3.4,
-    "Focus from agents": 0.0,
-    "Needs you from persons": 13.6,
-    "Needs you from agents": 7.6,
-    "FYI from persons": 11.8,
-    "FYI from agents": 0.0,
-    "single list": 36.4,
-    "Focus": 3.4
-   },
-   "p09": {
-    "Focus from persons": 12.8,
-    "Focus from agents": 9.7,
-    "Needs you from persons": 9.4,
-    "Needs you from agents": 0.0,
-    "FYI from persons": 15.6,
-    "FYI from agents": 0.0,
-    "single list": 47.5,
-    "Focus": 22.5
-   }
-  },
-  "personas at a visit": {
-   "p02": {
-    "focus_new": {
-     "mean": 0.4,
-     "median": 0,
-     "p90": 1,
-     "max": 2
-    },
-    "focus_kept": {
-     "mean": 1.2,
-     "median": 1,
-     "p90": 3,
-     "max": 4
-    },
-    "needs": {
-     "mean": 3.6,
-     "median": 3,
-     "p90": 8,
-     "max": 9
-    },
-    "fyi": {
-     "mean": 3.4,
-     "median": 3,
-     "p90": 8,
-     "max": 12
-    }
-   },
-   "p01": {
-    "focus_new": {
-     "mean": 0.4,
-     "median": 0,
-     "p90": 1,
-     "max": 3
-    },
-    "focus_kept": {
-     "mean": 0.8,
-     "median": 1,
-     "p90": 2,
-     "max": 3
-    },
-    "needs": {
-     "mean": 3.3,
-     "median": 3,
-     "p90": 7,
-     "max": 8
-    },
-    "fyi": {
-     "mean": 2.5,
-     "median": 2,
-     "p90": 5,
-     "max": 12
-    }
-   },
-   "p04": {
-    "focus_new": {
-     "mean": 0.4,
-     "median": 0,
-     "p90": 1,
-     "max": 4
-    },
-    "focus_kept": {
-     "mean": 1.4,
-     "median": 1,
-     "p90": 3,
-     "max": 4
-    },
-    "needs": {
-     "mean": 4.0,
-     "median": 3,
-     "p90": 10,
-     "max": 13
-    },
-    "fyi": {
-     "mean": 2.1,
-     "median": 1,
-     "p90": 5,
-     "max": 9
-    }
-   },
-   "p09": {
-    "focus_new": {
-     "mean": 3.0,
-     "median": 3,
-     "p90": 6,
-     "max": 10
-    },
-    "focus_kept": {
-     "mean": 0.8,
-     "median": 1,
-     "p90": 2,
-     "max": 3
-    },
-    "needs": {
-     "mean": 2.0,
-     "median": 1,
-     "p90": 5,
-     "max": 12
-    },
-    "fyi": {
-     "mean": 2.6,
-     "median": 2,
-     "p90": 7,
-     "max": 11
-    }
-   }
-  },
-  "items by bucket and author": {
-   "Focus / person": 1461,
-   "Focus / agent": 513,
-   "Needs you / person": 7157,
-   "Needs you / agent": 4738,
-   "FYI / person": 5721
-  },
-  "why items land in Needs you": {
-   "Reply in a thread you started": 7018,
-   "Reply in a thread you only replied in": 3055,
-   "Mentioned you": 1228,
-   "Flag that names nobody": 594
-  },
+  "read at once while watching": 446,
   "end of run": {
    "rows kept by a flag at the end (per person, mean)": 0.1,
    "rows kept by the person at the end (per person, mean)": 0.9,
-   "markers left in conversations": 4
+   "markers left in conversations": 5
   },
   "rulings": {
-   "R06": 2,
-   "R13": 6,
-   "R16": 137,
-   "R18": 173,
-   "R22": 41399,
-   "R27": 22
+   "R13": 9,
+   "R16": 82,
+   "R18": 185,
+   "R22": 43441,
+   "R27": 49,
+   "R35": 3,
+   "R36": 9,
+   "R38": 170,
+   "R41": 3,
+   "R42": 43,
+   "R43": 25,
+   "R44": 2
   },
   "notes": {}
  },
  {
   "variant": "half the traffic",
-  "messages": 6755,
+  "messages": 6674,
   "share written by agents": 0.35,
-  "events": 12163,
+  "events": 12060,
   "violations": 0,
   "violation samples": [],
   "rows at a visit": {
@@ -684,138 +727,86 @@
     "mean": 0.3,
     "median": 0,
     "p90": 1,
-    "max": 6
+    "max": 7
    },
    "focus_kept": {
     "mean": 0.5,
     "median": 0,
-    "p90": 1,
+    "p90": 2,
     "max": 4
    },
    "needs": {
-    "mean": 1.8,
+    "mean": 2.0,
     "median": 1,
-    "p90": 4,
-    "max": 15
+    "p90": 5,
+    "max": 16
    },
    "fyi": {
-    "mean": 1.6,
+    "mean": 1.2,
     "median": 1,
-    "p90": 4,
-    "max": 10
+    "p90": 3,
+    "max": 8
    }
   },
   "Needs you at a visit over time": {
-   "days 1-2": 1.6,
-   "days 5-6": 1.7,
-   "days 9-10": 2.2
+   "days 1-2": 1.7,
+   "days 5-6": 2.2,
+   "days 9-10": 2.0
   },
   "new rows per person per day": {
    "all": {
     "Focus from persons": 2.1,
     "Focus from agents": 0.2,
-    "Needs you from persons": 7.7,
-    "Needs you from agents": 0.9,
-    "FYI from persons": 8.2,
+    "Needs you from persons": 8.7,
+    "Needs you from agents": 1.1,
+    "FYI from persons": 6.0,
     "FYI from agents": 1.4,
-    "single list": 20.4,
+    "single list": 19.5,
     "Focus": 2.3
    },
    "p02": {
-    "Focus from persons": 2.2,
-    "Focus from agents": 0.0,
-    "Needs you from persons": 7.6,
-    "Needs you from agents": 0.3,
-    "FYI from persons": 10.7,
-    "FYI from agents": 1.9,
-    "single list": 22.7,
-    "Focus": 2.2
-   },
-   "p01": {
-    "Focus from persons": 2.4,
-    "Focus from agents": 0.1,
-    "Needs you from persons": 6.2,
-    "Needs you from agents": 0.1,
-    "FYI from persons": 8.8,
-    "FYI from agents": 0.6,
-    "single list": 18.2,
-    "Focus": 2.5
-   },
-   "p04": {
     "Focus from persons": 1.8,
     "Focus from agents": 0.0,
-    "Needs you from persons": 7.8,
-    "Needs you from agents": 2.6,
-    "FYI from persons": 7.3,
-    "FYI from agents": 2.2,
-    "single list": 21.7,
+    "Needs you from persons": 6.5,
+    "Needs you from agents": 0.4,
+    "FYI from persons": 9.9,
+    "FYI from agents": 1.2,
+    "single list": 19.8,
     "Focus": 1.8
    },
+   "p01": {
+    "Focus from persons": 2.1,
+    "Focus from agents": 0.0,
+    "Needs you from persons": 9.1,
+    "Needs you from agents": 0.3,
+    "FYI from persons": 6.4,
+    "FYI from agents": 0.7,
+    "single list": 18.6,
+    "Focus": 2.1
+   },
+   "p04": {
+    "Focus from persons": 2.2,
+    "Focus from agents": 0.2,
+    "Needs you from persons": 10.4,
+    "Needs you from agents": 3.5,
+    "FYI from persons": 4.1,
+    "FYI from agents": 2.6,
+    "single list": 23.0,
+    "Focus": 2.4
+   },
    "p09": {
-    "Focus from persons": 8.0,
-    "Focus from agents": 4.0,
-    "Needs you from persons": 4.5,
+    "Focus from persons": 7.6,
+    "Focus from agents": 4.4,
+    "Needs you from persons": 5.8,
     "Needs you from agents": 0.0,
-    "FYI from persons": 7.7,
-    "FYI from agents": 1.1,
-    "single list": 25.3,
+    "FYI from persons": 6.5,
+    "FYI from agents": 2.5,
+    "single list": 26.8,
     "Focus": 12.0
    }
   },
   "personas at a visit": {
    "p02": {
-    "focus_new": {
-     "mean": 0.3,
-     "median": 0,
-     "p90": 1,
-     "max": 3
-    },
-    "focus_kept": {
-     "mean": 0.5,
-     "median": 0,
-     "p90": 2,
-     "max": 2
-    },
-    "needs": {
-     "mean": 1.7,
-     "median": 1,
-     "p90": 5,
-     "max": 7
-    },
-    "fyi": {
-     "mean": 2.4,
-     "median": 2,
-     "p90": 5,
-     "max": 8
-    }
-   },
-   "p01": {
-    "focus_new": {
-     "mean": 0.3,
-     "median": 0,
-     "p90": 1,
-     "max": 3
-    },
-    "focus_kept": {
-     "mean": 0.5,
-     "median": 0,
-     "p90": 2,
-     "max": 2
-    },
-    "needs": {
-     "mean": 1.6,
-     "median": 1,
-     "p90": 4,
-     "max": 9
-    },
-    "fyi": {
-     "mean": 1.7,
-     "median": 1,
-     "p90": 4,
-     "max": 8
-    }
-   },
-   "p04": {
     "focus_new": {
      "mean": 0.2,
      "median": 0,
@@ -823,84 +814,151 @@
      "max": 2
     },
     "focus_kept": {
-     "mean": 0.7,
+     "mean": 0.9,
      "median": 1,
      "p90": 2,
-     "max": 2
+     "max": 3
     },
     "needs": {
-     "mean": 2.0,
-     "median": 2,
-     "p90": 5,
-     "max": 9
-    },
-    "fyi": {
      "mean": 1.4,
      "median": 1,
      "p90": 3,
-     "max": 9
-    }
-   },
-   "p09": {
-    "focus_new": {
-     "mean": 1.8,
+     "max": 5
+    },
+    "fyi": {
+     "mean": 2.2,
      "median": 2,
      "p90": 4,
-     "max": 6
+     "max": 7
+    }
+   },
+   "p01": {
+    "focus_new": {
+     "mean": 0.3,
+     "median": 0,
+     "p90": 1,
+     "max": 2
     },
     "focus_kept": {
-     "mean": 0.7,
-     "median": 1,
+     "mean": 0.5,
+     "median": 0,
      "p90": 1,
      "max": 2
     },
     "needs": {
-     "mean": 1.0,
-     "median": 0,
-     "p90": 3,
-     "max": 6
+     "mean": 1.9,
+     "median": 1,
+     "p90": 5,
+     "max": 11
     },
     "fyi": {
-     "mean": 1.4,
+     "mean": 1.1,
+     "median": 1,
+     "p90": 3,
+     "max": 5
+    }
+   },
+   "p04": {
+    "focus_new": {
+     "mean": 0.2,
+     "median": 0,
+     "p90": 1,
+     "max": 3
+    },
+    "focus_kept": {
+     "mean": 0.9,
+     "median": 0,
+     "p90": 3,
+     "max": 4
+    },
+    "needs": {
+     "mean": 2.8,
+     "median": 2,
+     "p90": 6,
+     "max": 10
+    },
+    "fyi": {
+     "mean": 1.3,
+     "median": 1,
+     "p90": 3,
+     "max": 5
+    }
+   },
+   "p09": {
+    "focus_new": {
+     "mean": 1.9,
+     "median": 1,
+     "p90": 5,
+     "max": 7
+    },
+    "focus_kept": {
+     "mean": 0.9,
+     "median": 1,
+     "p90": 2,
+     "max": 3
+    },
+    "needs": {
+     "mean": 1.2,
      "median": 1,
      "p90": 4,
-     "max": 7
+     "max": 5
+    },
+    "fyi": {
+     "mean": 1.1,
+     "median": 1,
+     "p90": 3,
+     "max": 5
     }
    }
   },
   "items by bucket and author": {
-   "Focus / person": 692,
-   "Focus / agent": 185,
-   "Needs you / person": 3567,
-   "Needs you / agent": 487,
-   "FYI / person": 2964,
-   "FYI / agent": 1943
+   "Focus / person": 699,
+   "Focus / agent": 191,
+   "Needs you / person": 3809,
+   "Needs you / agent": 550,
+   "FYI / person": 2309,
+   "FYI / agent": 1890
   },
   "why items land in Needs you": {
-   "Reply in a thread you started": 1722,
-   "Reply in a thread you only replied in": 1357,
-   "Mentioned you": 629,
-   "Flag that names nobody": 346
+   "Reply in a thread you started": 1971,
+   "Reply in a thread you only replied in": 1302,
+   "Reaction from someone you addressed, in a direct conversation": 458,
+   "Flag that names nobody": 273,
+   "Mentioned you, nothing else": 216,
+   "Reaction from someone you addressed, in a channel": 139
   },
+  "notifications per person per day": {
+   "A": 20.7,
+   "B": 14.6,
+   "C": 2.7
+  },
+  "read at once while watching": 180,
   "end of run": {
-   "rows kept by a flag at the end (per person, mean)": 0,
-   "rows kept by the person at the end (per person, mean)": 0.4,
+   "rows kept by a flag at the end (per person, mean)": 0.1,
+   "rows kept by the person at the end (per person, mean)": 0.5,
    "markers left in conversations": 0
   },
   "rulings": {
-   "R13": 5,
-   "R16": 84,
-   "R18": 96,
-   "R22": 22314,
-   "R27": 28
+   "R06": 1,
+   "R13": 3,
+   "R16": 65,
+   "R18": 87,
+   "R22": 21498,
+   "R27": 31,
+   "R35": 3,
+   "R36": 3,
+   "R38": 73,
+   "R41": 2,
+   "R42": 23,
+   "R43": 9
   },
   "notes": {}
  },
  {
   "variant": "double the traffic",
-  "messages": 26793,
+  "messages": 26740,
   "share written by agents": 0.35,
-  "events": 42790,
+  "events": 43268,
   "violations": 0,
   "violation samples": [],
   "rows at a visit": {
@@ -908,7 +966,7 @@
     "mean": 1.0,
     "median": 1,
     "p90": 2,
-    "max": 21
+    "max": 17
    },
    "focus_kept": {
     "mean": 1.9,
@@ -917,125 +975,125 @@
     "max": 8
    },
    "needs": {
-    "mean": 6.7,
-    "median": 5,
+    "mean": 7.2,
+    "median": 6,
     "p90": 15,
-    "max": 39
+    "max": 38
    },
    "fyi": {
-    "mean": 5.2,
+    "mean": 4.5,
     "median": 4,
-    "p90": 11,
-    "max": 27
+    "p90": 9,
+    "max": 28
    }
   },
   "Needs you at a visit over time": {
-   "days 1-2": 5.9,
+   "days 1-2": 6.5,
    "days 5-6": 7.1,
-   "days 9-10": 7.1
+   "days 9-10": 7.4
   },
   "new rows per person per day": {
    "all": {
     "Focus from persons": 7.9,
-    "Focus from agents": 0.5,
-    "Needs you from persons": 27.4,
-    "Needs you from agents": 4.0,
-    "FYI from persons": 27.0,
-    "FYI from agents": 6.2,
-    "single list": 72.9,
-    "Focus": 8.4
-   },
-   "p02": {
-    "Focus from persons": 8.0,
-    "Focus from agents": 0.3,
-    "Needs you from persons": 27.8,
-    "Needs you from agents": 1.6,
-    "FYI from persons": 33.5,
-    "FYI from agents": 8.9,
-    "single list": 80.1,
+    "Focus from agents": 0.4,
+    "Needs you from persons": 32.0,
+    "Needs you from agents": 4.1,
+    "FYI from persons": 23.0,
+    "FYI from agents": 6.0,
+    "single list": 73.4,
     "Focus": 8.3
    },
-   "p01": {
-    "Focus from persons": 8.5,
+   "p02": {
+    "Focus from persons": 7.6,
     "Focus from agents": 0.0,
-    "Needs you from persons": 30.1,
-    "Needs you from agents": 0.4,
-    "FYI from persons": 24.6,
-    "FYI from agents": 3.6,
-    "single list": 67.2,
-    "Focus": 8.5
+    "Needs you from persons": 35.0,
+    "Needs you from agents": 2.3,
+    "FYI from persons": 30.9,
+    "FYI from agents": 6.6,
+    "single list": 82.4,
+    "Focus": 7.6
+   },
+   "p01": {
+    "Focus from persons": 8.7,
+    "Focus from agents": 0.0,
+    "Needs you from persons": 32.1,
+    "Needs you from agents": 1.1,
+    "FYI from persons": 23.2,
+    "FYI from agents": 2.8,
+    "single list": 67.9,
+    "Focus": 8.7
    },
    "p04": {
-    "Focus from persons": 8.5,
+    "Focus from persons": 7.8,
     "Focus from agents": 0.0,
-    "Needs you from persons": 28.3,
-    "Needs you from agents": 11.3,
-    "FYI from persons": 21.1,
-    "FYI from agents": 7.4,
-    "single list": 76.6,
-    "Focus": 8.5
+    "Needs you from persons": 31.8,
+    "Needs you from agents": 10.9,
+    "FYI from persons": 16.2,
+    "FYI from agents": 8.4,
+    "single list": 75.1,
+    "Focus": 7.8
    },
    "p09": {
-    "Focus from persons": 20.5,
-    "Focus from agents": 12.2,
-    "Needs you from persons": 20.5,
+    "Focus from persons": 22.3,
+    "Focus from agents": 11.6,
+    "Needs you from persons": 26.7,
     "Needs you from agents": 0.0,
-    "FYI from persons": 25.4,
-    "FYI from agents": 4.3,
-    "single list": 82.9,
-    "Focus": 32.7
+    "FYI from persons": 22.0,
+    "FYI from agents": 4.8,
+    "single list": 87.4,
+    "Focus": 33.9
    }
   },
   "personas at a visit": {
    "p02": {
     "focus_new": {
-     "mean": 1.0,
+     "mean": 0.9,
      "median": 1,
      "p90": 3,
      "max": 3
     },
     "focus_kept": {
-     "mean": 1.2,
-     "median": 1,
-     "p90": 2,
-     "max": 4
+     "mean": 1.9,
+     "median": 2,
+     "p90": 5,
+     "max": 6
     },
     "needs": {
-     "mean": 6.9,
-     "median": 6,
-     "p90": 18,
-     "max": 27
+     "mean": 7.7,
+     "median": 7,
+     "p90": 16,
+     "max": 28
     },
     "fyi": {
-     "mean": 5.3,
+     "mean": 6.7,
      "median": 5,
-     "p90": 10,
-     "max": 16
+     "p90": 16,
+     "max": 22
     }
    },
    "p01": {
     "focus_new": {
      "mean": 0.8,
-     "median": 0,
-     "p90": 2,
-     "max": 5
+     "median": 1,
+     "p90": 3,
+     "max": 4
     },
     "focus_kept": {
-     "mean": 2.5,
-     "median": 3,
+     "mean": 1.8,
+     "median": 1,
      "p90": 4,
-     "max": 6
+     "max": 5
     },
     "needs": {
-     "mean": 6.4,
-     "median": 5,
-     "p90": 15,
-     "max": 23
+     "mean": 6.8,
+     "median": 6,
+     "p90": 14,
+     "max": 24
     },
     "fyi": {
-     "mean": 5.7,
-     "median": 4,
-     "p90": 15,
+     "mean": 4.5,
+     "median": 3,
+     "p90": 12,
      "max": 22
     }
    },
@@ -1044,81 +1102,95 @@
      "mean": 1.0,
      "median": 1,
      "p90": 3,
-     "max": 5
+     "max": 4
     },
     "focus_kept": {
-     "mean": 3.0,
-     "median": 3,
+     "mean": 2.3,
+     "median": 2,
      "p90": 5,
      "max": 7
     },
     "needs": {
-     "mean": 8.1,
-     "median": 6,
-     "p90": 17,
-     "max": 33
+     "mean": 8.7,
+     "median": 7,
+     "p90": 20,
+     "max": 32
     },
     "fyi": {
-     "mean": 3.4,
-     "median": 3,
-     "p90": 10,
-     "max": 14
+     "mean": 3.8,
+     "median": 4,
+     "p90": 8,
+     "max": 12
     }
    },
    "p09": {
     "focus_new": {
      "mean": 4.8,
      "median": 4,
-     "p90": 9,
-     "max": 21
+     "p90": 10,
+     "max": 17
     },
     "focus_kept": {
-     "mean": 1.3,
+     "mean": 1.2,
      "median": 1,
-     "p90": 4,
-     "max": 5
+     "p90": 2,
+     "max": 3
     },
     "needs": {
-     "mean": 3.9,
+     "mean": 4.3,
      "median": 3,
-     "p90": 9,
-     "max": 16
+     "p90": 10,
+     "max": 19
     },
     "fyi": {
      "mean": 4.6,
-     "median": 4,
-     "p90": 9,
-     "max": 18
+     "median": 3,
+     "p90": 10,
+     "max": 21
     }
    }
   },
   "items by bucket and author": {
-   "Focus / person": 2786,
-   "Focus / agent": 625,
-   "Needs you / person": 14176,
-   "Needs you / agent": 2338,
-   "FYI / person": 11386,
-   "FYI / agent": 8345
+   "Focus / person": 2752,
+   "Focus / agent": 640,
+   "Needs you / person": 15210,
+   "Needs you / agent": 2301,
+   "FYI / person": 10028,
+   "FYI / agent": 8308
   },
   "why items land in Needs you": {
-   "Reply in a thread you started": 6980,
-   "Reply in a thread you only replied in": 5829,
-   "Mentioned you": 2424,
-   "Flag that names nobody": 1281
+   "Reply in a thread you started": 7915,
+   "Reply in a thread you only replied in": 5245,
+   "Reaction from someone you addressed, in a direct conversation": 1701,
+   "Flag that names nobody": 1233,
+   "Mentioned you, nothing else": 857,
+   "Reaction from someone you addressed, in a channel": 560
   },
+  "notifications per person per day": {
+   "A": 77.8,
+   "B": 54.3,
+   "C": 10.0
+  },
+  "read at once while watching": 1371,
   "end of run": {
-   "rows kept by a flag at the end (per person, mean)": 0.4,
-   "rows kept by the person at the end (per person, mean)": 1.5,
-   "markers left in conversations": 12
+   "rows kept by a flag at the end (per person, mean)": 0.1,
+   "rows kept by the person at the end (per person, mean)": 1.6,
+   "markers left in conversations": 18
   },
   "rulings": {
-   "R03": 1,
-   "R06": 2,
-   "R13": 21,
-   "R16": 159,
-   "R18": 365,
-   "R22": 83049,
-   "R27": 38
+   "R06": 1,
+   "R13": 17,
+   "R16": 86,
+   "R18": 369,
+   "R22": 83522,
+   "R27": 65,
+   "R35": 14,
+   "R36": 16,
+   "R38": 292,
+   "R41": 4,
+   "R42": 94,
+   "R43": 54,
+   "R44": 2
   },
   "notes": {}
  },
@@ -1126,9 +1198,9 @@
   "seeds": [
    {
     "variant": "base",
-    "messages": 13418,
+    "messages": 13406,
     "share written by agents": 0.35,
-    "events": 22287,
+    "events": 22418,
     "violations": 0,
     "violation samples": [],
     "rows at a visit": {
@@ -1136,82 +1208,82 @@
       "mean": 0.5,
       "median": 0,
       "p90": 1,
-      "max": 9
+      "max": 10
      },
      "focus_kept": {
-      "mean": 1.0,
+      "mean": 1.1,
       "median": 1,
-      "p90": 2,
-      "max": 7
+      "p90": 3,
+      "max": 6
      },
      "needs": {
-      "mean": 3.5,
+      "mean": 3.7,
       "median": 3,
       "p90": 8,
-      "max": 22
+      "max": 25
      },
      "fyi": {
-      "mean": 2.9,
+      "mean": 2.2,
       "median": 2,
-      "p90": 7,
-      "max": 19
+      "p90": 5,
+      "max": 14
      }
     },
     "Needs you at a visit over time": {
-     "days 1-2": 3.3,
-     "days 5-6": 3.3,
-     "days 9-10": 3.8
+     "days 1-2": 3.4,
+     "days 5-6": 3.4,
+     "days 9-10": 3.6
     },
     "new rows per person per day": {
      "all": {
-      "Focus from persons": 4.0,
+      "Focus from persons": 4.2,
       "Focus from agents": 0.2,
-      "Needs you from persons": 14.5,
-      "Needs you from agents": 1.7,
-      "FYI from persons": 14.9,
-      "FYI from agents": 3.1,
-      "single list": 38.4,
-      "Focus": 4.2
+      "Needs you from persons": 16.7,
+      "Needs you from agents": 1.6,
+      "FYI from persons": 11.6,
+      "FYI from agents": 3.0,
+      "single list": 37.3,
+      "Focus": 4.4
      },
      "p02": {
-      "Focus from persons": 3.0,
-      "Focus from agents": 0.0,
-      "Needs you from persons": 14.6,
-      "Needs you from agents": 1.1,
-      "FYI from persons": 21.1,
-      "FYI from agents": 2.9,
-      "single list": 42.7,
-      "Focus": 3.0
-     },
-     "p01": {
-      "Focus from persons": 4.7,
-      "Focus from agents": 0.1,
-      "Needs you from persons": 17.0,
-      "Needs you from agents": 4.2,
-      "FYI from persons": 17.9,
-      "FYI from agents": 3.1,
-      "single list": 47.0,
-      "Focus": 4.8
-     },
-     "p04": {
       "Focus from persons": 3.9,
       "Focus from agents": 0.0,
-      "Needs you from persons": 14.3,
-      "Needs you from agents": 1.1,
-      "FYI from persons": 13.1,
-      "FYI from agents": 4.4,
-      "single list": 36.8,
+      "Needs you from persons": 17.7,
+      "Needs you from agents": 0.8,
+      "FYI from persons": 16.6,
+      "FYI from agents": 2.0,
+      "single list": 41.0,
       "Focus": 3.9
      },
+     "p01": {
+      "Focus from persons": 3.9,
+      "Focus from agents": 0.1,
+      "Needs you from persons": 17.4,
+      "Needs you from agents": 4.3,
+      "FYI from persons": 13.2,
+      "FYI from agents": 2.8,
+      "single list": 41.7,
+      "Focus": 4.0
+     },
+     "p04": {
+      "Focus from persons": 4.3,
+      "Focus from agents": 0.0,
+      "Needs you from persons": 17.7,
+      "Needs you from agents": 0.9,
+      "FYI from persons": 9.5,
+      "FYI from agents": 2.9,
+      "single list": 35.3,
+      "Focus": 4.3
+     },
      "p09": {
-      "Focus from persons": 10.1,
-      "Focus from agents": 5.9,
-      "Needs you from persons": 14.0,
-      "Needs you from agents": 0.1,
-      "FYI from persons": 17.2,
-      "FYI from agents": 3.9,
-      "single list": 51.2,
-      "Focus": 16.0
+      "Focus from persons": 9.9,
+      "Focus from agents": 5.1,
+      "Needs you from persons": 16.5,
+      "Needs you from agents": 0.2,
+      "FYI from persons": 11.2,
+      "FYI from agents": 4.5,
+      "single list": 47.4,
+      "Focus": 15.0
      }
     },
     "personas at a visit": {
@@ -1219,140 +1291,155 @@
       "focus_new": {
        "mean": 0.4,
        "median": 0,
-       "p90": 2,
+       "p90": 1,
        "max": 4
       },
       "focus_kept": {
-       "mean": 1.5,
+       "mean": 1.2,
        "median": 1,
        "p90": 3,
-       "max": 4
+       "max": 5
       },
       "needs": {
-       "mean": 3.5,
+       "mean": 3.7,
        "median": 3,
-       "p90": 7,
-       "max": 12
+       "p90": 8,
+       "max": 13
       },
       "fyi": {
        "mean": 3.2,
        "median": 3,
-       "p90": 7,
-       "max": 8
+       "p90": 6,
+       "max": 11
       }
      },
      "p01": {
       "focus_new": {
-       "mean": 0.5,
+       "mean": 0.4,
        "median": 0,
-       "p90": 2,
+       "p90": 1,
        "max": 4
       },
       "focus_kept": {
        "mean": 1.1,
        "median": 1,
        "p90": 3,
-       "max": 3
+       "max": 4
       },
       "needs": {
-       "mean": 4.7,
-       "median": 4,
-       "p90": 12,
-       "max": 16
+       "mean": 4.2,
+       "median": 3,
+       "p90": 9,
+       "max": 18
       },
       "fyi": {
-       "mean": 4.4,
-       "median": 3,
-       "p90": 12,
-       "max": 18
+       "mean": 3.2,
+       "median": 2,
+       "p90": 8,
+       "max": 10
       }
      },
      "p04": {
       "focus_new": {
+       "mean": 0.4,
+       "median": 0,
+       "p90": 1,
+       "max": 2
+      },
+      "focus_kept": {
        "mean": 0.5,
        "median": 0,
        "p90": 1,
-       "max": 3
-      },
-      "focus_kept": {
-       "mean": 1.0,
-       "median": 1,
-       "p90": 2,
-       "max": 3
+       "max": 2
       },
       "needs": {
-       "mean": 3.3,
+       "mean": 3.5,
        "median": 3,
-       "p90": 6,
-       "max": 9
-      },
-      "fyi": {
-       "mean": 3.1,
-       "median": 2,
-       "p90": 7,
-       "max": 11
-      }
-     },
-     "p09": {
-      "focus_new": {
-       "mean": 2.5,
-       "median": 2,
-       "p90": 5,
-       "max": 9
-      },
-      "focus_kept": {
-       "mean": 1.6,
-       "median": 1,
-       "p90": 3,
-       "max": 5
-      },
-      "needs": {
-       "mean": 3.0,
-       "median": 2,
        "p90": 7,
        "max": 13
       },
       "fyi": {
-       "mean": 2.8,
+       "mean": 1.8,
        "median": 2,
-       "p90": 7,
+       "p90": 4,
+       "max": 6
+      }
+     },
+     "p09": {
+      "focus_new": {
+       "mean": 2.4,
+       "median": 2,
+       "p90": 5,
        "max": 10
+      },
+      "focus_kept": {
+       "mean": 1.6,
+       "median": 2,
+       "p90": 3,
+       "max": 6
+      },
+      "needs": {
+       "mean": 3.1,
+       "median": 2,
+       "p90": 8,
+       "max": 15
+      },
+      "fyi": {
+       "mean": 2.2,
+       "median": 2,
+       "p90": 5,
+       "max": 7
       }
      }
     },
     "items by bucket and author": {
-     "Focus / person": 1370,
-     "Focus / agent": 347,
-     "Needs you / person": 7308,
-     "Needs you / agent": 1030,
-     "FYI / person": 5889,
-     "FYI / agent": 4008
+     "Focus / person": 1406,
+     "Focus / agent": 336,
+     "Needs you / person": 8021,
+     "Needs you / agent": 993,
+     "FYI / person": 4781,
+     "FYI / agent": 4120
     },
     "why items land in Needs you": {
-     "Reply in a thread you started": 3486,
-     "Reply in a thread you only replied in": 2961,
-     "Mentioned you": 1258,
-     "Flag that names nobody": 633
+     "Reply in a thread you started": 4049,
+     "Reply in a thread you only replied in": 3014,
+     "Reaction from someone you addressed, in a direct conversation": 919,
+     "Mentioned you, nothing else": 414,
+     "Flag that names nobody": 344,
+     "Reaction from someone you addressed, in a channel": 274
     },
+    "notifications per person per day": {
+     "A": 39.4,
+     "B": 28.0,
+     "C": 5.2
+    },
+    "read at once while watching": 424,
     "end of run": {
-     "rows kept by a flag at the end (per person, mean)": 0,
+     "rows kept by a flag at the end (per person, mean)": 0.2,
      "rows kept by the person at the end (per person, mean)": 0.9,
-     "markers left in conversations": 6
+     "markers left in conversations": 4
     },
     "rulings": {
-     "R13": 13,
-     "R16": 89,
-     "R18": 151,
-     "R22": 42722,
-     "R27": 17
+     "R06": 1,
+     "R13": 11,
+     "R16": 83,
+     "R18": 166,
+     "R22": 41806,
+     "R27": 42,
+     "R35": 7,
+     "R36": 4,
+     "R38": 167,
+     "R42": 63,
+     "R43": 15,
+     "R44": 2
     },
     "notes": {}
    },
    {
     "variant": "base",
-    "messages": 13538,
+    "messages": 13442,
     "share written by agents": 0.35,
-    "events": 22337,
+    "events": 22472,
     "violations": 0,
     "violation samples": [],
     "rows at a visit": {
@@ -1363,132 +1450,132 @@
       "max": 8
      },
      "focus_kept": {
-      "mean": 1.0,
+      "mean": 1.1,
       "median": 1,
-      "p90": 2,
+      "p90": 3,
       "max": 6
      },
      "needs": {
-      "mean": 3.6,
+      "mean": 3.9,
       "median": 3,
       "p90": 8,
-      "max": 22
+      "max": 23
      },
      "fyi": {
-      "mean": 2.7,
+      "mean": 2.1,
       "median": 2,
-      "p90": 6,
-      "max": 16
+      "p90": 5,
+      "max": 14
      }
     },
     "Needs you at a visit over time": {
-     "days 1-2": 3.6,
-     "days 5-6": 3.8,
-     "days 9-10": 3.4
+     "days 1-2": 4.0,
+     "days 5-6": 4.0,
+     "days 9-10": 3.8
     },
     "new rows per person per day": {
      "all": {
-      "Focus from persons": 4.1,
-      "Focus from agents": 0.2,
-      "Needs you from persons": 14.4,
-      "Needs you from agents": 2.2,
-      "FYI from persons": 14.0,
-      "FYI from agents": 3.0,
-      "single list": 38.0,
+      "Focus from persons": 4.0,
+      "Focus from agents": 0.3,
+      "Needs you from persons": 17.3,
+      "Needs you from agents": 2.1,
+      "FYI from persons": 11.8,
+      "FYI from agents": 2.9,
+      "single list": 38.4,
       "Focus": 4.3
      },
      "p02": {
-      "Focus from persons": 5.2,
+      "Focus from persons": 3.7,
       "Focus from agents": 0.0,
-      "Needs you from persons": 15.2,
-      "Needs you from agents": 0.1,
-      "FYI from persons": 18.8,
-      "FYI from agents": 1.5,
-      "single list": 40.8,
-      "Focus": 5.2
+      "Needs you from persons": 19.1,
+      "Needs you from agents": 0.2,
+      "FYI from persons": 19.1,
+      "FYI from agents": 1.2,
+      "single list": 43.3,
+      "Focus": 3.7
      },
      "p01": {
-      "Focus from persons": 3.8,
-      "Focus from agents": 0.0,
-      "Needs you from persons": 15.5,
-      "Needs you from agents": 0.6,
-      "FYI from persons": 14.7,
-      "FYI from agents": 2.7,
-      "single list": 37.3,
-      "Focus": 3.8
+      "Focus from persons": 3.5,
+      "Focus from agents": 0.1,
+      "Needs you from persons": 16.6,
+      "Needs you from agents": 0.9,
+      "FYI from persons": 10.5,
+      "FYI from agents": 2.3,
+      "single list": 33.9,
+      "Focus": 3.6
      },
      "p04": {
-      "Focus from persons": 3.3,
+      "Focus from persons": 3.4,
       "Focus from agents": 0.0,
-      "Needs you from persons": 15.2,
-      "Needs you from agents": 0.4,
-      "FYI from persons": 12.3,
-      "FYI from agents": 0.5,
-      "single list": 31.7,
-      "Focus": 3.3
+      "Needs you from persons": 17.6,
+      "Needs you from agents": 0.3,
+      "FYI from persons": 6.7,
+      "FYI from agents": 0.4,
+      "single list": 28.4,
+      "Focus": 3.4
      },
      "p09": {
-      "Focus from persons": 9.6,
-      "Focus from agents": 6.5,
-      "Needs you from persons": 14.2,
-      "Needs you from agents": 0.7,
-      "FYI from persons": 14.4,
-      "FYI from agents": 5.9,
-      "single list": 51.3,
-      "Focus": 16.1
+      "Focus from persons": 8.9,
+      "Focus from agents": 7.4,
+      "Needs you from persons": 15.5,
+      "Needs you from agents": 0.9,
+      "FYI from persons": 13.8,
+      "FYI from agents": 7.6,
+      "single list": 54.1,
+      "Focus": 16.3
      }
     },
     "personas at a visit": {
      "p02": {
       "focus_new": {
-       "mean": 0.6,
-       "median": 0,
-       "p90": 2,
-       "max": 4
-      },
-      "focus_kept": {
-       "mean": 0.3,
+       "mean": 0.4,
        "median": 0,
        "p90": 1,
        "max": 2
       },
-      "needs": {
-       "mean": 3.4,
-       "median": 3,
-       "p90": 8,
-       "max": 14
-      },
-      "fyi": {
-       "mean": 3.3,
-       "median": 3,
-       "p90": 6,
-       "max": 8
-      }
-     },
-     "p01": {
-      "focus_new": {
-       "mean": 0.5,
-       "median": 0,
-       "p90": 2,
-       "max": 2
-      },
       "focus_kept": {
-       "mean": 0.8,
+       "mean": 0.9,
        "median": 1,
        "p90": 2,
        "max": 3
       },
       "needs": {
+       "mean": 3.9,
+       "median": 3,
+       "p90": 9,
+       "max": 15
+      },
+      "fyi": {
+       "mean": 3,
+       "median": 2,
+       "p90": 7,
+       "max": 9
+      }
+     },
+     "p01": {
+      "focus_new": {
+       "mean": 0.4,
+       "median": 0,
+       "p90": 1,
+       "max": 3
+      },
+      "focus_kept": {
+       "mean": 1.4,
+       "median": 1,
+       "p90": 3,
+       "max": 4
+      },
+      "needs": {
        "mean": 3.5,
        "median": 3,
-       "p90": 7,
+       "p90": 8,
        "max": 14
       },
       "fyi": {
-       "mean": 2.8,
-       "median": 2,
-       "p90": 5,
-       "max": 13
+       "mean": 2.2,
+       "median": 1,
+       "p90": 6,
+       "max": 9
       }
      },
      "p04": {
@@ -1499,42 +1586,42 @@
        "max": 3
       },
       "focus_kept": {
+       "mean": 0.7,
+       "median": 0,
+       "p90": 2,
+       "max": 3
+      },
+      "needs": {
+       "mean": 3.2,
+       "median": 3,
+       "p90": 7,
+       "max": 8
+      },
+      "fyi": {
        "mean": 1.3,
        "median": 1,
        "p90": 3,
-       "max": 4
-      },
-      "needs": {
-       "mean": 3.3,
-       "median": 3,
-       "p90": 6,
-       "max": 9
-      },
-      "fyi": {
-       "mean": 2,
-       "median": 2,
-       "p90": 5,
        "max": 6
       }
      },
      "p09": {
       "focus_new": {
-       "mean": 2.6,
+       "mean": 2.7,
        "median": 2,
        "p90": 6,
        "max": 8
       },
       "focus_kept": {
-       "mean": 2.0,
-       "median": 2,
-       "p90": 4,
+       "mean": 1.7,
+       "median": 1,
+       "p90": 3,
        "max": 4
       },
       "needs": {
-       "mean": 3.5,
+       "mean": 3.6,
        "median": 3,
-       "p90": 7,
-       "max": 12
+       "p90": 8,
+       "max": 16
       },
       "fyi": {
        "mean": 2.5,
@@ -1545,38 +1632,52 @@
      }
     },
     "items by bucket and author": {
-     "Focus / person": 1343,
-     "Focus / agent": 351,
-     "Needs you / person": 7162,
-     "Needs you / agent": 1180,
-     "FYI / person": 5603,
-     "FYI / agent": 4090
+     "Focus / person": 1311,
+     "Focus / agent": 345,
+     "Needs you / person": 8104,
+     "Needs you / agent": 1129,
+     "FYI / person": 4853,
+     "FYI / agent": 4019
     },
     "why items land in Needs you": {
-     "Reply in a thread you started": 3491,
-     "Reply in a thread you only replied in": 2907,
-     "Mentioned you": 1184,
-     "Flag that names nobody": 760
+     "Reply in a thread you started": 4081,
+     "Reply in a thread you only replied in": 2940,
+     "Reaction from someone you addressed, in a direct conversation": 829,
+     "Flag that names nobody": 710,
+     "Mentioned you, nothing else": 417,
+     "Reaction from someone you addressed, in a channel": 256
     },
+    "notifications per person per day": {
+     "A": 40.7,
+     "B": 29.0,
+     "C": 5.0
+    },
+    "read at once while watching": 495,
     "end of run": {
-     "rows kept by a flag at the end (per person, mean)": 0.2,
-     "rows kept by the person at the end (per person, mean)": 1.2,
-     "markers left in conversations": 5
+     "rows kept by a flag at the end (per person, mean)": 0.1,
+     "rows kept by the person at the end (per person, mean)": 1.0,
+     "markers left in conversations": 4
     },
     "rulings": {
-     "R13": 10,
-     "R16": 149,
-     "R18": 193,
-     "R22": 41919,
-     "R27": 23
+     "R06": 1,
+     "R13": 5,
+     "R16": 90,
+     "R18": 218,
+     "R22": 41489,
+     "R27": 29,
+     "R35": 9,
+     "R36": 5,
+     "R38": 170,
+     "R42": 39,
+     "R43": 24
     },
     "notes": {}
    },
    {
     "variant": "base",
-    "messages": 13485,
+    "messages": 13422,
     "share written by agents": 0.35,
-    "events": 22302,
+    "events": 22435,
     "violations": 0,
     "violation samples": [],
     "rows at a visit": {
@@ -1593,100 +1694,100 @@
       "max": 5
      },
      "needs": {
-      "mean": 3.4,
+      "mean": 3.7,
       "median": 3,
-      "p90": 7,
-      "max": 20
+      "p90": 8,
+      "max": 19
      },
      "fyi": {
-      "mean": 2.8,
+      "mean": 2.4,
       "median": 2,
-      "p90": 6,
+      "p90": 5,
       "max": 17
      }
     },
     "Needs you at a visit over time": {
-     "days 1-2": 3.2,
-     "days 5-6": 3.3,
-     "days 9-10": 3.3
+     "days 1-2": 3.3,
+     "days 5-6": 3.9,
+     "days 9-10": 3.7
     },
     "new rows per person per day": {
      "all": {
-      "Focus from persons": 4.4,
-      "Focus from agents": 0.2,
-      "Needs you from persons": 14.1,
-      "Needs you from agents": 1.4,
-      "FYI from persons": 14.6,
-      "FYI from agents": 2.8,
-      "single list": 37.5,
-      "Focus": 4.6
+      "Focus from persons": 4.2,
+      "Focus from agents": 0.3,
+      "Needs you from persons": 16.7,
+      "Needs you from agents": 1.8,
+      "FYI from persons": 12.2,
+      "FYI from agents": 2.9,
+      "single list": 38.0,
+      "Focus": 4.5
      },
      "p02": {
-      "Focus from persons": 4.0,
-      "Focus from agents": 0.0,
-      "Needs you from persons": 14.6,
-      "Needs you from agents": 3.9,
-      "FYI from persons": 20.6,
-      "FYI from agents": 1.8,
-      "single list": 44.9,
-      "Focus": 4.0
+      "Focus from persons": 3.1,
+      "Focus from agents": 0.1,
+      "Needs you from persons": 16.9,
+      "Needs you from agents": 5.7,
+      "FYI from persons": 16.0,
+      "FYI from agents": 3.2,
+      "single list": 45.0,
+      "Focus": 3.2
      },
      "p01": {
-      "Focus from persons": 4.0,
-      "Focus from agents": 0.0,
-      "Needs you from persons": 15.8,
-      "Needs you from agents": 1.3,
-      "FYI from persons": 16.5,
+      "Focus from persons": 3.7,
+      "Focus from agents": 0.1,
+      "Needs you from persons": 15.5,
+      "Needs you from agents": 1.0,
+      "FYI from persons": 13.9,
       "FYI from agents": 5.0,
-      "single list": 42.6,
-      "Focus": 4.0
+      "single list": 39.2,
+      "Focus": 3.8
      },
      "p04": {
       "Focus from persons": 3.9,
       "Focus from agents": 0.1,
-      "Needs you from persons": 13.5,
-      "Needs you from agents": 4.1,
-      "FYI from persons": 10.2,
-      "FYI from agents": 2.0,
-      "single list": 33.8,
+      "Needs you from persons": 16.3,
+      "Needs you from agents": 5.9,
+      "FYI from persons": 9.6,
+      "FYI from agents": 2.8,
+      "single list": 38.6,
       "Focus": 4.0
      },
      "p09": {
-      "Focus from persons": 11.7,
-      "Focus from agents": 5.0,
-      "Needs you from persons": 11.8,
+      "Focus from persons": 11.3,
+      "Focus from agents": 7.3,
+      "Needs you from persons": 13.5,
       "Needs you from agents": 0.8,
-      "FYI from persons": 15.2,
-      "FYI from agents": 7.1,
-      "single list": 51.6,
-      "Focus": 16.7
+      "FYI from persons": 14.1,
+      "FYI from agents": 6.9,
+      "single list": 53.9,
+      "Focus": 18.6
      }
     },
     "personas at a visit": {
      "p02": {
       "focus_new": {
-       "mean": 0.4,
+       "mean": 0.3,
        "median": 0,
        "p90": 1,
        "max": 3
       },
       "focus_kept": {
-       "mean": 1.5,
+       "mean": 0.9,
        "median": 1,
-       "p90": 4,
-       "max": 4
+       "p90": 2,
+       "max": 3
       },
       "needs": {
-       "mean": 3.8,
-       "median": 3,
-       "p90": 9,
-       "max": 16
+       "mean": 4.3,
+       "median": 4,
+       "p90": 8,
+       "max": 14
       },
       "fyi": {
-       "mean": 3.8,
+       "mean": 3.0,
        "median": 3,
-       "p90": 7,
-       "max": 9
+       "p90": 5,
+       "max": 12
       }
      },
      "p01": {
@@ -1697,111 +1798,126 @@
        "max": 4
       },
       "focus_kept": {
-       "mean": 1.0,
-       "median": 1,
+       "mean": 1.7,
+       "median": 2,
        "p90": 3,
        "max": 3
       },
       "needs": {
-       "mean": 3.9,
+       "mean": 3.7,
        "median": 3,
-       "p90": 10,
+       "p90": 8,
        "max": 13
       },
       "fyi": {
-       "mean": 3.1,
-       "median": 3,
-       "p90": 6,
-       "max": 16
+       "mean": 2.6,
+       "median": 2,
+       "p90": 7,
+       "max": 12
       }
      },
      "p04": {
       "focus_new": {
-       "mean": 0.5,
+       "mean": 0.6,
        "median": 0,
-       "p90": 1,
+       "p90": 2,
        "max": 4
       },
       "focus_kept": {
-       "mean": 0.5,
-       "median": 0,
+       "mean": 1.3,
+       "median": 1,
        "p90": 2,
-       "max": 2
+       "max": 3
       },
       "needs": {
-       "mean": 3.4,
-       "median": 3,
-       "p90": 7,
-       "max": 13
+       "mean": 4.3,
+       "median": 4,
+       "p90": 10,
+       "max": 18
       },
       "fyi": {
-       "mean": 2.1,
-       "median": 2,
-       "p90": 6,
-       "max": 8
+       "mean": 1.6,
+       "median": 1,
+       "p90": 3,
+       "max": 9
       }
      },
      "p09": {
       "focus_new": {
-       "mean": 2.7,
-       "median": 2,
-       "p90": 5,
+       "mean": 3.0,
+       "median": 3,
+       "p90": 7,
        "max": 9
       },
       "focus_kept": {
-       "mean": 1.2,
-       "median": 1,
-       "p90": 3,
-       "max": 3
+       "mean": 2,
+       "median": 2,
+       "p90": 4,
+       "max": 5
       },
       "needs": {
        "mean": 3.0,
-       "median": 3,
+       "median": 2,
        "p90": 7,
        "max": 11
       },
       "fyi": {
-       "mean": 3.6,
+       "mean": 3.1,
        "median": 3,
        "p90": 7,
-       "max": 10
+       "max": 9
       }
      }
     },
     "items by bucket and author": {
-     "Focus / person": 1454,
-     "Focus / agent": 324,
-     "Needs you / person": 7334,
-     "Needs you / agent": 907,
-     "FYI / person": 5767,
-     "FYI / agent": 4007
+     "Focus / person": 1394,
+     "Focus / agent": 330,
+     "Needs you / person": 7905,
+     "Needs you / agent": 1020,
+     "FYI / person": 5090,
+     "FYI / agent": 3950
     },
     "why items land in Needs you": {
-     "Reply in a thread you started": 3505,
-     "Reply in a thread you only replied in": 3100,
-     "Mentioned you": 1243,
-     "Flag that names nobody": 393
+     "Reply in a thread you started": 4036,
+     "Reply in a thread you only replied in": 2840,
+     "Reaction from someone you addressed, in a direct conversation": 886,
+     "Mentioned you, nothing else": 447,
+     "Flag that names nobody": 420,
+     "Reaction from someone you addressed, in a channel": 296
     },
+    "notifications per person per day": {
+     "A": 40.2,
+     "B": 28.0,
+     "C": 5.2
+    },
+    "read at once while watching": 490,
     "end of run": {
      "rows kept by a flag at the end (per person, mean)": 0.1,
      "rows kept by the person at the end (per person, mean)": 1.0,
-     "markers left in conversations": 6
+     "markers left in conversations": 8
     },
     "rulings": {
-     "R06": 3,
-     "R13": 15,
-     "R16": 110,
-     "R18": 219,
-     "R22": 37532,
-     "R27": 17
+     "R06": 1,
+     "R13": 4,
+     "R16": 88,
+     "R18": 166,
+     "R22": 37362,
+     "R27": 38,
+     "R35": 14,
+     "R36": 7,
+     "R38": 155,
+     "R41": 1,
+     "R42": 48,
+     "R43": 23,
+     "R44": 1
     },
     "notes": {}
    },
    {
     "variant": "base",
-    "messages": 13487,
+    "messages": 13341,
     "share written by agents": 0.35,
-    "events": 22257,
+    "events": 22369,
     "violations": 0,
     "violation samples": [],
     "rows at a visit": {
@@ -1809,82 +1925,82 @@
       "mean": 0.5,
       "median": 0,
       "p90": 2,
-      "max": 9
-     },
-     "focus_kept": {
-      "mean": 1.1,
-      "median": 1,
-      "p90": 3,
       "max": 7
      },
+     "focus_kept": {
+      "mean": 1.0,
+      "median": 1,
+      "p90": 2,
+      "max": 5
+     },
      "needs": {
-      "mean": 3.6,
+      "mean": 3.7,
       "median": 3,
       "p90": 8,
-      "max": 19
+      "max": 22
      },
      "fyi": {
-      "mean": 2.8,
+      "mean": 2.3,
       "median": 2,
       "p90": 6,
-      "max": 19
+      "max": 20
      }
     },
     "Needs you at a visit over time": {
      "days 1-2": 3.3,
-     "days 5-6": 3.4,
-     "days 9-10": 3.8
+     "days 5-6": 3.7,
+     "days 9-10": 3.6
     },
     "new rows per person per day": {
      "all": {
-      "Focus from persons": 4.2,
+      "Focus from persons": 4.0,
       "Focus from agents": 0.2,
-      "Needs you from persons": 15.0,
-      "Needs you from agents": 1.6,
-      "FYI from persons": 14.4,
+      "Needs you from persons": 16.1,
+      "Needs you from agents": 2.0,
+      "FYI from persons": 12.1,
       "FYI from agents": 3.0,
-      "single list": 38.4,
-      "Focus": 4.4
+      "single list": 37.5,
+      "Focus": 4.2
      },
      "p02": {
-      "Focus from persons": 3.5,
+      "Focus from persons": 3.7,
       "Focus from agents": 0.1,
-      "Needs you from persons": 14.6,
-      "Needs you from agents": 0.9,
-      "FYI from persons": 18.0,
-      "FYI from agents": 3.6,
-      "single list": 40.7,
-      "Focus": 3.6
+      "Needs you from persons": 16.7,
+      "Needs you from agents": 1.3,
+      "FYI from persons": 16.2,
+      "FYI from agents": 4.5,
+      "single list": 42.5,
+      "Focus": 3.8
      },
      "p01": {
-      "Focus from persons": 4.3,
+      "Focus from persons": 4.1,
       "Focus from agents": 0.0,
-      "Needs you from persons": 15.5,
-      "Needs you from agents": 0.1,
-      "FYI from persons": 16.3,
-      "FYI from agents": 1.1,
-      "single list": 37.3,
-      "Focus": 4.3
+      "Needs you from persons": 18.9,
+      "Needs you from agents": 0.7,
+      "FYI from persons": 13.1,
+      "FYI from agents": 1.5,
+      "single list": 38.3,
+      "Focus": 4.1
      },
      "p04": {
-      "Focus from persons": 3.8,
-      "Focus from agents": 0.1,
-      "Needs you from persons": 15.5,
-      "Needs you from agents": 1.2,
-      "FYI from persons": 13.1,
-      "FYI from agents": 5.3,
-      "single list": 39.0,
-      "Focus": 3.9
+      "Focus from persons": 4.3,
+      "Focus from agents": 0.0,
+      "Needs you from persons": 14.0,
+      "Needs you from agents": 1.1,
+      "FYI from persons": 10.1,
+      "FYI from agents": 5.0,
+      "single list": 34.5,
+      "Focus": 4.3
      },
      "p09": {
-      "Focus from persons": 12.8,
-      "Focus from agents": 4.9,
-      "Needs you from persons": 11.8,
-      "Needs you from agents": 1.4,
-      "FYI from persons": 16.1,
-      "FYI from agents": 8.9,
-      "single list": 55.9,
-      "Focus": 17.7
+      "Focus from persons": 11.5,
+      "Focus from agents": 7.1,
+      "Needs you from persons": 12.4,
+      "Needs you from agents": 0.9,
+      "FYI from persons": 10.1,
+      "FYI from agents": 7.3,
+      "single list": 49.3,
+      "Focus": 18.6
      }
     },
     "personas at a visit": {
@@ -1898,135 +2014,150 @@
       "focus_kept": {
        "mean": 1.1,
        "median": 1,
-       "p90": 4,
-       "max": 4
-      },
-      "needs": {
-       "mean": 3.3,
-       "median": 3,
-       "p90": 6,
-       "max": 17
-      },
-      "fyi": {
-       "mean": 3.6,
-       "median": 4,
-       "p90": 6,
-       "max": 12
-      }
-     },
-     "p01": {
-      "focus_new": {
-       "mean": 0.3,
-       "median": 0,
-       "p90": 1,
-       "max": 2
-      },
-      "focus_kept": {
-       "mean": 1.0,
-       "median": 1,
        "p90": 2,
        "max": 3
-      },
-      "needs": {
-       "mean": 3.4,
-       "median": 3,
-       "p90": 7,
-       "max": 11
-      },
-      "fyi": {
-       "mean": 3.0,
-       "median": 3,
-       "p90": 6,
-       "max": 9
-      }
-     },
-     "p04": {
-      "focus_new": {
-       "mean": 0.4,
-       "median": 0,
-       "p90": 1,
-       "max": 2
-      },
-      "focus_kept": {
-       "mean": 1.4,
-       "median": 1,
-       "p90": 3,
-       "max": 4
       },
       "needs": {
        "mean": 3.7,
        "median": 3,
        "p90": 8,
-       "max": 15
+       "max": 13
+      },
+      "fyi": {
+       "mean": 3.9,
+       "median": 3,
+       "p90": 8,
+       "max": 14
+      }
+     },
+     "p01": {
+      "focus_new": {
+       "mean": 0.5,
+       "median": 0,
+       "p90": 1,
+       "max": 4
+      },
+      "focus_kept": {
+       "mean": 1.2,
+       "median": 1,
+       "p90": 3,
+       "max": 3
+      },
+      "needs": {
+       "mean": 3.9,
+       "median": 3,
+       "p90": 8,
+       "max": 14
       },
       "fyi": {
        "mean": 2.6,
        "median": 2,
-       "p90": 6,
-       "max": 10
+       "p90": 7,
+       "max": 9
+      }
+     },
+     "p04": {
+      "focus_new": {
+       "mean": 0.5,
+       "median": 0,
+       "p90": 1,
+       "max": 4
+      },
+      "focus_kept": {
+       "mean": 1.1,
+       "median": 1,
+       "p90": 3,
+       "max": 3
+      },
+      "needs": {
+       "mean": 3.4,
+       "median": 3,
+       "p90": 8,
+       "max": 15
+      },
+      "fyi": {
+       "mean": 2.1,
+       "median": 2,
+       "p90": 5,
+       "max": 8
       }
      },
      "p09": {
       "focus_new": {
        "mean": 2.9,
-       "median": 2,
+       "median": 3,
        "p90": 6,
-       "max": 9
+       "max": 7
       },
       "focus_kept": {
        "mean": 1.6,
        "median": 2,
-       "p90": 3,
+       "p90": 4,
        "max": 4
       },
       "needs": {
-       "mean": 3.1,
-       "median": 3,
-       "p90": 7,
-       "max": 10
-      },
-      "fyi": {
-       "mean": 3.3,
+       "mean": 3.2,
        "median": 3,
        "p90": 8,
-       "max": 10
+       "max": 11
+      },
+      "fyi": {
+       "mean": 2.1,
+       "median": 2,
+       "p90": 4,
+       "max": 11
       }
      }
     },
     "items by bucket and author": {
-     "Focus / person": 1431,
-     "Focus / agent": 332,
-     "Needs you / person": 7508,
-     "Needs you / agent": 938,
-     "FYI / person": 5781,
-     "FYI / agent": 4041
+     "Focus / person": 1375,
+     "Focus / agent": 341,
+     "Needs you / person": 7706,
+     "Needs you / agent": 1097,
+     "FYI / person": 4958,
+     "FYI / agent": 3951
     },
     "why items land in Needs you": {
-     "Reply in a thread you started": 3556,
-     "Reply in a thread you only replied in": 3046,
-     "Mentioned you": 1210,
-     "Flag that names nobody": 634
+     "Reply in a thread you started": 4031,
+     "Reply in a thread you only replied in": 2792,
+     "Reaction from someone you addressed, in a direct conversation": 812,
+     "Flag that names nobody": 510,
+     "Mentioned you, nothing else": 417,
+     "Reaction from someone you addressed, in a channel": 241
     },
+    "notifications per person per day": {
+     "A": 39.8,
+     "B": 27.6,
+     "C": 5.1
+    },
+    "read at once while watching": 501,
     "end of run": {
      "rows kept by a flag at the end (per person, mean)": 0.1,
      "rows kept by the person at the end (per person, mean)": 1.1,
-     "markers left in conversations": 5
+     "markers left in conversations": 4
     },
     "rulings": {
      "R03": 1,
-     "R13": 6,
-     "R16": 78,
-     "R18": 142,
-     "R22": 41655,
-     "R27": 16
+     "R13": 9,
+     "R16": 89,
+     "R18": 153,
+     "R22": 40605,
+     "R27": 27,
+     "R35": 7,
+     "R36": 8,
+     "R38": 167,
+     "R41": 3,
+     "R42": 56,
+     "R43": 25,
+     "R44": 2
     },
     "notes": {}
    },
    {
     "variant": "base",
-    "messages": 13486,
+    "messages": 13417,
     "share written by agents": 0.35,
-    "events": 22172,
+    "events": 22505,
     "violations": 0,
     "violation samples": [],
     "rows at a visit": {
@@ -2034,142 +2165,90 @@
       "mean": 0.5,
       "median": 0,
       "p90": 2,
-      "max": 9
+      "max": 10
      },
      "focus_kept": {
-      "mean": 0.9,
+      "mean": 1.1,
       "median": 1,
-      "p90": 2,
+      "p90": 3,
       "max": 5
      },
      "needs": {
-      "mean": 3.5,
+      "mean": 3.8,
       "median": 3,
       "p90": 8,
-      "max": 21
+      "max": 23
      },
      "fyi": {
-      "mean": 2.8,
+      "mean": 2.2,
       "median": 2,
-      "p90": 6,
-      "max": 17
+      "p90": 5,
+      "max": 13
      }
     },
     "Needs you at a visit over time": {
-     "days 1-2": 3.2,
-     "days 5-6": 3.6,
-     "days 9-10": 3.6
+     "days 1-2": 3.6,
+     "days 5-6": 3.8,
+     "days 9-10": 4.1
     },
     "new rows per person per day": {
      "all": {
       "Focus from persons": 4.2,
       "Focus from agents": 0.2,
-      "Needs you from persons": 14.1,
+      "Needs you from persons": 16.8,
       "Needs you from agents": 1.9,
-      "FYI from persons": 14.4,
-      "FYI from agents": 2.9,
-      "single list": 37.6,
+      "FYI from persons": 11.8,
+      "FYI from agents": 3.0,
+      "single list": 37.8,
       "Focus": 4.4
      },
      "p02": {
-      "Focus from persons": 4.1,
+      "Focus from persons": 4.8,
       "Focus from agents": 0.0,
-      "Needs you from persons": 14.4,
-      "Needs you from agents": 1.0,
-      "FYI from persons": 20.4,
-      "FYI from agents": 4.5,
-      "single list": 44.4,
-      "Focus": 4.1
+      "Needs you from persons": 17.6,
+      "Needs you from agents": 1.4,
+      "FYI from persons": 18.7,
+      "FYI from agents": 4.8,
+      "single list": 47.3,
+      "Focus": 4.8
      },
      "p01": {
-      "Focus from persons": 4.6,
+      "Focus from persons": 4.0,
       "Focus from agents": 0.0,
-      "Needs you from persons": 13.4,
-      "Needs you from agents": 1.3,
-      "FYI from persons": 15.7,
-      "FYI from agents": 4.7,
-      "single list": 39.7,
-      "Focus": 4.6
+      "Needs you from persons": 19.1,
+      "Needs you from agents": 1.6,
+      "FYI from persons": 13.7,
+      "FYI from agents": 6.9,
+      "single list": 45.3,
+      "Focus": 4.0
      },
      "p04": {
-      "Focus from persons": 3.6,
+      "Focus from persons": 2.8,
       "Focus from agents": 0.0,
-      "Needs you from persons": 15.6,
-      "Needs you from agents": 0.4,
-      "FYI from persons": 10.9,
-      "FYI from agents": 2.1,
-      "single list": 32.6,
-      "Focus": 3.6
+      "Needs you from persons": 17.8,
+      "Needs you from agents": 0.8,
+      "FYI from persons": 8.9,
+      "FYI from agents": 2.9,
+      "single list": 33.2,
+      "Focus": 2.8
      },
      "p09": {
-      "Focus from persons": 10.9,
-      "Focus from agents": 6.4,
-      "Needs you from persons": 13.1,
+      "Focus from persons": 11.3,
+      "Focus from agents": 5.7,
+      "Needs you from persons": 15.7,
       "Needs you from agents": 0.9,
-      "FYI from persons": 14.3,
-      "FYI from agents": 5.7,
-      "single list": 51.3,
-      "Focus": 17.3
+      "FYI from persons": 13.4,
+      "FYI from agents": 6.5,
+      "single list": 53.5,
+      "Focus": 17.0
      }
     },
     "personas at a visit": {
      "p02": {
       "focus_new": {
-       "mean": 0.5,
+       "mean": 0.6,
        "median": 0,
        "p90": 2,
-       "max": 3
-      },
-      "focus_kept": {
-       "mean": 1.0,
-       "median": 1,
-       "p90": 3,
-       "max": 4
-      },
-      "needs": {
-       "mean": 3.5,
-       "median": 3,
-       "p90": 8,
-       "max": 13
-      },
-      "fyi": {
-       "mean": 3.7,
-       "median": 3,
-       "p90": 7,
-       "max": 12
-      }
-     },
-     "p01": {
-      "focus_new": {
-       "mean": 0.5,
-       "median": 0,
-       "p90": 1,
-       "max": 3
-      },
-      "focus_kept": {
-       "mean": 0.5,
-       "median": 0,
-       "p90": 1,
-       "max": 1
-      },
-      "needs": {
-       "mean": 3.4,
-       "median": 3,
-       "p90": 8,
-       "max": 10
-      },
-      "fyi": {
-       "mean": 3.1,
-       "median": 3,
-       "p90": 7,
-       "max": 10
-      }
-     },
-     "p04": {
-      "focus_new": {
-       "mean": 0.4,
-       "median": 0,
-       "p90": 1,
        "max": 3
       },
       "focus_kept": {
@@ -2179,24 +2258,24 @@
        "max": 3
       },
       "needs": {
-       "mean": 3.3,
-       "median": 3,
+       "mean": 3.9,
+       "median": 4,
        "p90": 8,
-       "max": 14
+       "max": 10
       },
       "fyi": {
-       "mean": 2.1,
-       "median": 2,
-       "p90": 4,
-       "max": 6
+       "mean": 3.4,
+       "median": 3,
+       "p90": 8,
+       "max": 9
       }
      },
-     "p09": {
+     "p01": {
       "focus_new": {
-       "mean": 2.7,
-       "median": 2,
-       "p90": 5,
-       "max": 9
+       "mean": 0.5,
+       "median": 0,
+       "p90": 1,
+       "max": 4
       },
       "focus_kept": {
        "mean": 1.3,
@@ -2205,45 +2284,111 @@
        "max": 3
       },
       "needs": {
-       "mean": 3.3,
-       "median": 3,
-       "p90": 7,
-       "max": 14
-      },
-      "fyi": {
-       "mean": 3.6,
-       "median": 3,
+       "mean": 4.2,
+       "median": 4,
        "p90": 9,
        "max": 11
+      },
+      "fyi": {
+       "mean": 2.5,
+       "median": 2,
+       "p90": 6,
+       "max": 8
+      }
+     },
+     "p04": {
+      "focus_new": {
+       "mean": 0.3,
+       "median": 0,
+       "p90": 1,
+       "max": 2
+      },
+      "focus_kept": {
+       "mean": 0.9,
+       "median": 1,
+       "p90": 2,
+       "max": 3
+      },
+      "needs": {
+       "mean": 3.6,
+       "median": 3,
+       "p90": 8,
+       "max": 11
+      },
+      "fyi": {
+       "mean": 1.7,
+       "median": 1,
+       "p90": 4,
+       "max": 7
+      }
+     },
+     "p09": {
+      "focus_new": {
+       "mean": 2.5,
+       "median": 2,
+       "p90": 5,
+       "max": 10
+      },
+      "focus_kept": {
+       "mean": 2.1,
+       "median": 2,
+       "p90": 5,
+       "max": 5
+      },
+      "needs": {
+       "mean": 3.7,
+       "median": 3,
+       "p90": 9,
+       "max": 12
+      },
+      "fyi": {
+       "mean": 2.6,
+       "median": 2,
+       "p90": 5,
+       "max": 9
       }
      }
     },
     "items by bucket and author": {
-     "Focus / person": 1365,
-     "Focus / agent": 331,
-     "Needs you / person": 7272,
-     "Needs you / agent": 1065,
-     "FYI / person": 5765,
-     "FYI / agent": 4008
+     "Focus / person": 1384,
+     "Focus / agent": 350,
+     "Needs you / person": 7917,
+     "Needs you / agent": 1058,
+     "FYI / person": 4847,
+     "FYI / agent": 4028
     },
     "why items land in Needs you": {
-     "Reply in a thread you started": 3486,
-     "Reply in a thread you only replied in": 3068,
-     "Mentioned you": 1234,
-     "Flag that names nobody": 549
+     "Reply in a thread you started": 4056,
+     "Reply in a thread you only replied in": 2885,
+     "Reaction from someone you addressed, in a direct conversation": 886,
+     "Flag that names nobody": 466,
+     "Mentioned you, nothing else": 423,
+     "Reaction from someone you addressed, in a channel": 259
     },
+    "notifications per person per day": {
+     "A": 40.0,
+     "B": 28.4,
+     "C": 5.2
+    },
+    "read at once while watching": 437,
     "end of run": {
-     "rows kept by a flag at the end (per person, mean)": 0,
-     "rows kept by the person at the end (per person, mean)": 0.8,
-     "markers left in conversations": 6
+     "rows kept by a flag at the end (per person, mean)": 0.0,
+     "rows kept by the person at the end (per person, mean)": 1.2,
+     "markers left in conversations": 4
     },
     "rulings": {
-     "R06": 2,
-     "R13": 10,
-     "R16": 107,
-     "R18": 143,
-     "R22": 38869,
-     "R27": 28
+     "R13": 12,
+     "R16": 177,
+     "R18": 162,
+     "R22": 39157,
+     "R27": 29,
+     "R35": 6,
+     "R36": 7,
+     "R38": 157,
+     "R41": 5,
+     "R42": 60,
+     "R43": 15,
+     "R44": 2
     },
     "notes": {}
    }

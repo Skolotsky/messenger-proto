@@ -1,8 +1,9 @@
 """E-001: ten working days of a 30-person, 6-agent, 20-channel team through the model.
 
 Checks the invariants as it goes and measures what each person's buckets hold at each visit.
-The traffic numbers below are ASSUMPTIONS, not measurements. Read the results as comparisons
-between variants under the same traffic.
+The traffic numbers below are ASSUMPTIONS, not measurements. Variants use the same seed and rates,
+but the traffic is not identical between them: what people read changes who replies, and that
+feeds back. Differences smaller than the spread across seeds, printed at the end, are noise.
 """
 import heapq
 import json
@@ -35,6 +36,9 @@ ASSUME = dict(
     visits_per_day=6,               # times a person opens the feed
     read_needs_p=0.90, view_fyi_p=0.70, reply_to_mention_p=0.30,
     keep_p=0.04, done_after_day_p=0.50,
+    react_answer_p=0.30,            # a person addressed in a message answers with a reaction instead of words
+    mention_react_p=0.20,           # a person merely mentioned reacts to acknowledge
+    watch_minutes=3,                # after writing in a conversation, a person keeps it open in front of them
 )
 
 CHANNELS = [("#general", 30), ("#random", 30), ("#launch", 15), ("#product", 12), ("#engineering", 12),
@@ -101,10 +105,16 @@ def run(name, seed=7, scale=1.0, mentions_focus=False, info_used=True, check_eve
         items_by[(it.bucket, k)] += 1
         if it.bucket == NEEDS:
             why = it.reason.split(" · ")[0]
-            if why == "Reply in your thread":
+            own = m.parent is not None and not m.conv.startswith("dm:") and it.kind == "msg" \
+                and w.auto_level(u, m.parent, before=m.id) == "needs"
+            if " reacted " in why:
+                why = "Reaction from someone you addressed, in a direct conversation" if m.conv.startswith("dm:") \
+                    else "Reaction from someone you addressed, in a channel"
+            elif own or why == "Reply in your thread":
+                # counted as a thread reply even when it also mentions the person: it would be here anyway
                 why = "Reply in a thread you started" if w.msgs[m.parent].author == u else "Reply in a thread you only replied in"
             elif "mentioned you" in why:
-                why = "Mentioned you"
+                why = "Mentioned you, nothing else"
             elif why.startswith("Flagged for everyone"):
                 why = "Flag that names nobody"
             elif why.startswith("Direct message from agent"):
@@ -130,8 +140,9 @@ def run(name, seed=7, scale=1.0, mentions_focus=False, info_used=True, check_eve
 
     def reply_later(t, who, conv, root):
         def go():
-            if not w.msgs[root].deleted:
+            if root in w.msgs and not w.msgs[root].deleted:
                 w.post(who, conv, parent=root)
+                w.watch(who, ("dm", conv) if conv.startswith("dm:") else ("th", root), w.now + A["watch_minutes"])
         at(t, go)
 
     def human_msg(t):
@@ -164,6 +175,10 @@ def run(name, seed=7, scale=1.0, mentions_focus=False, info_used=True, check_eve
             level = "info"
         m = w.post(a, conv, parent=parent, mentions=mentions, group=group, level=level)
         root = parent or m.id
+        w.watch(a, ("dm", conv) if (is_dm and parent is None) else ("th", root), t + A["watch_minutes"])
+        for p in mentions:
+            if level != "flag" and w.kind[p] == "person" and rng.random() < A["mention_react_p"]:
+                at(t + rng.uniform(1, 120), lambda p=p: w.react(p, m.id, "eyes"))
         if parent is None and not is_dm:
             roots[conv].append(m.id)
         for _ in range(poisson(rng, A["reactions_per_msg"])):
@@ -187,7 +202,9 @@ def run(name, seed=7, scale=1.0, mentions_focus=False, info_used=True, check_eve
             named = sorted(p for p in w.flag_recipients(m) if w.kind[p] == "person")
             for p in named:
                 if rng.random() < A["flag_answer_p"]:
-                    if is_dm:
+                    if rng.random() < A["react_answer_p"]:
+                        at(t + rng.uniform(5, 180), lambda p=p: w.react(p, m.id, "check"))
+                    elif is_dm:
                         at(t + rng.uniform(5, 180), lambda p=p: w.post(p, conv))
                     else:
                         reply_later(t + rng.uniform(5, 180), p, conv, root)
@@ -297,6 +314,7 @@ def run(name, seed=7, scale=1.0, mentions_focus=False, info_used=True, check_eve
         if events[0] % check_every == 0:
             violations.extend(w.check())
     violations.extend(w.check())
+    violations.extend(w.violations)
 
     # ---- summarise
     def stat(xs):
@@ -332,6 +350,8 @@ def run(name, seed=7, scale=1.0, mentions_focus=False, info_used=True, check_eve
         "rows at a visit": at_visit, "Needs you at a visit over time": needs_trend, "new rows per person per day": per_day, "personas at a visit": persona_visit,
         "items by bucket and author": {f"{BUCKET[b]} / {k}": n for (b, k), n in sorted(items_by.items(), reverse=True)},
         "why items land in Needs you": dict(needs_why.most_common()),
+        "notifications per person per day": {p: round(sum(w.notified[(u, p)] for u in people) / len(people) / A["days"], 1) for p in "ABC"},
+        "read at once while watching": w.read_at_once,
         "end of run": end_state, "rulings": dict(sorted(model.RULINGS.items())), "notes": dict(model.NOTES),
     }
 
@@ -362,6 +382,9 @@ if __name__ == "__main__":
         print(f"   new rows per person per day: Focus {d['Focus']} (from agents {d['Focus from agents']}), "
               f"Needs you {round(d['Needs you from persons'] + d['Needs you from agents'], 1)} (from agents {d['Needs you from agents']}), "
               f"FYI {round(d['FYI from persons'] + d['FYI from agents'], 1)} (from agents {d['FYI from agents']}); one single list: {d['single list']}")
+        n = r["notifications per person per day"]
+        print(f"   notifications per person per day: everything {n['A']}, Focus and Needs you {n['B']} (accepted default), Focus only {n['C']}")
+        print(f"   arrivals read at once because the person had just written in that conversation (a rough stand-in for 'watching'): {r['read at once while watching']}")
         print("   Needs you at a visit, mean, as the run goes on:", ", ".join(f"{k}: {v}" for k, v in r["Needs you at a visit over time"].items()))
         for k, n in r["end of run"].items():
             print(f"   {k}: {n}")
@@ -379,7 +402,11 @@ if __name__ == "__main__":
         print(f"   {why:40s} {n:6d}  {round(100 * n / total)}%")
     print("\n== behaviours the model had to invent, and how often each came up in the base run")
     for code, n in sorted(base["rulings"].items(), key=lambda x: -x[1]):
-        print(f"   {code} x{n:6d}  {model.RULING_TEXT[code]}")
+        if code not in model.ACCEPTED:
+            print(f"   {code} x{n:6d}  STILL OPEN  {model.RULING_TEXT[code]}")
+    for code, n in sorted(base["rulings"].items(), key=lambda x: -x[1]):
+        if code in model.ACCEPTED:
+            print(f"   {code} x{n:6d}  accepted in D-013  {model.RULING_TEXT[code]}")
 
     print("\n== how much the base numbers move with the random seed (five other seeds)")
     seeds = [run("base", seed=s) for s in (1, 2, 3, 4, 5)]
@@ -393,6 +420,8 @@ if __name__ == "__main__":
     print("   Needs you at a visit (p90):              ", rng_of(lambda r: r["rows at a visit"]["needs"]["p90"]))
     print("   Focus, kept, at a visit (mean):          ", rng_of(lambda r: r["rows at a visit"]["focus_kept"]["mean"]))
     print("   Focus, kept, at a visit (max):           ", rng_of(lambda r: r["rows at a visit"]["focus_kept"]["max"]))
+    print("   notifications a day, accepted default:   ", rng_of(lambda r: r["notifications per person per day"]["B"]))
+    print("   notifications a day, Focus only:         ", rng_of(lambda r: r["notifications per person per day"]["C"]))
     print("   invariant violations:                    ", rng_of(lambda r: r["violations"]))
     out.append({"seeds": seeds})
     json.dump(out, open("results.json", "w"), indent=1)

@@ -44,6 +44,11 @@ def where(w, u, m, kind="msg"):
     return s
 
 
+def mine(w, u="you"):
+    """Notifications sent to u under the accepted default (D-012, option B)."""
+    return len([n for n in w.notifications if n[0] == u])
+
+
 def tick(w, dt=1.0):
     w.now += dt
 
@@ -331,6 +336,93 @@ w = team()
 t = w.post("anna", "#product"); w.set_thread_dial("you", t.id, "fyi"); r = w.post("marco", "#product", parent=t.id)
 w.set_thread_dial("you", t.id, "focus")
 case("You raise a followed thread to Focus: its unread reply moves up", where(w, "you", r), "Focus/new", "D-013")
+
+# ---------------------------------------------------------------- reactions as answers (D-014)
+w = team()
+m = w.post("you", "#launch", mentions=["marco"], level="flag")
+w.react("anna", m.id, "tada"); w.react("marco", m.id, "check")
+row = w._row_of("you", m, "answer:marco")
+case("You flag Marco; he reacts: an answer, in Needs you, with his name",
+     (where(w, "you", m, "answer:marco"), row.items[(m.id, "answer:marco")].reason), ("Needs you", "marco reacted check to your message"), "D-014")
+case("…Anna's reaction on the same message stays grouped in For your information, not counting Marco",
+     row.items[(m.id, "reaction")].reason, "1 reacted to your message", "D-014")
+w.unreact("marco", m.id)
+case("…Marco takes his reaction back before you saw it", (m.id, "answer:marco") in row.items, False, "D-004")
+w = team()
+m = w.post("you", w.dm("you", "anna"))
+w.react("anna", m.id, "+1")
+case("Anna reacts to your direct message: an answer", where(w, "you", m, "answer:anna"), "Needs you", "D-014")
+w = team()
+w.set_channel_dial("you", "#launch", "focus")
+m = w.post("you", "#launch", mentions=["marco"]); w.react("marco", m.id)
+case("An answer by reaction in a channel you put in Focus still lands in Needs you", where(w, "you", m, "answer:marco"), "Needs you", "D-014 reactions never land in Focus")
+w = team()
+m = w.post("you", "#launch", mentions=["release"]); w.react("release", m.id, "eyes")
+case("An agent you mentioned reacts: grouped, in For your information", where(w, "you", m, "reaction"), "FYI", "R34")
+
+# ---------------------------------------------------------------- read (D-015) and notifications (D-012)
+w = team()
+t = w.post("you", "#product"); w.watch("you", ("th", t.id), w.now + 5)
+r = w.post("marco", "#product", parent=t.id)
+case("A reply arrives in a thread open in front of you: read at once, no feed row", where(w, "you", r), "Earlier", "D-015")
+case("…and no notification", mine(w), 0, "D-015 + D-012")
+w = team()
+t = w.post("you", "#product")
+r1 = w.post("marco", "#product", parent=t.id); r2 = w.post("anna", "#product", parent=t.id)
+case("Two replies in your thread before you read it: one notification, not two", mine(w), 1, "D-012 one per row")
+f = w.post("anna", "#product", parent=t.id, mentions=["you"], level="flag")
+case("…then a flag for you in the same unread thread: the row moves up to Focus and notifies once more", mine(w), 2, "D-012")
+w.read_row("you", ("th", t.id)); w.post("marco", "#product", parent=t.id)
+case("…you read it, then a new reply: a new notification", mine(w), 3, "D-012")
+w = team()
+m = w.post("you", "#launch"); w.react("anna", m.id); w.post("marco", "#random", group=True)
+p = w.post("anna", "#product", mentions=["you"], level="info")
+case("Reactions, a whole-channel mention and an Info mention: no notification", w.notifications, [], "D-012 FYI never; D-001 Info none")
+w = team()
+m = w.post("anna", "#launch"); w.edit(m.id, mentions=["you"])
+case("An edit adds a mention of you: it notifies like a new message", mine(w), 1, "R36")
+
+# ---------------------------------------------------------------- history tabs (D-016)
+w = team()
+w.set_channel_dial("you", "#launch", "muted")
+m1 = w.post("anna", "#launch", mentions=["you"]); w.read_row("you", ("th", m1.id)); w.open_feed("you"); w.leave_feed("you")
+m2 = w.post("marco", "#product", mentions=["you"]); m3 = w.post("marco", "#product", mentions=["you"]); w.delete(m3.id)
+d = w.post("anna", w.dm("anna", "you"))
+t = w.post("you", "#product"); r = w.post("marco", "#product", parent=t.id); w.react("anna", t.id)
+case("Mentions tab: read and unread together, from any channel, without the deleted one", w.history("you", "mentions"), [m2.id, m1.id], "D-016")
+case("Direct messages tab", w.history("you", "dms"), [d.id], "D-016")
+case("Threads tab: replies in threads you follow", w.history("you", "threads"), [r.id], "D-016")
+case("Reactions tab: your messages that got reactions", w.history("you", "reactions"), [t.id], "D-016")
+
+# ---------------------------------------------------------------- cases found by the second independent check
+w = team()
+m = w.post("anna", "#product", mentions=["you"], level="info"); w.read_row("you", ("th", m.id))
+w.edit(m.id, level=None)
+case("An edit removes Info from a mention you had read: it comes back as new, and notifies", (where(w, "you", m), mine(w)), ("Needs you", 1), "D-013 as if new")
+w = team()
+m = w.post("anna", "#product", mentions=["you"]); w.keep("you", ("th", m.id))
+case("Keeping a row marks it read", w._row_of("you", m).items[(m.id, "msg")].read, True, "D-015 acting implies read")
+w = team()
+f = w.post("anna", w.dm("anna", "you"), mentions=["release"], level="flag"); w.read_row("you", ("dm", w.dm("anna", "you")))
+case("A flagged direct message that also mentions an agent is still kept for you", where(w, "you", f), "Focus/kept", "D-011")
+w = team()
+d = w.post("anna", w.dm("anna", "you")); r = w.post("anna", w.dm("anna", "you"), parent=d.id)
+case("A reply under a message in a direct conversation reaches you", where(w, "you", r), "Focus/new", "D-001")
+w = team()
+t = w.post("anna", "#launch"); s = w.post("release", "#launch", parent=t.id, streaming=True)
+w.post("you", "#launch", parent=t.id); w.finish_stream(s)
+case("An agent's reply finishes streaming after you replied in the thread: it reaches you", where(w, "you", s), "Needs you", "D-001")
+w = team()
+m = w.post("you", "#launch"); w.watch("you", ("th", m.id), w.now + 5)
+w.react("anna", m.id); w.react("priya", m.id)
+case("Two reactions arrive while the thread is open in front of you: both read at once", where(w, "you", m, "reaction"), "Earlier", "D-015")
+w = team()
+t = w.post("you", "#product"); w.post("marco", "#product", parent=t.id, level="info"); w.post("marco", "#product", parent=t.id)
+case("An Info reply, then an ordinary one, in your unread thread: the ordinary one notifies", mine(w), 1, "D-012 + D-001")
+w = team()
+m = w.post("marco", "#product", mentions=["you"]); w.read_row("you", ("th", m.id)); w.open_feed("you"); w.leave_feed("you")
+w.add_rule("you", "mentions")
+case("A rule change leaves a row you already read where it was", where(w, "you", m), "Earlier", "D-013")
 
 # ---------------------------------------------------------------- report
 bad = [r for r in results if not r[0]]

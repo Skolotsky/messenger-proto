@@ -66,6 +66,10 @@ No second opinion was sought: cheap to reverse.
 
 Accepted by the user on 2026-11-22: **B as the default, with one personal switch to C**, and the rules listed under the recommendation.
 
+### Corrected measurement, 2026-11-22 (added after acceptance; the decision is unchanged)
+
+The "about 21 a day" for option B, quoted when this was decided, was too low. E-001's third run counts notifications by the rule itself and gives about 29 a day for B in the simulated team (27.6 to 29.0 across seeds), about 41 for A and about 5 for C. The earlier figure counted rows by the bucket of their first item; a row that starts in For your information and later gets a reply still notifies, and a row that was read notifies again on its next reply. The user was told when the correction was made.
+
 ## Consequences
 
 - Easier: one rule to explain: a notification means a row became unread in a bucket that notifies. The dials need no notification settings of their own.
