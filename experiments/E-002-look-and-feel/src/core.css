@@ -490,3 +490,21 @@ body.resizing{cursor:col-resize;user-select:none}
 .av .bot svg{width:12px;height:12px}
 .av.xs .bot{width:13px;height:13px;right:-4px;bottom:-4px;border-width:1px}.av.xs .bot svg{width:9px;height:9px}
 .av.xs.ag{border-radius:5px;font-size:9px}
+/* row layout variants (desktop), to choose from */
+@media (min-width:761px){
+  /* a and c: nothing is reserved at the right; the actions float over the row's corner on hover */
+  [data-rowv="a"] .row-main,[data-rowv="c"] .row-main,[data-rowv="b"] .row-main{position:relative}
+  [data-rowv="a"] .row-side,[data-rowv="c"] .row-side{position:absolute;top:5px;right:12px;bottom:9px;justify-content:space-between;pointer-events:none}
+  [data-rowv="a"] .row-side>*,[data-rowv="c"] .row-side>*{pointer-events:auto}
+  [data-rowv="a"] .row-btns,[data-rowv="c"] .row-btns{box-shadow:0 2px 8px rgba(0,0,0,.14)}
+  [data-rowv="a"] .row.has-side .row-preview,[data-rowv="c"] .row.has-side .row-preview{padding-right:78px}
+  [data-rowv="a"] .row-side .state,[data-rowv="c"] .row-side .state,[data-rowv="a"] .row-side>[data-act="done"],[data-rowv="c"] .row-side>[data-act="done"]{margin-top:auto;order:3}
+  [data-rowv="a"] .row-main:hover .row-time{visibility:hidden}
+  /* c: the time sits beside the title */
+  [data-rowv="c"] .row-time{margin-left:0;padding-left:0}
+  [data-rowv="c"] .row-time::before{content:"· "}
+  /* b: one fixed column at the right holds the time and, under it, the actions */
+  [data-rowv="b"] .row-time{position:absolute;right:16px;top:9px;margin:0;padding:0}
+  [data-rowv="b"] .row-side{width:92px;padding-top:24px;align-items:flex-end}
+}
+.bk-head h2{cursor:default}

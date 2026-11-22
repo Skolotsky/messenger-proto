@@ -9,8 +9,8 @@ const P = {
   sam: ['Sam Whitaker', 'Support lead'], jonas: ['Jonas Weber', 'Sales'], dele: ['Dele Adeyemi', 'Data'],
   ines: ['Inès Laurent', 'Frontend'], kofi: ['Kofi Mensah', 'Mobile'], yuki: ['Yuki Tanaka', 'QA'],
   omar: ['Omar Haddad', 'Finance and ops'], ruth: ['Ruth Mendel', 'Customer success'],
-  ship: ['Shipwright', 'Release agent', 1], triage: ['Triage', 'Support agent', 1],
-  field: ['Fieldnotes', 'Research agent', 1], ledger: ['Ledger', 'Metrics agent', 1]
+  ship: ['Deployer', 'Release agent', 1], triage: ['Triage', 'Support agent', 1],
+  field: ['Researcher', 'Research agent', 1], ledger: ['Metrics', 'Metrics agent', 1]
 };
 const PID = Object.keys(P);
 const pn = id => P[id][0], first = id => P[id][0].split(' ')[0], isAgent = id => !!P[id][2];
@@ -54,7 +54,7 @@ const BG = { // ordinary traffic in conversations that carry no situation
   'ch-mobile': [['kofi', '09:05', 'iOS build 412 is on TestFlight. Android 388 follows after lunch.', [['yuki', '09:40', 'Smoke run on 412 is clean.'], ['lena', '09:44', 'The new tab bar looks right on a small phone.']]], ['kofi', '09:50', 'Does anyone still have an Android 11 device?', [['yuki', '09:52', 'QA has one. Desk by the window.']]]],
   'ch-frontend': [['ines', '09:15', 'Storybook is updated for the new date picker.'], ['lena', '09:22', 'Looks right. The focus ring is finally visible on dark.']],
   'ch-backend': [['tomas', 'Yesterday 18:20', 'Migration 0412 adds the location index. Dry run took 41 seconds on a copy of prod.'], ['marco', 'Yesterday 18:31', 'Run it before the freeze tonight.']],
-  'ch-qa': [['yuki', '08:50', 'Regression pass for rc3 starts as soon as Shipwright posts the build.', [['kofi', '08:58', 'Ping me for anything on Android 12.'], ['ines', '09:03', 'And me for Safari.']]], ['yuki', '09:30', 'Flaky test of the week: calendar drag on Firefox. Fails one run in ten.', [['ines', '09:36', 'It is the animation timing. Fix is in review.']]]],
+  'ch-qa': [['yuki', '08:50', 'Regression pass for rc3 starts as soon as Deployer posts the build.', [['kofi', '08:58', 'Ping me for anything on Android 12.'], ['ines', '09:03', 'And me for Safari.']]], ['yuki', '09:30', 'Flaky test of the week: calendar drag on Firefox. Fails one run in ten.', [['ines', '09:36', 'It is the animation timing. Fix is in review.']]]],
   'ch-customers': [['ruth', 'Yesterday 11:02', 'Brightwell renewed for 12 months, 9 locations.', [['jonas', 'Yesterday 11:05', 'That is our biggest account now.'], ['anna', 'Yesterday 11:20', 'Well done, both of you.']]], ['sam', 'Yesterday 14:15', 'Northgate Dental asked for an invoice per location.', [['omar', 'Yesterday 14:40', 'Possible from January. I will write to them.']]]],
   'ch-ops': [['omar', 'Mon 16:45', 'Launch day lunch is ordered for 34 people.'], ['anna', 'Mon 16:50', 'Thank you. Make it 36, two contractors are in.']],
   'ch-random': [['kofi', '08:12', 'The coffee machine on the 2nd floor is fixed.'], ['priya', '08:15', 'Best news of launch week.']],
@@ -92,7 +92,7 @@ function seed() {
     M('s0', 'sam', 'Yesterday 12:20', 'Macros for the new booking flow are written. Want to skim them?'),
     M('s00', 'maya', 'Yesterday 13:02', 'Skimmed. The refund one is very clear.')]);
   C('th-rc', 'thread', '2.0 release candidate', { where: 'releases', tdial: 'fyi', tauto: 'you were mentioned in it' }, [
-    M('rc1', 'marco', 'Yesterday 17:10', 'Cutting 2.0.0-rc3 tonight. @Shipwright please build it and run the full suite. @Maya signs off the beta rollout.'),
+    M('rc1', 'marco', 'Yesterday 17:10', 'Cutting 2.0.0-rc3 tonight. @Deployer please build it and run the full suite. @Maya signs off the beta rollout.'),
     M('rc2', 'ship', '08:02', 'Build started. 340 tests queued.', { info: 1 }),
     M('rc3', 'ship', '09:14', 'Progress: 212 of 340 tests passed, none failed.', { info: 1 }),
     M('rc4', 'ship', '10:21', '2.0.0-rc3 is built and all 340 tests pass. I have stopped before the rollout: I need your approval to release it to the 5% beta ring, @Maya.', { flag: 1, isNew: 1, status: 'Waiting on Maya' })]);
@@ -133,7 +133,7 @@ function seed() {
     M('j1', 'jonas', '10:27', '@Maya can we promise Brightwell SSO in Q1? They will ask on the call today.', { isNew: 1 }),
     M('j2', 'ruth', '10:35', 'Their admin team is 4 people, for what it is worth.')]);
   C('th-comp', 'thread', 'Competitor pricing scan', { where: 'research', tdial: 'needs', tauto: 'you started this thread' }, [
-    M('p1', 'maya', 'Mon 14:02', '@Fieldnotes read the public pricing pages of our 20 closest competitors and tell me who charges per location.'),
+    M('p1', 'maya', 'Mon 14:02', '@Researcher read the public pricing pages of our 20 closest competitors and tell me who charges per location.'),
     M('p2', 'field', 'Mon 14:40', 'Progress: 12 of 20 pages read. Nothing blocking.', { info: 1 }),
     M('p3', 'field', '10:08', 'Done: 20 of 20 read. 7 charge per location, 11 per seat, 2 a flat fee. The median per-location price is €49 a month. The full table is in the doc linked at the top of this thread.', { isNew: 1, status: 'Done' })]);
   C('th-metrics', 'thread', 'Weekly metrics refresh', { where: 'data', tdial: 'fyi', tauto: 'you were mentioned in it' }, [
@@ -161,7 +161,7 @@ function seed() {
   const R = (id, conv, bucket, items, by, t, reason, why, o) => Object.assign({ id, conv, bucket, items, by, t, reason, why, sec: 'new', read: false, kept: null, done: false, replies: [] }, o || {});
   const rows = [
     R('r-anna', 'dm-anna', 'focus', ['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9', 'a10'], 'anna', '10:41', 'In Focus: direct message from Anna', 'Anna is one of your Focus people: everyone who writes to you directly is added.', { rule: 'dm' }),
-    R('r-rc', 'th-rc', 'focus', ['rc4'], 'ship', '10:21', 'In Focus: Shipwright flagged this for you', 'A flag that names you lands in Focus and is kept for you until you press Done, reply or react. Shipwright has stopped and is waiting for you.', { kept: 'flag', rule: 'flag' }),
+    R('r-rc', 'th-rc', 'focus', ['rc4'], 'ship', '10:21', 'In Focus: Deployer flagged this for you', 'A flag that names you lands in Focus and is kept for you until you press Done, reply or react. Deployer has stopped and is waiting for you.', { kept: 'flag', rule: 'flag' }),
     R('r-inc', 'ch-incidents', 'focus', ['i1', 'i2', 'i3', 'i4', 'i5', 'i6'], 'yuki', '10:24', 'In Focus: #incidents is set to Focus', 'You set this channel\'s dial to Focus, so every new post lands here, as one row however many there are.', { drive: 'channel', chan: 1 }),
     R('r-go', 'ch-launch', 'focus', ['l3'], 'anna', '09:12', 'Flagged by Anna', 'Anna flagged this and named you. You read it at 09:20, so it is kept for you until you press Done, reply or react. Nobody else\'s answer changes that.', { sec: 'kept', kept: 'flag', read: true, rule: 'flag' }),
     R('r-empty', 'th-empty', 'focus', ['e1'], 'lena', 'Yesterday', 'Kept by you', 'You kept this yesterday. It stays until you press Done, reply or react.', { sec: 'kept', kept: 'you', read: true, note: 'edited since you kept it' }),
@@ -171,7 +171,7 @@ function seed() {
     R('r-mig', 'ch-engineering', 'needs', ['mig1'], 'marco', '10:16', 'Needs you: Marco answered your mention', 'You mentioned Marco in this message, so his reaction counts as an answer and lands in Needs you with his name.', { title: 'Marco reacted ✅ to your message', sub: '#engineering', kind: 'rx' }),
     R('r-comp', 'th-comp', 'needs', ['p3'], 'field', '10:08', 'Needs you: reply in a thread you started', 'An agent\'s result carries no level, so it is sorted like anyone\'s reply: you started this thread.', { drive: 'thread' }),
     R('r-triage', 'ch-support', 'needs', ['u2'], 'triage', '09:58', 'Needs you: flagged for everyone in #support', 'A flag that names nobody lands in Needs you for everyone in the channel. It leaves once you have read it, like any row.'),
-    R('r-metrics', 'th-metrics', 'fyi', ['w2'], 'ledger', '10:15', 'For your information: Ledger marked this Info', 'A progress update marked Info never lands higher than here and sends no notification.', { drive: 'thread' }),
+    R('r-metrics', 'th-metrics', 'fyi', ['w2'], 'ledger', '10:15', 'For your information: Metrics marked this Info', 'A progress update marked Info never lands higher than here and sends no notification.', { drive: 'thread' }),
     R('r-copy', 'ch-marketing', 'fyi', ['q1'], 'priya', '10:18', 'For your information: Priya marked this Info', 'It mentions you, but the sender\'s Info wins: a courtesy copy, one bucket down, no notification.'),
     R('r-icons', 'th-icons', 'fyi', ['k3', 'k4'], 'ines', '09:52', 'For your information: a thread you follow', 'You clicked Follow on this thread, so its replies land here.', { drive: 'thread' }),
     R('r-rota', 'ch-general', 'fyi', ['n1'], 'sam', '09:30', 'For your information: mention of the whole channel', 'A mention of the whole channel is not a mention of you.'),
@@ -205,7 +205,7 @@ const HIST = {
 };
 const DIAL = { focus: ['Focus', 'Every new post, and everything addressed to you, in Focus'], all: ['All activity', 'The same posts; the ones not addressed to you go to For your information'], default: ['Default', 'Only what is addressed to you, by the starting rules'], muted: ['Muted', 'Only what names you, and your own threads'] };
 const TDIAL = { focus: ['Focus', 'New replies land in Focus'], needs: ['Needs you', 'New replies land in Needs you'], fyi: ['For your information', 'What Follow sets'], off: ['Off', 'What Unfollow sets. What names you still gets through'] };
-const BK = { focus: ['Focus', 'What matches your rules'], needs: ['Needs you', 'Directed at you'], fyi: ['For your information', 'Concerns you, not waiting on you'] };
+const BK = { focus: ['Focus', 'What matches your rules', 'Focus: what matches your own rules. You decide what goes here.'], needs: ['Needs you', 'Directed at you', 'Needs you: directed at you. Mentions, replies in your threads, flags.'], fyi: ['For your information', 'Concerns you, not waiting on you', 'For your information: concerns you, but nobody is waiting on you. Never notifies.'] };
 const EMPTY = { focus: 'Nothing new in Focus.', needs: 'Nobody is waiting on you.', fyi: 'All caught up. What you read is in History.' };
 const RCOUNT = { tomas: 7, anna: 19, marco: 11, lena: 8, priya: 9, sam: 6, jonas: 5, ship: 12, triage: 14, field: 4, ledger: 6 };
 const CVOL = { engineering: 64, incidents: 23, launch: 41, support: 88, sales: 27, general: 52, product: 33, design: 29, marketing: 21, data: 12, releases: 18, research: 9 };
@@ -259,6 +259,8 @@ function dialCtl(c, ctx) {
   return '';
 }
 /* ---- "why is this here, and I do not want it here": three ways to show it, picked with #why=a, b or c (E-002 follow-up) ---- */
+// row layout variants for the user to choose from: #row=a, b or c (E-002 follow-up)
+const ROWV = (location.hash.match(/row=([abc])/) || [])[1] || ''; if (ROWV) document.documentElement.dataset.rowv = ROWV;
 const WHY = (location.hash.match(/why=([abc])/) || [])[1] || 'a'; // the user chose a (D-020)
 const ruleOn = r => r.rule === 'dm' ? S.dmPeople.includes(conv(r.conv).with) : S.rules.some(x => x.id === r.rule);
 function explain(r) {
@@ -318,7 +320,7 @@ function rowHTML(r) {
       <div class="acts"><span class="quick"><small>React to the latest</small>${EMO.map(e => `<button class="rx-btn" data-act="react" data-id="${r.id}" data-e="${e}" aria-label="React ${e}">${e}</button>`).join('')}<button class="rx-btn rx-pick" data-act="pick" data-m="${last.id}" aria-label="More reactions" data-tip="More reactions">${ic('smile')}</button></span>${kd}<button class="btn sm" data-act="openConv" data-c="${r.conv}" data-id="${r.id}">Open conversation</button>${dialCtl(c, r.id)}<button class="btn sm" data-act="ruleFor" data-c="${r.conv}" data-by="${r.by}">Add to Focus…</button></div>
       <form class="reply" data-form="reply" data-id="${r.id}"><input name="t" autocomplete="off" aria-label="Reply" placeholder="Reply ${c.kind === 'dm' ? 'to ' + first(c.with) : 'in ' + where}…"><button class="btn pri">Send</button></form></div>`;
   }
-  return `<article class="row b-${r.bucket} ${r.read ? 'read' : 'unread'}${exp ? ' expanded' : ''}${r.fresh ? ' fresh' : ''}${r.sec === 'kept' ? ' kept' : ''}${r.done ? ' done' : ''}" data-row="${r.id}">
+  return `<article class="row b-${r.bucket} ${r.read ? 'read' : 'unread'}${exp ? ' expanded' : ''}${state || (r.sec === 'kept' && !r.done) ? ' has-side' : ''}${r.fresh ? ' fresh' : ''}${r.sec === 'kept' ? ' kept' : ''}${r.done ? ' done' : ''}" data-row="${r.id}">
     <div class="sw-under" aria-hidden="true"><span class="sw-l">${ic('check')} ${r.sec === 'kept' ? 'Done' : 'Mark read'}</span><span class="sw-k">${r.kept && !r.done ? 'Kept' : r.done ? 'Keep again' : 'Keep'} ${ic('pin')}</span></div>
     <div class="row-main" role="button" tabindex="0" data-act="toggle" data-id="${r.id}" aria-expanded="${exp}">${av(r.chan ? '#' : r.kind === 'rx' ? r.by : last.by)}
       <div class="row-text"><div class="row-head"><span class="row-title">${esc(title)}</span>${sub ? `<span class="row-sub">${sub}</span>` : ''}${marks}${cnt}<span class="row-time">${r.t}${last.edited ? ' · edited' : ''}</span></div>
@@ -334,7 +336,7 @@ function bucketHTML(b) {
   const cnt = b === 'fyi' ? (n ? '<span class="bk-dot" data-tip="Something new"></span>' : '') : `<span class="bk-count">${n}</span>`;
   let body = nw.length ? nw.map(rowHTML).join('') : `<div class="empty">${SUN}<p>${EMPTY[b]}</p></div>`;
   if (kp.length) body += `<div class="kept-head"><b>Kept · ${kp.length}</b><small>${S.autoDone ? 'Stays until you press Done, reply or react' : 'Stays until you press Done'}</small></div>` + kp.map(rowHTML).join('');
-  return `<section class="bucket b-${b}" data-b="${b}"><header class="bk-head"><h2>${BK[b][0]}</h2>${cnt}<span class="bk-desc">${BK[b][1]}</span><span class="bk-acts"><button class="btn sm" data-act="markAll" data-b="${b}">Mark all read</button></span></header>${body}</section>`;
+  return `<section class="bucket b-${b}" data-b="${b}"><header class="bk-head"><h2 data-tip="${BK[b][2]}">${BK[b][0]}</h2>${cnt}<span class="bk-acts"><button class="btn sm" data-act="markAll" data-b="${b}">Mark all read</button></span></header>${body}</section>`;
 }
 const counts = () => ({ focus: S.rows.filter(r => r.bucket === 'focus' && r.sec !== 'kept' && !r.read).length, needs: S.rows.filter(r => r.bucket === 'needs' && !r.read).length, fyi: S.rows.filter(r => r.bucket === 'fyi' && !r.read).length });
 function pillHTML() {

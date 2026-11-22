@@ -18,7 +18,7 @@
   "width": "desktop",
   "check": "fyi: every row gives its reason",
   "pass": true,
-  "detail": "['For your information: Ledger marked this Info']"
+  "detail": "['For your information: Metrics marked this Info']"
  },
  {
   "page": "slack-like",
@@ -521,6 +521,13 @@
   "page": "slack-like",
   "width": "desktop",
   "check": "a deleted message without replies leaves nothing",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a bucket's meaning is a tooltip on its name, not a line of text",
   "pass": true,
   "detail": ""
  },
@@ -1033,7 +1040,7 @@
   "width": "phone",
   "check": "fyi: every row gives its reason",
   "pass": true,
-  "detail": "['For your information: Ledger marked this Info']"
+  "detail": "['For your information: Metrics marked this Info']"
  },
  {
   "page": "slack-like",
@@ -1719,7 +1726,7 @@
   "width": "desktop",
   "check": "fyi: every row gives its reason",
   "pass": true,
-  "detail": "['For your information: Ledger marked this Info']"
+  "detail": "['For your information: Metrics marked this Info']"
  },
  {
   "page": "telegram-like",
@@ -2321,7 +2328,7 @@
   "width": "phone",
   "check": "fyi: every row gives its reason",
   "pass": true,
-  "detail": "['For your information: Ledger marked this Info']"
+  "detail": "['For your information: Metrics marked this Info']"
  },
  {
   "page": "telegram-like",
@@ -2888,7 +2895,7 @@
   "width": "desktop",
   "check": "fyi: every row gives its reason",
   "pass": true,
-  "detail": "['For your information: Ledger marked this Info']"
+  "detail": "['For your information: Metrics marked this Info']"
  },
  {
   "page": "own",
@@ -3490,7 +3497,7 @@
   "width": "phone",
   "check": "fyi: every row gives its reason",
   "pass": true,
-  "detail": "['For your information: Ledger marked this Info']"
+  "detail": "['For your information: Metrics marked this Info']"
  },
  {
   "page": "own",

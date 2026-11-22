@@ -62,6 +62,7 @@ The results say how many messages were found, mark the match, show "edited" wher
 - **A box that holds text is as tall as its text** and shows no scrollbar until it reaches its limit (reported by the user as a bug in the edit box).
 - **A row of tabs that does not fit scrolls sideways by dragging.**
 - **A line between days in a conversation**, "so I can visually distinguish today's messages from older ones".
+- **What a bucket means is a tooltip on its name**, not a line of text beside it ("these explanations may be just tooltips").
 - **An agent is marked by a robot on the corner of its avatar**, not by a text label. This is the visible agent mark D-002 asks for, in another form.
 
 ## Consequences

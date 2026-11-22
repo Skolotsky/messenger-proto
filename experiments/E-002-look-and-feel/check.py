@@ -475,6 +475,8 @@ def writing(browser, slug, size, vp, scale):
     shot("32-delete-ask")
     mine.locator('[data-act="delMsg"]').click()
     ok("a deleted message without replies leaves nothing", pg.locator(".pane .msg").count() == n - 1 and "XLSX the week after" not in pg.locator(".pane .conv-body").inner_text())
+    pg.locator(".bucket.b-focus .bk-head h2").hover(); pg.wait_for_timeout(500)
+    ok("a bucket's meaning is a tooltip on its name, not a line of text", "your own rules" in pg.locator(".tip").inner_text() and pg.locator(".bk-desc").count() == 0)
     # tooltips on actions, and the send hint leads to its setting
     pg.locator('.pane .composer [data-l="flag"]').hover(); pg.wait_for_timeout(500)
     ok("an action explains itself in a tooltip", pg.locator(".tip.on").count() == 1 and "needs attention" in pg.locator(".tip").inner_text())
