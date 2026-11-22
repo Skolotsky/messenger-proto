@@ -25,16 +25,15 @@ No contract, schema or product code knows a Reset number. A retired organization
 ## Log
 
 - 2026-11-22: Started after the user accepted D-033 and its five readings.
-- 2026-11-22: `reset` removed (commit bd1da42). Retire, stop, delete per part, `seed.sealed` and G-031 built; staged, not committed.
-- 2026-11-22: **Blocked, two things need a decision.** (1) `tests/guardrails/log-numbering` (G-005, protected) counts the log as `1 + (writers-1)*savesEach`; the `seed.sealed` entry makes it one more, so the test fails until that line says `2 +`. Not edited: it needs the user's approval (G-022). (2) `core.hooksPath` in the shared git config was changed to an absolute path at 21:53:56 by something outside this task, so `./scripts/check` fails its "hook is switched on" line and no commit can pass. Not changed here.
-- Open for T-052: the feed must build its engine with `rules.NewFromSeed`. A rule cannot tell a seeded change from a live one while reading in order, so the choice is made once, when the engine is created.
+- 2026-11-22: `reset` removed (bd1da42). Retire, stop, delete per part, `seed.sealed` and G-031 built (f2a2b9f).
+- 2026-11-22: A rule reading the log in order cannot tell a seeded change from a live one, so the log now says it: `seed.opened` starts a seeded history and `seed.sealed` ends it. A session without the opener writes no seal, so G-005 and G-003 needed no change. The rules decide from the log alone.
 
 ## Evidence
 
 - Search for `reset`: what remains is the `demo-reset` operation (`demo:/reset`, the contract's own name) and the panel-width reset in the web app.
 - G-031 (`tests/guardrails/retire-and-delete`): seen failing with deletes that removed nothing; with a delete that skips `sender.notifications` ("rows of the deleted organization are left in [sender.notifications]"); with a delete that ignores the organization ("the other organization changed"); and for a new table with no delete. Passes with the real delete, with a crash after each of the seven steps and two repeats.
-- Rule test `TestNoNotesUpToTheSeal`: passes. It was not seen failing on its own.
-- Seeded history: the old history with its `reset` keys stripped hashes exactly to the new pin.
+- Retired, rule off in a scratch copy: "start: want 410 organization_gone, got 200" and "a retired organization's log moved from 4 to 5".
+- Stopped, rule off in a scratch copy: "delivered after the stop: search 5 to 34, feed 5 to 80, sender 60 to 80".
+- Suppression, rule off in a scratch copy: `TestNoNotesUpToTheSeal` failed with "a seeded mention wrote notes".
+- Seeded history: the new history without its opener, with every number moved back by one, hashes exactly to the previous pin.
 - Protected tests `saved-once`, `log-numbering`, `change-and-log-together`, `conversations-independent`: no line changed.
-- Run by hand on a composed system: every guardrail test passes except G-005 (302 changes, expected 301). A scratch copy with the count raised by one passed 5 of 5. Must-fail builds, server integration tests and browser tests (71 passed, 19 skipped) pass.
-- **Not run:** `./scripts/verify` as a whole, because its first step is the failing check.

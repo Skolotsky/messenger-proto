@@ -1244,12 +1244,12 @@ func TestSeededHistoryWritesNoNotes(t *testing.T) {
 	}
 }
 
-// D-033: the log itself says where seeded history ends. Nothing up to and
-// including seed.sealed writes a note, with no option from the caller; the first
-// change after it does.
+// D-033: the log itself says where seeded history starts and ends. Nothing from
+// seed.opened up to seed.sealed writes a note, with no option from the caller;
+// the first change after it does, and a log without the opener is as before.
 func TestNoNotesUpToTheSeal(t *testing.T) {
 	const at = "2026-11-22T10:00:00.000Z"
-	e := NewFromSeed("acme")
+	e := New("acme")
 	n := int64(0)
 	apply := func(build func(n, prev int64) any) Effects {
 		t.Helper()
@@ -1259,6 +1259,13 @@ func TestNoNotesUpToTheSeal(t *testing.T) {
 			t.Fatal(err)
 		}
 		return fx
+	}
+	opened := contract.ChangeSeedOpened{Kind: "seed.opened", Org: "acme", Number: 1, Previous: 0, At: at}
+	if !IsOrgWide(contract.Change{Value: opened}) {
+		t.Fatal("seed.opened must be applied as an organization-wide change")
+	}
+	if fx := apply(func(int64, int64) any { return opened }); !fx.Known || len(fx.Notes) != 0 {
+		t.Fatalf("the opener: known %v, notes %v", fx.Known, fx.Notes)
 	}
 	mention := func(id string) func(n, prev int64) any {
 		return func(n, prev int64) any {
@@ -1292,6 +1299,24 @@ func TestNoNotesUpToTheSeal(t *testing.T) {
 	}
 	if fx := apply(mention("live")); len(fx.Notes) == 0 {
 		t.Fatal("the first mention after the seal wrote no note")
+	}
+
+	plain := New("acme")
+	for i, c := range []any{
+		contract.ChangePersonJoined{Kind: "person.joined", Org: "acme", Number: 1, Previous: 0, At: at, Person: "anna", Name: "anna"},
+		contract.ChangePersonJoined{Kind: "person.joined", Org: "acme", Number: 2, Previous: 1, At: at, Person: "you", Name: "you"},
+		contract.ChangeChannelCreated{Kind: "channel.created", Org: "acme", Number: 3, Previous: 2, At: at, Conversation: "#a", Name: "a", People: []string{"anna", "you"}},
+	} {
+		if _, err := plain.Apply(contract.Change{Value: c}, Options{}); err != nil {
+			t.Fatalf("change %d: %v", i, err)
+		}
+	}
+	fx, err := plain.Apply(contract.Change{Value: mention("no-opener")(4, 3)}, Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(fx.Notes) == 0 {
+		t.Fatal("a log without the opener wrote no note for a mention")
 	}
 }
 

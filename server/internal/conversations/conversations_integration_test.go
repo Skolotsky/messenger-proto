@@ -650,18 +650,48 @@ func TestSeedSession(t *testing.T) {
 	if _, err := s.SeedOpen(ctx, org); !errors.As(err, &r) || r.Reason != "not empty" {
 		t.Errorf("opening on an organization with changes: %v", err)
 	}
-	// The seal is the session's last entry, at the seed's last time (D-033).
-	var sealKind string
-	var sealAt time.Time
-	if err := orgdb.InOrg(ctx, s.Dir, org, func(tx pgx.Tx) error {
-		return tx.QueryRow(ctx, `SELECT kind, at FROM change_log WHERE org = $1 AND number = 4`, string(org)).Scan(&sealKind, &sealAt)
-	}); err != nil || sealKind != "seed.sealed" || !sealAt.Equal(time.Date(2026, 11, 1, 10, 0, 0, 0, time.UTC)) {
-		t.Errorf("entry 4 after the seed: %q at %v, %v", sealKind, sealAt, err)
-	}
 	// The log continues from the seed's last number and time.
 	status, answer, err = s.Act(ctx, org, []byte(`{"kind":"focus_only","id":"after","as":"p1","on":true}`))
-	if err != nil || status != 200 || *answer.(contract.ActionSaved).Number != 5 {
+	if err != nil || status != 200 || *answer.(contract.ActionSaved).Number != 4 {
 		t.Errorf("first action after the seed: %d %v %v", status, answer, err)
+	}
+}
+
+// A history that begins with seed.opened is closed by a seed.sealed entry at the
+// seed's last time, whose number is the answer; only the seal call can write it.
+func TestSeedWithAnOpenerEndsWithASeal(t *testing.T) {
+	s := &Store{Dir: orgdb.Single{Pool: testPool(t)}, Clock: clock.NewManual(time.Date(2026, 11, 22, 10, 0, 0, 0, time.UTC))}
+	org := newOrg("sealed")
+	ctx := context.Background()
+	session, err := s.SeedOpen(ctx, org)
+	if err != nil {
+		t.Fatal(err)
+	}
+	const first, last = "2026-11-01T09:00:00.000Z", "2026-11-01T10:00:00.000Z"
+	opener := func(n int64) contract.Change {
+		return contract.Change{Value: contract.ChangeSeedOpened{Kind: "seed.opened", Org: string(org), Number: n, Previous: n - 1, At: first}}
+	}
+	person := contract.Change{Value: contract.ChangePersonJoined{Kind: "person.joined", Org: string(org), Number: 2, Previous: 1, At: last, Person: "p", Name: "P"}}
+	if through, err := s.SeedBatch(ctx, org, session, contract.SeedBatch{Changes: []contract.Change{opener(1), person}}); err != nil || through != 2 {
+		t.Fatalf("batch: %d %v", through, err)
+	}
+	var r SeedRefused
+	if _, err := s.SeedBatch(ctx, org, session, contract.SeedBatch{Changes: []contract.Change{opener(3)}}); !errors.As(err, &r) {
+		t.Errorf("an opener that is not first: %v", err)
+	}
+	seal := contract.Change{Value: contract.ChangeSeedSealed{Kind: "seed.sealed", Org: string(org), Number: 3, Previous: 2, At: last}}
+	if _, err := s.SeedBatch(ctx, org, session, contract.SeedBatch{Changes: []contract.Change{seal}}); !errors.As(err, &r) {
+		t.Errorf("a seal inside a batch: %v", err)
+	}
+	if through, err := s.SeedSeal(ctx, org, session); err != nil || through != 3 {
+		t.Fatalf("seal: %d %v", through, err)
+	}
+	var kind string
+	var at time.Time
+	if err := orgdb.InOrg(ctx, s.Dir, org, func(tx pgx.Tx) error {
+		return tx.QueryRow(ctx, `SELECT kind, at FROM change_log WHERE org = $1 AND number = 3`, string(org)).Scan(&kind, &at)
+	}); err != nil || kind != "seed.sealed" || !at.Equal(time.Date(2026, 11, 1, 10, 0, 0, 0, time.UTC)) {
+		t.Errorf("entry 3: %q at %v, %v", kind, at, err)
 	}
 }
 

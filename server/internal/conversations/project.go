@@ -110,7 +110,7 @@ func (s *Step) project(change any, number int64) error {
 			ON CONFLICT (org, person, key) DO UPDATE SET value = EXCLUDED.value`, c.Person, c.Key, c.Value)
 	case contract.ChangeReaderProfileLine:
 		return exec(`UPDATE people SET line = $3 WHERE org = $1 AND id = $2`, c.Person, c.Text)
-	case contract.ChangeTick, contract.ChangeSeedSealed, contract.ChangeReplyStarted, contract.ChangeReplyAbandoned,
+	case contract.ChangeTick, contract.ChangeSeedOpened, contract.ChangeSeedSealed, contract.ChangeReplyStarted, contract.ChangeReplyAbandoned,
 		contract.ChangeReaderWatchingStarted, contract.ChangeReaderWatchingEnded:
 		// In the log only. The live connection (T-053) keeps the watching table
 		// and the agent door (T-054) the text of a reply in progress.

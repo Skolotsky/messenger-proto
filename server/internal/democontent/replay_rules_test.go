@@ -56,9 +56,20 @@ func TestSituationsProduceTheirOutcomesInTheRealRules(t *testing.T) {
 		t.Run(s.ID, func(t *testing.T) {
 			e := rules.New("larkmere")
 			for _, ch := range h.Changes {
-				if _, err := e.Apply(ch, rules.Options{NoNotes: true}); err != nil {
+				fx, err := e.Apply(ch, rules.Options{})
+				if err != nil {
 					t.Fatalf("seeded history does not apply: %v", err)
 				}
+				if len(fx.Notes) != 0 {
+					t.Fatalf("seeded history wrote notes: %v", fx.Notes)
+				}
+			}
+			// As sealing the session does.
+			through := h.Through + 1
+			seal := contract.ChangeSeedSealed{Kind: "seed.sealed", Org: c.Org.Org, Number: through, Previous: h.Through,
+				At: h.Last.UTC().Format("2006-01-02T15:04:05.000Z")}
+			if _, err := e.Apply(contract.Change{Value: seal}, rules.Options{}); err != nil {
+				t.Fatal(err)
 			}
 			prefix := fmt.Sprintf("replay%d_", i)
 			applied := 0
@@ -66,7 +77,7 @@ func TestSituationsProduceTheirOutcomesInTheRealRules(t *testing.T) {
 			for n, st := range s.Steps {
 				partial := s
 				partial.Steps = s.Steps[:n+1]
-				changes, err := c.Compile(partial, h.Through, h.Last, prefix)
+				changes, err := c.Compile(partial, through, h.Last, prefix)
 				if err != nil {
 					t.Fatal(err)
 				}

@@ -122,6 +122,10 @@ func (c *Content) Build(o Options) (*History, error) {
 		start: day.AddDate(0, 0, -15), replied: map[string]bool{}, findingsLeft: slices.Clone(findings), usedLines: map[string]int{}, decks: map[string][]string{}, ticket: 4100}
 	b.w = newWriter(c, 0, b.start, "s")
 
+	// The log itself says where seeded history starts (D-033). Sealing the
+	// session writes its end.
+	number, previous, stamp := b.w.next(b.start)
+	b.w.add(contract.ChangeSeedOpened{Kind: "seed.opened", Org: c.Org.Org, Number: number, Previous: previous, At: stamp})
 	b.opening()
 	for _, ex := range c.Exchanges {
 		b.placeExchange(ex)

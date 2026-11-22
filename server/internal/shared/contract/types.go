@@ -453,6 +453,15 @@ type ChangeTick struct {
 	At       string `json:"at"`
 }
 
+// ChangeSeedOpened is the contract type of the same name.
+type ChangeSeedOpened struct {
+	Kind     string `json:"kind"`
+	Org      string `json:"org"`
+	Number   int64  `json:"number"`
+	Previous int64  `json:"previous"`
+	At       string `json:"at"`
+}
+
 // ChangeSeedSealed is the contract type of the same name.
 type ChangeSeedSealed struct {
 	Kind     string `json:"kind"`
@@ -573,6 +582,10 @@ func (u *Change) UnmarshalJSON(b []byte) error {
 		return err
 	case "tick":
 		v, err := decode[ChangeTick](b)
+		u.Value = v
+		return err
+	case "seed.opened":
+		v, err := decode[ChangeSeedOpened](b)
 		u.Value = v
 		return err
 	case "seed.sealed":
@@ -2140,6 +2153,7 @@ var Types = map[string]func([]byte) (any, error){
 	"ChangeReaderPreference":      func(b []byte) (any, error) { return decode[ChangeReaderPreference](b) },
 	"ChangeReaderProfileLine":     func(b []byte) (any, error) { return decode[ChangeReaderProfileLine](b) },
 	"ChangeTick":                  func(b []byte) (any, error) { return decode[ChangeTick](b) },
+	"ChangeSeedOpened":            func(b []byte) (any, error) { return decode[ChangeSeedOpened](b) },
 	"ChangeSeedSealed":            func(b []byte) (any, error) { return decode[ChangeSeedSealed](b) },
 	"SeedOpenRequest":             func(b []byte) (any, error) { return decode[SeedOpenRequest](b) },
 	"CurrentOrganization":         func(b []byte) (any, error) { return decode[CurrentOrganization](b) },

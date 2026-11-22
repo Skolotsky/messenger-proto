@@ -123,6 +123,14 @@ func (st *Step) appendSeeded(change contract.Change) error {
 	if st.headAt != nil && at.Before(*st.headAt) {
 		return SeedRefused{"time goes back"}
 	}
+	switch change.Value.(type) {
+	case contract.ChangeSeedOpened:
+		if h.Number != 1 {
+			return SeedRefused{"seed.opened must be the first entry"}
+		}
+	case contract.ChangeSeedSealed:
+		return SeedRefused{"seed.sealed is written by sealing"}
+	}
 	if m, ok := change.Value.(contract.ChangeMessageCreated); ok && m.Message.Number != h.Number {
 		return SeedRefused{"a message's number must be its change's number"}
 	}
@@ -147,24 +155,32 @@ func seedHeader(change contract.Change) (header, error) {
 	return h, json.Unmarshal(b, &h)
 }
 
-// SeedSeal closes the session for good by writing its last entry, seed.sealed,
-// at the seed's last time, and answers with the last seeded number, as the
-// contract's example does; the seal itself is the entry after it. The log
-// continues from there, and the feed writes no notes for anything up to it.
+// SeedSeal closes the session for good and answers with the log's last number.
+// A session whose log begins with seed.opened ends with a seed.sealed entry, at
+// the seed's last time, and that entry is the number answered: the feed writes
+// no notes from the opener up to it. A session without the opener writes no
+// seal. The log continues from there.
 func (s *Store) SeedSeal(ctx context.Context, org ids.Org, session string) (int64, error) {
 	var through int64
 	err := s.Save(ctx, org, func(st *Step) error {
 		if err := st.checkSession(session); err != nil {
 			return err
 		}
-		st.noTick = true
-		if st.headAt != nil {
-			st.at = st.headAt.UTC()
-		}
-		through = st.head // the contract's answer: the last seeded number, not the seal's own
-		if _, err := st.Append(contract.ChangeSeedSealed{Kind: "seed.sealed"}); err != nil {
+		var opened bool
+		if err := st.Tx.QueryRow(ctx, `SELECT EXISTS (SELECT 1 FROM change_log WHERE org = $1 AND number = 1 AND kind = 'seed.opened')`,
+			string(org)).Scan(&opened); err != nil {
 			return err
 		}
+		if opened {
+			st.noTick = true
+			if st.headAt != nil {
+				st.at = st.headAt.UTC()
+			}
+			if _, err := st.Append(contract.ChangeSeedSealed{Kind: "seed.sealed"}); err != nil {
+				return err
+			}
+		}
+		through = st.head
 		_, err := st.Tx.Exec(ctx, `UPDATE seed_sessions SET sealed = true WHERE org = $1`, string(org))
 		return err
 	})

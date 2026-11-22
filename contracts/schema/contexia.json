@@ -1782,6 +1782,9 @@
     },
     {
      "$ref": "#/$defs/ChangeSeedSealed"
+    },
+    {
+     "$ref": "#/$defs/ChangeSeedOpened"
     }
    ]
   },
@@ -5800,7 +5803,7 @@
   },
   "ChangeSeedSealed": {
    "type": "object",
-   "description": "Closes a seed session: no notification is written for anything up to and including it (D-032, D-033).",
+   "description": "Closes a seed session that began with seed.opened; a session without that opener writes no seal (D-033).",
    "properties": {
     "kind": {
      "const": "seed.sealed"
@@ -5905,6 +5908,38 @@
    },
    "required": [
     "organizations"
+   ],
+   "additionalProperties": false
+  },
+  "ChangeSeedOpened": {
+   "type": "object",
+   "description": "The first entry of a seeded log: from here until seed.sealed the feed writes no notification notes (D-033).",
+   "properties": {
+    "kind": {
+     "const": "seed.opened"
+    },
+    "org": {
+     "type": "string"
+    },
+    "number": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "previous": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "at": {
+     "type": "string",
+     "format": "date-time"
+    }
+   },
+   "required": [
+    "kind",
+    "org",
+    "number",
+    "previous",
+    "at"
    ],
    "additionalProperties": false
   }

@@ -134,7 +134,8 @@ export type Change =
   | ChangeReaderPreference
   | ChangeReaderProfileLine
   | ChangeTick
-  | ChangeSeedSealed;
+  | ChangeSeedSealed
+  | ChangeSeedOpened;
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "PeopleAction".
@@ -442,6 +443,7 @@ export interface ContractTypes {
   CurrentOrganization?: CurrentOrganization;
   OrganizationEntry?: OrganizationEntry;
   OrganizationList?: OrganizationList;
+  ChangeSeedOpened?: ChangeSeedOpened;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -901,13 +903,26 @@ export interface ChangeTick {
   at: string;
 }
 /**
- * Closes a seed session: no notification is written for anything up to and including it (D-032, D-033).
+ * Closes a seed session that began with seed.opened; a session without that opener writes no seal (D-033).
  *
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "ChangeSeedSealed".
  */
 export interface ChangeSeedSealed {
   kind: "seed.sealed";
+  org: string;
+  number: number;
+  previous: number;
+  at: string;
+}
+/**
+ * The first entry of a seeded log: from here until seed.sealed the feed writes no notification notes (D-033).
+ *
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "ChangeSeedOpened".
+ */
+export interface ChangeSeedOpened {
+  kind: "seed.opened";
   org: string;
   number: number;
   previous: number;

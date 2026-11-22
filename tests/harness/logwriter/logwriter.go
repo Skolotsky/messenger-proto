@@ -154,6 +154,7 @@ func isAgent(p string) bool {
 }
 
 func (w *writer) opening() {
+	w.emitAtNow("seed.opened", map[string]any{})
 	for _, p := range people {
 		w.emit("person.joined", map[string]any{"person": p, "name": p, "is_agent": false})
 	}
