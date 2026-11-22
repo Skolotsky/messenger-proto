@@ -37,7 +37,7 @@ func (s *Search) Routes() http.Handler {
 	mux.HandleFunc("POST /changes", s.change)
 	mux.HandleFunc("GET /orgs/{org}/query", s.query)
 	mux.HandleFunc("GET /orgs/{org}/place", s.place)
-	controlRoutes(mux, s.modes, s.opt.Dir, s.wipeOrg)
+	controlRoutes(mux, s.modes, s.opt.Dir, s.wipeOrg, "messages", "state")
 	return mux
 }
 

@@ -17,14 +17,16 @@ const maxBody = 8 << 20
 // Routes adds the people door's actions and questions, and the seed session, to
 // mux. The live connection (T-053) and the agent door (T-054) add their own.
 func (s *Store) Routes(mux *http.ServeMux) {
-	mux.HandleFunc("POST /orgs/{org}/people/actions", s.handleAct)
-	mux.HandleFunc("GET /orgs/{org}/people/{person}/start", s.handleStart)
-	mux.HandleFunc("GET /orgs/{org}/conversations/{conversation}/messages", s.handleMessages)
-	mux.HandleFunc("GET /orgs/{org}/suggest", s.handleSuggest)
+	mux.HandleFunc("POST /orgs/{org}/people/actions", s.door(s.handleAct))
+	mux.HandleFunc("GET /orgs/{org}/people/{person}/start", s.door(s.handleStart))
+	mux.HandleFunc("GET /orgs/{org}/conversations/{conversation}/messages", s.door(s.handleMessages))
+	mux.HandleFunc("GET /orgs/{org}/suggest", s.door(s.handleSuggest))
 	mux.HandleFunc("GET /orgs/{org}/people", s.handlePeople)
 	mux.HandleFunc("POST /orgs/{org}/seed/open", s.handleSeedOpen)
 	mux.HandleFunc("POST /orgs/{org}/seed/{session}", s.handleSeedBatch)
 	mux.HandleFunc("POST /orgs/{org}/seed/{session}/seal", s.handleSeedSeal)
+	mux.HandleFunc("POST /orgs/{org}/retire", s.handleRetire)
+	mux.HandleFunc("DELETE /orgs/{org}", s.handleDelete)
 }
 
 func send(w http.ResponseWriter, status int, v any) {
@@ -49,6 +51,8 @@ func fail(w http.ResponseWriter, r *http.Request, err error) {
 	switch {
 	case errors.As(err, &seed):
 		send(w, http.StatusConflict, contract.Refusal{Refused: seed.Reason})
+	case errors.Is(err, ErrOrganizationGone):
+		WriteGone(w)
 	case errors.Is(err, ErrUnknownOrg):
 		send(w, http.StatusNotFound, contract.Refusal{Refused: "unknown organization"})
 	case errors.Is(err, ErrNotFound):
@@ -157,7 +161,18 @@ func (s *Store) handleSeedOpen(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	session, err := s.SeedOpen(r.Context(), org)
+	var in contract.SeedOpenRequest
+	if r.ContentLength != 0 {
+		if err := json.NewDecoder(io.LimitReader(r.Body, maxBody)).Decode(&in); err != nil {
+			send(w, http.StatusConflict, contract.Refusal{Refused: refusedUnreadable})
+			return
+		}
+	}
+	name := ""
+	if in.Name != nil {
+		name = *in.Name
+	}
+	session, err := s.SeedOpenNamed(r.Context(), org, name)
 	if err != nil {
 		fail(w, r, err)
 		return

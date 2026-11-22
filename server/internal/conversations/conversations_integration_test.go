@@ -650,9 +650,17 @@ func TestSeedSession(t *testing.T) {
 	if _, err := s.SeedOpen(ctx, org); !errors.As(err, &r) || r.Reason != "not empty" {
 		t.Errorf("opening on an organization with changes: %v", err)
 	}
+	// The seal is the session's last entry, at the seed's last time (D-033).
+	var sealKind string
+	var sealAt time.Time
+	if err := orgdb.InOrg(ctx, s.Dir, org, func(tx pgx.Tx) error {
+		return tx.QueryRow(ctx, `SELECT kind, at FROM change_log WHERE org = $1 AND number = 4`, string(org)).Scan(&sealKind, &sealAt)
+	}); err != nil || sealKind != "seed.sealed" || !sealAt.Equal(time.Date(2026, 11, 1, 10, 0, 0, 0, time.UTC)) {
+		t.Errorf("entry 4 after the seed: %q at %v, %v", sealKind, sealAt, err)
+	}
 	// The log continues from the seed's last number and time.
 	status, answer, err = s.Act(ctx, org, []byte(`{"kind":"focus_only","id":"after","as":"p1","on":true}`))
-	if err != nil || status != 200 || *answer.(contract.ActionSaved).Number != 4 {
+	if err != nil || status != 200 || *answer.(contract.ActionSaved).Number != 5 {
 		t.Errorf("first action after the seed: %d %v %v", status, answer, err)
 	}
 }

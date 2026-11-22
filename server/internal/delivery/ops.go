@@ -9,6 +9,7 @@ import (
 
 	"contexia/internal/shared/contract"
 	"contexia/internal/shared/ids"
+	"contexia/internal/shared/orgdb"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -20,6 +21,8 @@ func (s *Service) Routes() http.Handler {
 	mux.HandleFunc("GET /orgs/{org}/parked", s.withOrg(s.parked))
 	mux.HandleFunc("POST /orgs/{org}/parked/{number}/retry", s.withOrg(s.retry))
 	mux.HandleFunc("POST /orgs/{org}/receivers/{receiver}/restart", s.withOrg(s.restart))
+	mux.HandleFunc("POST /orgs/{org}/stop", s.withOrg(s.handleStop))
+	mux.HandleFunc("DELETE /orgs/{org}", s.withOrg(s.handleDelete))
 	return mux
 }
 
@@ -145,6 +148,17 @@ func (s *Service) retry(w http.ResponseWriter, r *http.Request, org ids.Org) {
 	l, ok := s.lanes[name]
 	if !ok || name == Feed {
 		refuse(w, http.StatusBadRequest, "no such receiver")
+		return
+	}
+	var halted bool
+	if err := orgdb.InOrg(r.Context(), s.cfg.DB, org, func(tx pgx.Tx) error {
+		return tx.QueryRow(r.Context(), `SELECT EXISTS (SELECT 1 FROM delivery_stopped WHERE org = $1)`, string(org)).Scan(&halted)
+	}); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if halted {
+		refuse(w, http.StatusNotFound, "not parked") // a stopped organization is sent nothing more
 		return
 	}
 	var found bool

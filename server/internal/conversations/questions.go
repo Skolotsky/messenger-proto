@@ -136,7 +136,14 @@ func (s *Store) People(ctx context.Context, org ids.Org) (contract.PeopleList, e
 func (s *Store) Start(ctx context.Context, org ids.Org, person string) (contract.StartAnswer, error) {
 	out := contract.StartAnswer{Org: string(org), OrgName: string(org)}
 	err := s.question(ctx, org, func(tx pgx.Tx, _ int64) error {
-		var err error
+		var display *string
+		err := tx.QueryRow(ctx, `SELECT name FROM seed_sessions WHERE org = $1`, string(org)).Scan(&display)
+		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+			return err
+		}
+		if display != nil {
+			out.OrgName = *display
+		}
 		if out.People, err = loadPeople(ctx, tx, org, `ORDER BY name, id`); err != nil {
 			return err
 		}

@@ -10,7 +10,8 @@ CREATE TABLE org_log (
   head           bigint NOT NULL DEFAULT 0,
   head_at        timestamptz,
   last_change_at timestamptz,          -- newest entry that is not a tick
-  tick_due_at    timestamptz           -- null when no tick is due
+  tick_due_at    timestamptz,          -- null when no tick is due
+  retired_at     timestamptz           -- set once: accepts nothing more (D-033)
 );
 CREATE INDEX org_log_tick_due ON org_log (tick_due_at) WHERE tick_due_at IS NOT NULL;
 
@@ -69,5 +70,11 @@ CREATE TABLE delivery_receivers (
   failures      int NOT NULL DEFAULT 0
 );
 
+-- Organizations delivery has been told to stop for (D-033). Read per
+-- organization at the start of a pass, never scanned (G-029).
+CREATE TABLE delivery_stopped (
+  org text PRIMARY KEY
+);
+
 GRANT SELECT ON org_log, change_log TO delivery;
-GRANT SELECT, INSERT, UPDATE, DELETE ON delivery_due, delivery_places, delivery_parked, delivery_receivers TO delivery;
+GRANT SELECT, INSERT, UPDATE, DELETE ON delivery_due, delivery_places, delivery_parked, delivery_receivers, delivery_stopped TO delivery;

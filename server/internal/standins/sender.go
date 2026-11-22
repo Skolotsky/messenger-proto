@@ -38,7 +38,7 @@ func (s *Sender) Routes() http.Handler {
 	mux.HandleFunc("POST /notes", s.note)
 	mux.HandleFunc("GET /orgs/{org}/place", s.place)
 	mux.HandleFunc("GET /orgs/{org}/notifications", s.notifications)
-	controlRoutes(mux, s.modes, s.opt.Dir, s.wipeOrg)
+	controlRoutes(mux, s.modes, s.opt.Dir, s.wipeOrg, "notifications", "deliveries", "state")
 	return mux
 }
 

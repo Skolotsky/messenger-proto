@@ -22,20 +22,27 @@ type SeedRefused struct{ Reason string }
 
 func (e SeedRefused) Error() string { return "seed refused: " + e.Reason }
 
-// SeedOpen opens the one seed session of an organization whose log is empty.
-// It is also what first creates the organization's log row. Asking again while
-// it is still empty and open gives the same session.
+// SeedOpen opens a seed session with no display name: the organization's ID.
 func (s *Store) SeedOpen(ctx context.Context, org ids.Org) (string, error) {
+	return s.SeedOpenNamed(ctx, org, "")
+}
+
+// SeedOpenNamed opens the one seed session of an organization whose log is
+// empty. It is also what first creates the organization's log row. Asking again
+// while it is still empty and open gives the same session and keeps the first
+// name.
+func (s *Store) SeedOpenNamed(ctx context.Context, org ids.Org, name string) (string, error) {
 	var session string
 	err := orgdb.InOrg(ctx, s.Dir, org, func(tx pgx.Tx) error {
 		if _, err := tx.Exec(ctx, `INSERT INTO org_log (org) VALUES ($1) ON CONFLICT DO NOTHING`, string(org)); err != nil {
 			return err
 		}
 		var head int64
-		if err := tx.QueryRow(ctx, `SELECT head FROM org_log WHERE org = $1 FOR UPDATE`, string(org)).Scan(&head); err != nil {
+		var retired *time.Time
+		if err := tx.QueryRow(ctx, `SELECT head, retired_at FROM org_log WHERE org = $1 FOR UPDATE`, string(org)).Scan(&head, &retired); err != nil {
 			return err
 		}
-		if head != 0 {
+		if head != 0 || retired != nil {
 			return SeedRefused{refusedNotEmpty}
 		}
 		var sealed bool
@@ -50,7 +57,11 @@ func (s *Store) SeedOpen(ctx context.Context, org ids.Org) (string, error) {
 			return err
 		}
 		session = ids.New("seed")
-		_, err = tx.Exec(ctx, `INSERT INTO seed_sessions (org, session) VALUES ($1, $2)`, string(org), session)
+		var display *string
+		if name != "" {
+			display = &name
+		}
+		_, err = tx.Exec(ctx, `INSERT INTO seed_sessions (org, session, name) VALUES ($1, $2, $3)`, string(org), session, display)
 		return err
 	})
 	return session, err
@@ -83,6 +94,9 @@ func (s *Store) SeedBatch(ctx context.Context, org ids.Org, session string, batc
 		through = st.head
 		return nil
 	})
+	if errors.Is(err, ErrOrganizationGone) {
+		return 0, SeedRefused{refusedNotEmpty}
+	}
 	var pg *pgconn.PgError
 	if errors.As(err, &pg) && (pg.Code == "23503" || pg.Code == "23505" || pg.Code == "23514") {
 		return 0, SeedRefused{"invalid change: " + pg.ConstraintName}
@@ -133,17 +147,29 @@ func seedHeader(change contract.Change) (header, error) {
 	return h, json.Unmarshal(b, &h)
 }
 
-// SeedSeal closes the session for good and answers with the log's last number.
-// The log continues from there.
+// SeedSeal closes the session for good by writing its last entry, seed.sealed,
+// at the seed's last time, and answers with the last seeded number, as the
+// contract's example does; the seal itself is the entry after it. The log
+// continues from there, and the feed writes no notes for anything up to it.
 func (s *Store) SeedSeal(ctx context.Context, org ids.Org, session string) (int64, error) {
 	var through int64
 	err := s.Save(ctx, org, func(st *Step) error {
 		if err := st.checkSession(session); err != nil {
 			return err
 		}
-		through = st.head
+		st.noTick = true
+		if st.headAt != nil {
+			st.at = st.headAt.UTC()
+		}
+		through = st.head // the contract's answer: the last seeded number, not the seal's own
+		if _, err := st.Append(contract.ChangeSeedSealed{Kind: "seed.sealed"}); err != nil {
+			return err
+		}
 		_, err := st.Tx.Exec(ctx, `UPDATE seed_sessions SET sealed = true WHERE org = $1`, string(org))
 		return err
 	})
+	if errors.Is(err, ErrOrganizationGone) {
+		return 0, SeedRefused{refusedNotEmpty}
+	}
 	return through, err
 }

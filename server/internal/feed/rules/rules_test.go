@@ -1244,6 +1244,57 @@ func TestSeededHistoryWritesNoNotes(t *testing.T) {
 	}
 }
 
+// D-033: the log itself says where seeded history ends. Nothing up to and
+// including seed.sealed writes a note, with no option from the caller; the first
+// change after it does.
+func TestNoNotesUpToTheSeal(t *testing.T) {
+	const at = "2026-11-22T10:00:00.000Z"
+	e := NewFromSeed("acme")
+	n := int64(0)
+	apply := func(build func(n, prev int64) any) Effects {
+		t.Helper()
+		n++
+		fx, err := e.Apply(contract.Change{Value: build(n, n-1)}, Options{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return fx
+	}
+	mention := func(id string) func(n, prev int64) any {
+		return func(n, prev int64) any {
+			return contract.ChangeMessageCreated{Kind: "message.created", Org: "acme", Number: n, Previous: prev, At: at,
+				Message: contract.Message{Id: id, Number: n, Version: 1, Conversation: "#a", Author: "anna", Text: "@you", Mentions: []string{"you"}, Reactions: []contract.Reaction{}, CreatedAt: at}}
+		}
+	}
+	for _, p := range []string{"anna", "you"} {
+		apply(func(n, prev int64) any {
+			return contract.ChangePersonJoined{Kind: "person.joined", Org: "acme", Number: n, Previous: prev, At: at, Person: p, Name: p}
+		})
+	}
+	apply(func(n, prev int64) any {
+		return contract.ChangeChannelCreated{Kind: "channel.created", Org: "acme", Number: n, Previous: prev, At: at, Conversation: "#a", Name: "a", People: []string{"anna", "you"}}
+	})
+	if fx := apply(mention("seeded")); len(fx.Notes) != 0 {
+		t.Fatalf("a seeded mention wrote notes: %v", fx.Notes)
+	}
+	if fx := apply(func(n, prev int64) any {
+		return contract.ChangeTick{Kind: "tick", Org: "acme", Number: n, Previous: prev, At: at}
+	}); len(fx.Notes) != 0 {
+		t.Fatalf("a tick before the seal wrote notes: %v", fx.Notes)
+	}
+	sealed := contract.Change{Value: contract.ChangeSeedSealed{Kind: "seed.sealed", Org: "acme", Number: n + 1, Previous: n, At: at}}
+	if !IsOrgWide(sealed) {
+		t.Fatal("seed.sealed must be applied as an organization-wide change")
+	}
+	fx := apply(func(n, prev int64) any { return sealed.Value })
+	if !fx.Known || len(fx.Notes) != 0 {
+		t.Fatalf("the seal: known %v, notes %v", fx.Known, fx.Notes)
+	}
+	if fx := apply(mention("live")); len(fx.Notes) == 0 {
+		t.Fatal("the first mention after the seal wrote no note")
+	}
+}
+
 func TestHistoryTabs(t *testing.T) {
 	runCases(t, "D-016, D-014, D-004, T-038 point 14", []ruleCase{
 		{"Mentions holds read and unread, from any channel, newest first", func(w *W) (any, any) {

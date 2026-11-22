@@ -123,11 +123,24 @@ type Engine struct {
 	convs   map[string]*conv
 	people  map[string]*person
 	readers []string // people who are not agents, sorted
+	// awaitingSeal: a log that begins with a seed session writes no notes up to
+	// and including its seed.sealed. Written only by that organization-wide
+	// change, which nothing else is applied beside.
+	awaitingSeal bool
 }
 
-// New gives an empty organization.
+// New gives an empty organization whose log has no seed session.
 func New(org string) *Engine {
 	return &Engine{org: org, convs: map[string]*conv{}, people: map[string]*person{}}
+}
+
+// NewFromSeed gives an empty organization whose log begins with a seed session,
+// as every organization's does in the running system. It writes no notes up to
+// and including the log's seed.sealed; nobody has to say which changes those are.
+func NewFromSeed(org string) *Engine {
+	e := New(org)
+	e.awaitingSeal = true
+	return e
 }
 
 // person is what is known about a reader as a whole: organization-wide state.
@@ -393,6 +406,8 @@ func header(c contract.Change) (number int64, at string, err error) {
 		return v.Number, v.At, nil
 	case contract.ChangeTick:
 		return v.Number, v.At, nil
+	case contract.ChangeSeedSealed:
+		return v.Number, v.At, nil
 	}
 	return 0, "", cannot("unknown change %T", c.Value)
 }
@@ -402,7 +417,8 @@ func header(c contract.Change) (number int64, at string, err error) {
 func IsOrgWide(c contract.Change) bool {
 	switch c.Value.(type) {
 	case contract.ChangeReaderFocusRule, contract.ChangeReaderFocusPerson, contract.ChangeReaderFocusAutoAdd,
-		contract.ChangeReaderFocusOnly, contract.ChangeReaderReleaseSetting, contract.ChangePersonJoined, contract.ChangeTick:
+		contract.ChangeReaderFocusOnly, contract.ChangeReaderReleaseSetting, contract.ChangePersonJoined, contract.ChangeTick,
+		contract.ChangeSeedSealed:
 		return true
 	}
 	return false
@@ -418,7 +434,7 @@ func (e *Engine) Apply(c contract.Change, opt Options) (Effects, error) {
 	if err != nil {
 		return Effects{}, cannot("change %d has a bad time %q", number, atText)
 	}
-	f := &fx{number: number, atText: atText, at: at, noNotes: opt.NoNotes,
+	f := &fx{number: number, atText: atText, at: at, noNotes: opt.NoNotes || e.awaitingSeal,
 		touched: map[string]map[string]map[rowKey]bool{}, readers: map[string]bool{}}
 	known, err := e.dispatch(c, f)
 	if err != nil {
@@ -527,6 +543,9 @@ func (e *Engine) dispatch(c contract.Change, f *fx) (bool, error) {
 		if !f.noNotes {
 			f.notes = append(f.notes, NoteDraft{Kind: "clock", At: f.atText})
 		}
+		return true, nil
+	case contract.ChangeSeedSealed:
+		e.awaitingSeal = false
 		return true, nil
 	}
 	return false, nil // reply.started, reply.abandoned, reader.preference, reader.profile_line: counted, no effect

@@ -15,6 +15,7 @@ import (
 	"contexia/internal/shared/contract"
 	"contexia/internal/shared/ids"
 	"contexia/internal/shared/orgdb"
+	"contexia/internal/shared/orgwipe"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -71,6 +72,13 @@ func (m *modes) set(org string, v contract.Mode) {
 	defer m.mu.Unlock()
 	m.byOrg[org] = v
 	m.announce()
+}
+
+// forget drops what is known of a deleted organization.
+func (m *modes) forget(org string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	delete(m.byOrg, org)
 }
 
 func (m *modes) setAll(v contract.Mode) {
@@ -139,8 +147,24 @@ func orgOf(w http.ResponseWriter, r *http.Request) (ids.Org, bool) {
 	return org, true
 }
 
-// controlRoutes adds the mode switches and the wipes, the same on both.
-func controlRoutes(mux *http.ServeMux, m *modes, dir orgdb.Directory, wipe func(context.Context, ids.Org) error) {
+// controlRoutes adds the mode switches, the wipes and the delete, the same on
+// both. tables are the stand-in's own tables that hold an organization.
+func controlRoutes(mux *http.ServeMux, m *modes, dir orgdb.Directory, wipe func(context.Context, ids.Org) error, tables ...string) {
+	mux.HandleFunc("DELETE /orgs/{org}", func(w http.ResponseWriter, r *http.Request) {
+		org, ok := orgOf(w, r)
+		if !ok {
+			return
+		}
+		err := orgdb.InOrg(r.Context(), dir, org, func(tx pgx.Tx) error {
+			return orgwipe.Delete(r.Context(), tx, org, tables...)
+		})
+		if err != nil {
+			unavailable(w, "delete organization", err)
+			return
+		}
+		m.forget(string(org))
+		writeJSON(w, http.StatusOK, struct{}{})
+	})
 	readMode := func(w http.ResponseWriter, r *http.Request) (contract.Mode, bool) {
 		var in contract.ModeBody
 		if err := json.NewDecoder(r.Body).Decode(&in); err != nil || !validMode(in.Mode) {
