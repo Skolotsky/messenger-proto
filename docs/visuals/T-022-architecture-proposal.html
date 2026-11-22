@@ -166,7 +166,7 @@ details > .stack { gap: 10px; }
 
 <div class="ask">
   <div class="label">Where it stands</div>
-  <p><strong>All technical decisions are taken.</strong> You decided the shape, the database and the live connection (D-005), Go for the server (D-025), who owns what a reader did (D-017), who decides a notification (D-018), and that the architecture is ready for many organizations (D-026, section 11). On your delegation I decided the delivery promise (D-006), the numbers (D-007) and the agent door (D-008). Any of them can be overturned.</p>
+  <p><strong>All technical decisions are taken.</strong> You decided the shape, the database and the live connection (D-005; a message broker was tried and dropped again, D-027 and D-028), Go for the server (D-025), who owns what a reader did (D-017), who decides a notification (D-018), and that the architecture is ready for many organizations (D-026, section 11). On your delegation I decided the delivery promise (D-006), the numbers (D-007) and the agent door (D-008). Any of them can be overturned.</p>
   <p class="note">An organization is the tenant; the seeded team lives inside one. There is no organization switcher in this scope: the second organization exists only for the tests.</p>
 </div>
 
@@ -727,6 +727,7 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
     <div class="panel"><div class="label">What a failure now touches</div><p>A receiver that is down is down for every organization. Everything else is per organization: a change that is parked, three refusals that pause delivery, a fence, a feed that stops after five fences, a rebuild, a reset. A receiver has its own answer for "this organization is stopped", so the others carry on.</p></div>
     <div class="panel"><div class="label">Not built</div><p>Creating or administering organizations, sign-in, limits per organization, one identity across organizations, several copies of a program actually running. The first version runs one organization with the seeded team in it, and has no organization switcher; a second small organization exists only so the tests can prove separation.</p></div>
   </div>
+  <p class="note">Tried since (E-006, last part): with one organization holding 20,000 waiting changes, our own worker taking organizations in turn applied the others' changes in 25 ms (worst 61 ms); with that rule taken out, 8 s (worst 25 s).</p>
   <p class="note">Two guardrails come with it: nothing of one organization is ever shown to or changed by another (enforced by the database itself, G-025), and what happens in one organization does not delay another (G-026). The diagrams and examples earlier on this page show one organization.</p>
 </section>
 

@@ -159,7 +159,7 @@ details > .stack { gap: 10px; }
 <body>
 <main class="page">
 <header class="top">
-  <div class="label">Decision brief · D-005 · 2026-11-22 · decided: no message broker in the first version</div>
+  <div class="label">Decision brief · D-005, D-027, D-028 · 2026-11-22 · decided: no message broker, after trying one</div>
   <h1>A message broker: when it becomes the right choice, and how it would slot in</h1>
   <p class="lede">The first version delivers changes with a log in PostgreSQL and one worker per receiver. A broker becomes right when receivers multiply, belong to other teams, or need to work in parallel. Because the rules that matter stay the same, adding one later replaces a single layer.</p>
 </header>
@@ -182,6 +182,24 @@ details > .stack { gap: 10px; }
     </table>
   </div>
   <p>How you would notice in practice: receivers falling behind while their own systems are healthy; the database busy serving the workers' reads; a second team asking for "the events". Until then a broker is one more system that has to be up, and it would replace delivery machinery that is already built small and tested.</p>
+</section>
+
+<section>
+  <h2>What trying it showed (E-006)</h2>
+  <p>You chose a broker (D-027) so the system could ship alongside other teams' services on standard tooling. Before rewriting the design around it, Apache Kafka was put in the middle of a small build and broken on purpose. The promises held, with two things built on top, and it cost speed and the independence of organizations. You then decided to go back (D-028).</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th></th><th>Without Kafka</th><th>With Kafka in the middle</th></tr></thead>
+      <tbody>
+        <tr><td>Nothing lost, nothing applied twice, under every fault</td><td>held (E-003)</td><td>held, once the relay advanced only on confirmed delivery; the first relay lost 393 of 7,061 changes when Kafka was restarted</td></tr>
+        <tr><td>Save to receiver, healthy</td><td class="num">7 ms median</td><td class="num">121 ms median</td></tr>
+        <tr><td>One organization gets 20,000 changes at once: delay for the others</td><td class="num">25 ms median, 61 ms worst</td><td class="num">8 s median, 24 s worst; with a hand-made consumer that takes organizations in turn: 54 ms median, 2.1 s worst</td></tr>
+        <tr><td>Kafka itself stopped</td><td>not applicable</td><td>people keep working; receivers wait and catch up</td></tr>
+        <tr><td>Stateful systems to run</td><td>PostgreSQL</td><td>PostgreSQL and Kafka, with a relay between</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Kafka ran as one node with near-default settings; a tuned setup would be faster. The delay between organizations is structural: Kafka keeps order per lane, and several organizations share a lane.</p>
 </section>
 
 <section>
@@ -319,7 +337,7 @@ details > .stack { gap: 10px; }
   <h2>5 · If the day comes: which broker, and what to prove again</h2>
   <p>Apache Kafka would be the first candidate: it is the standard, and its model (a log that is kept, a remembered place per reader, replay from the start) is our design word for word. NATS JetStream is lighter and less widely known. RabbitMQ in its classic form hands a message over and forgets it, which does not fit rebuilding a receiver by replay. Redis Streams keeps data in memory first and promises less about not losing it.</p>
   <p>What would have to be tested again with the broker in the middle: the relay killed between publishing and noting how far it got; the broker stopped mid-burst while people keep working; a receiver stopped, and wiped and rebuilt from the start of the stream; freshness against the 2-second target.</p>
-  <p class="note">How this was decided: you first chose a broker, asked for the case for it, and after reading the case and its limits decided to build the first version without one (2026-11-22).</p>
+  <p class="note">How this was decided, all on 2026-11-22: you first chose a broker, read the case for it and decided against (D-005); chose one again for standard tooling alongside other teams' services (D-027); and after it was tried, went back to the design without one, keeping it ready for many organizations (D-028). A middle way stays open for later: our own receivers fed directly as now, and Kafka only as an outward stream that other teams attach to.</p>
 </section>
 
 <footer class="foot">
