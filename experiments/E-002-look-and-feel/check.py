@@ -211,8 +211,8 @@ def run(browser, slug, size, vp, scale):
     close_conv()
     feed()
     click('[data-act="modal"][data-m="rules"]')
-    click('.sheet .set-nav [data-s="people"]')
-    ok("the rule is in its own list in settings", "Everything that reaches you from" in pg.locator(".sheet .set-body").inner_text())
+    click('.sheet .set-nav [data-s="channels"]')
+    ok("what was added from the conversation shows in settings", pg.locator('.sheet select[data-dial="ch-design"]').input_value() == "focus")
     click('.sheet [data-act="closeModal"]')
 
     # 12. notifications, shown outside the product (D-022)
@@ -590,6 +590,58 @@ def extras(browser):
         ok("notification-app", "no script errors on either page", not errs, errs)
         pg.close()
 
+def rest(browser, slug, size, vp, scale):
+    """Slack-like, desktop: the last four pieces (proposals, 2026-11-22): an agent writing live, creating a channel, the person switcher, an empty Focus."""
+    if slug != "slack-like" or size != "desktop": return
+    ctx = browser.new_context(viewport=vp, device_scale_factor=scale)
+    pg = ctx.new_page(); pg.goto(f"file://{here.resolve()}/{slug}.html")
+    def ok(name, cond, detail=""):
+        results.append({"page": slug, "width": size, "check": name, "pass": bool(cond), "detail": str(detail)})
+        if not cond: failures.append(f"{slug} @ {size}: {name} {detail}")
+    def shot(n): pg.screenshot(path=str(shots / f"{slug}-{size}-{n}.jpg"), type="jpeg", quality=80)
+    def demo(act): pg.locator(".demo-btn").click(); pg.locator(f'.demo [data-act="{act}"]').click(); pg.locator(".demo-btn").click()
+    # an agent writes while you watch
+    pg.locator(".feed-scroll").evaluate("e => e.scrollTop = 0")
+    pg.locator('article[data-row="r-comp"] .row-main').click(position={"x": 24, "y": 24})
+    rows = pg.locator(".row").count()
+    demo("playAgent"); pg.wait_for_timeout(1200)
+    live = pg.locator(".pane .msg.is-streaming")
+    ok("an agent's answer appears as it is written, marked as not finished", live.count() == 1 and "Writing" in live.inner_text() and "only when it is finished" in live.inner_text() and 3 < len(live.locator(".msg-body").inner_text().split()) < 40)
+    ok("while it is being written nothing reaches the feed", pg.locator(".row").count() == rows and pg.locator(".newpill").count() == 0)
+    shot("41-agent-writing")
+    pg.wait_for_function("!document.querySelector('.msg.is-streaming')", timeout=15000)
+    ok("finished while watched: read at once, no feed row, no arrivals bar", "Done" in pg.locator(".pane .msg").last.inner_text() and pg.locator(".newpill").count() == 0 and "table" in pg.locator(".pane .msg").last.inner_text())
+    # not watching: it arrives like any finished message
+    pg.reload(); demo("playAgent")
+    pg.wait_for_function("document.querySelector('.newpill')", timeout=15000)
+    ok("finished while not watched: it waits behind Show like any arrival", "1 new" in pg.locator(".newpill").inner_text())
+    # create a channel
+    pg.reload()
+    pg.locator(".add-ch").click()
+    pg.locator("#nc-name").press_sequentially("Launch")
+    ok("a name that exists is refused before creating", "already exists" in pg.locator("#nc-prev").inner_text() and pg.locator("#nc-go").is_disabled())
+    pg.locator("#nc-name").press_sequentially(" Retro")
+    pg.locator('.chip[data-p="lena"]').click(); pg.locator('.chip[data-p="marco"]').click()
+    ok("the name is tidied and shown before creating; picking people keeps it", "#launch-retro" in pg.locator("#nc-prev").inner_text() and pg.locator(".chip.on").count() == 2 and pg.locator("#nc-name").input_value() == "Launch Retro" and pg.locator("#nc-go").is_enabled())
+    shot("42-create-channel")
+    pg.locator("#nc-go").click()
+    ok("the new channel is in the list and opens, saying where it starts", "#launch-retro" in pg.locator(".conv-title b").inner_text() and pg.locator('.side [data-c="ch-launch-retro"]').count() == 1 and "start of #launch-retro" in pg.locator(".conv-body").inner_text() and "3 people" in pg.locator(".conv-title small").inner_text())
+    shot("43-new-channel")
+    # the person switcher
+    pg.locator(".me-btn").click()
+    ok("the person's menu offers View as, marked as a demonstration feature", pg.locator(".me-pop .who").count() == 4 and "demonstration" in pg.locator(".me-pop").inner_text().lower())
+    shot("44-view-as")
+    pg.locator('.me-pop .who[data-p="tomas"]').click()
+    ok("choosing someone explains what the product will show", "Tomás" in pg.locator(".dialog").inner_text() and "their feed" in pg.locator(".dialog").inner_text())
+    pg.locator('.dialog .btn.pri').click()
+    # an empty Focus with no rules
+    demo("playNoRules")
+    ok("a Focus with no rules offers three to start with, each with its count", pg.locator(".bucket.b-focus .suggest .rule").count() == 3 and "23 items" in pg.locator(".suggest").inner_text())
+    shot("45-empty-focus")
+    pg.locator('.suggest [data-act="ruleToggle"][data-id="flag"]').click()
+    ok("adding one makes it a rule", pg.locator(".suggest").count() == 0 and "Nothing new in Focus" in pg.locator(".bucket.b-focus").inner_text())
+    ctx.close()
+
 def hist_unread(browser, slug, size, vp, scale):
     """History tabs carry an unread count, and unread entries a mark; opening one clears both (user, 2026-11-22)."""
     ctx = browser.new_context(viewport=vp, device_scale_factor=scale, has_touch=size == "phone")
@@ -618,6 +670,7 @@ with sync_playwright() as p:
                 run(b, slug, size, vp, scale)
                 conv_edit(b, slug, size, vp, scale)
                 hist_unread(b, slug, size, vp, scale)
+                rest(b, slug, size, vp, scale)
                 writing(b, slug, size, vp, scale)
                 chrome(b, slug, size, vp, scale)
                 bursts(b, slug, size, vp, scale)

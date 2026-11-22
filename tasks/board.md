@@ -10,7 +10,7 @@ _Nothing in progress._
 
 ## Waiting on user
 
-- **T-025** `decide` Smaller proposal points in D-023 still need the user's word: the arrivals button called "Show"; which swipe direction is which; the redrawn Notifications and Channel levels pages of settings. The points the user stated are accepted in D-023
+- **T-035** `decide` Sign-off of the design phase. Shown in `experiments/E-002-look-and-feel/slack-like.html` and waiting for the user's yes: (1) the last four pieces: an agent's answer appearing as it is written, creating a channel, View as in the person's menu, an empty Focus that offers three rules; (2) the agent's picks left from T-025: the arrivals button is called "Show", swipe right marks read and swipe left keeps, the Notifications and Channel levels pages as redrawn; (3) the fixes from the agent's own review pass. On yes: record them, tidy the experiment, run an independent verifier over the prototype, close the phase
 - **T-021** `decide` Nine small behaviours the E-001 model still chooses on its own (list in `experiments/E-001-feed-rules-model/README.md`, "Still open after this run"). None blocks the look-and-feel work. The notification default was confirmed by the user at about 29 a day
 
 ## Next

@@ -506,3 +506,59 @@ body.resizing{cursor:col-resize;user-select:none}
   .row.has-side .row-preview{padding-right:116px}
 }
 .bk-head h2{cursor:default}
+/* last pieces: suggestions in an empty Focus, creating a channel, switching person, an agent writing */
+.suggest{padding:14px 16px;border-bottom:1px solid var(--line)}
+.suggest>p:first-child{margin-bottom:6px}
+.chats h3{display:flex;align-items:center;gap:6px}
+.add-ch{margin-left:auto;width:22px;height:22px;border-radius:5px;font-size:17px;line-height:1;color:inherit;text-align:center}
+.add-ch:hover{background:var(--hover)}
+.sheet.dialog{width:min(480px,94vw);height:auto;max-height:90vh;border-radius:12px;padding:20px}
+.sheet.dialog p{margin:8px 0}
+.fld{display:block;margin:12px 0 4px}
+.fld>span{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.fld input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--panel);font:inherit;color:inherit}
+.fld input:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:3px 10px 3px 4px;font-size:13.5px;background:var(--panel)}
+.chip.on{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.dlg-acts{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.err{color:var(--flag)}
+.demo-tag{font:600 10px ui-monospace,Menlo,monospace;background:#111;color:#ffd479;padding:1px 6px;border-radius:4px;margin-left:4px;text-transform:uppercase}
+.opt.who.on b::after{content:" (you)";font-weight:400;color:var(--muted)}
+.me-pop{width:300px}
+.msg.is-streaming .msg-body::after{content:"▍";color:var(--accent);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.status.live .st-dot{animation:blink 1s steps(2) infinite}
+.empty.start{padding-top:60px}
+@media (max-width:760px){.sheet.dialog{width:100%;border-radius:16px 16px 0 0;max-height:86dvh}}
+/* review pass: narrow panels and the phone */
+.composer,.conv-body{container-type:inline-size}
+@container (max-width:400px){.send-hint{display:none}.thread-link small,.thread-link .tl-go{display:none}}
+.cbar .levels small{flex:1;min-width:0}
+.th-close{font-size:20px;margin-left:auto}
+.side-thread .conv-acts{width:100%}
+.set-thr{margin:8px 2px 0}
+@media (max-width:760px){
+  .set-nav{padding-right:52px;scrollbar-width:none}
+  .set-nav::-webkit-scrollbar{display:none}
+  .sheet.settings>.close{top:8px;right:6px;background:var(--panel2);z-index:2}
+  .set-item.sub{padding-left:10px}
+}
+/* review pass 2 */
+/* history rows: Keep behaves like the feed's actions, and never hides the time */
+@media (min-width:761px){
+  .hrow .row-side{top:5px;bottom:auto}
+  .hrow .row-side .btn{opacity:0;box-shadow:0 2px 8px rgba(0,0,0,.14)}
+  .hrow .row-main:hover .row-side .btn,.hrow .row-side .btn.on,.hrow .row-side .btn:focus-visible{opacity:1}
+  .hrow:has(.row-side .btn.on) .row-time{visibility:hidden}
+}
+@media (max-width:760px){
+  .hrow .row-preview{padding-right:74px}
+  /* settings on a phone: title and close on one line, the sections as chips that wrap */
+  .set-nav{flex-wrap:wrap;overflow:visible;padding:12px 12px 10px;gap:6px}
+  .set-nav h2{flex:0 0 100%;padding:0 44px 6px 2px}
+  .set-item,.set-item.sub{padding:6px 12px;border:1px solid var(--line);border-radius:99px;font-size:14px;color:var(--text)}
+  .set-item.on{border-color:transparent}
+  .sheet.settings>.close{top:6px;right:6px;background:none}
+  .sheet.settings{grid-template-rows:auto minmax(0,1fr)}
+}

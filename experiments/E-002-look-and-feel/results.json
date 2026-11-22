@@ -380,7 +380,7 @@
  {
   "page": "slack-like",
   "width": "desktop",
-  "check": "the rule is in its own list in settings",
+  "check": "what was added from the conversation shows in settings",
   "pass": true,
   "detail": ""
  },
@@ -481,6 +481,83 @@
   "check": "opening an entry clears its mark and lowers the count; the entry stays",
   "pass": true,
   "detail": "7"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "an agent's answer appears as it is written, marked as not finished",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "while it is being written nothing reaches the feed",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "finished while watched: read at once, no feed row, no arrivals bar",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "finished while not watched: it waits behind Show like any arrival",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a name that exists is refused before creating",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the name is tidied and shown before creating; picking people keeps it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the new channel is in the list and opens, saying where it starts",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the person's menu offers View as, marked as a demonstration feature",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "choosing someone explains what the product will show",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "a Focus with no rules offers three to start with, each with its count",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "adding one makes it a rule",
+  "pass": true,
+  "detail": ""
  },
  {
   "page": "slack-like",
@@ -1395,7 +1472,7 @@
  {
   "page": "slack-like",
   "width": "phone",
-  "check": "the rule is in its own list in settings",
+  "check": "what was added from the conversation shows in settings",
   "pass": true,
   "detail": ""
  },
@@ -2088,7 +2165,7 @@
  {
   "page": "telegram-like",
   "width": "desktop",
-  "check": "the rule is in its own list in settings",
+  "check": "what was added from the conversation shows in settings",
   "pass": true,
   "detail": ""
  },
@@ -2697,7 +2774,7 @@
  {
   "page": "telegram-like",
   "width": "phone",
-  "check": "the rule is in its own list in settings",
+  "check": "what was added from the conversation shows in settings",
   "pass": true,
   "detail": ""
  },
@@ -3271,7 +3348,7 @@
  {
   "page": "own",
   "width": "desktop",
-  "check": "the rule is in its own list in settings",
+  "check": "what was added from the conversation shows in settings",
   "pass": true,
   "detail": ""
  },
@@ -3880,7 +3957,7 @@
  {
   "page": "own",
   "width": "phone",
-  "check": "the rule is in its own list in settings",
+  "check": "what was added from the conversation shows in settings",
   "pass": true,
   "detail": ""
  },
