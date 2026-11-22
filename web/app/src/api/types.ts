@@ -20,6 +20,7 @@ export type {
   PersonView,
   PreviewAnswer,
   Reaction,
+  ReplyInProgress,
   RowAct,
   RowChange,
   ScreenFeedAnswer,
@@ -31,7 +32,7 @@ export type {
   ThreadSummary,
 } from '../../../../contracts/generated/types';
 
-import type { Level, Reaction, ThreadSummary } from '../../../../contracts/generated/types';
+import type { Level, Reaction, ReplyInProgress, ThreadSummary } from '../../../../contracts/generated/types';
 
 /**
  * The generated `Message` is an open map, because the generator cannot express the schema's
@@ -64,5 +65,6 @@ export interface MessageRow {
 export interface MessagesPage {
   number: number;
   messages: MessageRow[];
+  in_progress?: ReplyInProgress[];
   has_after?: boolean;
 }

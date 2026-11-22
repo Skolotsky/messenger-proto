@@ -8,8 +8,8 @@ import type { Session } from '../state/useSession';
 import { Avatar } from './Avatar';
 import { conversationTitle } from './ConversationView';
 import { FeedRowItem } from './FeedRowItem';
-import { rowTime } from './format';
-import { useIsLooking } from './hooks';
+import { rowTime, timeOf } from './format';
+import { useIsLooking, useOfflineNotice } from './hooks';
 import { Icon } from './Icon';
 import { BUCKET_NAME, ReasonPanel } from './ReasonPanel';
 import type { SettingsSection } from './SettingsScreen';
@@ -89,6 +89,7 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
   viewRef.current = view;
   const { model } = feed;
   const { enter, markRead } = feed;
+  const offline = useOfflineNotice(session.offlineSince);
 
   /* ---------- history ---------- */
   const refreshHistory = useCallback(
@@ -117,7 +118,7 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
 
   useEffect(() => {
     if (session.phase === 'ready') void refreshHistory(HISTORY_TABS.map((t) => t.tab));
-  }, [session.phase, refreshHistory]);
+  }, [session.phase, feed.freshLoads, refreshHistory]);
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -331,6 +332,18 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
           <small className="org-line">{session.orgName}</small>
           Activity
         </h1>
+        {offline !== null ? (
+          <span className="top-notice" role="status">
+            Reconnecting · since {timeOf(new Date(offline).toISOString())}
+          </span>
+        ) : (
+          model.phase === 'ready' &&
+          model.notice && (
+            <span className="top-notice" role="status">
+              {model.notice}
+            </span>
+          )
+        )}
         {waitingCount > 0 && (
           <div className="newpill" role="status">
             <span>
@@ -392,14 +405,7 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
                 </p>
               </div>
             ) : (
-              <>
-                {model.notice && (
-                  <p className="hist-note" role="status">
-                    {model.notice}
-                  </p>
-                )}
-                {(['focus', 'needs_you', 'fyi'] as const).map(bucket)}
-              </>
+              (['focus', 'needs_you', 'fyi'] as const).map(bucket)
             )
           ) : (
             <HistoryList
