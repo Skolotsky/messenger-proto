@@ -47,13 +47,24 @@ type searchState struct {
 }
 
 func lockSearchState(ctx context.Context, tx pgx.Tx, org ids.Org) (searchState, error) {
-	if _, err := tx.Exec(ctx, "INSERT INTO state (org) VALUES ($1) ON CONFLICT DO NOTHING", string(org)); err != nil {
-		return searchState{}, err
-	}
+	// One statement, so a delete between two steps cannot leave it with no row.
+	var st searchState
+	err := tx.QueryRow(ctx, `INSERT INTO state (org) VALUES ($1)
+		ON CONFLICT (org) DO UPDATE SET org = EXCLUDED.org
+		RETURNING through, wipe, refill_high`, string(org)).Scan(&st.through, &st.wipe, &st.refillHigh)
+	return st, err
+}
+
+// findSearchState locks the row if there is one, and creates nothing: only a
+// delivered change makes an organization known here.
+func findSearchState(ctx context.Context, tx pgx.Tx, org ids.Org) (searchState, bool, error) {
 	var st searchState
 	err := tx.QueryRow(ctx, "SELECT through, wipe, refill_high FROM state WHERE org = $1 FOR UPDATE", string(org)).
 		Scan(&st.through, &st.wipe, &st.refillHigh)
-	return st, err
+	if errors.Is(err, pgx.ErrNoRows) {
+		return st, false, nil
+	}
+	return st, err == nil, err
 }
 
 // nextThrough moves the place. Normally it only rises. After a wipe the worker
@@ -307,7 +318,7 @@ func (s *Search) place(w http.ResponseWriter, r *http.Request) {
 	}
 	var p contract.SearchPlace
 	err := orgdb.InOrg(r.Context(), s.opt.Dir, org, func(tx pgx.Tx) error {
-		st, err := lockSearchState(r.Context(), tx, org)
+		st, _, err := findSearchState(r.Context(), tx, org)
 		p = contract.SearchPlace{Through: st.through, Wipe: st.wipe}
 		return err
 	})
@@ -320,9 +331,9 @@ func (s *Search) place(w http.ResponseWriter, r *http.Request) {
 
 func (s *Search) wipeOrg(ctx context.Context, org ids.Org) error {
 	return orgdb.InOrg(ctx, s.opt.Dir, org, func(tx pgx.Tx) error {
-		st, err := lockSearchState(ctx, tx, org)
-		if err != nil {
-			return err
+		st, found, err := findSearchState(ctx, tx, org)
+		if err != nil || !found {
+			return err // nothing was ever delivered, or it was deleted: nothing to wipe
 		}
 		if _, err := tx.Exec(ctx, "DELETE FROM messages WHERE org = $1", string(org)); err != nil {
 			return err

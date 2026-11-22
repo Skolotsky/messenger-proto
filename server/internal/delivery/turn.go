@@ -38,14 +38,6 @@ const (
 // turn serves one claimed organization until it is level, its budget is spent
 // or half its claim has passed.
 func (l *lane) turn(ctx context.Context, pool *pgxpool.Pool, org ids.Org, failures int) {
-	if !l.s.enter(org) {
-		if err := l.dropDue(ctx, pool, org); err != nil && ctx.Err() == nil {
-			slog.Warn("delivery cannot drop a stopped organization", "receiver", l.name, "org", org, "err", err)
-		}
-		l.release(ctx, pool, org)
-		return
-	}
-	defer l.s.leave(org)
 	start := l.s.cfg.Clock.Now()
 	result := again
 	for spent := 0; result == again && spent < turnBudget; spent += batchSize {
@@ -71,7 +63,7 @@ func (l *lane) pass(ctx context.Context, pool *pgxpool.Pool, org ids.Org, failur
 	var items []entry
 	found, stopped := true, false
 	err := l.inOrg(ctx, org, func(tx pgx.Tx) error {
-		err := tx.QueryRow(ctx, `SELECT EXISTS (SELECT 1 FROM delivery_stopped WHERE org = $1)`, string(org)).Scan(&stopped)
+		err := tx.QueryRow(ctx, haltedSQL, string(org)).Scan(&stopped)
 		if err != nil || stopped {
 			return err
 		}
@@ -174,8 +166,8 @@ func (l *lane) deliverFeed(ctx context.Context, pool *pgxpool.Pool, org ids.Org,
 	for i, e := range items {
 		bodies[i] = e.body
 	}
-	if l.s.isStopped(org) {
-		return finish, nil
+	if h, err := l.halted(ctx, pool, org); h || err != nil {
+		return finish, err
 	}
 	var o outcome
 	if len(bodies) == 1 {
@@ -215,9 +207,6 @@ func (l *lane) deliverSearch(ctx context.Context, pool *pgxpool.Pool, org ids.Or
 		return l.note(ctx, pool, org, progress, refusals, nil)
 	}
 	for _, e := range items {
-		if l.s.isStopped(org) {
-			return finish, save()
-		}
 		body, send, err := forSearch(org, e.number, e.kind, e.body)
 		if err != nil {
 			return holdOff, err
@@ -225,6 +214,12 @@ func (l *lane) deliverSearch(ctx context.Context, pool *pgxpool.Pool, org ids.Or
 		if !send {
 			progress = e.number
 			continue
+		}
+		if h, err := l.halted(ctx, pool, org); h || err != nil {
+			if saveErr := save(); saveErr != nil {
+				return holdOff, saveErr
+			}
+			return finish, err
 		}
 		o := l.rc.post(ctx, "/changes", body)
 		if o.answer == down {
@@ -274,8 +269,11 @@ func (l *lane) deliverNotes(ctx context.Context, pool *pgxpool.Pool, org ids.Org
 		return l.note(ctx, pool, org, progress, 0, nil)
 	}
 	for _, e := range items {
-		if l.s.isStopped(org) {
-			return finish, save()
+		if h, err := l.halted(ctx, pool, org); h || err != nil {
+			if saveErr := save(); saveErr != nil {
+				return holdOff, saveErr
+			}
+			return finish, err
 		}
 		o := l.rc.post(ctx, "/notes", json.RawMessage(e.body))
 		if o.answer == down {
