@@ -220,8 +220,8 @@ details > .stack { gap: 10px; }
 
         <rect class="box-agent" x="20" y="336" width="420" height="84" rx="6"/>
         <text class="t" x="230" y="360" text-anchor="middle">Delivery workers · as many as needed</text>
-        <text class="t2" x="230" y="378" text-anchor="middle">ask "which organizations have work?", take one under</text>
-        <text class="t2" x="230" y="394" text-anchor="middle">a lock the others skip; no worker owns an organization</text>
+        <text class="t2" x="230" y="378" text-anchor="middle">find work through an index of organizations that have some,</text>
+        <text class="t2" x="230" y="394" text-anchor="middle">claim one for a few seconds; no worker owns an organization</text>
 
         <line class="edge" x1="440" y1="378" x2="470" y2="378" marker-end="url(#arrowS)"/>
 
@@ -242,11 +242,11 @@ details > .stack { gap: 10px; }
       <thead><tr><th>Part</th><th>To grow, add</th><th>What keeps copies apart</th><th>In the first version</th></tr></thead>
       <tbody>
         <tr><td><strong>Conversations' database</strong></td><td>Databases. Organizations are spread over them.</td><td>The directory. No question spans two organizations, so none spans two databases.</td><td><span class="chip">one database</span> Every access already goes through "the database for this organization".</td></tr>
-        <tr><td><strong>Conversations: the doors, live connection, replies in progress</strong></td><td>Copies.</td><td>Everything of one organization goes to one copy, chosen from the organization in the address, plain calls included. What that copy saved it pushes at once; what others wrote for the organization reaches it by a nudge and a check every 10 seconds.</td><td><span class="chip">one copy</span> The organization is already in every address.</td></tr>
+        <tr><td><strong>Conversations: the doors, live connection, replies in progress</strong></td><td>Copies.</td><td>Everything of one organization goes to one copy, chosen from the organization in the address, plain calls included. What that copy saved it pushes at once; what others wrote for the organization reaches it by a nudge and a check every 5 seconds.</td><td><span class="chip">one copy</span> The organization is already in every address.</td></tr>
         <tr><td><strong>Delivery workers</strong></td><td>Workers.</td><td>Work is found through an index of the organizations that have some. A worker claims an organization for a few seconds; a claim that runs out is taken over. No worker owns an organization. A change may then be delivered twice, which receivers ignore.</td><td><span class="chip ok">built this way, tested with two</span></td></tr>
         <tr><td><strong>Activity feed</strong></td><td>Copies of the program; databases for its rows.</td><td>It has no memory. A change is applied only if it follows the organization's last one, so two copies cannot apply it twice.</td><td><span class="chip ok">built this way, tested with two</span></td></tr>
         <tr><td><strong>Search and notification sender</strong></td><td>Their connectors are workers like the others. The engines behind them scale on their own side.</td><td>As for delivery workers. A notification's name starts with the organization.</td><td><span class="chip">stand-ins</span></td></tr>
-        <tr><td><strong>Housekeeping</strong> (the clock tick for a quiet organization, lapsed "watching", abandoned replies, old agent events)</td><td>Nothing: it runs once per database, asking through indexes of the organizations that need it.</td><td>A lock per database that one copy holds at a time; another copy takes it within seconds if the holder dies.</td><td><span class="chip ok">built this way</span></td></tr>
+        <tr><td><strong>Housekeeping</strong> (the clock tick for a quiet organization, the watching of a copy that died, abandoned replies, old agent events)</td><td>Nothing: it runs once per database, asking through indexes of the organizations that need it.</td><td>A lock per database that one copy holds at a time; another copy takes it within seconds if the holder dies.</td><td><span class="chip ok">built this way</span></td></tr>
         <tr><td><strong>The directory and the entry point</strong></td><td>Standard means: copies of a small, read-mostly table; an ordinary load balancer.</td><td>They hold no per-message state.</td><td><span class="chip">not built: one database needs neither</span></td></tr>
       </tbody>
     </table>
@@ -258,7 +258,7 @@ details > .stack { gap: 10px; }
   <div class="split">
     <div class="panel"><div class="label"><span class="chip risk">removed</span> Waking workers through the database on every save</div><p>Convenient at small size, and a hidden queue everybody shares. Measured: saving dropped from 9,549 to 2,043 changes a second. Workers now ask one cheap question every few tens of milliseconds.</p></div>
     <div class="panel"><div class="label"><span class="chip risk">removed</span> "I am still looking at this" written to the log every 20 seconds</div><p>Three log entries a minute for every person with a conversation open: more than all messages, reactions and reads together, and each one passed on to the feed. Now only the start and the end are written.</p></div>
-    <div class="panel"><div class="label"><span class="chip risk">removed</span> Asking every organization in turn whether it has work</div><p>The cost grows with the number of organizations even when nothing happens. Measured with 5,000: 719 ms a round, against 1 ms for the single question "which organizations have work?".</p></div>
+    <div class="panel"><div class="label"><span class="chip risk">removed</span> Asking every organization in turn whether it has work</div><p>The cost grows with the number of organizations even when nothing happens. Measured with 5,000: 719 ms a round. The question that replaced it first read every organization's row and was itself replaced by an index of the organizations that have work.</p></div>
   </div>
 </section>
 
@@ -269,9 +269,9 @@ details > .stack { gap: 10px; }
       <thead><tr><th>Found</th><th>Why it mattered</th><th>Answer</th></tr></thead>
       <tbody>
         <tr><td>"Which organizations have work?" read every organization's row.</td><td>Its cost grew with the total (the verifier measured 1 ms at 5,000 organizations, 52 ms at 300,000), and it is asked many times a second.</td><td>An index that holds only the organizations with work. The cost no longer depends on the idle ones.</td></tr>
-        <tr><td>The feed's row changes had no way to reach a screen once the feed runs as several copies.</td><td>The path relied on one call held open per person at one feed copy.</td><td>The feed nudges the organization's copy of Conversations, which then asks any feed copy. A lost nudge is covered by a check every 10 seconds.</td></tr>
-        <tr><td>"The copy that serves an organization made the saves, so it knows what to push" was false for housekeeping, and during a move between copies.</td><td>A clock tick, an ended "watching" or a late save would never have been pushed.</td><td>The same nudge and the same 10-second check.</td></tr>
-        <tr><td>"Watching" was described three ways, and none survived a copy dying or an organization moving.</td><td>Messages could have been marked read on arrival for someone no longer there.</td><td>Watching lasts as long as the connection it was said on; each copy holds a short lease; housekeeping ends what a dead copy had started.</td></tr>
+        <tr><td>The feed's row changes had no way to reach a screen once the feed runs as several copies.</td><td>The path relied on one call held open per person at one feed copy.</td><td>Conversations' own delivery worker, once the feed has confirmed a change, nudges the organization's copy of Conversations, which then asks any feed copy. The feed itself never calls Conversations. A lost nudge is covered by a check every 5 seconds.</td></tr>
+        <tr><td>"The copy that serves an organization made the saves, so it knows what to push" was false for housekeeping, and during a move between copies.</td><td>A clock tick, an ended "watching" or a late save would never have been pushed.</td><td>The same nudge and the same 5-second check.</td></tr>
+        <tr><td>"Watching" was described three ways, and none survived a copy dying or an organization moving.</td><td>Messages could have been marked read on arrival for someone no longer there.</td><td>Watching is per connection and lasts as long as it; each copy holds a short lease, without which it can save no watching; housekeeping ends what a dead copy had started.</td></tr>
         <tr><td>Organizations were not really taken in turn, and fresh traffic queued behind a wave of catching up.</td><td>One of D-026's promises.</td><td>Those that one turn will clear go first; every round also takes some that are far behind.</td></tr>
       </tbody>
     </table>
@@ -285,7 +285,7 @@ details > .stack { gap: 10px; }
     <table>
       <thead><tr><th>One at a time</th><th>Ceiling today</th><th>What lifts it</th><th>Changes a contract?</th></tr></thead>
       <tbody>
-        <tr><td><strong>The feed applies one change after another</strong> per organization.</td><td>200 to 500 changes a second: 10,000 to 25,000 people.</td><td>Apply the organization's conversations side by side. Order is kept inside a conversation; changes about a reader as a whole stay in place.</td><td>No. It is inside the feed.</td></tr>
+        <tr><td><strong>The feed applies one change after another</strong> per organization.</td><td>200 to 500 changes a second: 10,000 to 25,000 people.</td><td>Apply the organization's conversations side by side. Order is kept inside a conversation; changes about a reader as a whole stay in place.</td><td>Not at the delivery boundary. One contract was made stricter for it: the notification sender's clock moves only on clock notes from the feed.</td></tr>
         <tr><td><strong>Saves are confirmed one by one</strong>, because each takes the organization's next number.</td><td>300 to 1,000 saves a second: 15,000 to 50,000 people.</td><td>The organization's copy of Conversations confirms the saves of a few milliseconds together.</td><td>No. It is inside Conversations.</td></tr>
         <tr><td><strong>A message for a whole channel writes a row per member.</strong></td><td>About half a second for 10,000 members, during which that organization's feed waits.</td><td>In a channel above 500 members, keep such an item once for the channel and combine it with each reader's own rows when shown.</td><td>No. It is inside the feed.</td></tr>
       </tbody>
@@ -293,10 +293,10 @@ details > .stack { gap: 10px; }
   </div>
   <div class="split">
     <div class="panel"><div class="label">Today</div><p><strong>About 5,000 people</strong> in one organization comfortably. Up to 10,000 to 25,000 with delays after large announcements.</p></div>
-    <div class="panel"><div class="label">With the three measures</div><p><strong>About 100,000 people.</strong> Decided as the path (D-030); none is built in the first version, where the seeded team has 36.</p></div>
+    <div class="panel"><div class="label">With the three measures</div><p><strong>About 100,000 people.</strong> Decided as the path (D-030); none is built in the first version, where the seeded team has 36. This is also where one copy of Conversations holding all of one organization's connections ends.</p></div>
     <div class="panel"><div class="label">Beyond that</div><p>A numbered log per conversation instead of per organization. Possible, and a real redesign: every contract's numbers and the screen's catch-up change. Not adopted.</p></div>
   </div>
-  <p><strong>Held from the first version, so that all of this stays possible (G-030):</strong> the feed's result for a conversation depends only on that conversation's changes, in their order, and on reader-wide changes at their place. Checked in a small simulation (E-008): 200 different interleavings of conversations gave the same feed every time; with the reader-wide changes moved, never.</p>
+  <p><strong>Held from the first version, so that all of this stays possible (G-030):</strong> the feed's result for a conversation depends only on that conversation's changes, in their order, and on reader-wide changes at their place. Checked in a small simulation on a subset of the rules (E-008): 200 different interleavings of conversations gave the same feed every time; with the reader-wide changes moved, never. The real proof is this guardrail's test on the product's own rules.</p>
   <p class="note">These figures are estimates from the assumptions stated, not measurements.</p>
 </section>
 
@@ -316,7 +316,7 @@ details > .stack { gap: 10px; }
       </tbody>
     </table>
   </div>
-  <p class="note">The larger runs of E-007 were made before you asked that no large sizes be run on your machine; none will be repeated there. Not checked at all: a second database, several copies of Conversations, the nudge and the 10-second check, real hardware. An earlier figure of mine, "about 1,000 saves a second", was the limit of a test program; one PostgreSQL saved about 9,500 here.</p>
+  <p class="note">The larger runs of E-007 were made before you asked that no large sizes be run on your machine; none will be repeated there. Not checked at all: a second database, several copies of Conversations, the nudge and the 5-second check, real hardware. A second independent check found three contradictions in my corrections (the nudge coming from the feed, the notification hold under side-by-side work, watching defined three ways); they are answered in the records, and those answers have not been checked a third time. An earlier figure of mine, "about 1,000 saves a second", was the limit of a test program; one PostgreSQL saved about 9,500 here.</p>
 </section>
 
 <section>

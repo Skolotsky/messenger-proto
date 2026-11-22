@@ -65,7 +65,7 @@ def make_log(n, seed):
             log.append((num, 'message.changed', json.loads(json.dumps(m))))
         elif x < 0.90:
             log.append((num, 'reader.read', dict(person=p, ck=spine.ck_of(m), upto=num - 1)))
-        elif x < 0.93:
+        elif x < 0.903:
             log.append((num, 'reader.watch', dict(person=p, ck=spine.ck_of(m) if r.random() < 0.7 else None)))
         elif x < 0.96:
             log.append((num, 'reader.dial', dict(person=p, channel=r.choice(CH), level=r.choice(['default', 'muted', 'focus', 'all']))))
@@ -96,7 +96,10 @@ def replay(order):
         out = []
         spine.fold(st, n, kind, json.loads(json.dumps(b)), out)
         notes += [(e['kind'], e['name']) for e in out]
-    return st.dump(), sorted(notes)
+    per = {}
+    for kind, name in notes:                    # notes in order per conversation; the order between conversations is free
+        per.setdefault(name.split('/')[1], []).append((kind, name))
+    return st.dump(), per
 
 
 def shuffle_lanes(log, rng, respect_barriers=True):

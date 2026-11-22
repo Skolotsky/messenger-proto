@@ -75,6 +75,13 @@ A fresh verifier tried to break the claim and did, in four places. The answers, 
 
 Withdrawn: "looking for work costs a millisecond however many organizations are idle" (measured at one size only); "can therefore never deliver the same change at the same time"; "about 50 s" for the large organization's backlog (that run had not finished). Not measured, and not to be measured on the user's machine: 300,000 organizations under load. The claim that the design grows by adding rests on the analysis: after these corrections no question, lock, timer or table in it depends on the total number of organizations.
 
+After a second independent check, same day:
+- The nudge comes from Conversations' own delivery worker once the feed has confirmed a change, and from housekeeping, never from the feed, so "the feed never calls Conversations" (G-008) stays true.
+- The regular check and the screen's `last_sent` message are every 5 seconds, not 10, so that a lost nudge and a lost update together still stay inside the 20 seconds promised.
+- Watching is per connection and belongs to its conversation; a start is saved only together with a check of the copy's lease, and a copy declared dead can save nothing more. With the lease valid 15 s, renewed every 5, and housekeeping every 5, the screens of a dead copy end within about 25 s.
+- The index of organizations with work, each receiver's state and the copies' leases span organizations by nature. They hold numbers and times, never content; G-025 says so.
+- The door asks the feed by organization ("row changes after N"), not with a list of people.
+
 One organization growing large is decided separately in D-030.
 
 ## Consequences

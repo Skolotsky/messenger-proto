@@ -10,7 +10,7 @@ The feed delivery worker (ours) calls the activity feed. The feed never calls Co
 
 Every call is made for one organization (D-026). It is in the address of every call a screen, an agent or the door makes (`/orgs/acme/…`) and in every item a worker delivers; a live connection is opened for one organization. All numbers, places and logs count within that organization. Nothing of another organization is ever sent or accepted.
 
-Every change, in log order: messages (created, changed, deleted; finished ones only), what readers did (read, watching, keep, done, dial, focus rule, focus person, focus only), and clock ticks. Each carries its number, the number before it, and the log's timestamp.
+Every change, in log order: messages (created, changed, deleted; finished ones only), what readers did (read, watching started or ended on one connection, keep, done, dial, focus rule, focus person, focus only), and clock ticks. Each carries its number, the number before it, and the log's timestamp.
 
 ```json
 POST /changes
@@ -31,7 +31,7 @@ Applying a batch stops at the first change that is not answered 200, and answers
 - Never lost; strictly in order. The feed takes only the change whose "previous" is the last one it applied, and saves its rows, its place and its notification notes in one step, so each change counts once.
 - The feed's rows always equal what the rules give for the log up to its place. A feed rebuilt from the start of the log equals the live one.
 - The feed holds nothing original: wiping it loses nothing.
-- The feed may apply the changes of different conversations of one organization side by side (D-030). It keeps the order inside a conversation (a channel with its threads, or a direct conversation), and applies a reader-wide change (a Focus rule, a Focus person or the option that fills that list, "Focus only") only after everything before it and before anything after it. Every other change belongs to exactly one conversation.
+- At this boundary nothing changes with the size of an organization: the feed takes changes strictly in order and confirms each. Inside, it may then work on different conversations of one organization side by side (D-030). It keeps the order inside a conversation (a channel with its threads, or a direct conversation), and treats an organization-wide change (a Focus rule, a Focus person or the option that fills that list, "Focus only", a clock tick) as a point that everything before it must have reached first. Every other change belongs to exactly one conversation. "Its place", and the `through` it reports, is the last change up to which everything has been applied.
 - When healthy, a change is reflected within 2 seconds, 19 times in 20.
 - Timestamps never decrease within an organization's log. When an organization goes quiet, its log gets one clock tick 6 seconds after its last change, so that everything before it is known to be more than 5 seconds old; there is no tick while changes keep coming, since they carry the time themselves.
 - The feed's rows, its place, its own log of notification notes and that log's edition are all per organization. One organization's feed can be rebuilt without touching another's.

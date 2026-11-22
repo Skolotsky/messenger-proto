@@ -50,7 +50,7 @@ The run with 300,000 organizations is not to be repeated on this machine (user's
 
 ## Conclusion
 
-**Delivery grows by adding workers, safely.** Several workers never deliver a change twice, capacity rises with workers as soon as applying costs something, one organization's backlog stays its own, and looking for work costs a millisecond however many organizations are idle. **NOTIFY on every save must not be used**: it cut saving to a fifth.
+**Delivery grows by adding workers, safely.** In the first part every change was marked applied exactly once with several workers (that test could not have seen a double delivery: the mark is made in the same step as the place, see the second part), capacity rises with workers as soon as applying costs something, and one organization's backlog stays its own. Looking for work cost a millisecond at this one size; the second part shows it grew with the number of organizations and how that was removed. **NOTIFY on every save must not be used**: it cut saving to a fifth.
 
 A correction to earlier notes: E-004 reported about 1,000 saves a second. That was the limit of a single Python client; with separate processes the same PostgreSQL saved about 9,500.
 

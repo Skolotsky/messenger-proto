@@ -17,8 +17,7 @@ GET feed/orgs/acme/people/marco/rows                     → { "edition": "feed-
 GET feed/orgs/acme/people/marco/history?tab=mentions     → entries with an unread mark each, and the tab's unread count
 GET feed/orgs/acme/people/marco/settings                 → Focus people, removed people, each thread's and channel's level as it is in effect
 GET feed/orgs/acme/people/marco/preview?change=…         → what the change would have moved in the last 7 days
-GET feed/orgs/acme/updates?people=marco,lena&after=…&edition=feed-7c1      → row changes for those people after the given numbers, each with the number before it; or { "new_edition": "feed-9d4" }
-POST conversations/orgs/acme/nudge   { "from": "feed" }                        the feed saying "there is news for this organization"; may be lost
+GET feed/orgs/acme/updates?after=103&edition=feed-7c1                        → the organization's row changes after 103, a page at a time, each naming its reader and the number before it for that reader; or { "new_edition": "feed-9d4" }
 GET search/orgs/acme/query?q=pricing&as=marco&after=…     → { "through": 4855, "total": 37, "next": "…", "results": [ { "message": "msg_7Q2", "version": 2, "conversation": "#launch", "thread": null, "author": "anna", "edited": true, "text": "…", "match": [[31, 38]] } ] }
 ```
 
@@ -30,7 +29,7 @@ GET search/orgs/acme/query?q=pricing&as=marco&after=…     → { "through": 485
 - A search answer gives the true total, not the number shown, marks where the text matched, says whether a message was edited, and names the thread of a reply so the screen can open it there (D-024; T-038, points 20 to 22).
 - The feed's row updates are numbered by its own log and carry its edition; after a rebuild the edition changes and the door tells screens to load the feed fresh.
 - The door adds nothing and remembers nothing: what it shows is what the part answered, or a notice.
-- The door asks for updates when nudged, and every 10 seconds for each organization it has open screens for. It never holds a call open per person, so any copy of the feed can answer and the cost follows the organizations that have screens open, not all of them.
+- The feed never calls Conversations. The door learns that the feed has news from Conversations' own delivery worker, which nudges the organization's copy when the feed has confirmed a change; the nudge carries no data and may be lost. The door also asks every 5 seconds for each organization it has open screens for. It asks by organization, never per person and never with a call held open, so any copy of the feed can answer, and the cost follows the organizations that have screens open and the changes they have.
 
 ## 4. Failure behaviour
 

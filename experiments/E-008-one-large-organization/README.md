@@ -28,7 +28,7 @@ B. A queue model: workers serve organizations in turns of at most 40 changes at 
 
 Raw output: `results.txt`.
 
-A. With reader-wide changes kept in place: **0 of 200** interleavings gave a different feed. With them shuffled as well: 200 of 200 differed.
+A. With reader-wide changes kept in place: **0 of 200** interleavings gave a different feed. With them shuffled as well: 149 of 200 differed. (After an independent check the simulation was tightened: reader-wide changes are now about 5 in a log of 1,500, so stretches of about 300 changes are reordered, and the notification notes are compared in their order per conversation. The first version, with shorter stretches and notes compared without order, gave 0 and 200.)
 
 B. A fresh change waits:
 
@@ -46,4 +46,4 @@ A. **Holds for the rules modelled**: the order between conversations does not ma
 
 B. **The two-line rule is worth having**: with enough workers, fresh traffic is not held up by a wave of catching up, and the wave is not slowed.
 
-What this does not show: the full feed rules (E-001's, with Focus rules and Focus people, which are reader-wide and would act as barriers); real costs; anything about a database.
+What this does not show: the full feed rules (E-001's, with Focus rules and Focus people, which are reader-wide and would act as barriers; none of the product's reader-wide kinds is in this model); conversations applied at the same time (the replay is one after another, in a different order); real costs; anything about a database. It is an indication that the rule can hold, not the proof: that is guardrail G-030's test on the product's own rules.

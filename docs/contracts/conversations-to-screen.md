@@ -16,7 +16,7 @@ A connection is opened at `/orgs/acme/live` for one person of one organization. 
 screen → { "resume": { "conversations": 4855, "feed": 97, "feed_edition": "feed-7c1" } }
 server → { "stream": "conversations", "number": 4859, "after": 4855, "kind": "message.changed", "message": { "id": "msg_7Q2", "version": 2, "text": "…" } }
 server → { "stream": "feed", "number": 103, "after": 97, "edition": "feed-7c1", "kind": "row.changed", "row": { "conversation": "#launch", "bucket": "needs_you", "unread": true, "why": "Anna mentioned you" } }
-server → { "last_sent": { "conversations": 4859, "feed": 103 } }       every 10 s
+server → { "last_sent": { "conversations": 4859, "feed": 103 } }       every 5 s
 server → { "too_far_behind": "feed" }                                   the screen loads that view fresh
 server → { "piece": { "message": "msg_9A1", "at": 120, "text": "ready. " } }
 ```
@@ -33,9 +33,9 @@ server → { "piece": { "message": "msg_9A1", "at": 120, "text": "ready. " } }
 ## 4. Failure behaviour
 
 - Connection lost or refused: the screen shows "Reconnecting", keeps what it shows, tries again after 0.1 s, doubling up to 1 s, and on success sends its numbers.
-- An update lost on a live connection: noticed by the next update's `after`, or by the `last_sent` message sent every 10 s, and asked for again.
+- An update lost on a live connection: noticed by the next update's `after`, or by the `last_sent` message sent every 5 s, and asked for again.
 - Nothing here can lose data: the connection only forwards what is saved elsewhere.
-- What the copy did not save itself (a row the feed changed, a clock tick or an ended "watching" written by housekeeping, a save finished by the copy that served the organization before a move) reaches it by a nudge sent through the same address, which may be lost, and by a check every 10 seconds of the organizations it has open screens for. So the 20-second promise above holds without any nudge.
+- What the copy did not save itself (a row the feed changed, a clock tick or an ended "watching" written by housekeeping, a save finished by the copy that served the organization before a move) reaches it by a nudge from whoever wrote it on Conversations' side (the delivery worker once the feed has confirmed, or housekeeping), sent through the organization's address, and by a check every 5 seconds of the organizations it has open screens for. A nudge may be lost; with every nudge lost and one update lost on the connection as well, a screen is still right within 5 + 5 seconds plus the fetch, inside the 20 seconds promised above.
 
 ## 5. Evolution
 

@@ -17,7 +17,7 @@ POST /notes
   "why": "Anna mentioned you in #launch", "text": "@Marco can you sign off the pricing page?" }
 { "org": "acme", "number": 1301, "previous": 1300, "edition": "feed-7c1", "at": "…", "kind": "changed",   "name": "acme / marco / #launch / 4812", "text": "…new text…" }
 { "org": "acme", "number": 1317, "previous": 1316, "edition": "feed-7c1", "at": "…", "kind": "withdrawn", "name": "acme / marco / #launch / 4812", "because": "read" }
-{ "org": "acme", "number": 1318, "previous": 1317, "edition": "feed-7c1", "at": "…", "kind": "tick" }
+{ "org": "acme", "number": 1318, "previous": 1317, "edition": "feed-7c1", "at": "…", "kind": "clock" }
 
 answers: 200 taken · 200 already had it · 409 { "i_am_at": 1285 } · anything else, or 3 s of silence: down
 ```
@@ -29,9 +29,9 @@ A row that moves up into Focus while unread gets a second "due" with its own nam
 - The sender never judges: it sends what is due and nothing else.
 - A name begins with the organization, so two organizations can never produce the same one. A name is sent once, also after restarts and after the feed is rebuilt (a new edition of that organization's log).
 - The sender keeps a place per organization.
-- A notification is held for 5 seconds, measured by the timestamps in the notes, not by any machine's clock: it is sent only once a note of the same organization stamped later than "due plus 5 s" has arrived. The feed passes the clock on while that organization has a notification on hold. So nothing is sent for something read or deleted within the hold, however late the feed or the sender are.
+- A notification is held for 5 seconds, measured by the timestamps in the notes, not by any machine's clock: it is sent only once a clock note of the same organization stamped later than "due plus 5 s" has arrived. A clock note says "everything of this organization up to this time has been applied": the feed writes one only when that is true for all of the organization's conversations, about once a second while a notification of that organization is on hold, and when the log's own clock tick arrives. Other notes do not move the sender's clock. So nothing is sent for something read or deleted within the hold, however late the feed or the sender are.
 - One already sent cannot be recalled; its entry then shows the current truth ("message deleted", read, the new text).
-- Every notification that is due and not withdrawn within its hold is sent. When everything is healthy it goes out within 8 seconds of becoming due (5 s hold, then the next change or the clock tick at 6 s, then delivery). Never lost; may be late. One sent more than 10 minutes late is marked "delayed".
+- Every notification that is due and not withdrawn within its hold is sent. When everything is healthy it goes out within 8 seconds of becoming due (5 s hold, then the next clock note, at the latest from the log's tick at 6 s, then delivery). Never lost; may be late. One sent more than 10 minutes late is marked "delayed".
 
 ## 4. Failure behaviour
 
