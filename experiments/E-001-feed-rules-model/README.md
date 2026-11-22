@@ -97,6 +97,15 @@ Behaviours the model has to choose that no decision states. In the base run, mos
 
 Not modelled: the notification tray's contents, search, a read position inside a row (a row is read or not), showing reactions on a row, and the phone-sized screen.
 
+### Fourth run: Focus people and "only Done releases" (T-039)
+
+The model now has D-021 (a list of people that fills itself, removal, Add back, the option off) and D-023 point 26 (only Done releases).
+
+- 140 scripted cases pass, 17 of them new. Four injected faults in the new rules were each caught by them.
+- No invariant broke in the five variants and five further seeds.
+- **The notification figures stand:** about 29 a day by default (27.6 to 29.0 across seeds), about 5 with Focus only (5.0 to 5.2).
+- Not measured: how long Kept grows with "only Done releases" on. The user is content with the Kept design for this stage (2026-11-22), so the measurement was dropped. The setting is off at the start.
+
 ### Independent checks
 
 Two fresh verifier agents, each given only the decision records and the code, probed the model with their own scripts.

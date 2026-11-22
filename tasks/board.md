@@ -17,7 +17,6 @@ _Nothing in progress._
 ## Next
 
 - **T-038** `implement` Rules the prototype only approximates, kept as acceptance criteria for the build. Detail: `tasks/T-038-build-acceptance-from-e002.md`
-- **T-039** `experiment` Rerun the E-001 feed-rules model with D-021 (Focus people) and D-023 point 26 (only Done releases). Until then its figures, such as about 29 notifications a day, predate these decisions
 
 
 

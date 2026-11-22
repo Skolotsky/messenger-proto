@@ -105,6 +105,9 @@ class Person:
     view: dict | None = None                      # snapshot while the feed is open
     view_ts: float = 0.0
     pending_new: int = 0
+    dm_people: set = field(default_factory=set)   # D-021: whose direct messages land in Focus
+    dm_removed: set = field(default_factory=set)  # D-021: taken out by hand, never added back by writing again
+    only_done: bool = False                       # D-023 point 26: a reply or reaction does not release a kept row
 
 
 class World:
@@ -227,7 +230,9 @@ class World:
             if self.kind[who] == "person":
                 if "dm" not in P.rules:
                     ruling("R31")
-                cands.append((FOCUS if "dm" in P.rules else NEEDS, f"Direct message from {who}", ("dm", m.conv), None, "dm"))
+                if "dm" in P.rules and who not in P.dm_removed:
+                    P.dm_people.add(who)      # D-021: the option adds everyone who writes to you directly
+                cands.append((FOCUS if who in P.dm_people else NEEDS, f"Direct message from {who}", ("dm", m.conv), None, "dm"))
             else:
                 ruling("R04")
                 cands.append((NEEDS, f"Direct message from agent {who}", ("dm", m.conv), None, "dm"))
@@ -435,8 +440,9 @@ class World:
                         it.read = True
                     if P.rows[key].kept or len(P.rows[key].flagged) > 1:
                         ruling("R42")
-                    P.rows[key].kept = P.rows[key].hold = False
-                    P.rows[key].flagged.clear()   # D-011: replying releases what a flag kept
+                    if not P.only_done:           # D-023 point 26: with the setting on, only Done releases
+                        P.rows[key].kept = P.rows[key].hold = False
+                        P.rows[key].flagged.clear()   # D-011: replying releases what a flag kept
         for u in self.people:
             cls = self.classify(u, m)
             if cls:
@@ -460,8 +466,9 @@ class World:
                         it.read = True
                 if row.kept:
                     ruling("R42")
-                row.kept = row.hold = False
-                row.flagged.discard(mid)      # D-011: reacting releases what the flag kept
+                if not self.people[u].only_done:  # D-023 point 26
+                    row.kept = row.hold = False
+                    row.flagged.discard(mid)  # D-011: reacting releases what the flag kept
         a = m.author
         if a == u or a not in self.people:
             return
@@ -719,6 +726,25 @@ class World:
             row.flagged.clear()
             for it in row.items.values():
                 it.read = True
+
+    # ------------------------------------------------------- Focus people (D-021)
+    def remove_dm_person(self, u, who):
+        P = self.people[u]
+        P.dm_people.discard(who); P.dm_removed.add(who)
+        self.resort(u)
+
+    def add_dm_person(self, u, who):
+        P = self.people[u]
+        P.dm_removed.discard(who); P.dm_people.add(who)
+        self.resort(u)
+
+    def dm_option_off(self, u, remove_all=False):
+        """Switching the option off stops adding; those already added stay unless the person says otherwise."""
+        P = self.people[u]
+        P.rules.discard("dm")
+        if remove_all:
+            P.dm_removed |= P.dm_people; P.dm_people = set()
+        self.resort(u)
 
     def resort(self, u):
         """D-013: a dial or rule change re-sorts unread rows already in the feed; read ones stay."""

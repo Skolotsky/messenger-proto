@@ -424,6 +424,44 @@ m = w.post("marco", "#product", mentions=["you"]); w.read_row("you", ("th", m.id
 w.add_rule("you", "mentions")
 case("A rule change leaves a row you already read where it was", where(w, "you", m), "Earlier", "D-013")
 
+# ---------------------------------------------------------------- Focus people (D-021)
+w = team(); m = w.post("anna", w.dm("anna", "you"))
+case("D-021: someone who writes to you directly is added to your Focus people", ("anna" in w.people["you"].dm_people, where(w, "you", m)), (True, "Focus/new"), "D-021")
+w = team(); w.post("anna", w.dm("anna", "you")); w.dm_option_off("you"); a = w.post("anna", w.dm("anna", "you")); b = w.post("marco", w.dm("marco", "you"))
+case("D-021: option off: someone already added stays in Focus", where(w, "you", a), "Focus/new", "D-021")
+case("D-021: option off: someone new is not added", where(w, "you", b), "Needs you", "D-021")
+w = team(); w.post("anna", w.dm("anna", "you")); w.post("marco", w.dm("marco", "you")); w.dm_option_off("you", remove_all=True); a = w.post("anna", w.dm("anna", "you"))
+case("D-021: option off and remove all: nobody is left", (w.people["you"].dm_people, where(w, "you", a)), (set(), "Needs you"), "D-021")
+w = team(); w.post("anna", w.dm("anna", "you")); w.post("marco", w.dm("marco", "you")); w.remove_dm_person("you", "anna"); a = w.post("anna", w.dm("anna", "you")); b = w.post("marco", w.dm("marco", "you"))
+case("D-021: a person removed is not added back when they write again", where(w, "you", a), "Needs you", "D-021")
+case("D-021: removing one person leaves the others", where(w, "you", b), "Focus/new", "D-021")
+w = team(); w.post("anna", w.dm("anna", "you")); w.remove_dm_person("you", "anna"); w.add_dm_person("you", "anna"); a = w.post("anna", w.dm("anna", "you"))
+case("D-021: Add back returns them to Focus", where(w, "you", a), "Focus/new", "D-021")
+w = team(); a = w.post("release", w.dm("release", "you"))
+case("D-021: an agent is not added to Focus people", ("release" in w.people["you"].dm_people, where(w, "you", a)), (False, "Needs you"), "D-021, D-013")
+w = team(); a = w.post("anna", w.dm("anna", "you")); w.remove_dm_person("you", "anna")
+case("D-021: an unread row moves to Needs you once the person is removed", where(w, "you", a), "Needs you", "D-021, D-013")
+w = team(); a = w.post("anna", w.dm("anna", "you")); w.read_row("you", ("dm", w.dm("anna", "you"))); w.keep("you", ("dm", w.dm("anna", "you"))); w.remove_dm_person("you", "anna")
+case("D-021: removing a person does not release a row you kept", w.people["you"].rows[("dm", w.dm("anna", "you"))].kept, True, "D-021, D-003")
+
+# ---------------------------------------------------------------- only Done releases (D-023 point 26)
+def only_done():
+    w = team(); w.people["you"].only_done = True
+    return w
+w = only_done(); f = w.post("anna", "#launch", mentions=["you"], level="flag"); w.post("you", "#launch", parent=f.id); r = w._row_of("you", f)
+case("Only Done: a reply leaves a flag kept", bool(r.flagged), True, "D-023 p26")
+w = only_done(); f = w.post("anna", "#launch", mentions=["you"], level="flag"); w.react("you", f.id); r = w._row_of("you", f)
+case("Only Done: a reaction leaves a flag kept", bool(r.flagged), True, "D-023 p26")
+case("Only Done: acting still reads the row", all(i.read for i in r.items.values() if i.msg == f.id), True, "D-015")
+w.done("you", r.key)
+case("Only Done: Done releases it", (bool(r.flagged), r.kept), (False, False), "D-023 p26")
+w = only_done(); m = w.post("anna", "#launch"); t = w.post("marco", "#launch", mentions=["you"]); k = w._row_of("you", t); w.keep("you", k.key); w.react("you", t.id)
+case("Only Done: a reaction leaves your own Keep", k.kept, True, "D-023 p26")
+w = only_done(); f = w.post("anna", "#launch", mentions=["you"], level="flag"); r = w._row_of("you", f); w.edit(f.id, level=None)
+case("Only Done: a flag the sender removes is still released", bool(r.flagged), False, "D-011")
+w = team(); f = w.post("anna", "#launch", mentions=["you"], level="flag"); w.post("you", "#launch", parent=f.id); r = w._row_of("you", f)
+case("Setting off (the start): a reply releases the flag", bool(r.flagged), False, "D-011")
+
 # ---------------------------------------------------------------- report
 bad = [r for r in results if not r[0]]
 width = max(len(r[1]) for r in results)

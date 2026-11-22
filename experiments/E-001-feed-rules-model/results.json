@@ -219,6 +219,8 @@
   "read at once while watching": 460,
   "end of run": {
    "rows kept by a flag at the end (per person, mean)": 0.1,
+   "rows in Kept at the end (per person, mean)": 1.2,
+   "rows in Kept at the end (largest for one person)": 4,
    "rows kept by the person at the end (per person, mean)": 1.2,
    "markers left in conversations": 4
   },
@@ -457,6 +459,8 @@
   "read at once while watching": 489,
   "end of run": {
    "rows kept by a flag at the end (per person, mean)": 0.2,
+   "rows in Kept at the end (per person, mean)": 0.7,
+   "rows in Kept at the end (largest for one person)": 2,
    "rows kept by the person at the end (per person, mean)": 0.6,
    "markers left in conversations": 2
   },
@@ -696,6 +700,8 @@
   "read at once while watching": 446,
   "end of run": {
    "rows kept by a flag at the end (per person, mean)": 0.1,
+   "rows in Kept at the end (per person, mean)": 1.0,
+   "rows in Kept at the end (largest for one person)": 3,
    "rows kept by the person at the end (per person, mean)": 0.9,
    "markers left in conversations": 5
   },
@@ -935,6 +941,8 @@
   "read at once while watching": 180,
   "end of run": {
    "rows kept by a flag at the end (per person, mean)": 0.1,
+   "rows in Kept at the end (per person, mean)": 0.6,
+   "rows in Kept at the end (largest for one person)": 3,
    "rows kept by the person at the end (per person, mean)": 0.5,
    "markers left in conversations": 0
   },
@@ -1174,6 +1182,8 @@
   "read at once while watching": 1371,
   "end of run": {
    "rows kept by a flag at the end (per person, mean)": 0.1,
+   "rows in Kept at the end (per person, mean)": 1.7,
+   "rows in Kept at the end (largest for one person)": 4,
    "rows kept by the person at the end (per person, mean)": 1.6,
    "markers left in conversations": 18
   },
@@ -1416,6 +1426,8 @@
     "read at once while watching": 424,
     "end of run": {
      "rows kept by a flag at the end (per person, mean)": 0.2,
+     "rows in Kept at the end (per person, mean)": 1.0,
+     "rows in Kept at the end (largest for one person)": 3,
      "rows kept by the person at the end (per person, mean)": 0.9,
      "markers left in conversations": 4
     },
@@ -1655,6 +1667,8 @@
     "read at once while watching": 495,
     "end of run": {
      "rows kept by a flag at the end (per person, mean)": 0.1,
+     "rows in Kept at the end (per person, mean)": 1.1,
+     "rows in Kept at the end (largest for one person)": 3,
      "rows kept by the person at the end (per person, mean)": 1.0,
      "markers left in conversations": 4
     },
@@ -1893,6 +1907,8 @@
     "read at once while watching": 490,
     "end of run": {
      "rows kept by a flag at the end (per person, mean)": 0.1,
+     "rows in Kept at the end (per person, mean)": 1.1,
+     "rows in Kept at the end (largest for one person)": 4,
      "rows kept by the person at the end (per person, mean)": 1.0,
      "markers left in conversations": 8
     },
@@ -2133,6 +2149,8 @@
     "read at once while watching": 501,
     "end of run": {
      "rows kept by a flag at the end (per person, mean)": 0.1,
+     "rows in Kept at the end (per person, mean)": 1.1,
+     "rows in Kept at the end (largest for one person)": 4,
      "rows kept by the person at the end (per person, mean)": 1.1,
      "markers left in conversations": 4
     },
@@ -2373,6 +2391,8 @@
     "read at once while watching": 437,
     "end of run": {
      "rows kept by a flag at the end (per person, mean)": 0.0,
+     "rows in Kept at the end (per person, mean)": 1.3,
+     "rows in Kept at the end (largest for one person)": 5,
      "rows kept by the person at the end (per person, mean)": 1.2,
      "markers left in conversations": 4
     },

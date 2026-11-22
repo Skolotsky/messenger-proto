@@ -244,9 +244,43 @@ ok   An Info reply, then an ordinary one, in your unread thread: the ordinary on
        -> 1   [D-012 + D-001]
 ok   A rule change leaves a row you already read where it was
        -> Earlier   [D-013]
+ok   D-021: someone who writes to you directly is added to your Focus people
+       -> (True, 'Focus/new')   [D-021]
+ok   D-021: option off: someone already added stays in Focus
+       -> Focus/new   [D-021]
+ok   D-021: option off: someone new is not added
+       -> Needs you   [D-021]
+ok   D-021: option off and remove all: nobody is left
+       -> (set(), 'Needs you')   [D-021]
+ok   D-021: a person removed is not added back when they write again
+       -> Needs you   [D-021]
+ok   D-021: removing one person leaves the others
+       -> Focus/new   [D-021]
+ok   D-021: Add back returns them to Focus
+       -> Focus/new   [D-021]
+ok   D-021: an agent is not added to Focus people
+       -> (False, 'Needs you')   [D-021, D-013]
+ok   D-021: an unread row moves to Needs you once the person is removed
+       -> Needs you   [D-021, D-013]
+ok   D-021: removing a person does not release a row you kept
+       -> True   [D-021, D-003]
+ok   Only Done: a reply leaves a flag kept
+       -> True   [D-023 p26]
+ok   Only Done: a reaction leaves a flag kept
+       -> True   [D-023 p26]
+ok   Only Done: acting still reads the row
+       -> True   [D-015]
+ok   Only Done: Done releases it
+       -> (False, False)   [D-023 p26]
+ok   Only Done: a reaction leaves your own Keep
+       -> True   [D-023 p26]
+ok   Only Done: a flag the sender removes is still released
+       -> False   [D-011]
+ok   Setting off (the start): a reply releases the flag
+       -> False   [D-011]
 
-123 of 123 cases behave as the decisions say
-invented behaviours exercised by the scenarios: R03, R04, R06, R12, R13, R22, R27, R34, R38, R40, R42
+140 of 140 cases behave as the decisions say
+invented behaviours exercised by the scenarios: R03, R04, R06, R12, R13, R22, R27, R31, R34, R38, R40, R42
 
 == base: the accepted rules
    13442 messages, 35% by agents, 22343 events, invariant violations: 0
@@ -260,6 +294,8 @@ invented behaviours exercised by the scenarios: R03, R04, R06, R12, R13, R22, R2
    arrivals read at once because the person had just written in that conversation (a rough stand-in for 'watching'): 460
    Needs you at a visit, mean, as the run goes on: days 1-2: 3.5, days 5-6: 3.9, days 9-10: 4.4
    rows kept by a flag at the end (per person, mean): 0.1
+   rows in Kept at the end (per person, mean): 1.2
+   rows in Kept at the end (largest for one person): 4
    rows kept by the person at the end (per person, mean): 1.2
    markers left in conversations: 4
 
@@ -275,6 +311,8 @@ invented behaviours exercised by the scenarios: R03, R04, R06, R12, R13, R22, R2
    arrivals read at once because the person had just written in that conversation (a rough stand-in for 'watching'): 489
    Needs you at a visit, mean, as the run goes on: days 1-2: 2.8, days 5-6: 3.1, days 9-10: 3.2
    rows kept by a flag at the end (per person, mean): 0.2
+   rows in Kept at the end (per person, mean): 0.7
+   rows in Kept at the end (largest for one person): 2
    rows kept by the person at the end (per person, mean): 0.6
    markers left in conversations: 2
 
@@ -290,6 +328,8 @@ invented behaviours exercised by the scenarios: R03, R04, R06, R12, R13, R22, R2
    arrivals read at once because the person had just written in that conversation (a rough stand-in for 'watching'): 446
    Needs you at a visit, mean, as the run goes on: days 1-2: 3.6, days 5-6: 4.1, days 9-10: 4.0
    rows kept by a flag at the end (per person, mean): 0.1
+   rows in Kept at the end (per person, mean): 1.0
+   rows in Kept at the end (largest for one person): 3
    rows kept by the person at the end (per person, mean): 0.9
    markers left in conversations: 5
 
@@ -305,6 +345,8 @@ invented behaviours exercised by the scenarios: R03, R04, R06, R12, R13, R22, R2
    arrivals read at once because the person had just written in that conversation (a rough stand-in for 'watching'): 180
    Needs you at a visit, mean, as the run goes on: days 1-2: 1.7, days 5-6: 2.2, days 9-10: 2.0
    rows kept by a flag at the end (per person, mean): 0.1
+   rows in Kept at the end (per person, mean): 0.6
+   rows in Kept at the end (largest for one person): 3
    rows kept by the person at the end (per person, mean): 0.5
    markers left in conversations: 0
 
@@ -320,6 +362,8 @@ invented behaviours exercised by the scenarios: R03, R04, R06, R12, R13, R22, R2
    arrivals read at once because the person had just written in that conversation (a rough stand-in for 'watching'): 1371
    Needs you at a visit, mean, as the run goes on: days 1-2: 6.5, days 5-6: 7.1, days 9-10: 7.4
    rows kept by a flag at the end (per person, mean): 0.1
+   rows in Kept at the end (per person, mean): 1.7
+   rows in Kept at the end (largest for one person): 4
    rows kept by the person at the end (per person, mean): 1.6
    markers left in conversations: 18
 

@@ -60,7 +60,7 @@ def poisson(rng, lam):
         n += 1
 
 
-def run(name, seed=7, scale=1.0, mentions_focus=False, info_used=True, check_every=500):
+def run(name, seed=7, scale=1.0, mentions_focus=False, info_used=True, check_every=500, only_done=False, done_p=None, dm_removed=0):
     rng = random.Random(seed)             # traffic: who writes what, where, when
     rv = random.Random(seed * 1000 + 1)   # behaviour at a visit, kept apart so a rule change does not reshuffle traffic
     model.RULINGS.clear(); model.NOTES.clear()
@@ -69,6 +69,9 @@ def run(name, seed=7, scale=1.0, mentions_focus=False, info_used=True, check_eve
     people = [f"p{i:02d}" for i in range(1, 31)]
     for p in people:
         w.add_person(p)
+        w.people[p].only_done = only_done
+        if dm_removed:                    # D-021: each person has taken this many colleagues out of Focus
+            w.people[p].dm_removed = set(random.Random(f"{seed}{p}").sample([q for q in people if q != p], dm_removed))
         if mentions_focus:
             w.add_rule(p, "mentions")
     for a in AGENTS:
@@ -284,7 +287,7 @@ def run(name, seed=7, scale=1.0, mentions_focus=False, info_used=True, check_eve
                 w.keep(u, row.key)
         for row in list(w.people[u].rows.values()):
             # a row kept by the person, or by a flag they have not answered, is marked done after a day or so
-            if (row.kept or row.flagged) and row.last < t - 1440 and rv.random() < A["done_after_day_p"]:
+            if (row.kept or row.flagged) and row.last < t - 1440 and rv.random() < (A["done_after_day_p"] if done_p is None else done_p):
                 w.done(u, row.key)
         w.leave_feed(u)
 
@@ -340,6 +343,10 @@ def run(name, seed=7, scale=1.0, mentions_focus=False, info_used=True, check_eve
     end_state = {
         "rows kept by a flag at the end (per person, mean)": round(statistics.mean(
             sum(1 for r in w.people[u].rows.values() if r.flagged) for u in people), 1),
+        "rows in Kept at the end (per person, mean)": round(statistics.mean(
+            sum(1 for r in w.people[u].rows.values() if r.kept or r.flagged) for u in people), 1),
+        "rows in Kept at the end (largest for one person)": max(
+            sum(1 for r in w.people[u].rows.values() if r.kept or r.flagged) for u in people),
         "rows kept by the person at the end (per person, mean)": round(statistics.mean(
             sum(1 for r in w.people[u].rows.values() if r.kept) for u in people), 1),
         "markers left in conversations": w.tombstones,
