@@ -1,5 +1,6 @@
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { MessageRow } from '../api/types';
+import type { Jump } from './jump';
 import { dayKey, dayLabel } from './format';
 
 interface Props {
@@ -10,6 +11,9 @@ interface Props {
   afterFirst?: ReactNode;
   /** Opened from a feed row: start at this number, under a New line (D-023, point 21). */
   newFrom?: number | null;
+  /** A search hit to bring into view, once. */
+  target?: Jump | null;
+  onLanded?(nonce: number): void;
 }
 
 const NEAR_BOTTOM = 8;
@@ -19,7 +23,7 @@ const NEAR_BOTTOM = 8;
  * away from the bottom, the message at the top of the view keeps its exact place through
  * arrivals and through a change of the panel's width. At the bottom, the list stays there.
  */
-export function MessageList({ rows, renderRow, onPinnedChange, afterFirst, newFrom = null }: Props) {
+export function MessageList({ rows, renderRow, onPinnedChange, afterFirst, newFrom = null, target, onLanded }: Props) {
   const scroller = useRef<HTMLDivElement>(null);
   const inner = useRef<HTMLDivElement>(null);
   const pinned = useRef(true);
@@ -68,6 +72,26 @@ export function MessageList({ rows, renderRow, onPinnedChange, afterFirst, newFr
   }, [newLine, capture, onPinnedChange]);
 
   useLayoutEffect(hold, [rows, hold]);
+
+  // Opens at the hit: it stands in the middle of the view, and the list stops following the bottom.
+  const landed = useRef<number | null>(null);
+  useLayoutEffect(() => {
+    const box = scroller.current;
+    if (!box || !target || landed.current === target.nonce) return;
+    const el = box.querySelector<HTMLElement>(`[data-msg="${CSS.escape(target.message)}"]`);
+    if (!el) return;
+    landed.current = target.nonce;
+    box.querySelector('[data-hit]')?.removeAttribute('data-hit');
+    const rect = el.getBoundingClientRect();
+    const view = box.getBoundingClientRect();
+    box.scrollTop += rect.top - view.top - (box.clientHeight - rect.height) / 2;
+    el.setAttribute('data-hit', '');
+    const isPinned = box.scrollHeight - box.scrollTop - box.clientHeight < NEAR_BOTTOM;
+    pinned.current = isPinned;
+    onPinnedChange(isPinned);
+    capture();
+    onLanded?.(target.nonce);
+  }, [rows, target, capture, onPinnedChange, onLanded]);
 
   useEffect(() => {
     const observer = new ResizeObserver(hold);

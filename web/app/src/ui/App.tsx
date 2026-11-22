@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
-import type { FeedRow, HistoryEntry, PersonView } from '../api/types';
+import type { ConversationSummary, FeedRow, HistoryEntry, PersonView } from '../api/types';
 import { HOME_PERSON } from '../config';
 import { useFeed } from '../state/useFeed';
 import { useSession } from '../state/useSession';
@@ -7,6 +7,7 @@ import { Activity } from './Activity';
 import { ConversationView } from './ConversationView';
 import { stored, useIsPhone } from './hooks';
 import { Icon } from './Icon';
+import type { Jump } from './jump';
 import { usePanels } from './panels';
 import { PickerProvider } from './ReactionPicker';
 import { Resizer } from './Resizer';
@@ -37,6 +38,9 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
   const [settings, setSettings] = useState<SettingsSection | null>(null);
   // Where a conversation opened from a feed row begins (D-023, point 21).
   const [newFrom, setNewFrom] = useState<{ thread: string | null; number: number | null } | null>(null);
+  const [jump, setJump] = useState<Jump | null>(null);
+  // A search hit can be in a channel this person is not in (D-009: every channel can be seen).
+  const [visiting, setVisiting] = useState<ConversationSummary | null>(null);
   const shown = useMemo(() => ({ activity: activityOpen, thread: thread !== null }), [activityOpen, thread]);
   const { widths, resize, reset } = usePanels(shown);
   const { setOpenConversation } = session;
@@ -44,7 +48,9 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
 
   useEffect(() => setOpenConversation(open), [open, setOpenConversation]);
 
-  const conversation = session.conversations.find((c) => c.conversation === open) ?? null;
+  const conversation =
+    session.conversations.find((c) => c.conversation === open) ??
+    (visiting?.conversation === open ? visiting : null);
   const viewing = person !== HOME_PERSON;
   const home = session.people.get(HOME_PERSON);
 
@@ -70,19 +76,32 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
     setOpen(id);
     setThread(null);
     setNewFrom(null);
+    setJump(null);
   };
   /** A click on a row: its conversation, or its thread beside the channel, at the first new message. */
   const openRow = (row: FeedRow) => {
     setOpen(row.conversation);
     setThread(row.thread);
+    setJump(null);
     setNewFrom(row.unread ? { thread: row.thread, number: row.first_new } : null);
     feed.markRead(row);
   };
   const openEntry = (entry: HistoryEntry) => {
     setOpen(entry.conversation);
     setThread(entry.thread);
+    setJump(null);
     setNewFrom(entry.unread ? { thread: entry.thread, number: entry.number } : null);
     if (entry.unread) session.read(entry.conversation, entry.thread, entry.number);
+  };
+  const openHit = (hit: Jump) => {
+    if (!session.conversations.some((c) => c.conversation === hit.conversation)) {
+      const name = hit.conversation.replace(/^#/, '');
+      setVisiting({ conversation: hit.conversation, type: 'channel', name, people: [], unread: false, dial: 'default' });
+    }
+    setOpen(hit.conversation);
+    setThread(hit.thread);
+    setNewFrom(null);
+    setJump(hit);
   };
   const classes = [
     'app sk',
@@ -122,6 +141,7 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
             onSwitch={setAsking}
             onSettings={() => setSettings('account')}
             attention={feed.attention}
+            onSearchHit={openHit}
           />
           <Resizer panel="side" label="Resize the sidebar" width={widths.side} onResize={resize} onReset={reset} />
         </aside>
@@ -149,6 +169,7 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
               onOpenThread={setThread}
               onClose={() => openConversation(null)}
               newFrom={newFrom && newFrom.thread === null ? newFrom.number : null}
+              target={jump && jump.thread === null ? jump : null}
             />
           ) : (
             <div className="conv none">
@@ -179,8 +200,12 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
               thread={thread}
               openThread={null}
               onOpenThread={setThread}
-              onClose={() => setThread(null)}
+              onClose={() => {
+                setThread(null);
+                setJump(null);
+              }}
               newFrom={newFrom && newFrom.thread === thread ? newFrom.number : null}
+              target={jump?.thread === thread ? jump : null}
             />
           </section>
         )}

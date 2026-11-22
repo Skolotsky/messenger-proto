@@ -24,7 +24,7 @@ export class DoorError extends Error {
 
 const LIMIT_MS = 3000; // the screen treats an action unanswered after 3 s as not sent (screen-to-conversations.md)
 
-async function call<T>(path: string, init?: RequestInit): Promise<T> {
+export async function call<T>(path: string, init?: RequestInit): Promise<T> {
   let res: Response;
   try {
     res = await fetch(`/orgs/${encodeURIComponent(ORG)}${path}`, { ...init, signal: AbortSignal.timeout(LIMIT_MS) });
@@ -41,8 +41,11 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const loadStart = (person: string) => call<StartAnswer>(`/people/${encodeURIComponent(person)}/start`);
 
-export function loadMessages(conversation: string, thread: string | null) {
-  const query = thread ? `?thread=${encodeURIComponent(thread)}` : '';
+export function loadMessages(conversation: string, thread: string | null, around?: number) {
+  const params = new URLSearchParams();
+  if (thread) params.set('thread', thread);
+  if (around !== undefined) params.set('around', String(around));
+  const query = params.size ? `?${params}` : '';
   return call<MessagesPage>(`/conversations/${encodeURIComponent(conversation)}/messages${query}`);
 }
 

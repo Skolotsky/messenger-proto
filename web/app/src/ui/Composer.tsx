@@ -2,15 +2,20 @@ import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 
 import { DoorError, newId } from '../api/door';
 import type { Level } from '../api/types';
 import { listKey } from '../state/lists';
+import { mentionsIn } from '../state/mentions';
 import type { Session } from '../state/useSession';
 import { AutoTextarea } from './AutoTextarea';
 import { useIsPhone } from './hooks';
+import { useMentionBox } from './Mentions';
+import { allowsEveryone, type Problem } from './OwnMessage';
 
 interface Props {
   session: Session;
   conversation: string;
   thread: string | null;
   placeholder: string;
+  /** Called after a message was saved. */
+  onSent?(): void;
 }
 
 const LEVEL_NOTE: Record<Level, string> = {
@@ -19,16 +24,16 @@ const LEVEL_NOTE: Record<Level, string> = {
 };
 
 /**
- * The message box. Seams for T-056: `@` suggestions, and the waiting and failed states of a
- * message in the list. Until then a send that fails keeps its text here and says so.
+ * The message box, with `@` suggestions. Seam for the second half of T-056: the waiting state of
+ * a message in the list. Until then a send that fails keeps its text here and says so.
  */
-export function Composer({ session, conversation, thread, placeholder }: Props) {
+export function Composer({ session, conversation, thread, placeholder, onSent }: Props) {
   const key = listKey(conversation, thread);
   const isPhone = useIsPhone();
   const [text, setText] = useState(() => session.drafts.get(key) ?? '');
   const [level, setLevel] = useState<Level | null>(null);
   const [sending, setSending] = useState(false);
-  const [problem, setProblem] = useState<string | null>(null);
+  const [problem, setProblem] = useState<Problem | null>(null);
   const box = useRef<HTMLTextAreaElement>(null);
   // The same text sent again keeps its IDs, so a send whose answer was lost is saved once.
   const attempt = useRef<{ body: string; actionId: string; messageId: string } | null>(null);
@@ -44,6 +49,9 @@ export function Composer({ session, conversation, thread, placeholder }: Props) 
     else session.drafts.delete(key);
   };
 
+  const allowEveryone = allowsEveryone(session, conversation);
+  const mention = useMentionBox({ session, allowEveryone, value: text, onValue: change, box });
+
   const submit = async () => {
     const body = text.trim();
     if (!body || sending) return;
@@ -55,24 +63,33 @@ export function Composer({ session, conversation, thread, placeholder }: Props) 
     setSending(true);
     setProblem(null);
     try {
-      await session.send({ conversation, thread, text: body, level, actionId, messageId });
+      const mentions = mentionsIn(body, session.peopleList, session.me?.id, allowEveryone);
+      await session.send({ conversation, thread, text: body, mentions, level, actionId, messageId });
       attempt.current = null;
       change('');
       setLevel(null);
+      onSent?.();
     } catch (e) {
       const refused = e instanceof DoorError && e.kind === 'refused';
       if (refused) attempt.current = null;
       setProblem(
         refused
-          ? `Not sent: ${(e as DoorError).message}. Your text is still here.`
-          : 'Not sent: no answer from the server. Your text is still here, try again.',
+          ? { text: `Not sent: ${(e as DoorError).message}. Your text is still here.`, canRetry: false }
+          : { text: 'Not sent: no answer from the server. Your text is still here, try again.', canRetry: true },
       );
     } finally {
       setSending(false);
     }
   };
 
+  const discard = () => {
+    attempt.current = null;
+    change('');
+    setLevel(null);
+  };
+
   const onKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (mention.onKeyDown(e)) return;
     if (e.key !== 'Enter' || e.nativeEvent.isComposing) return;
     const sends = session.sendKey === 'enter' ? !e.shiftKey && !e.ctrlKey && !e.metaKey : e.ctrlKey || e.metaKey;
     if (sends) {
@@ -103,6 +120,7 @@ export function Composer({ session, conversation, thread, placeholder }: Props) 
             aria-label="Message"
             placeholder={placeholder}
             onChange={(e) => change(e.target.value)}
+            onSelect={mention.onCaret}
             onKeyDown={onKey}
           />
         </div>
@@ -127,8 +145,20 @@ export function Composer({ session, conversation, thread, placeholder }: Props) 
               Info
             </button>
             <small role={problem ? 'alert' : undefined} className={problem ? 'err' : undefined}>
-              {problem ?? (level ? LEVEL_NOTE[level] : '')}
+              {problem?.text ?? (level ? LEVEL_NOTE[level] : '')}
             </small>
+            {problem && (
+              <span className="fix">
+                {problem.canRetry && (
+                  <button type="button" className="link" onClick={() => void submit()}>
+                    Try again
+                  </button>
+                )}
+                <button type="button" className="link" onClick={discard}>
+                  Discard
+                </button>
+              </span>
+            )}
           </div>
           <span className="send-hint">{hint}</span>
           <button className="btn pri send" disabled={sending || !text.trim()} title={tip}>
@@ -136,6 +166,7 @@ export function Composer({ session, conversation, thread, placeholder }: Props) 
           </button>
         </div>
       </div>
+      {mention.popup}
     </form>
   );
 }

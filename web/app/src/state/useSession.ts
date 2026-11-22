@@ -1,8 +1,16 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
-import { act, loadMessages, loadStart, newId } from '../api/door';
+import { act, DoorError, loadMessages, loadStart, newId } from '../api/door';
 import { connectLive } from '../api/live';
-import type { ChatMessage, ConversationPart, ConversationSummary, Level, PersonView, StartAnswer } from '../api/types';
-import { applyToConversations, applyToLists, listKey, mergePage, upsert, type Lists } from './lists';
+import type {
+  ChatMessage,
+  ConversationPart,
+  ConversationSummary,
+  Level,
+  MessagesPage,
+  PersonView,
+  StartAnswer,
+} from '../api/types';
+import { applyToConversations, applyToLists, dropOwnDeleted, listKey, mergePage, upsert, type Lists } from './lists';
 
 interface State {
   phase: 'loading' | 'ready' | 'failed';
@@ -16,7 +24,8 @@ interface State {
 type Action =
   | { type: 'started'; start: StartAnswer }
   | { type: 'failed' }
-  | { type: 'list'; key: string; rows: Lists[string] }
+  | { type: 'list'; key: string; rows: Lists[string]; replace?: boolean }
+  | { type: 'ownDeleted'; id: string }
   | { type: 'parts'; parts: ConversationPart[]; me: string; open: string | null }
   | { type: 'own'; key: string; message: ChatMessage }
   | { type: 'read'; conversation: string }
@@ -33,7 +42,15 @@ function reduce(state: State, action: Action): State {
     case 'failed':
       return { ...state, phase: 'failed' };
     case 'list':
-      return { ...state, lists: { ...state.lists, [action.key]: mergePage(state.lists[action.key], action.rows) } };
+      return {
+        ...state,
+        lists: {
+          ...state.lists,
+          [action.key]: action.replace ? action.rows : mergePage(state.lists[action.key], action.rows),
+        },
+      };
+    case 'ownDeleted':
+      return { ...state, lists: dropOwnDeleted(state.lists, action.id) };
     case 'parts': {
       let { lists, conversations } = state;
       for (const part of action.parts) {
@@ -72,10 +89,19 @@ export interface SendInput {
   conversation: string;
   thread: string | null;
   text: string;
+  mentions?: string[];
   level: Level | null;
   /** The same IDs on a retry, so that a send whose answer was lost is saved once. */
   actionId: string;
   messageId: string;
+}
+
+export interface EditChange {
+  text: string;
+  mentions: string[];
+  level: Level | null;
+  /** The same ID on a retry, so that an edit whose answer was lost is saved once. */
+  actionId: string;
 }
 
 export interface Session {
@@ -89,9 +115,17 @@ export interface Session {
   connected: boolean;
   sendKey: 'enter' | 'ctrl_enter';
   drafts: Map<string, string>;
-  loadList(conversation: string, thread: string | null): Promise<void>;
+  /** `around` opens at a position; `replace` shows exactly that page instead of joining it to what is held. */
+  loadList(
+    conversation: string,
+    thread: string | null,
+    options?: { around?: number; replace?: boolean },
+  ): Promise<MessagesPage>;
   send(input: SendInput): Promise<void>;
-  edit(message: ChatMessage, text: string): Promise<void>;
+  edit(message: ChatMessage, change: EditChange): Promise<void>;
+  remove(message: ChatMessage, actionId: string): Promise<void>;
+  createChannel(name: string, people: string[], actionId: string): Promise<string>;
+  openDirect(person: string, actionId: string): Promise<string>;
   read(conversation: string, thread: string | null, upTo: number): void;
   setOpenConversation(conversation: string | null): void;
   setPreference(key: string, value: string): Promise<void>;
@@ -126,18 +160,23 @@ export function useSession(person: string): Session {
     };
   }, [person, state.generation]);
 
-  const loadList = useCallback(async (conversation: string, thread: string | null) => {
-    const page = await loadMessages(conversation, thread);
-    dispatch({ type: 'list', key: listKey(conversation, thread), rows: page.messages });
-  }, []);
+  const loadList = useCallback(
+    async (conversation: string, thread: string | null, options?: { around?: number; replace?: boolean }) => {
+      const page = await loadMessages(conversation, thread, options?.around);
+      const replace = options?.replace || options?.around !== undefined;
+      dispatch({ type: 'list', key: listKey(conversation, thread), rows: page.messages, replace });
+      return page;
+    },
+    [],
+  );
 
   const send = useCallback(
-    async ({ conversation, thread, text, level, actionId, messageId }: SendInput) => {
+    async ({ conversation, thread, text, mentions = [], level, actionId, messageId }: SendInput) => {
       const saved = await act({
         kind: 'send',
         id: actionId,
         as: person,
-        message: { id: messageId, conversation, thread, text, mentions: [], level },
+        message: { id: messageId, conversation, thread, text, mentions, level },
       });
       // The answer is enough to show it, also if the live connection is away right now.
       const message: ChatMessage = {
@@ -150,7 +189,7 @@ export function useSession(person: string): Session {
         author_is_agent: false,
         participants: null,
         text,
-        mentions: [],
+        mentions,
         level,
         reactions: [],
         stopped: false,
@@ -164,22 +203,68 @@ export function useSession(person: string): Session {
   );
 
   const edit = useCallback(
-    async (message: ChatMessage, text: string) => {
-      await act({
-        kind: 'edit',
-        id: newId('act'),
-        as: person,
-        message: message.id,
+    async (message: ChatMessage, { text, mentions, level, actionId }: EditChange) => {
+      await act({ kind: 'edit', id: actionId, as: person, message: message.id, text, mentions, level });
+      const changed = {
+        ...message,
         text,
-        mentions: message.mentions,
-        level: message.level,
-      });
-      const changed = { ...message, text, version: message.version + 1, edited_at: new Date().toISOString() };
+        mentions,
+        level,
+        version: message.version + 1,
+        edited_at: new Date().toISOString(),
+      };
       // A root message is in its channel's list and in its thread's: both change.
       const part = { kind: 'message.changed', message: changed } as unknown as ConversationPart;
       dispatch({ type: 'parts', parts: [part], me: person, open: openRef.current });
     },
     [person],
+  );
+
+  const remove = useCallback(
+    async (message: ChatMessage, actionId: string) => {
+      await act({ kind: 'delete', id: actionId, as: person, message: message.id });
+      const part = {
+        kind: 'message.deleted',
+        message: {
+          id: message.id,
+          version: message.version + 1,
+          conversation: message.conversation,
+          thread: message.thread,
+        },
+      } as ConversationPart;
+      dispatch({ type: 'parts', parts: [part], me: person, open: openRef.current });
+      dispatch({ type: 'ownDeleted', id: message.id });
+    },
+    [person],
+  );
+
+  const addConversation = useCallback(
+    (summary: ConversationSummary) => {
+      const part = { kind: 'conversation.added', conversation_summary: summary } as ConversationPart;
+      dispatch({ type: 'parts', parts: [part], me: person, open: openRef.current });
+    },
+    [person],
+  );
+
+  const createChannel = useCallback(
+    async (name: string, people: string[], actionId: string) => {
+      const saved = await act({ kind: 'create_channel', id: actionId, as: person, name, people });
+      const conversation = saved.conversation ?? `#${name}`;
+      addConversation({ conversation, type: 'channel', name, people: [person, ...people], unread: false, dial: 'default' });
+      return conversation;
+    },
+    [person, addConversation],
+  );
+
+  const openDirect = useCallback(
+    async (other: string, actionId: string) => {
+      const saved = await act({ kind: 'open_direct', id: actionId, as: person, with: other });
+      if (!saved.conversation) throw new DoorError('unreachable', 'No conversation in the answer.');
+      const conversation = saved.conversation;
+      addConversation({ conversation, type: 'direct', name: conversation, people: [person, other], unread: false, dial: 'default' });
+      return conversation;
+    },
+    [person, addConversation],
   );
 
   const read = useCallback(
@@ -228,6 +313,9 @@ export function useSession(person: string): Session {
     loadList,
     send,
     edit,
+    remove,
+    createChannel,
+    openDirect,
     read,
     setOpenConversation,
     setPreference,

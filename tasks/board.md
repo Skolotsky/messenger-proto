@@ -20,7 +20,7 @@ Work in flight. Order inside a section is priority. Finished work moves to `done
 - **T-052** `implement` Wave 2 · The feed as a service (G-007, G-009, G-008). Needs T-049
 - **T-053** `implement` Wave 2 · Conversations: live connection, reading through the door, housekeeping (G-024; server half of G-015, G-019). Needs T-046
 - **T-054** `implement` Wave 2 · Conversations: the agent door (G-016, G-017, G-018). Needs T-046
-- **T-056** `implement` Wave 2 · Web app: writing, going wrong, search, staying current (screen half of G-015). Needs T-050
+- **T-056** `implement` Wave 2 · Web app: writing, going wrong, search, staying current (screen half of G-015). First half merged (mentions, edit, delete, search, new conversations; `tasks/T-056-writing-and-search.md`); the live client, waiting and failed states and `organization_gone` remain. Needs T-050
 - **T-057** `validate` Wave 3 · Milestone 1: the spine runs end to end; delivery guardrails with two copies (G-013, G-025, G-027); independent verifier. Needs T-046, T-047, T-048, T-052
 - **T-058** `validate` Wave 3 · Milestone 2: the web app on the real programs at both widths (G-015, G-019, all of T-038); independent verifier. Needs T-053, T-055, T-056, T-057
 - **T-059** `implement` Wave 3 · The demonstration: scripted team, control panel, notification app, reset (G-020). The two pages are merged against fixtures (`tasks/T-059-outside-pages.md`); the demo program, its routes and the connection to real parts remain. Needs T-051, T-053, T-054

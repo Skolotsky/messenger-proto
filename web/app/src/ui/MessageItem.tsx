@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
-import { act, DoorError, newId } from '../api/door';
-import type { MessageRow, PersonView } from '../api/types';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { act, newId } from '../api/door';
+import type { MessageRow } from '../api/types';
 import type { Session } from '../state/useSession';
-import { AutoTextarea } from './AutoTextarea';
 import { Avatar } from './Avatar';
 import { timeOf, whenOf } from './format';
 import { Icon } from './Icon';
 import { usePicker } from './ReactionPicker';
+import { textWithMentions } from './Mentions';
+import { ActionProblem, DeleteAsk, EditBox, OwnTools, StableBody, useOwnMessage } from './OwnMessage';
 
 interface Props {
   row: MessageRow;
@@ -16,35 +17,12 @@ interface Props {
   onOpenThread?(id: string): void;
 }
 
-/** Marks a mention only where the message really names that person; everything stays text. */
-function withMentions(text: string, mentions: string[], people: Map<string, PersonView>, me: string | undefined) {
-  const names = new Map<string, string>();
-  for (const id of mentions) {
-    const name = people.get(id)?.name;
-    if (name) names.set(name.toLowerCase(), id);
-  }
-  if (mentions.includes('channel')) names.set('channel', 'channel');
-  if (names.size === 0) return text;
-  const out: ReactNode[] = [];
-  let last = 0;
-  for (const match of text.matchAll(/@([\p{L}\p{N}_-]+)/gu)) {
-    const id = names.get(match[1].toLowerCase());
-    if (!id) continue;
-    out.push(text.slice(last, match.index));
-    out.push(
-      <span key={match.index} className={`at${id === me ? ' me' : ''}`}>
-        {match[0]}
-      </span>,
-    );
-    last = match.index + match[0].length;
-  }
-  out.push(text.slice(last));
-  return out;
-}
-
 export function MessageItem({ row, session, inThread, isThreadOpen, onOpenThread }: Props) {
   const { message: m, thread_summary: summary } = row;
   const [editing, setEditing] = useState(false);
+  const own = useOwnMessage(session, m);
+  const self = useRef<HTMLDivElement>(null);
+  const height = useRef(0);
   const author = session.people.get(m.author);
   const mine = m.author === session.me?.id;
   const replies = summary?.replies ?? 0;
@@ -59,6 +37,11 @@ export function MessageItem({ row, session, inThread, isThreadOpen, onOpenThread
   const classes = ['msg', mine && 'mine', m.level === 'flag' && 'is-flag', m.level === 'info' && 'is-info', m.deleted && 'deleted']
     .filter(Boolean)
     .join(' ');
+
+  // A marker has the height of what it replaces, so nothing below it moves (D-004).
+  useLayoutEffect(() => {
+    if (!m.deleted && !editing && !own.asking && self.current) height.current = self.current.getBoundingClientRect().height;
+  });
 
   const threadLink =
     !inThread && replies > 0 && summary ? (
@@ -81,7 +64,7 @@ export function MessageItem({ row, session, inThread, isThreadOpen, onOpenThread
   if (m.deleted) {
     return (
       <div className={classes} data-msg={m.id}>
-        <div className="msg-self">
+        <div className="msg-self" style={height.current ? { height: height.current } : undefined}>
           <span className="tomb">This message was deleted.</span>
         </div>
         {threadLink}
@@ -91,8 +74,8 @@ export function MessageItem({ row, session, inThread, isThreadOpen, onOpenThread
 
   return (
     <div className={classes} data-msg={m.id}>
-      <div className="msg-self">
-        {!editing && (
+      <div className="msg-self" ref={self}>
+        {!editing && !own.asking && (
           <span className="msg-tools">
             <button
               aria-label="React"
@@ -114,11 +97,7 @@ export function MessageItem({ row, session, inThread, isThreadOpen, onOpenThread
                 <Icon name="chat" />
               </button>
             )}
-            {mine && (
-              <button aria-label="Edit" title="Edit" onClick={() => setEditing(true)}>
-                <Icon name="pencil" />
-              </button>
-            )}
+            {mine && <OwnTools own={own} flagged={m.level === 'flag'} onEdit={() => setEditing(true)} />}
           </span>
         )}
         <Avatar id={m.author} person={author} />
@@ -132,9 +111,12 @@ export function MessageItem({ row, session, inThread, isThreadOpen, onOpenThread
           </div>
           {editing ? (
             <EditBox session={session} row={row} onClose={() => setEditing(false)} />
+          ) : own.asking ? (
+            <DeleteAsk own={own} hasReplies={replies > 0} />
           ) : (
-            <div className="msg-body">{withMentions(m.text, m.mentions, session.people, session.me?.id)}</div>
+            <StableBody text={m.text}>{textWithMentions(m.text, m.mentions, session.peopleList, session.me?.id)}</StableBody>
           )}
+          {own.problem && <ActionProblem problem={own.problem} onRetry={own.retry} onDiscard={own.discard} />}
           {m.reactions.length > 0 && (
             <div className="rxs">
               {m.reactions.map((r) => (
@@ -154,98 +136,5 @@ export function MessageItem({ row, session, inThread, isThreadOpen, onOpenThread
       </div>
       {threadLink}
     </div>
-  );
-}
-
-/**
- * Edit in place: the smallest form T-038 point 25 needs. Seam for T-056, which adds mentions,
- * Remove flag, Delete and the waiting state.
- */
-function EditBox({ session, row, onClose }: { session: Session; row: MessageRow; onClose(): void }) {
-  const m = row.message;
-  const [text, setText] = useState(m.text);
-  const [problem, setProblem] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const box = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    const el = box.current;
-    if (el) {
-      el.focus({ preventScroll: true });
-      el.setSelectionRange(el.value.length, el.value.length);
-    }
-  }, []);
-
-  const save = async () => {
-    const body = text.trim();
-    if (!body) {
-      setProblem('A message cannot be empty. Nothing was changed: write something, or press Cancel.');
-      return;
-    }
-    if (body === m.text) {
-      onClose();
-      return;
-    }
-    setSaving(true);
-    setProblem(null);
-    try {
-      await session.edit(m, body);
-      onClose();
-    } catch (e) {
-      setSaving(false);
-      setProblem(
-        e instanceof DoorError && e.kind === 'refused'
-          ? `Not saved: ${e.message}.`
-          : 'Not saved: no answer from the server. Your change is still here, try again.',
-      );
-    }
-  };
-
-  const onKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      onClose();
-      return;
-    }
-    if (e.key !== 'Enter' || e.nativeEvent.isComposing) return;
-    const saves = session.sendKey === 'enter' ? !e.shiftKey && !e.ctrlKey && !e.metaKey : e.ctrlKey || e.metaKey;
-    if (saves) {
-      e.preventDefault();
-      void save();
-    }
-  };
-
-  return (
-    <>
-      <form
-        className="edit"
-        onSubmit={(e) => {
-          e.preventDefault();
-          void save();
-        }}
-      >
-        <AutoTextarea
-          ref={box}
-          value={text}
-          aria-label="Edit your message"
-          onChange={(e) => {
-            setText(e.target.value);
-            setProblem(null);
-          }}
-          onKeyDown={onKey}
-        />
-        <button className="btn sm pri" disabled={saving}>
-          Save
-        </button>
-        <button type="button" className="btn sm" onClick={onClose}>
-          Cancel
-        </button>
-      </form>
-      {problem && (
-        <div className="send-state fail" role="alert">
-          {problem}
-        </div>
-      )}
-    </>
   );
 }

@@ -24,7 +24,10 @@ export type {
   RowChange,
   ScreenFeedAnswer,
   SettingsAnswer,
+  ScreenSearchAnswer,
+  SearchResult,
   StartAnswer,
+  SuggestAnswer,
   ThreadSummary,
 } from '../../../../contracts/generated/types';
 
@@ -61,4 +64,5 @@ export interface MessageRow {
 export interface MessagesPage {
   number: number;
   messages: MessageRow[];
+  has_after?: boolean;
 }

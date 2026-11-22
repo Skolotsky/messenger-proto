@@ -3,7 +3,10 @@ import type { Session } from '../state/useSession';
 import { Avatar } from './Avatar';
 import { conversationTitle } from './ConversationView';
 import { Icon } from './Icon';
+import type { Jump } from './jump';
+import { NewConversationButton } from './NewConversation';
 import { PersonMenu } from './PersonMenu';
+import { SearchBox } from './SearchBox';
 
 interface Props {
   session: Session;
@@ -15,10 +18,11 @@ interface Props {
   onSettings(): void;
   /** Unread rows in Focus and Needs you. It stays here while Activity is closed (D-023, point 12). */
   attention: number;
+  onSearchHit(jump: Jump): void;
 }
 
 /** Organization, Activity, channels, direct messages, and the person's own menu (D-019, D-023). */
-export function Sidebar({ session, open, activityOpen, onToggleActivity, onOpen, onSwitch, onSettings, attention }: Props) {
+export function Sidebar({ session, open, activityOpen, onToggleActivity, onOpen, onSwitch, onSettings, attention, onSearchHit }: Props) {
   const channels = session.conversations.filter((c) => c.type === 'channel');
   const directs = session.conversations.filter((c) => c.type === 'direct');
 
@@ -56,6 +60,7 @@ export function Sidebar({ session, open, activityOpen, onToggleActivity, onOpen,
           <small>{session.peopleList.length} members</small>
         </span>
       </div>
+      <SearchBox session={session} onHit={onSearchHit} />
       <button
         className={`side-item${activityOpen ? ' on' : ''}`}
         aria-pressed={activityOpen}
@@ -68,9 +73,15 @@ export function Sidebar({ session, open, activityOpen, onToggleActivity, onOpen,
       </button>
       <div className="side-scroll">
         <nav className="chats" aria-label="Conversations">
-          <h3>Channels</h3>
+          <h3>
+            Channels
+            <NewConversationButton kind="channel" session={session} onOpen={onOpen} />
+          </h3>
           {channels.map(item)}
-          <h3>Direct messages</h3>
+          <h3>
+            Direct messages
+            <NewConversationButton kind="direct" session={session} onOpen={onOpen} />
+          </h3>
           {directs.map(item)}
         </nav>
       </div>
