@@ -48,6 +48,10 @@ Assumed by the agent in the model and shown to the user for objection, none rais
 - Reading a conversation in the channel itself marks its feed row read. Mark all read leaves kept rows in place.
 - A person who is not a member of a channel gets nothing from it except what names them.
 
+### Confirmed by the user, 2026-11-22 (added after acceptance; the decision is unchanged)
+
+The reading in point 1 (a muted channel does not silence your own threads) and the list of smaller assumed behaviours were shown to the user again and confirmed ("ok").
+
 ## Consequences
 
 - Easier: the rules have one reading. The model and the decisions agree.

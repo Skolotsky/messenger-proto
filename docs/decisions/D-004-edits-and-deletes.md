@@ -81,6 +81,10 @@ Accepted by the user on 2026-11-22: **C in the activity feed, and a stricter rul
 - **Rows the person never saw leave no marker.** The agent asked this as a separate question and recommended it; the user answered "So decided?" and moved on. It is recorded as accepted on that basis and is the first thing to revisit if that reading was wrong.
 - The rules listed under the recommendation for the other cases (an edit that adds or removes a mention or flag, a text-only edit, reactions, search, notifications, the phone-sized screen) stand as written.
 
+### Confirmed by the user, 2026-11-22 (added after acceptance; the decision is unchanged)
+
+The point that rested on "So decided?" (rows the person never saw leave no marker) was explained again with an example and confirmed ("ok").
+
 ## Consequences
 
 - Easier: the two places have one sentence each. A conversation reads as if the message was never there; the feed explains itself wherever a person had already paid attention.

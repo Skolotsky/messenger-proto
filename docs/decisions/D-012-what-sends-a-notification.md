@@ -1,6 +1,6 @@
 # D-012: What sends a notification
 
-- Status: proposed
+- Status: accepted
 - Level: product
 - Date: 2026-11-22
 - Decided by: user
@@ -64,11 +64,13 @@ No second opinion was sought: cheap to reverse.
 
 ## Decision
 
-_Open._
+Accepted by the user on 2026-11-22: **B as the default, with one personal switch to C**, and the rules listed under the recommendation.
 
 ## Consequences
 
-_Filled in when accepted._
+- Easier: one rule to explain: a notification means a row became unread in a bucket that notifies. The dials need no notification settings of their own.
+- Harder: the notification sender has to know a row's bucket and whether it is already unread, so it depends on the feed's state, not only on the message. A row moving up into Focus is a second trigger.
+- Committed to: notifications follow the bucket; one per row; one switch per person.
 
 ## Follow-ups
 
