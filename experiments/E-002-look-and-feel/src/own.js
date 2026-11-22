@@ -6,6 +6,6 @@ window.Skin = { file: 'own', title: 'The agent\'s own', buckets: 'stack', shell(
   const body = S.view === 'feed' ? h.feed() : S.view === 'history' ? `<nav class="tabs">${h.histTabs()}</nav>${h.history()}` : `<div class="feed-wrap"><div class="feed-scroll" data-scroll="chats">${h.chats()}</div></div>`;
   return `<div class="app own v-${S.view}${S.conv ? ' has-conv' : ''}">
   <nav class="rail"><span class="logo" aria-hidden="true">L</span>${h.nav('feed', 'Feed', 'feed', h.badge())}${h.nav('history', 'History', 'clock')}${h.nav('chats', 'Channels', 'chat')}<span class="rail-gap"></span><button class="nav" data-act="modal" data-m="rules">${h.ic('rules')}<span>Rules</span></button></nav>
-  <main class="main"><header class="top"><div class="top-t">${head}</div>${h.bell()}</header><div class="search-wrap">${h.search()}</div>${body}</main>
+  <main class="main"><header class="top"><div class="top-t">${head}</div></header><div class="search-wrap">${h.search()}</div>${body}</main>
   <section class="pane">${h.conv()}</section>
 </div>`; } };

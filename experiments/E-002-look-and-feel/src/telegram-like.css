@@ -16,7 +16,6 @@ body{font-size:16px}
 .tg .nav .ic{width:24px;height:24px}
 .tg .bk-head{border-bottom:0;padding-top:8px;padding-bottom:4px;background:var(--panel)}
 .tg .bk-head h2,.tg .bk-head .bk-count,.tg .bk-head .bk-dot{display:none}
-.tg .bk-desc{display:block;font-size:13px}
 .tg .row{border-bottom:0}
 .tg .row-main{padding:9px 12px;gap:12px;min-height:76px;align-items:center}
 .tg .row .av{width:52px;height:52px;border-radius:50%;font-size:17px}
@@ -31,7 +30,6 @@ body{font-size:16px}
 .tg .row-badge:empty{min-width:12px;height:12px;padding:0}
 .tg .row-count{display:none}
 .tg .row.gone .row-main{padding-left:76px}
-.tg .row-exp{padding:8px 12px 14px;background:var(--wall);border-top:0}
 .tg .kept-head{padding-top:14px}
 .tg .btn{border-radius:99px}
 .tg .btn.sm{min-height:32px;padding:4px 12px}
@@ -54,7 +52,6 @@ body{font-size:16px}
 .tg .msg.is-flag>.msg-self .msg-main{box-shadow:inset 0 0 0 2px var(--flag)}
 .tg .msg.deleted>.msg-self{padding-left:42px}
 .tg .msg.deleted .tomb{background:var(--panel);border-radius:99px;padding:2px 12px;font-size:14px}
-.tg .msg-replies{margin-left:16px;padding-left:10px}
 .tg .newline{justify-content:center}
 .tg .newline::before,.tg .newline::after{display:none}
 .tg .newline span{background:var(--panel);border-radius:99px;padding:2px 12px;color:var(--muted)}

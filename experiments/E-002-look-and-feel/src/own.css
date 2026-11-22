@@ -46,15 +46,8 @@
 .own .row.b-fyi .row-preview{-webkit-line-clamp:1;font-size:14px;color:var(--muted)}
 .own .row.b-fyi .row-title{font-size:14px}
 .own .row.b-fyi .rxs{display:none}
-.own .row.b-fyi:not(.expanded) .row-text{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);column-gap:8px;align-items:baseline}
-.own .row.b-fyi:not(.expanded) .row-reason{grid-column:1/-1;font-weight:400;margin-bottom:0}
-.own .row.b-fyi:not(.expanded) .row-head{grid-column:1;max-width:46vw}
-.own .row.b-fyi:not(.expanded) .row-time,.own .row.b-fyi:not(.expanded) .row-sub{display:none}
-.own .row.b-fyi:not(.expanded) .row-preview{grid-column:2}
-.own .row.b-fyi:not(.expanded) .row-preview>b:first-child{display:none}
 .own .kept-head{padding:12px 0 6px}
 .own .row.kept{border-left-style:dashed}
-.own .row-exp{padding:4px 14px 14px;background:var(--panel)}
 .own .row.gone{background:none}
 .own .hrow{border:0;border-bottom:1px solid var(--line);border-radius:0;background:none;margin:0}
 .own .hist-note{border:0;background:none;padding:10px 0}
