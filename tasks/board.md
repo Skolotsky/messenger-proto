@@ -2,7 +2,7 @@
 
 Work in flight. Order inside a section is priority. Finished work moves to `done.md`. Rules: CLAUDE.md, section "Tasks".
 
-**Where we are:** The user kicked off on 2026-11-22. Research into existing products is done (R-002) and eight decisions are identified as `open` in the decision index. Nothing is decided or built yet. Next: the user picks the first decision to open; the agent recommends D-001, then D-002.
+**Where we are:** Research into existing products is done (R-002); eight decisions are `open` in the decision index. Order set by the user on 2026-11-22: product decisions first (D-001 to D-004); technical ones (D-005 to D-008) are not opened until the product scope is final and the experiments are agreed. Now asking the first question of D-001: who the prototype is for and how it is judged.
 
 ## Now
 
@@ -10,7 +10,7 @@ _Nothing in progress._
 
 ## Waiting on user
 
-- **T-007** `decide` Which decision to open first. Recommended: D-001 scope and audience, then D-002 the role of AI agents. Overview: `docs/visuals/R-002-decision-landscape.html`
+- **T-007** `decide` D-001, first question: who looks at the prototype, how it reaches them, and by when. Asked 2026-11-22. Overview of all decisions: `docs/visuals/R-002-decision-landscape.html`
 
 ## Next
 
