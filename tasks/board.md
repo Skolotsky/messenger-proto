@@ -6,7 +6,7 @@ Work in flight. Order inside a section is priority. Finished work moves to `done
 
 ## Now
 
-- **T-017** `experiment` Bring the E-001 model in line with D-011 and D-013 and rerun it, to confirm the hole is closed. Done when: `./experiments/E-001-feed-rules-model/run.sh` passes and the README states the new result
+_Nothing in progress._
 
 ## Waiting on user
 

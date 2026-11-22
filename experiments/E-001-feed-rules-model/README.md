@@ -33,6 +33,8 @@ The traffic numbers (messages per person, how often people mention, flag, edit, 
 
 ## Result
 
+**Read this first.** The findings below led to two decisions the same day, D-011 (a flag has no state of its own) and D-013 (the readings the model needed). The model, the scenarios and the simulation were then changed to match and rerun; `results.txt` and `results.json` hold that second run. The section "After D-011 and D-013" at the end gives its numbers. Everything between here and there describes the first run, under the rules as first accepted, and is kept because it is the evidence for those two decisions.
+
 Run on 2026-11-22, Python 3.12, `./experiments/E-001-feed-rules-model/run.sh`, about 40 seconds. Raw output: `results.txt`, `results.json`. Two runs give identical output.
 
 ### Do the rules hold together?
@@ -65,9 +67,20 @@ Base run: 13,466 messages in ten working days, 35% written by agents.
 
 A fresh verifier agent, given only the decision records and the code, probed the model with its own scripts. It found six places where the model contradicted the decision text (a withdrawn flag on a message that still mentions you; an answered flag for everyone deleting a post that belonged in the feed anyway; a text-only edit re-delivering or moving a row; replying in a turned-off thread inside a muted channel; a mention inside a Focus channel landing in Needs you; replying not releasing a kept channel row), eleven behaviours decided without being marked, six "inventions" that the decisions do in fact state, weak invariants, and two skews in the simulation (one random stream shared by traffic and behaviour; replies to mentions only generated from Needs you). All were corrected before the numbers above were taken. The corrections were not re-verified by a second independent pass.
 
+### After D-011 and D-013
+
+Rerun on 2026-11-22 with the model changed to match: a flag that names you keeps the row for you until you press Done, reply or react; a flag that names nobody is an ordinary row; removing a flag releases what it kept; a muted channel does not silence your own threads; All activity leaves addressed items as at Default; a dial or rule change re-sorts unread rows.
+
+- 98 scripted cases behave as the decisions say. No invariant broken in five variants and five further seeds.
+- **The hole is closed.** The Needs you list a person meets stays flat over the ten days: 3.1 rows (days 1-2), 3.4 (days 5-6), 3.5 (days 9-10), against 3.3, 5.8, 7.2 before. Across seeds its mean is 3.4 to 3.6 and nine visits in ten show 8 rows or fewer.
+- Focus, kept (by the person or by a flag): 1.0 row on average at a visit, 5 at most (5 to 7 across seeds), against 17 unanswered flags for one person before. This depends on the assumption that a person presses Done on a flag they will not answer within a day or two.
+- Focus still receives about one row in nine of a single list: 4.5 new rows a day against 38.2.
+- The behaviours the model still has to invent are down to the small list recorded in D-013: R22, R18, R16, R27, R13, R06 came up in the base run.
+- This second version of the model was not checked by an independent verifier.
+
 ## Conclusion
 
-**The foundation holds, with one hole to close and a short list to confirm.** The three buckets, the dials, Flag and Info, Keep and Done, and the edit and delete rules can be written as one procedure that gives every person one answer for every message, and its promises survive a simulated busy team. Hypothesis 2 holds under the assumed traffic: Focus stays short and agents stay out of it unless they are waiting on someone.
+**The foundation holds. The one hole found is closed by D-011, and the points to confirm are settled by D-013, apart from notifications (D-012).** The three buckets, the dials, Flag and Info, Keep and Done, and the edit and delete rules can be written as one procedure that gives every person one answer for every message, and its promises survive a simulated busy team. Hypothesis 2 holds under the assumed traffic: Focus stays short and agents stay out of it unless they are waiting on someone.
 
 Hypothesis 1 was partly false, as expected. What needs the user before building:
 

@@ -56,11 +56,11 @@ def poisson(rng, lam):
         n += 1
 
 
-def run(name, seed=7, scale=1.0, mentions_focus=False, info_used=True, open_flag_persists=True, check_every=500):
+def run(name, seed=7, scale=1.0, mentions_focus=False, info_used=True, check_every=500):
     rng = random.Random(seed)             # traffic: who writes what, where, when
     rv = random.Random(seed * 1000 + 1)   # behaviour at a visit, kept apart so a rule change does not reshuffle traffic
     model.RULINGS.clear(); model.NOTES.clear()
-    w = World(open_flag_persists=open_flag_persists)
+    w = World()
     w.self_check = True
     people = [f"p{i:02d}" for i in range(1, 31)]
     for p in people:
@@ -266,7 +266,8 @@ def run(name, seed=7, scale=1.0, mentions_focus=False, info_used=True, open_flag
             if rv.random() < A["keep_p"]:
                 w.keep(u, row.key)
         for row in list(w.people[u].rows.values()):
-            if row.kept and row.last < t - 1440 and rv.random() < A["done_after_day_p"]:
+            # a row kept by the person, or by a flag they have not answered, is marked done after a day or so
+            if (row.kept or row.flagged) and row.last < t - 1440 and rv.random() < A["done_after_day_p"]:
                 w.done(u, row.key)
         w.leave_feed(u)
 
@@ -302,7 +303,7 @@ def run(name, seed=7, scale=1.0, mentions_focus=False, info_used=True, open_flag
         xs = sorted(xs)
         return {"mean": round(statistics.mean(xs), 1), "median": xs[len(xs) // 2], "p90": xs[int(len(xs) * 0.9)], "max": xs[-1]}
 
-    keys = ["focus_new", "focus_waiting", "focus_kept", "needs", "fyi"]
+    keys = ["focus_new", "focus_kept", "needs", "fyi"]
     at_visit = {k: stat([c[k] for u in people for c in visits[u]]) for k in keys}
     needs_trend = {f"days {a + 1}-{b}": round(statistics.mean(c["needs"] for u in people for c in visits[u] if a <= c["day"] < b), 1)
                    for a, b in ((0, 2), (4, 6), (8, 10))}
@@ -319,13 +320,10 @@ def run(name, seed=7, scale=1.0, mentions_focus=False, info_used=True, open_flag
     msgs = list(w.msgs.values())
     by_agents = sum(1 for m in msgs if w.kind[m.author] == "agent")
     end_state = {
-        "open flags that name a person, never answered": sum(len([p for p in m.flag_named if w.kind[p] == "person"]) for m in msgs),
-        "open flags that name nobody, never answered": sum(1 for m in msgs if m.flag_open),
-        "rows stuck in Needs you: read, flag for everyone still open (per person, mean)": round(statistics.mean(
-            sum(1 for r in w.people[u].rows.values()
-                if not r.kept and w.row_bucket(u, r) == NEEDS and any(i.flag == "open" and i.read and w.persistent(u, i) for i in r.items.values()))
-            for u in people), 1),
-        "kept rows (per person, mean)": round(statistics.mean(sum(1 for r in w.people[u].rows.values() if r.kept) for u in people), 1),
+        "rows kept by a flag at the end (per person, mean)": round(statistics.mean(
+            sum(1 for r in w.people[u].rows.values() if r.flagged) for u in people), 1),
+        "rows kept by the person at the end (per person, mean)": round(statistics.mean(
+            sum(1 for r in w.people[u].rows.values() if r.kept) for u in people), 1),
         "markers left in conversations": w.tombstones,
     }
     return {
@@ -342,7 +340,6 @@ VARIANTS = [
     ("base: the accepted rules", {}),
     ("mentions start in Focus", {"mentions_focus": True}),
     ("agents do not use Info", {"info_used": False}),
-    ("a flag that names nobody leaves once read", {"open_flag_persists": False}),
     ("half the traffic", {"scale": 0.5}),
     ("double the traffic", {"scale": 2.0}),
 ]
@@ -359,9 +356,9 @@ if __name__ == "__main__":
         for s in r["violation samples"]:
             print("     !", s)
         print("   rows waiting when a person opens the feed (mean / p90 / max):")
-        for k, label in [("focus_new", "Focus, new"), ("focus_waiting", "Focus, waiting on you"), ("focus_kept", "Focus, kept"),
+        for k, label in [("focus_new", "Focus, new"), ("focus_kept", "Focus, kept (by you or a flag)"),
                          ("needs", "Needs you"), ("fyi", "For your information")]:
-            print(f"     {label:24s} {v[k]['mean']:5} / {v[k]['p90']:3} / {v[k]['max']:3}")
+            print(f"     {label:32s} {v[k]['mean']:5} / {v[k]['p90']:3} / {v[k]['max']:3}")
         print(f"   new rows per person per day: Focus {d['Focus']} (from agents {d['Focus from agents']}), "
               f"Needs you {round(d['Needs you from persons'] + d['Needs you from agents'], 1)} (from agents {d['Needs you from agents']}), "
               f"FYI {round(d['FYI from persons'] + d['FYI from agents'], 1)} (from agents {d['FYI from agents']}); one single list: {d['single list']}")
@@ -383,8 +380,7 @@ if __name__ == "__main__":
     print("\n== behaviours the model had to invent, and how often each came up in the base run")
     for code, n in sorted(base["rulings"].items(), key=lambda x: -x[1]):
         print(f"   {code} x{n:6d}  {model.RULING_TEXT[code]}")
-    for code, n in base["notes"].items():
-        print(f"   {code} x{n:6d}  {model.NOTE_TEXT[code]}")
+
     print("\n== how much the base numbers move with the random seed (five other seeds)")
     seeds = [run("base", seed=s) for s in (1, 2, 3, 4, 5)]
     def rng_of(f):
@@ -395,8 +391,8 @@ if __name__ == "__main__":
     print("   Focus, new, at a visit (mean):           ", rng_of(lambda r: r["rows at a visit"]["focus_new"]["mean"]))
     print("   Needs you at a visit (mean):             ", rng_of(lambda r: r["rows at a visit"]["needs"]["mean"]))
     print("   Needs you at a visit (p90):              ", rng_of(lambda r: r["rows at a visit"]["needs"]["p90"]))
-    print("   rows stuck in Needs you per person:      ", rng_of(lambda r: r["end of run"]["rows stuck in Needs you: read, flag for everyone still open (per person, mean)"]))
-    print("   Focus 'waiting on you' at a visit (max): ", rng_of(lambda r: r["rows at a visit"]["focus_waiting"]["max"]))
+    print("   Focus, kept, at a visit (mean):          ", rng_of(lambda r: r["rows at a visit"]["focus_kept"]["mean"]))
+    print("   Focus, kept, at a visit (max):           ", rng_of(lambda r: r["rows at a visit"]["focus_kept"]["max"]))
     print("   invariant violations:                    ", rng_of(lambda r: r["violations"]))
     out.append({"seeds": seeds})
     json.dump(out, open("results.json", "w"), indent=1)

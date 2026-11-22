@@ -1,4 +1,4 @@
-"""E-001: an executable model of the feed rules in D-001, D-003 and D-004.
+"""E-001: an executable model of the feed rules in D-001, D-003, D-004, D-011 and D-013.
 
 Throwaway. No storage, no network, no interface. Product code must not import it.
 Every behaviour the decisions do not state goes through ruling(), so it is named and counted.
@@ -16,33 +16,21 @@ RULING_TEXT = {
     "R04": "A direct message from an agent lands in Needs you (the Focus starting rule says 'from people')",
     "R05": "A Focus rule for a person lifts what already reaches you from them; it does not pull in their other messages",
     "R06": "An Info message that mentions you in a muted channel still arrives, in For your information",
-    "R07": "Any reply in the thread by the flagged person answers the flag, not only a reply to that exact message",
-    "R08": "An Info reply does not answer a flag",
-    "R09": "An agent's reply answers a flag that named nobody, for everyone",
-    "R10": "In a direct conversation, any later message from the flagged person answers the flag",
     "R12": "An edit that removes Info delivers the message as if new",
     "R13": "An edit that lowers a message you have not read moves it down quietly",
-    "R15": "Changing a dial or a rule acts on what arrives next; rows already in the feed stay where they are",
     "R16": "New activity on a kept row shows inside the Kept section; it does not move the row back to New",
-    "R17": "A read, still-open flag sits in its own 'Waiting on you' section of Focus (D-003 names only New and Kept)",
     "R18": "Reactions to your message follow the thread: none when the thread is Off or the channel Muted",
     "R19": "Reading a conversation in the channel itself marks its feed row read",
     "R22": "A person who is not a member of a channel gets nothing from it except what names them",
     "R23": "Mark all read leaves open flags and kept rows in place",
-    "R24": "A flag withdrawn from a message that still reaches you (it still mentions you): if you had read it, the row stays in Focus until Done, marked 'flag withdrawn'",
     "R25": "Replying in a thread you set to For your information by hand leaves it there",
-    "R26": "At All activity, what is addressed to you lands as at Default (the record's wording can also be read as 'in Focus')",
     "R27": "Deleting your own message does not remove you from its thread: later replies still reach you",
-    "R28": "A deleted flag that named nobody leaves an ordinary marker, not one that stays until Done",
-    "R29": "A reaction from anyone answers a flag that named nobody, for everyone",
     "R30": "A whole-channel mention inside a thread reply reaches nobody extra",
     "R31": "If you remove a starting Focus rule, those items land in Needs you",
     "R32": "A flag that mentions only an agent counts as naming somebody, so no person receives it",
-    "R33": "An edit that turns a flag for named people into one that names nobody opens it for everyone",
 }
 NOTES = Counter()
 NOTE_TEXT = {
-    "N01": "Stated by D-001, worth confirming: a muted channel silences replies in threads you started or replied in there",
 }
 QUIET = [False]
 
@@ -71,8 +59,6 @@ class Msg:
     deleted: bool = False
     version: int = 1
     reactions: dict = field(default_factory=dict)   # user -> emoji
-    flag_named: set = field(default_factory=set)    # named recipients the flag is still open for
-    flag_open: bool = False                         # a flag that named nobody, still open
 
 
 @dataclass
@@ -92,8 +78,9 @@ class Item:
 class Row:
     key: tuple
     items: dict = field(default_factory=dict)   # (msg, kind) -> Item
-    kept: bool = False
-    hold: bool = False         # a marker that stays until Done (D-004: kept or flagged)
+    kept: bool = False         # kept by the person (D-003)
+    flagged: set = field(default_factory=set)   # messages whose flag keeps this row for the person (D-011)
+    hold: bool = False         # a marker that stays until Done (D-004: a row the person kept)
     last: float = 0.0
 
 
@@ -109,7 +96,7 @@ class Person:
 
 
 class World:
-    def __init__(self, open_flag_persists=True):
+    def __init__(self):
         self.kind = {}                 # id -> "person" | "agent"
         self.channels = {}             # "#name" -> set of members
         self.msgs = {}
@@ -117,7 +104,6 @@ class World:
         self.people = {}               # id -> Person
         self.next_id = 1
         self.now = 0.0
-        self.open_flag_persists = open_flag_persists
         self.on_deliver = None         # hook for measurements
         self.tombstones = 0            # markers left in conversations (deleted message with replies)
         self.self_check = False        # compare delete and text-only edit against the D-004 table
@@ -166,9 +152,7 @@ class World:
             dial = P.ch_dial.get(m.conv, "default")
             if dial == "focus":
                 lvl = "focus"       # D-001: a channel in Focus brings replies in your threads there
-            elif dial == "muted":
-                note("N01")         # D-001: Muted lets through only what names you
-                lvl = "off"
+            # D-013: a muted channel does not silence replies in your own threads
         return lvl, False
 
     # ---------------------------------------------------------------- flags
@@ -182,46 +166,12 @@ class World:
             return set(m.conv[3:].split("|")) - {m.author}
         return set()
 
-    def _open_flag(self, m):
+    def _note_flag(self, m):
         named = self.flag_recipients(m)
-        m.flag_named = set(named)
-        m.flag_open = not named
         if m.group and not named:
             ruling("R03")
         if named and all(self.kind.get(x) == "agent" for x in named):
             ruling("R32")
-
-    def _close_flag_for(self, m, u):
-        """u responded (or the flag is being closed for u)."""
-        if u in m.flag_named:
-            m.flag_named.discard(u)
-            self._flag_item_closed(u, m)
-
-    def _close_open_flag(self, m):
-        if not m.flag_open:
-            return
-        m.flag_open = False
-        for u in self.people:
-            self._flag_item_closed(u, m, was_open_kind=True)
-
-    def _flag_item_closed(self, u, m, was_open_kind=False):
-        """The flag is closed for u. Where the message sits now is where it lands without the flag."""
-        if u not in self.people:
-            return
-        row = self._row_of(u, m)
-        it = row.items.get((m.id, "msg")) if row else None
-        if not it or not it.flag or it.retracted:
-            return
-        it.flag = None
-        cls = self.classify(u, m)
-        if cls:
-            if not it.read:
-                it.bucket, it.reason = cls[0], cls[1]
-        elif not it.read:
-            self._drop_item(u, row, it)   # D-003: "someone else answers one that named nobody"
-
-    def flag_is_open_for(self, u, m):
-        return u in m.flag_named or (m.flag_open and self.open_flag_persists)
 
     # ------------------------------------------------------------- classify
     def classify(self, u, m):
@@ -244,11 +194,11 @@ class World:
         lvl, by_hand = (self.thread_level(u, m) if is_reply else ("off", False))
 
         if m.level == "flag":
-            if u in m.flag_named:
+            if u in self.flag_recipients(m):
                 if "flags" not in P.rules:
                     ruling("R31")
                 cands.append((FOCUS if "flags" in P.rules else NEEDS, f"Flagged for you by {who}", ("th", root), "named", "flag"))
-            elif m.flag_open:
+            elif not self.flag_recipients(m):
                 in_scope = (lvl != "off") if is_reply else (member and dial != "muted")
                 if in_scope:
                     where = "the thread" if is_reply else m.conv
@@ -288,8 +238,7 @@ class World:
             # your threads, flags)". A thread level set by hand still wins for plain replies.
             cands = [c if (c[0] == FOCUS or (c[4] == "reply" and by_hand))
                      else (FOCUS, c[1] + f" · {m.conv} is in Focus", c[2], c[3], c[4]) for c in cands]
-        if not is_dm and dial == "all" and any(c[4] in ("mention", "flag", "reply") for c in cands):
-            ruling("R26")
+        # D-013: at All activity, what is addressed to you lands as at Default
 
         if not cands:
             return None
@@ -326,6 +275,8 @@ class World:
             ruling("R16")
         it = Item(m.id, kind, bucket, reason, self.now, flag=flag)
         row.items[(m.id, kind)] = it
+        if flag == "named":
+            row.flagged.add(m.id)      # D-011: a flag that names you keeps the row for you
         row.last = self.now
         if P.view is not None:
             P.pending_new += 1
@@ -343,23 +294,20 @@ class World:
         return
 
     # ------------------------------------------------------------ row status
-    def persistent(self, u, it):
-        return bool(it.flag) and not it.retracted and self.flag_is_open_for(u, self.msgs[it.msg]) and (
-            it.flag == "named" or self.open_flag_persists)
-
     def row_bucket(self, u, row):
         """Bucket the row sits in now, or None when it belongs in Earlier."""
-        if row.kept or row.hold:
+        if row.kept or row.hold or row.flagged:
             return FOCUS
-        live = [i for i in row.items.values() if (not i.read and not i.retracted) or self.persistent(u, i)]
+        live = [i for i in row.items.values() if not i.read and not i.retracted]
         return max(i.bucket for i in live) if live else None
 
     def row_section(self, u, row):
-        if any(not i.read and not i.retracted for i in row.items.values()) and not row.kept:
+        flag_read = row.flagged and all(row.items[(f, "msg")].read for f in row.flagged if (f, "msg") in row.items)
+        if row.kept or flag_read:
+            return "kept"          # new activity on a kept row shows inside Kept (R16)
+        if any(not i.read and not i.retracted for i in row.items.values()):
             return "new"
-        if row.kept:
-            return "kept"
-        return "waiting"       # read but an open flag, or a marker held until Done (R17)
+        return "kept"              # read, and kept for you by a flag, or a marker held until Done
 
     def feed(self, u):
         """Rows per bucket, newest activity first. Focus is split into its sections."""
@@ -380,9 +328,7 @@ class World:
     def counts(self, u):
         f = self.feed(u)
         sec = Counter(self.row_section(u, r) for r in f[FOCUS])
-        if sec["waiting"]:
-            ruling("R17")
-        return {"focus_new": sec["new"], "focus_waiting": sec["waiting"], "focus_kept": sec["kept"],
+        return {"focus_new": sec["new"], "focus_kept": sec["kept"],
                 "needs": len(f[NEEDS]), "fyi": len(f[FYI])}
 
     # ---------------------------------------------------------------- events
@@ -404,7 +350,7 @@ class World:
 
     def _after_post(self, m):
         if m.level == "flag":
-            self._open_flag(m)
+            self._note_flag(m)
         author = m.author
         root = m.parent or m.id
         # the author acted: their own row for this conversation is read, a kept row is released,
@@ -428,56 +374,17 @@ class World:
                     for it in P.rows[key].items.values():
                         it.read = True
                     P.rows[key].kept = False
-        # a response answers flags (D-001)
-        self._answer_flags(m)
+                    P.rows[key].flagged.clear()   # D-011: replying releases what a flag kept
         for u in self.people:
             cls = self.classify(u, m)
             if cls:
                 self._deliver(u, m, cls)
-
-    def _answer_flags(self, m):
-        author = m.author
-        if m.parent is not None:
-            candidates = [self.msgs[i] for i in [m.parent] + self.threads[m.parent] if i < m.id]
-        elif m.conv.startswith("dm:"):
-            candidates = [x for x in self.msgs.values() if x.conv == m.conv and x.id < m.id and x.level == "flag"]
-            if any(author in x.flag_named for x in candidates):
-                ruling("R10")
-        else:
-            candidates = []
-        for f in candidates:
-            if f.level != "flag" or f.deleted or f.author == author:
-                continue
-            if author in f.flag_named:
-                if m.level == "info":
-                    ruling("R08")
-                    continue
-                if f.id != m.parent:
-                    ruling("R07")
-                self._close_flag_for(f, author)
-            elif f.flag_open:
-                if m.level == "info":
-                    ruling("R08")
-                    continue
-                if f.id != m.parent:
-                    ruling("R07")
-                if self.kind[author] == "agent":
-                    ruling("R09")
-                self._close_open_flag(f)
 
     def react(self, u, mid, emoji="+1"):
         m = self.msgs[mid]
         if m.deleted:
             return
         m.reactions[u] = emoji
-        # a reaction from the flagged person answers the flag (D-003)
-        if u in m.flag_named:
-            self._close_flag_for(m, u)
-        elif m.flag_open and u != m.author:
-            ruling("R29")
-            if self.kind[u] == "agent":
-                ruling("R09")
-            self._close_open_flag(m)
         # the person reacting acted on their own row
         if u in self.people:
             row = self._row_of(u, m)
@@ -486,6 +393,7 @@ class World:
                     if it.msg == mid:
                         it.read = True
                 row.kept = False
+                row.flagged.discard(mid)      # D-011: reacting releases what the flag kept
         a = m.author
         if a == u or a not in self.people:
             return
@@ -561,19 +469,15 @@ class World:
         m.mentions, m.level, m.group = new_mentions, new_level, new_group
         new_recipients = self.flag_recipients(m)
         if m.level == "flag":
-            still_open = (m.flag_named & new_recipients) if old_level == "flag" else set()
-            m.flag_named = still_open | (new_recipients - old_recipients)
-            m.flag_open = (not new_recipients) and (m.flag_open or old_level != "flag" or bool(old_recipients))
-            if m.flag_open and old_level == "flag" and old_recipients:
-                ruling("R33")
-        else:
-            m.flag_named, m.flag_open = set(), False
+            self._note_flag(m)
         for u in self.people:
             row = self._row_of(u, m)
             it = row.items[(mid, "msg")] if row else None
             if it and it.retracted:
                 it = None
             cls = self.classify(u, m)
+            if row and u not in new_recipients:
+                row.flagged.discard(mid)        # D-011: if the flag is removed, what it kept is released
             newly_named = (u in m.mentions and u not in old_mentions) or (u in new_recipients and u not in old_recipients)
             if it is None and cls:
                 if not newly_named and old_level == "info" and m.level != "info":
@@ -585,9 +489,10 @@ class World:
                 self._retract(u, row, it)
             elif it and cls:
                 bucket, reason, key, flag = cls
-                was_flag_for_me = it.flag == "named"
                 it.edited = True
                 it.flag = flag
+                if flag == "named":
+                    row.flagged.add(mid)
                 if newly_named:
                     it.read = False
                     it.bucket, it.reason, it.ts = bucket, reason, self.now
@@ -596,12 +501,6 @@ class World:
                     if bucket < it.bucket and not it.read:
                         ruling("R13")
                     it.bucket, it.reason = bucket, reason
-                if was_flag_for_me and flag != "named" and it.read:
-                    # D-004: removing a flag is a retraction, and a flagged row keeps its marker until Done.
-                    # Here the message itself is still there, so the row is held and says so.
-                    ruling("R24")
-                    row.hold = True
-                    it.reason += " · flag withdrawn"
 
     def delete(self, mid):
         m = self.msgs[mid]
@@ -613,20 +512,20 @@ class World:
                 row = self._row_of(u, m)
                 if row and not row.items[(mid, "msg")].retracted:
                     it = row.items[(mid, "msg")]
-                    if row.kept or (it.flag == "named" and it.read):
+                    if row.kept:
                         expect[u] = "held marker"
                     elif self._on_screen(u, row, it) or it.read:
                         expect[u] = "marker"
                     else:
                         expect[u] = "nothing"
         m.deleted = True
-        m.flag_named, m.flag_open = set(), False
         if m.parent is None and self.threads[mid]:
             self.tombstones += 1            # D-004: the marker stays so the thread keeps its top
         for u in self.people:
             for kind in ("msg", "reaction"):
                 row = self._row_of(u, m, kind)
                 if row:
+                    row.flagged.discard(mid)    # D-011: deleting the message removes its flag too
                     self._retract(u, row, row.items[(mid, kind)])
         for u, want in expect.items():
             row = self._row_of(u, m)
@@ -639,14 +538,8 @@ class World:
         """D-004, option C: what is left when something aimed at a person is taken back."""
         if it.retracted:
             return
-        was_flag_for_me = it.flag == "named"
-        if it.flag == "open" and it.read and not row.kept:
-            ruling("R28")
         if row.kept:
             it.retracted, it.read = True, True
-            row.hold = True                 # marker stays in Focus until Done
-        elif was_flag_for_me and it.read:
-            it.retracted = True
             row.hold = True                 # marker stays in Focus until Done
         elif self._on_screen(u, row, it):
             it.retracted = True             # marker in the same space until the person moves on
@@ -713,27 +606,43 @@ class World:
         row = self.people[u].rows.get(key)
         if row:
             row.kept = row.hold = False
+            row.flagged.clear()
             for it in row.items.values():
                 it.read = True
 
-    def set_channel_dial(self, u, ch, level):
+    def resort(self, u):
+        """D-013: a dial or rule change re-sorts unread rows already in the feed; read ones stay."""
         P = self.people[u]
-        if any(self.row_bucket(u, r) for r in P.rows.values()
-               if any(self.msgs[i.msg].conv == ch for i in r.items.values())):
-            ruling("R15")
-        P.ch_dial[ch] = level
+        QUIET[0] = True
+        try:
+            for row in list(P.rows.values()):
+                for it in list(row.items.values()):
+                    if it.kind != "msg" or it.read or it.retracted:
+                        continue
+                    cls = self.classify(u, self.msgs[it.msg])
+                    if cls:
+                        it.bucket, it.reason = cls[0], cls[1]
+                    else:
+                        row.flagged.discard(it.msg)
+                        self._drop_item(u, row, it)
+        finally:
+            QUIET[0] = False
+
+    def set_channel_dial(self, u, ch, level):
+        self.people[u].ch_dial[ch] = level
+        self.resort(u)
 
     def set_thread_dial(self, u, root, level):
-        P = self.people[u]
-        if ("th", root) in P.rows and self.row_bucket(u, P.rows[("th", root)]):
-            ruling("R15")
-        P.th_dial[root] = level
+        self.people[u].th_dial[root] = level
+        self.resort(u)
 
     def add_rule(self, u, rule):
         self.people[u].rules.add(rule)
+        self.resort(u)
 
     def remove_rule(self, u, rule):
         self.people[u].rules.discard(rule)
+        self.resort(u)
 
     def rule_preview(self, u, rule, since=0.0):
         """D-001: how many items the rule would have pulled in recently."""
@@ -769,8 +678,12 @@ class World:
             seen = set()
             for row in P.rows.values():
                 b = self.row_bucket(u, row)
-                if (row.kept or row.hold) and b != FOCUS:
+                if (row.kept or row.hold or row.flagged) and b != FOCUS:
                     bad.append(f"{u}: a kept or held row is not in Focus")
+                for fid in row.flagged:
+                    fm = self.msgs[fid]
+                    if fm.deleted or fm.level != "flag" or u not in self.flag_recipients(fm):
+                        bad.append(f"{u}: a row is still kept by flag {fid}, which is gone (D-011)")
                 for it in row.items.values():
                     m = self.msgs[it.msg]
                     k = (it.msg, it.kind)
@@ -799,13 +712,10 @@ class World:
                     continue
                 if u in m.mentions and (m.id, "msg") not in seen:
                     bad.append(f"{u}: message {m.id} mentions them but never reached the feed (names you gets through)")
-                if u in m.flag_named:
-                    row = self._row_of(u, m)
-                    want = FOCUS if "flags" in P.rules else NEEDS
-                    if not row or self.row_bucket(u, row) is None or self.row_bucket(u, row) < want:
-                        bad.append(f"{u}: open flag {m.id} names them but its row is not in {BUCKET[want]}")
-                if m.flag_open:
+                if m.level == "flag" and u in self.flag_recipients(m) and (m.id, "msg") not in seen:
+                    bad.append(f"{u}: flag {m.id} names them but never reached the feed")
+                if m.level == "flag" and not self.flag_recipients(m):
                     cls = self.classify(u, m)
                     if cls and cls[3] == "open" and (m.id, "msg") not in seen:
-                        bad.append(f"{u}: open flag for everyone {m.id} is in scope but not in their feed")
+                        bad.append(f"{u}: flag for everyone {m.id} is in scope but never reached their feed")
         return bad
