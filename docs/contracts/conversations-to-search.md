@@ -47,4 +47,4 @@ Fields may be added to a message. The version rule and the meaning of a delete d
 
 ## 6. Enforced by
 
-G-006, G-012, G-013, G-014, G-019, G-020, G-023, G-025, G-026, G-027, G-028, G-029.
+G-006, G-012, G-013, G-014, G-019, G-020, G-023, G-025, G-026, G-027, G-029.

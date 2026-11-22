@@ -33,7 +33,8 @@ Every change, in log order, with no number skipped. Each carries `org`, `number`
 | `reader.focus_only` | `person, on` |
 | `reader.release_setting` | `person, on` (D-023, point 26) |
 | `reader.preference`, `reader.profile_line` | `person`, no effect on the feed: counted and ignored |
-| `seed.sealed` | nothing. The last entry of a seed session: the feed writes no notification notes for anything up to it (D-033). Organization-wide |
+| `seed.opened` | nothing. The first entry of a seeded log. From here until `seed.sealed` the feed writes no notification notes, so it knows from the log alone, also in a rebuild (D-033). Organization-wide |
+| `seed.sealed` | nothing. Closes a seed session that began with `seed.opened`; a session without that opener writes no seal. Organization-wide |
 | `tick` | nothing |
 
 ```json
@@ -75,4 +76,4 @@ New kinds of change may be added; the feed applies what it knows and counts the 
 
 ## 6. Enforced by
 
-G-005, G-007, G-008, G-009, G-012, G-013, G-019, G-020, G-023, G-024, G-025, G-026, G-027, G-028, G-029, G-030.
+G-005, G-007, G-008, G-009, G-012, G-013, G-019, G-020, G-023, G-024, G-025, G-026, G-027, G-029, G-030.

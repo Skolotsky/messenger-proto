@@ -23,7 +23,10 @@ if [ "$(sha256sum docs/brief.md 2>/dev/null | cut -d' ' -f1)" = "$brief_sum" ]; 
 
 # The pre-commit hook is switched on in this clone (G-002).
 if [ -d .git ] || [ -f .git ]; then
-  if [ "$(git config core.hooksPath 2>/dev/null)" = ".githooks" ]; then pass "pre-commit hook is switched on"; else fail "pre-commit hook is off. Run: git config core.hooksPath .githooks"; fi
+  # Creating a git worktree can rewrite the setting to the absolute path of the same folder.
+  hooks_path=$(git config core.hooksPath 2>/dev/null)
+  main_hooks="$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")/.githooks"
+  if [ "$hooks_path" = ".githooks" ] || [ "$hooks_path" = "$main_hooks" ]; then pass "pre-commit hook is switched on"; else fail "pre-commit hook is off. Run: git config core.hooksPath .githooks"; fi
 fi
 
 # A task lives in exactly one place: the board or the done log.
