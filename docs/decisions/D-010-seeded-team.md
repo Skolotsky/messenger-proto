@@ -1,6 +1,6 @@
 # D-010: The seeded team
 
-- Status: proposed
+- Status: accepted
 - Level: product
 - Date: 2026-11-22
 - Decided by: user
@@ -64,11 +64,18 @@ No second opinion was sought: cheap to reverse.
 
 ## Decision
 
-_Open._
+Accepted by the user on 2026-11-22: **C, a large team, plus a control panel.** The agent recommended B.
+
+- "I think that focus mode pays off when it's 30 or more." The bet in D-001 is about attention under pressure, and a team of 12 does not put Focus under pressure.
+- **A separate control panel** to start, stop and reset the demonstration. It shows plainly what has happened and what is going to happen, so the user can use it while explaining the product.
+
+The agent's stated risk with C (nobody can follow the cast; most writing effort goes to noise) is handled this way: a core cast of about eight people and the agents carries the hand-written situations listed above, with the default viewer among them; the other people and channels produce generated background traffic. The situations to produce stay as listed under the recommendation.
 
 ## Consequences
 
-_Filled in when accepted._
+- Easier: Focus, the channel dial and one row per conversation are shown under the load they exist for. The gap between Default and Muted on a busy channel is obvious.
+- Harder: about 30 people, 6 agents and 20 channels have to stay believable. More history, so the first load and search have real volume to deal with.
+- Committed to: the control panel as a surface of its own, outside the product's navigation. Reset returns the team to the same starting state every time, and the scripted activity follows a schedule that can be shown in advance, which is what makes "what is going to happen" possible. The panel also offers each situation on demand and the pace control. Controls to slow down or switch off search and notifications will live there too, when the quality decisions (D-007) define them.
 
 ## Follow-ups
 

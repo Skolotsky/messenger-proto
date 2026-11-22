@@ -10,10 +10,10 @@ Line format: `- **D-nnn** [status] The decision as a statement, and what it comm
 
 - **D-001** [accepted] The early access programme tests one bet: the feed sorts what deserves attention into three buckets (Focus by the person's own rules, Needs you, For your information), tuned by a dial per channel and per thread and by the sender's Flag or Info. Commits us to explained rules, one item in one place, no jumping on edit or delete, and model-judged text rules built last → [record](D-001-product-hypothesis.md)
 - **D-002** [accepted] People and agents in the first version are scripted and enter through the doors real ones would use; no model is needed to run it. A coding agent can join as an agent or on behalf of a person, as a demonstration feature for verification → [record](D-002-agents-in-first-version.md)
-- **D-003** [open] What the activity feed contains and how it is cleared: item types, grouping, read state, triage action. Evidence: R-002
+- **D-003** [proposed] How an item leaves the feed (recommended: a row stays until done; acting on it counts as done; the list does not move while viewed) → [record](D-003-how-items-leave-the-feed.md)
 - **D-004** [open] What an edit or a delete does to feed items and notifications that already exist. Evidence: R-002
 - **D-009** [accepted] The first version is the feed plus what makes it observable: direct messages, a search box, a notification tray, a Focus rules list, unread marks, creating channels, and a layout that works on a phone-sized screen, delivered as an installable web app (PWA). Commits us to two widths for every surface; the access model, sign-in, group messages, ad-hoc topics, profiles, files and formatted text stay out → [record](D-009-first-version-surfaces.md)
-- **D-010** [proposed] The seeded team (recommended: a product startup of 12 people and 3 agents across 9 channels, two weeks of history, live activity with a pace control) → [record](D-010-seeded-team.md)
+- **D-010** [accepted] The seeded team is large: about 30 people, 6 agents and 20 channels, with a core cast carrying hand-written situations and the rest as background. A separate control panel starts, stops and resets the demonstration and shows what happened and what comes next → [record](D-010-seeded-team.md)
 
 ## System shape: components, boundaries, stack
 
