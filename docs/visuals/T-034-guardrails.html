@@ -166,8 +166,27 @@ details > .stack { gap: 10px; }
 
 <div class="ask">
   <div class="label">Needs you</div>
-  <p><strong>Do you recognise your decisions in these sentences?</strong> Say which to change, drop or add. All but one are "pending": the product has no code yet, so their tests are named but not written. The first build task that touches one writes its test first and sees it fail.</p>
+  <p><strong>Do you recognise your decisions in these sentences?</strong> Start with the six that matter most, right below. Say which to change, drop or add. All but one are "pending": the product has no code yet, so their tests are named but not written. The first build task that touches one writes its test first and sees it fail.</p>
 </div>
+
+<section>
+  <h2>The six that matter most</h2>
+  <p>If you read nothing else, read these. Each protects something the brief asks for or you decided, and each would be expensive to discover broken late. They are marked <span class="chip you">key</span> in the tables below.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>What must stay true</th><th>Why it is one of the six</th></tr></thead>
+      <tbody>
+        <tr><td>G&#8209;004</td><td><strong>A change and its log entry are saved in one step; no change exists without a log entry.</strong></td><td>Everything else rests on it. If a message can be saved without the note that it changed, search, the feed and notifications silently never hear of it, and no later check can bring it back.</td></tr>
+        <tr><td>G&#8209;007</td><td><strong>The feed equals a clean replay of the log</strong> after an outage, repeats, a restart and a wipe.</td><td>The feed is the product. This sentence is what makes it trustworthy: whatever goes wrong on the way, each person's rows end exactly as the rules say, and the feed can always be rebuilt.</td></tr>
+        <tr><td>G&#8209;006</td><td><strong>Search holds the current text of every message that is not deleted, and nothing else.</strong></td><td>The brief asks that edits and deletes reach the other systems reliably. A deleted message that can still be found is the failure a person would notice and not forgive.</td></tr>
+        <tr><td>G&#8209;010</td><td><strong>Every notification that is due is sent exactly once</strong>, late if need be, never twice.</td><td>A notification is the one thing that interrupts a person. Missing one, or repeating one, is felt at once, and it cannot be taken back.</td></tr>
+        <tr><td>G&#8209;015</td><td><strong>A screen that lost its connection ends equal to a freshly loaded one.</strong></td><td>It is what a person actually sees. Every other guarantee is invisible if the screen in front of them is stale or wrong after a tunnel or a sleeping laptop.</td></tr>
+        <tr><td>G&#8209;025</td><td><strong>Nothing of one organization is ever shown to, sent to, or changed by another.</strong></td><td>With many organizations in one installation this is the mistake with no small version: one leak is a breach. It is enforced by the database itself, not by care.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Close behind them: no notification for something read or deleted within the hold (G&#8209;011), one organization cannot delay another (G&#8209;026), and a change the feed cannot apply harms only what it touches (G&#8209;009).</p>
+</section>
 
 <section>
   <h2>Nothing is lost, nothing happens twice</h2>
@@ -176,9 +195,9 @@ details > .stack { gap: 10px; }
       <thead><tr><th>ID</th><th>What must stay true</th><th>How it is enforced</th><th>Already shown in</th></tr></thead>
       <tbody>
         <tr><td>G&#8209;003</td><td>An action a screen or an agent was told is saved, is saved exactly once, also when sent again and when Conversations dies mid-burst.</td><td>A test that kills Conversations five times mid-burst and resends actions.</td><td>E-003</td></tr>
-        <tr><td>G&#8209;004</td><td>A change and its log entry are saved in one step; no change exists without a log entry.</td><td>The database itself refuses to save a change without its log entry; plus a test that tries.</td><td>E-003</td></tr>
+        <tr><td>G&#8209;004<br><span class="chip you">key</span></td><td>A change and its log entry are saved in one step; no change exists without a log entry.</td><td>The database itself refuses to save a change without its log entry; plus a test that tries.</td><td>E-003</td></tr>
         <tr><td>G&#8209;005</td><td>A reader of the change log never steps over a change, with many writers at once.</td><td>A test on PostgreSQL with one save held open while later ones finish.</td><td>E-004</td></tr>
-        <tr><td>G&#8209;010</td><td>Every notification that is due and not withdrawn in time is sent exactly once, also after restarts and a rebuilt feed; within 8 s when healthy; marked "delayed" when more than 10 minutes late.</td><td>A test that stops the sender for 5 and 11 minutes, kills it mid-send and rebuilds the feed mid-burst. It must fail for a sender that sends nothing.</td><td>E-003</td></tr>
+        <tr><td>G&#8209;010<br><span class="chip you">key</span></td><td>Every notification that is due and not withdrawn in time is sent exactly once, also after restarts and a rebuilt feed; within 8 s when healthy; marked "delayed" when more than 10 minutes late.</td><td>A test that stops the sender for 5 and 11 minutes, kills it mid-send and rebuilds the feed mid-burst. It must fail for a sender that sends nothing.</td><td>E-003</td></tr>
       </tbody>
     </table>
   </div>
@@ -190,8 +209,8 @@ details > .stack { gap: 10px; }
     <table>
       <thead><tr><th>ID</th><th>What must stay true</th><th>How it is enforced</th><th>Already shown in</th></tr></thead>
       <tbody>
-        <tr><td>G&#8209;006</td><td>Once level, search holds the current text of every message that is not deleted and nothing else, after an outage, repeats, late copies and a wipe; level within 30 s after a 10-minute outage.</td><td>A test with a troublemaker that repeats and delays deliveries; compare index with truth.</td><td>E-003</td></tr>
-        <tr><td>G&#8209;007</td><td>The feed equals a clean replay of the log after an outage, repeats, a restart and a wipe.</td><td>A test over generated sequences of changes with injected faults.</td><td>E-003</td></tr>
+        <tr><td>G&#8209;006<br><span class="chip you">key</span></td><td>Once level, search holds the current text of every message that is not deleted and nothing else, after an outage, repeats, late copies and a wipe; level within 30 s after a 10-minute outage.</td><td>A test with a troublemaker that repeats and delays deliveries; compare index with truth.</td><td>E-003</td></tr>
+        <tr><td>G&#8209;007<br><span class="chip you">key</span></td><td>The feed equals a clean replay of the log after an outage, repeats, a restart and a wipe.</td><td>A test over generated sequences of changes with injected faults.</td><td>E-003</td></tr>
         <tr><td>G&#8209;009</td><td>A change the feed cannot apply fences only the conversation or reader it touches; everything outside stays exact; more than five fences stop the feed.</td><td>A test that plants a fault on one edit and one dial change, then on every edit.</td><td>E-003</td></tr>
         <tr><td>G&#8209;014</td><td>A change a receiver refuses is parked after three tries, shown, and can be sent again; three different refusals in a row pause the worker.</td><td>A test that refuses one delete, then everything.</td><td>E-003</td></tr>
         <tr><td>G&#8209;020</td><td>The feed, search and the notification sender can each be rebuilt from nothing in under 2 minutes at the seeded team's size; Reset restores saved copies.</td><td>A test that wipes each receiver while the team is active, compares and times it.</td><td>E-003</td></tr>
@@ -210,7 +229,7 @@ details > .stack { gap: 10px; }
         <tr><td>G&#8209;024</td><td>Nothing is marked read on your behalf unless one of your screens reported the conversation open within the last 60 seconds.</td><td>A test with a controlled clock: a screen vanishes; a message a minute later is unread and notifies.</td><td>not yet</td></tr>
         <tr><td>G&#8209;012</td><td>A stopped or slow receiver delays no other: the feed stays within 2 s while search is stopped or slow, and with the feed stopped, sending, reading, unread marks and search work as before.</td><td>A measured test.</td><td>E-003</td></tr>
         <tr><td>G&#8209;013</td><td>When healthy, at 50 actions a second for a minute (about ten times the seeded team's pace), search and the feed reflect 19 changes in 20 within 2 s, and other screens show them within 1 s.</td><td>A measured test with the seeded team.</td><td>partly (small build)</td></tr>
-        <tr><td>G&#8209;015</td><td>A screen whose connection was cut, refused, lost single updates, or was away too long ends equal to a freshly loaded one; caught up within 2 s of reconnecting, a lost update fetched within 20 s.</td><td>A test in a real browser on the real web app.</td><td>E-005</td></tr>
+        <tr><td>G&#8209;015<br><span class="chip you">key</span></td><td>A screen whose connection was cut, refused, lost single updates, or was away too long ends equal to a freshly loaded one; caught up within 2 s of reconnecting, a lost update fetched within 20 s.</td><td>A test in a real browser on the real web app.</td><td>E-005</td></tr>
         <tr><td>G&#8209;019</td><td>Any surface more than 10 s behind says so: "Search is unavailable", "Catching up", "may be out of date", "Reconnecting".</td><td>A browser test at both widths: 5 s behind shows nothing, 15 s behind shows the notice.</td><td>not yet</td></tr>
       </tbody>
     </table>
@@ -238,7 +257,7 @@ details > .stack { gap: 10px; }
       <thead><tr><th>ID</th><th>What must stay true</th><th>How it is enforced</th><th>Status</th></tr></thead>
       <tbody>
         <tr><td>G&#8209;008</td><td>No part reads or writes another part's store; the feed holds nothing original.</td><td>Each part gets its own database login with rights to its own area only; plus a rule against importing another part's storage code.</td><td><span class="chip">pending</span></td></tr>
-        <tr><td>G&#8209;025</td><td>Nothing of one organization is ever shown to, sent to, or changed by another organization.</td><td>The database itself keeps organizations apart; plus a test with two organizations that share the same names and numbers, covering every door, the stand-ins, the notification app and the control panel.</td><td><span class="chip">pending</span></td></tr>
+        <tr><td>G&#8209;025<br><span class="chip you">key</span></td><td>Nothing of one organization is ever shown to, sent to, or changed by another organization.</td><td>The database itself keeps organizations apart; plus a test with two organizations that share the same names and numbers, covering every door, the stand-ins, the notification app and the control panel.</td><td><span class="chip">pending</span></td></tr>
         <tr><td>G&#8209;026</td><td>What happens in one organization does not delay another: a slow save, a burst, a long backlog, repeated refusals or a fenced feed in one leaves another's saves under 100 ms and its search and feed within 2 s.</td><td>A test with two organizations that must fail with one log for everybody, and with a worker that serves them in order of arrival.</td><td><span class="chip">pending</span></td></tr>
         <tr><td>G&#8209;023</td><td>Every call from one part to another gives up after at most 3 s and has a stated answer for failure.</td><td>One shared way of calling, with the limit built in; plus a test with a part that accepts a call and never answers.</td><td><span class="chip">pending</span></td></tr>
         <tr><td>G&#8209;021</td><td>Every contract names guardrails that exist, and every guardrail comes from an accepted decision.</td><td>The repository check; seen failing before the guardrails were registered.</td><td><span class="chip ok">enforced</span></td></tr>
