@@ -490,6 +490,9 @@ func TestAStoppedOrganizationIsDeliveredNothingMore(t *testing.T) {
 		if _, err := b.DB.Save(bg, "stopped"); err != nil {
 			t.Fatal(err)
 		}
+		if _, err := b.DB.SaveNote(bg, "stopped", "clock"); err != nil {
+			t.Fatal(err)
+		}
 		if _, err := b.DB.Save(bg, "running"); err != nil {
 			t.Fatal(err)
 		}
