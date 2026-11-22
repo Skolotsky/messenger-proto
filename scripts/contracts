@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Regenerate the TypeScript types from the schema; with --check, fail if they are out of date.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+[ -d contracts/node_modules ] || TOOL_DIR=contracts ./scripts/tool npm ci --silent
+TOOL_DIR=contracts ./scripts/tool node generate.mjs "$@"

@@ -1,0 +1,7 @@
+{
+  "name": "contexia-contracts",
+  "private": true,
+  "type": "module",
+  "scripts": { "generate": "node generate.mjs" },
+  "devDependencies": { "json-schema-to-typescript": "15.0.4" }
+}

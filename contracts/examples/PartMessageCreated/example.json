@@ -1,0 +1,31 @@
+{
+ "kind": "message.created",
+ "message": {
+  "id": "msg_7Q2",
+  "number": 4812,
+  "version": 1,
+  "conversation": "#launch",
+  "thread": null,
+  "author": "anna",
+  "author_is_agent": false,
+  "participants": null,
+  "text": "@Marco can you sign off the pricing page?",
+  "mentions": [
+   "marco"
+  ],
+  "level": "flag",
+  "reactions": [
+   {
+    "emoji": "eyes",
+    "people": [
+     "marco",
+     "lena"
+    ]
+   }
+  ],
+  "stopped": false,
+  "created_at": "2026-11-22T10:14:03.120Z",
+  "edited_at": null,
+  "deleted": false
+ }
+}

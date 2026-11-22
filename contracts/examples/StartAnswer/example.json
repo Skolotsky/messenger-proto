@@ -1,0 +1,38 @@
+{
+ "org": "acme",
+ "person": {
+  "id": "marco",
+  "name": "Marco Silva",
+  "is_agent": false,
+  "line": "Pricing and launch"
+ },
+ "people": [
+  {
+   "id": "marco",
+   "name": "Marco Silva",
+   "is_agent": false,
+   "line": "Pricing and launch"
+  }
+ ],
+ "preferences": [
+  {
+   "key": "send_key",
+   "value": "enter"
+  }
+ ],
+ "conversations": [
+  {
+   "conversation": "#launch",
+   "type": "channel",
+   "name": "launch",
+   "people": [
+    "marco",
+    "lena"
+   ],
+   "unread": true,
+   "dial": "default"
+  }
+ ],
+ "reset": 2,
+ "number": 4812
+}

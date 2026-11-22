@@ -1,0 +1,10 @@
+{
+ "kind": "focus_rule",
+ "id": "act_01JD3K7Q2",
+ "as": "marco",
+ "rule": {
+  "type": "person",
+  "value": "anna"
+ },
+ "on": true
+}

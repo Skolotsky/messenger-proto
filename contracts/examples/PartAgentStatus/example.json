@@ -1,0 +1,6 @@
+{
+ "kind": "agent.status",
+ "agent": "release-agent",
+ "state": "working",
+ "on": "marco"
+}

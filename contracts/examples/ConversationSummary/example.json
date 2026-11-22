@@ -1,0 +1,11 @@
+{
+ "conversation": "#launch",
+ "type": "channel",
+ "name": "launch",
+ "people": [
+  "marco",
+  "lena"
+ ],
+ "unread": true,
+ "dial": "default"
+}

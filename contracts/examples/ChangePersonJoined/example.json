@@ -1,0 +1,10 @@
+{
+ "kind": "person.joined",
+ "org": "acme",
+ "number": 4812,
+ "previous": 4811,
+ "at": "2026-11-22T10:14:03.120Z",
+ "person": "marco",
+ "name": "Marco Silva",
+ "is_agent": false
+}

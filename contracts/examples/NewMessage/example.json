@@ -1,0 +1,10 @@
+{
+ "id": "msg_7Q2",
+ "conversation": "#launch",
+ "thread": "msg_4C1",
+ "text": "@Marco can you sign off the pricing page?",
+ "mentions": [
+  "marco"
+ ],
+ "level": "flag"
+}

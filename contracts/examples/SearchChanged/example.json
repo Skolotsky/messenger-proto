@@ -1,0 +1,19 @@
+{
+ "kind": "message.changed",
+ "org": "acme",
+ "number": 4812,
+ "message": {
+  "id": "msg_7Q2",
+  "version": 1,
+  "conversation": "#launch",
+  "thread": "msg_4C1",
+  "edited": false,
+  "participants": null,
+  "author": "anna",
+  "text": "@Marco can you sign off the pricing page?",
+  "mentions": [
+   "marco"
+  ],
+  "level": "flag"
+ }
+}

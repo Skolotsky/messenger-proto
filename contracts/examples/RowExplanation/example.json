@@ -1,0 +1,11 @@
+{
+ "what": "Asks Marco to sign off",
+ "decided_by": "Anna is in your Focus people",
+ "otherwise": "It would be in Needs you",
+ "change": {
+  "label": "Move Anna out of Focus",
+  "action": "focus_person",
+  "value": "enter",
+  "moved_last_7_days": 2
+ }
+}

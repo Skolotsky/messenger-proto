@@ -1,0 +1,9 @@
+{
+ "kind": "person.added",
+ "person_view": {
+  "id": "marco",
+  "name": "Marco Silva",
+  "is_agent": false,
+  "line": "Pricing and launch"
+ }
+}

@@ -1,0 +1,10 @@
+{
+ "kind": "add_people",
+ "id": "act_01JD3K7Q2",
+ "as": "marco",
+ "conversation": "#launch",
+ "people": [
+  "marco",
+  "lena"
+ ]
+}

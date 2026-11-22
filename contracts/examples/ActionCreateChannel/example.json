@@ -1,0 +1,10 @@
+{
+ "kind": "create_channel",
+ "id": "act_01JD3K7Q2",
+ "as": "marco",
+ "name": "launch",
+ "people": [
+  "marco",
+  "lena"
+ ]
+}

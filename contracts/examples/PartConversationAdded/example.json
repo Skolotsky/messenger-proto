@@ -1,0 +1,14 @@
+{
+ "kind": "conversation.added",
+ "conversation_summary": {
+  "conversation": "#launch",
+  "type": "channel",
+  "name": "launch",
+  "people": [
+   "marco",
+   "lena"
+  ],
+  "unread": true,
+  "dial": "default"
+ }
+}

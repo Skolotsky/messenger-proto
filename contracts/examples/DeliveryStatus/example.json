@@ -1,0 +1,11 @@
+{
+ "receivers": [
+  {
+   "name": "search",
+   "place": 2,
+   "waiting": 2,
+   "state": "running",
+   "parked": 2
+  }
+ ]
+}

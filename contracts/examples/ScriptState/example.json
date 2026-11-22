@@ -1,0 +1,25 @@
+{
+ "running": true,
+ "pace": 1,
+ "happened": [
+  {
+   "at": "2026-11-22T10:14:03.120Z",
+   "who": "anna",
+   "what": "Asks Marco to sign off"
+  }
+ ],
+ "next": [
+  {
+   "at": "2026-11-22T10:14:03.120Z",
+   "who": "anna",
+   "what": "Asks Marco to sign off"
+  }
+ ],
+ "situations": [
+  {
+   "id": "act_01JD3K7Q2",
+   "title": "The launch sign-off",
+   "outcome": "A flagged row in Focus for Marco"
+  }
+ ]
+}

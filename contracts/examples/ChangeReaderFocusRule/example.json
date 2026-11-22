@@ -1,0 +1,13 @@
+{
+ "kind": "reader.focus_rule",
+ "org": "acme",
+ "number": 4812,
+ "previous": 4811,
+ "at": "2026-11-22T10:14:03.120Z",
+ "person": "marco",
+ "rule": {
+  "type": "person",
+  "value": "anna"
+ },
+ "on": true
+}

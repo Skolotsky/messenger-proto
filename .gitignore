@@ -30,3 +30,6 @@ experiments/*/.ctl
 
 # Tool caches (Go and Node run in Docker)
 .cache/
+
+# Node dependencies
+node_modules/

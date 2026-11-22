@@ -1,0 +1,9 @@
+{
+ "kind": "reader.focus_auto_add",
+ "org": "acme",
+ "number": 4812,
+ "previous": 4811,
+ "at": "2026-11-22T10:14:03.120Z",
+ "person": "marco",
+ "on": true
+}

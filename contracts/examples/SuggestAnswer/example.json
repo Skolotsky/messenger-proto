@@ -1,0 +1,14 @@
+{
+ "people": [
+  {
+   "id": "marco",
+   "name": "Marco Silva",
+   "is_agent": false,
+   "line": "Pricing and launch"
+  }
+ ],
+ "channels": [
+  "launch",
+  "general"
+ ]
+}

@@ -1,0 +1,14 @@
+{
+ "notifications": [
+  {
+   "name": "launch",
+   "person": "marco",
+   "state": "held",
+   "at": "2026-11-22T10:14:03.120Z",
+   "delayed": false,
+   "why": "Anna mentioned you",
+   "text": "@Marco can you sign off the pricing page?",
+   "now": "now"
+  }
+ ]
+}

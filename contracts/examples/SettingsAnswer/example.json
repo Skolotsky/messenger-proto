@@ -1,0 +1,28 @@
+{
+ "focus_people": [
+  {
+   "person": "marco",
+   "items_last_7_days": 2
+  }
+ ],
+ "removed_people": [
+  "marco",
+  "lena"
+ ],
+ "auto_add": false,
+ "focus_only": false,
+ "release_on_act": false,
+ "rules": [
+  {
+   "type": "person",
+   "value": "anna"
+  }
+ ],
+ "levels": [
+  {
+   "conversation": "#launch",
+   "thread": "msg_4C1",
+   "level": "default"
+  }
+ ]
+}

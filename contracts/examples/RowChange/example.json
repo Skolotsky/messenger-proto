@@ -1,0 +1,6 @@
+{
+ "label": "Move Anna out of Focus",
+ "action": "focus_person",
+ "value": "enter",
+ "moved_last_7_days": 2
+}

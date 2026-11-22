@@ -1,0 +1,8 @@
+{
+ "kind": "people.added",
+ "conversation": "#launch",
+ "people": [
+  "marco",
+  "lena"
+ ]
+}

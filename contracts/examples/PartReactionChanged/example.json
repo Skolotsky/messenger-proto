@@ -1,0 +1,15 @@
+{
+ "kind": "reaction.changed",
+ "message": "msg_7Q2",
+ "conversation": "#launch",
+ "thread": "msg_4C1",
+ "reactions": [
+  {
+   "emoji": "eyes",
+   "people": [
+    "marco",
+    "lena"
+   ]
+  }
+ ]
+}

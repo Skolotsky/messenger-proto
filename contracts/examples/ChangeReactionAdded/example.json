@@ -1,0 +1,12 @@
+{
+ "kind": "reaction.added",
+ "org": "acme",
+ "number": 4812,
+ "previous": 4811,
+ "at": "2026-11-22T10:14:03.120Z",
+ "person": "marco",
+ "emoji": "eyes",
+ "message": "msg_7Q2",
+ "conversation": "#launch",
+ "thread": "msg_4C1"
+}

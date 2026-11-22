@@ -1,0 +1,50 @@
+{
+ "updates": [
+  {
+   "number": 4812,
+   "person": "marco",
+   "after": 4811,
+   "parts": [
+    {
+     "kind": "row.changed",
+     "row": {
+      "conversation": "#launch",
+      "thread": "msg_4C1",
+      "bucket": "needs_you",
+      "unread": true,
+      "kept": "flag",
+      "why": "Anna mentioned you",
+      "newest": 4812,
+      "author": "anna",
+      "preview": "@Marco can you sign off the pricing page?",
+      "at": "2026-11-22T10:14:03.120Z",
+      "new_items": 3,
+      "reactions": [
+       {
+        "emoji": "eyes",
+        "people": [
+         "marco",
+         "lena"
+        ]
+       }
+      ],
+      "state": "none",
+      "fenced": false,
+      "explanation": {
+       "what": "Asks Marco to sign off",
+       "decided_by": "Anna is in your Focus people",
+       "otherwise": "It would be in Needs you",
+       "change": {
+        "label": "Move Anna out of Focus",
+        "action": "focus_person",
+        "value": "enter",
+        "moved_last_7_days": 2
+       }
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "next": 2
+}
