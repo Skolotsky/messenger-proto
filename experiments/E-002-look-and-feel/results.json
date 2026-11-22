@@ -4289,5 +4289,89 @@
   "check": "no script errors on either page",
   "pass": true,
   "detail": "[]"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "by default the theme is System and matches a dark device",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "on System it follows the device live, without a reload",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the switcher is one click away in the person's menu",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Dark wins over a light device",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the menu opened from the sidebar follows the theme",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the choice is remembered after a reload",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the theme is applied before the styles, so nothing flashes",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "the pages outside the product use the same theme",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "Appearance in settings offers System, Light and Dark",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "back to System forgets the override",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "text meets 4.5:1 contrast in light",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "page": "slack-like",
+  "width": "desktop",
+  "check": "text meets 4.5:1 contrast in dark",
+  "pass": true,
+  "detail": "[]"
  }
 ]

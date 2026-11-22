@@ -5,9 +5,9 @@
 .sk .ws{padding:14px 16px 10px;display:flex;flex-direction:column;color:#fff}
 .sk .ws small{color:var(--muted);font-size:12px}
 .sk .side .search{margin:0 12px 8px;border-color:transparent;background:#16211f}
-.sk .side .sr{--panel:#fff;--text:#1c1d1f;--muted:#62666d;--line:#e3e3df;--hover:#f1f1ee;color:#1c1d1f;width:340px}
+.sk .side .sr{--panel:var(--m-panel);--panel2:var(--m-panel2);--text:var(--m-text);--muted:var(--m-muted);--line:var(--m-line);--hover:var(--m-hover);color:var(--m-text);width:340px}
 .sk .side-item{display:flex;align-items:center;gap:8px;padding:7px 16px;color:#fff}
-.sk .side-item.on{background:var(--accent);color:#fff}
+.sk .side-item.on{background:#0f6e64;color:#fff}
 .sk .side-item .badge{margin-left:auto}
 .sk .side-scroll{flex:1;overflow-y:auto;padding-bottom:20px}
 .sk .chat.on{background:var(--side-hover)}

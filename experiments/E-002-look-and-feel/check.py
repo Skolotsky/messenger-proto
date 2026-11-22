@@ -385,7 +385,7 @@ def chrome(browser, slug, size, vp, scale):
     def vis(sel): return pg.locator(sel).locator("visible=true")
     vis('[data-act="modal"][data-m="rules"]').first.click()
     body = lambda: pg.locator(".settings .set-body").inner_text().lower()
-    ok("settings is one screen, opened on Activity feed when reached from the feed", pg.locator(".settings .set-item").count() == 6 and pg.locator(".settings .set-item.on").inner_text() == "Activity feed")
+    ok("settings is one screen, opened on Activity feed when reached from the feed", pg.locator(".settings .set-item").count() == 7 and pg.locator(".settings .set-item.on").inner_text() == "Activity feed")
     ok("the Activity feed page keeps the general rules and links to the lists", pg.locator(".settings .set-sw").count() == 4 and "people · 5" in body() and "channel levels · 3 changed" in body())
     ok("threads are not a list in settings; the page says where they are managed", pg.locator('.settings [data-s="threads"]').count() == 0 and "on the thread itself" in body())
     pg.screenshot(path=str(shots / f"{slug}-{size}-24-settings.jpg"), type="jpeg", quality=80)
@@ -651,6 +651,50 @@ def rest(browser, slug, size, vp, scale):
     ok("adding one makes it a rule", pg.locator(".suggest").count() == 0 and "Nothing new in Focus" in pg.locator(".bucket.b-focus").inner_text())
     ctx.close()
 
+def themes(browser):
+    """System by default, Light and Dark by choice, remembered, no flash, readable in both (user, 2026-11-22)."""
+    def ok(name, cond, detail=""):
+        results.append({"page": "slack-like", "width": "desktop", "check": name, "pass": bool(cond), "detail": str(detail)})
+        if not cond: failures.append(f"theme: {name} {detail}")
+    ctx = browser.new_context(viewport={"width": 1280, "height": 800}, color_scheme="dark"); pg = ctx.new_page()
+    U = f"file://{here.resolve()}/slack-like.html"; pg.goto(U)
+    bg = lambda: pg.evaluate("getComputedStyle(document.body).backgroundColor")
+    D, L = "rgb(23, 24, 26)", "rgb(255, 255, 255)"
+    ok("by default the theme is System and matches a dark device", bg() == D and pg.evaluate("Theme.pref()") == "system" and pg.get_attribute('meta[name="theme-color"]', "content") == "#17181a")
+    pg.emulate_media(color_scheme="light"); pg.wait_for_timeout(50)
+    ok("on System it follows the device live, without a reload", bg() == L and pg.get_attribute('meta[name="theme-color"]', "content") == "#ffffff")
+    pg.locator(".me-btn").click()
+    ok("the switcher is one click away in the person's menu", pg.locator('.me-pop .seg-ctl button').count() == 3)
+    pg.locator('.me-pop [data-t="dark"]').click()
+    ok("Dark wins over a light device", bg() == D)
+    ok("the menu opened from the sidebar follows the theme", pg.evaluate("getComputedStyle(document.querySelector('.me-pop')).backgroundColor") == "rgb(29, 31, 34)")
+    pg.screenshot(path=str(shots / "theme-menu-dark.jpg"), type="jpeg", quality=85, clip={"x": 0, "y": 430, "width": 340, "height": 370})
+    pg.reload()
+    ok("the choice is remembered after a reload", bg() == D and pg.evaluate("Theme.pref()") == "dark")
+    html = pg.content()
+    ok("the theme is applied before the styles, so nothing flashes", html.index("contexia-theme") < html.index("<style>"))
+    pg.goto(f"file://{here.resolve()}/control-panel.html")
+    ok("the pages outside the product use the same theme", pg.evaluate("document.documentElement.dataset.theme") == "dark")
+    pg.goto(U); pg.locator('.top [data-m="rules"]').click(); pg.locator('.settings .set-nav [data-s="look"]').click()
+    ok("Appearance in settings offers System, Light and Dark", pg.locator(".settings .n-opt").count() == 3 and pg.locator(".settings .n-opt.on b").inner_text() == "Dark")
+    pg.screenshot(path=str(shots / "theme-settings-dark.jpg"), type="jpeg", quality=80)
+    pg.locator('.settings [data-t="system"]').click()
+    ok("back to System forgets the override", pg.evaluate("Theme.pref()") == "system" and pg.evaluate("document.documentElement.dataset.theme === undefined") and bg() == L)
+    PAIRS = [("--text", "--bg"), ("--text", "--panel"), ("--text", "--panel2"), ("--muted", "--bg"), ("--muted", "--panel"), ("--muted", "--panel2"), ("--on-accent", "--accent"), ("--accent", "--panel"), ("--focus", "--bg"), ("--focus", "--panel2"), ("--needs", "--bg"), ("--needs", "--panel2"), ("--flag", "--flag-soft"), ("--info", "--info-soft")]
+    def lum(h):
+        h = h.strip().lstrip("#"); h = "".join(x * 2 for x in h) if len(h) == 3 else h
+        v = [int(h[i:i + 2], 16) / 255 for i in (0, 2, 4)]; r, g, b_ = [x / 12.92 if x <= .03928 else ((x + .055) / 1.055) ** 2.4 for x in v]
+        return .2126 * r + .7152 * g + .0722 * b_
+    for t in ["light", "dark"]:
+        pg.evaluate("t => Theme.set(t)", t)
+        low = []
+        for fg, bk in PAIRS:
+            a_, b_ = pg.evaluate("([f, b]) => { const c = getComputedStyle(document.documentElement); return [c.getPropertyValue(f), c.getPropertyValue(b)]; }", [fg, bk])
+            x, y = sorted([lum(a_), lum(b_)], reverse=True); r = (x + .05) / (y + .05)
+            if r < 4.5: low.append(f"{fg} on {bk} {r:.2f}")
+        ok(f"text meets 4.5:1 contrast in {t}", not low, low)
+    ctx.close()
+
 def hist_unread(browser, slug, size, vp, scale):
     """History tabs carry an unread count, and unread entries a mark; opening one clears both (user, 2026-11-22)."""
     ctx = browser.new_context(viewport=vp, device_scale_factor=scale, has_touch=size == "phone")
@@ -687,6 +731,7 @@ with sync_playwright() as p:
             except Exception as e:
                 failures.append(f"{slug} @ {size}: stopped: {str(e).splitlines()[0][:300]}")
     extras(b)
+    themes(b)
     b.close()
 (here / "results.json").write_text(json.dumps(results, indent=1, ensure_ascii=False) + "\n")
 passed = sum(r["pass"] for r in results)

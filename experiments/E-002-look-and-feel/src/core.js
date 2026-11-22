@@ -219,6 +219,8 @@ const EMOJI = { // the full picker: a name on each, so the search box can find i
   'Work': '❌:cross no,⚠️:warning,❓:question,❗:exclamation important,🚀:rocket ship launch,💡:idea bulb,📌:pin,📎:paperclip attach,📅:calendar date,⏳:hourglass waiting,🐛:bug,🔧:wrench fix,🔒:lock,📈:chart up,📉:chart down,💬:speech comment',
   'Things': '⭐:star,🌟:glowing star,💯:hundred,🏆:trophy win,☕:coffee,🍕:pizza,🎂:cake birthday,🌱:seedling,🌧️:rain,☀️:sun'
 };
+const THEMES = { system: 'System', light: 'Light', dark: 'Dark' };
+const themeSeg = () => `<div class="seg-ctl" role="radiogroup" aria-label="Theme">${Object.keys(THEMES).map(t => `<button role="radio" aria-checked="${window.Theme.pref() === t}" class="${window.Theme.pref() === t ? 'on' : ''}" data-act="theme" data-t="${t}">${THEMES[t]}</button>`).join('')}</div>`;
 function pickerHTML() {
   const pk = S.pick; if (!pk) return '';
   const m = S.msgs[pk.m], x = Math.max(8, Math.min(pk.x - 150, innerWidth - 316)), y = Math.max(8, Math.min(pk.y + 10, innerHeight - 372));
@@ -447,7 +449,9 @@ function modalHTML() {
     const chans = `${back}<p class="set-q">How much of each channel reaches your feed?</p><p class="sheet-note">Every channel has one level. You can also change it from the channel itself. A mention or a flag that names you gets through at every level.</p><div class="lv-legend">${Object.keys(DIAL).map(l => `<div><b>${DIAL[l][0]}</b><span>${DIAL[l][1]}</span></div>`).join('')}</div>${chd.length ? `<h3>Changed by you · ${chd.length}</h3>${chd.map(chRow).join('')}` : ''}<h3>At Default · ${dfl.length}</h3>${dfl.map(chRow).join('')}`;
     const eOpt = (v, t, d) => { const on = (S.enterSends ? 'send' : 'newline') === v; return `<button class="n-opt${on ? ' on' : ''}" data-act="enterMode" data-v="${v}" role="radio" aria-checked="${on}"><span class="n-radio"></span><span class="n-text"><b>${t}</b><small>${d}</small></span></button>`; };
     const writing = `<p class="set-q">While writing or editing a message, what does Enter do?</p><div role="radiogroup" class="n-group">${eOpt('newline', 'Enter starts a new line', 'Ctrl+Enter sends the message, or saves the edit.')}${eOpt('send', 'Enter sends', 'Shift+Enter starts a new line.')}</div><p class="sheet-note">Esc leaves an edit without saving. On a phone the keyboard's Enter always starts a new line; the Send button sends.</p>`;
-    const secs = { account: ['Account', acct], writing: ['Writing messages', writing], feed: ['Activity feed', feedPart], people: ['Focus people', people, 1], channels: ['Channel levels', chans, 1], notif: ['Notifications', notif] };
+    const tOpt = (v, t, d) => { const on = window.Theme.pref() === v; return `<button class="n-opt${on ? ' on' : ''}" data-act="theme" data-t="${v}" role="radio" aria-checked="${on}"><span class="n-radio"></span><span class="n-text"><b>${t}</b><small>${d}</small></span></button>`; };
+    const look = `<p class="set-q">Which theme?</p><div role="radiogroup" class="n-group">${tOpt('system', 'System', `Follows your device and changes with it. It is ${window.Theme.resolved()} now.`)}${tOpt('light', 'Light', 'Always light.')}${tOpt('dark', 'Dark', 'Always dark.')}</div><p class="sheet-note">Remembered on this device, so a phone and a laptop can differ.</p>`;
+    const secs = { account: ['Account', acct], look: ['Appearance', look], writing: ['Writing messages', writing], feed: ['Activity feed', feedPart], people: ['Focus people', people, 1], channels: ['Channel levels', chans, 1], notif: ['Notifications', notif] };
     return `<div class="scrim center" data-act="closeModal"><div class="sheet settings" role="dialog" aria-modal="true" aria-label="Settings" data-stop="1"><button class="icon-btn close" data-act="closeModal" aria-label="Close">×</button><nav class="set-nav"><h2>Settings</h2>${Object.keys(secs).map(k => `<button class="set-item${secs[k][2] ? ' sub' : ''}${k === cur ? ' on' : ''}${k === 'feed' && secs[cur][2] ? ' parent' : ''}" data-act="setSec" data-s="${k}">${secs[k][0]}</button>`).join('')}</nav><div class="set-body"><h2>${secs[cur][0]}</h2>${secs[cur][1]}</div></div></div>`;
   }
   if (m.type === 'newch') {
@@ -469,7 +473,7 @@ function demoHTML() {
   const panel = S.demo ? `<div class="demo" data-stop="1"><h2>Demo controls</h2><p>Not part of the product. They stand in for the team acting while you watch.</p>
     ${b('playEdit', 'Tomás edits his message, longer')}${b('playDelete', 'Jonas deletes his message')}${b('playNew', 'Three new things arrive')}${b('leave', 'Leave the feed and come back')}<h2>More to see</h2>${b('playAgent', 'An agent writes an answer, live')}${b('playNoRules', 'Focus with no rules at all')}<h2>When things go wrong</h2>${b('netToggle', S.net === 'off' ? 'Connection returns' : 'Connection drops')}${b('failToggle', S.failNext ? 'Sending works again' : 'The next message fails to send')}${b('lagToggle', S.searchLag ? 'Search catches up' : 'Search falls behind')}<button class="btn sm" data-act="modal" data-m="tray">Open the notification app (outside the product)</button>${b('reset', 'Reset')}
     <p class="demo-note">${esc(S.note) || 'Tomás and Jonas are in Needs you.'}</p>
-    <div class="demo-row">Theme ${['auto', 'light', 'dark'].map(t => `<button class="btn sm${(document.documentElement.dataset.theme || 'auto') === t ? ' on' : ''}" data-act="theme" data-t="${t}">${t}</button>`).join('')}</div>
+    
     <div class="demo-row">Version ${Object.keys(OTHER).map(k => k === Skin.file ? `<b>${OTHER[k]}</b>` : `<a href="${k}.html">${OTHER[k]}</a>`).join(' · ')}</div></div>` : '';
   return `<button class="demo-btn" data-act="demo" aria-expanded="${S.demo}">Demo</button>${panel}`;
 }
@@ -481,7 +485,7 @@ const h = {
   search() { return `<div class="search">${ic('search')}<input type="search" data-search="1" aria-label="Search messages" placeholder="Search messages" value="${esc(S.q)}"><div class="sr" id="sr"></div></div>`; },
 me() { // the person's own menu; switching account is a second level of it
     const open = S.menu === 'me', who = S.viewAs || ME, label = who === ME ? S.myTitle : P[who][1];
-    const main = `<button class="opt" data-act="modal" data-m="rules" data-s="account"><b>Settings</b><span>Account, writing, activity feed, notifications</span></button><button class="opt" data-act="modal" data-m="rules" data-s="feed"><b>Activity feed settings</b><span>Focus people and rules</span></button><button class="opt nextlvl" data-act="meSub"><b>Switch account</b><span>View the team as someone else</span>${ic('chev')}</button>`;
+    const main = `<button class="opt" data-act="modal" data-m="rules" data-s="account"><b>Settings</b><span>Account, writing, activity feed, notifications</span></button><button class="opt" data-act="modal" data-m="rules" data-s="feed"><b>Activity feed settings</b><span>Focus people and rules</span></button><div class="theme-row"><span>Theme</span>${themeSeg()}</div><button class="opt nextlvl" data-act="meSub"><b>Switch account</b><span>View the team as someone else</span>${ic('chev')}</button>`;
     const sub = `<button class="opt backlvl" data-act="meSub">${ic('back')}<b>Switch account</b><span class="demo-tag">demonstration</span></button>${['maya', 'anna', 'tomas', 'sam'].map(x => `<button class="opt who${x === who ? ' on' : ''}" data-act="${x === who ? 'menu' : 'modal'}" data-key="me" data-m="switch" data-p="${x}">${av(x, 'xs')}<b>${pn(x)}</b></button>`).join('')}<div class="pop-f">There is no sign-in in the first version, so accounts are switched here and there is no Sign out.</div>`;
     return `<div class="me"><button class="me-btn" data-act="menu" data-key="me" aria-expanded="${open}" aria-label="Your account menu">${av(who)}<span><b>${pn(who)}</b><small>${esc(label)}</small></span>${ic('chev')}</button>${open ? `<div class="pop me-pop">${S.meSub ? sub : main}</div>` : ''}</div>`; },
   whoLine() { const w = S.viewAs || ME; return esc(pn(w) + ' · ' + (w === ME ? S.myTitle : P[w][1])); },
@@ -649,7 +653,7 @@ const A = {
   },
   leave() { settle(); S.note = 'You left and came back: read rows are in History, kept rows are under Kept, rule and dial changes are applied.'; },
   reset() { const t = S.demo, w = S.w, es = S.enterSends, ad = S.autoDone; S.newCh.forEach(n => { const i = CH.findIndex(x => x[0] === n); if (i >= 0) CH.splice(i, 1); }); S = seed(); S.demo = t; S.w = w; S.enterSends = es; S.autoDone = ad; },
-  theme(d) { if (d.t === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = d.t; }
+  theme(d) { window.Theme.set(d.t); return true; },
 };
 function submit(f) {
   const text = f.elements.t.value.trim(); if (!text) return;
@@ -764,6 +768,7 @@ document.addEventListener('mouseover', e => {
   tipT = setTimeout(() => { if (!document.contains(h)) return; t.textContent = h.dataset.tip; t.classList.add('on'); const b = h.getBoundingClientRect(), w = t.offsetWidth, ht = t.offsetHeight; t.style.left = Math.max(6, Math.min(innerWidth - w - 6, b.left + b.width / 2 - w / 2)) + 'px'; t.style.top = (b.top - ht - 8 < 4 ? b.bottom + 8 : b.top - ht - 8) + 'px'; }, 350);
 });
 document.addEventListener('pointerdown', () => { clearTimeout(tipT); tipEl().classList.remove('on'); });
+window.addEventListener('themechange', () => { if (S.modal || S.menu === 'me') render(); });
 window.E002 = { state: () => S };
 render();
 })();

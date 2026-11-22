@@ -344,7 +344,7 @@ button.rx:hover{border-color:var(--accent)}
 .me-btn>span:not(.av){display:flex;flex-direction:column;flex:1;min-width:0;line-height:1.2}
 .me-btn>.av{flex:none;width:32px;height:32px}
 .me-btn small{color:var(--muted);font-size:12px}
-.me-pop{top:auto;bottom:calc(100% + 4px);left:8px;--panel:#fff;--text:#1c1d1f;--muted:#62666d;--line:#e3e3df;--hover:#f1f1ee;color:#1c1d1f}
+.me-pop{top:auto;bottom:calc(100% + 4px);left:8px}
 .act-close{font-size:22px}
 @media (max-width:760px){
   .sheet.settings{width:100%;height:100dvh;max-height:none;border-radius:0;grid-template-columns:1fr;grid-template-rows:auto 1fr}
@@ -576,3 +576,14 @@ body.resizing{cursor:col-resize;user-select:none}
 .opt .av{color:#fff;font-size:10px}
 .opt .demo-tag{color:#ffd479;font-size:10px;margin-left:auto}
 @media (max-width:760px){.viewband .demo-tag{display:none}}
+/* theme: menus opened from the always-dark sidebar follow the page theme, not the sidebar */
+:root{--m-panel:#fff;--m-panel2:#f5f5f3;--m-text:#1c1d1f;--m-muted:#62666d;--m-line:#e3e3df;--m-hover:#f1f1ee}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--m-panel:#1d1f22;--m-panel2:#24262a;--m-text:#e9e9e6;--m-muted:#a0a4ab;--m-line:#33363b;--m-hover:#2a2d31}}
+:root[data-theme="dark"]{--m-panel:#1d1f22;--m-panel2:#24262a;--m-text:#e9e9e6;--m-muted:#a0a4ab;--m-line:#33363b;--m-hover:#2a2d31}
+.me-pop{--panel:var(--m-panel);--panel2:var(--m-panel2);--text:var(--m-text);--muted:var(--m-muted);--line:var(--m-line);--hover:var(--m-hover);color:var(--m-text)}
+.theme-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;font-weight:600}
+.seg-ctl{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.seg-ctl button{padding:3px 10px;font-size:13px;font-weight:400;color:var(--muted)}
+.seg-ctl button+button{border-left:1px solid var(--line)}
+.seg-ctl button:hover{background:var(--hover)}
+.seg-ctl button.on{background:var(--accent);color:var(--on-accent);font-weight:600}
