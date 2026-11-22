@@ -1,28 +1,38 @@
 {
  "focus_people": [
   {
-   "person": "marco",
-   "items_last_7_days": 2
+   "person": "anna",
+   "items_last_7_days": 6
   }
  ],
  "removed_people": [
-  "marco",
-  "lena"
+  "ship"
  ],
  "auto_add": false,
  "focus_only": false,
  "release_on_act": false,
  "rules": [
   {
-   "type": "person",
-   "value": "anna"
+   "type": "item_kind",
+   "value": "flags"
+  }
+ ],
+ "removed_rules": [
+  {
+   "type": "conversation",
+   "value": "#incidents"
   }
  ],
  "levels": [
   {
    "conversation": "#launch",
-   "thread": "msg_4C1",
-   "level": "default"
+   "thread": null,
+   "level": "all"
+  },
+  {
+   "conversation": "#launch",
+   "thread": "msg_7Q2",
+   "level": "needs_you"
   }
  ]
 }

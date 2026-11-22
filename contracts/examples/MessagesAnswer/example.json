@@ -1,4 +1,5 @@
 {
+ "number": 4812,
  "messages": [
   {
    "message": {
@@ -38,6 +39,16 @@
     ],
     "unread": true
    }
+  }
+ ],
+ "in_progress": [
+  {
+   "message": "msg_7Q2",
+   "conversation": "#launch",
+   "thread": "msg_4C1",
+   "author": "anna",
+   "at": 34,
+   "text": "@Marco can you sign off the pricing page?"
   }
  ],
  "read_up_to": 2,

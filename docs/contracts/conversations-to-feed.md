@@ -17,6 +17,7 @@ Every change, in log order, with no number skipped. Each carries `org`, `number`
 | `message.created`, `message.changed` | the whole finished message (`README.md`). A reply closed as stopped is a `message.created` with `stopped: true` and no mentions (D-031): a For your information row for the people in its thread (or the other person of a direct conversation), at any dial except Off, overriding the dial's bucket, and it never notifies (D-032) |
 | `message.deleted` | `message: { id, version, conversation, thread }` |
 | `reply.started` | `message, conversation, thread, author`. No text. The feed counts it and does nothing |
+| `reply.abandoned` | `message, conversation, thread`. A reply closed with no saved text: no message follows |
 | `reaction.added`, `reaction.removed` | `person, emoji, message, conversation, thread`. Does not change the message's version |
 | `person.joined` | `person, name, is_agent` |
 | `channel.created` | `conversation, name, people` |
@@ -44,7 +45,7 @@ POST /changes
 
 POST /changes/batch   { "changes": [ …up to 100 of the above, of one organization, in order… ] }      for a backlog
 
-answers: 200 applied · 200 already had it · 200 { "fenced": true } taken and set aside · 409 { "i_am_at": 4811 } · 423 { "organization_stopped": "acme" } · anything else, or 3 s of silence: down (for every organization)
+answers: 200 applied · 200 already had it · 200 { "applied": true, "fenced": true } taken and set aside · 409 { "i_am_at": 4811 } · 423 { "organization_stopped": "acme" } · anything else, or 3 s of silence: down (for every organization)
 Applying a batch stops at the first change that is not answered 200, and answers with that one.
 ```
 

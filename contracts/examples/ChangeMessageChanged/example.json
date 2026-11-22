@@ -1,21 +1,23 @@
 {
  "kind": "message.changed",
  "org": "acme",
- "number": 4812,
- "previous": 4811,
+ "reset": 2,
+ "number": 4830,
+ "previous": 4829,
  "at": "2026-11-22T10:14:03.120Z",
  "message": {
   "id": "msg_7Q2",
   "number": 4812,
-  "version": 1,
+  "version": 2,
   "conversation": "#launch",
   "thread": null,
   "author": "anna",
   "author_is_agent": false,
   "participants": null,
-  "text": "@Marco can you sign off the pricing page?",
+  "text": "@Marco @Lena can you sign off the pricing page?",
   "mentions": [
-   "marco"
+   "marco",
+   "lena"
   ],
   "level": "flag",
   "reactions": [
@@ -29,7 +31,7 @@
   ],
   "stopped": false,
   "created_at": "2026-11-22T10:14:03.120Z",
-  "edited_at": null,
+  "edited_at": "2026-11-22T10:20:41.000Z",
   "deleted": false
  }
 }

@@ -1,0 +1,18 @@
+{
+ "id": "msg_7Q2",
+ "number": 4812,
+ "version": 3,
+ "conversation": "#launch",
+ "thread": null,
+ "author": "anna",
+ "author_is_agent": false,
+ "participants": null,
+ "text": "",
+ "mentions": [],
+ "level": "flag",
+ "reactions": [],
+ "stopped": false,
+ "created_at": "2026-11-22T10:14:03.120Z",
+ "edited_at": "2026-11-22T10:20:41.000Z",
+ "deleted": true
+}

@@ -1,12 +1,15 @@
 {
  "kind": "message.created",
  "org": "acme",
+ "reset": 2,
  "number": 4812,
  "message": {
   "id": "msg_7Q2",
+  "number": 4812,
+  "created_at": "2026-11-22T10:14:03.120Z",
   "version": 1,
   "conversation": "#launch",
-  "thread": "msg_4C1",
+  "thread": null,
   "edited": false,
   "participants": null,
   "author": "anna",

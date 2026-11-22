@@ -1,7 +1,7 @@
 // Generated from contracts/schema/contexia.json. Do not edit: run ./scripts/contracts
 
 /**
- * From and to, in Unicode code points.
+ * From (inclusive) and to (exclusive), in Unicode code points.
  *
  * @minItems 2
  *
@@ -23,12 +23,37 @@ export type Bucket = "focus" | "needs_you" | "fyi";
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "DialLevel".
  */
-export type DialLevel = "focus" | "all" | "default" | "muted" | "needs_you" | "fyi" | "off";
+export type DialLevel = "focus" | "all" | "default" | "muted" | "needs_you" | "fyi" | "off" | "auto";
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "ChannelDial".
+ */
+export type ChannelDial = "focus" | "all" | "default" | "muted";
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "ItemKind".
+ */
+export type ItemKind = "flags" | "mentions" | "direct_messages";
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "Stream".
+ */
+export type Stream = "conversations" | "feed";
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "NoteNow".
+ */
+export type NoteNow = "read" | "deleted";
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "WithdrawReason".
+ */
+export type WithdrawReason = "read" | "deleted" | "fenced" | "rule_changed";
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "RuleType".
  */
-export type RuleType = "person" | "conversation" | "thread" | "item_kind" | "text";
+export type RuleType = "person" | "conversation" | "item_kind" | "text";
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "KeptBy".
@@ -81,6 +106,27 @@ export type AgentState = "working" | "waiting" | "done";
 export type ScriptCommand = "start" | "pause" | "pace" | "play_situation";
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "FocusRule".
+ */
+export type FocusRule = {
+  [k: string]: unknown;
+};
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "Message".
+ */
+export type Message = {
+  [k: string]: unknown;
+};
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "ChangeReaderDial".
+ */
+export type ChangeReaderDial = {
+  [k: string]: unknown;
+};
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "Change".
  */
 export type Change =
@@ -88,6 +134,7 @@ export type Change =
   | ChangeMessageChanged
   | ChangeMessageDeleted
   | ChangeReplyStarted
+  | ChangeReplyAbandoned
   | ChangeReactionAdded
   | ChangeReactionRemoved
   | ChangePersonJoined
@@ -108,6 +155,13 @@ export type Change =
   | ChangeReaderPreference
   | ChangeReaderProfileLine
   | ChangeTick;
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "ActionDial".
+ */
+export type ActionDial = {
+  [k: string]: unknown;
+};
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "PeopleAction".
@@ -133,6 +187,25 @@ export type PeopleAction =
   | ActionProfileLine;
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "RowActDial".
+ */
+export type RowActDial = {
+  [k: string]: unknown;
+};
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "RowAct".
+ */
+export type RowAct = RowActDial | RowActFocusPerson | RowActFocusRule | RowActDone;
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "LevelEntry".
+ */
+export type LevelEntry = {
+  [k: string]: unknown;
+};
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "LiveIn".
  */
 export type LiveIn = LiveResume | LiveWatching;
@@ -149,12 +222,12 @@ export type ConversationPart =
   | PartUnread
   | PartReadMoved
   | PartReplyStarted
+  | PartReplyAbandoned
   | PartConversationAdded
   | PartPeopleAdded
   | PartPersonAdded
   | PartPreference
-  | PartProfileLine
-  | PartAgentStatus;
+  | PartProfileLine;
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "FeedPart".
@@ -166,7 +239,7 @@ export type FeedPart =
  * via the `definition` "LiveOut".
  */
 export type LiveOut =
-  LiveFeedUpdate | LiveConversationsUpdate | LiveLastSent | LiveTooFarBehind | LiveReset | LivePiece;
+  LiveFeedUpdate | LiveConversationsUpdate | LiveLastSent | LiveTooFarBehind | LiveReset | LivePiece | LiveAgentStatus;
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "SearchChange".
@@ -197,6 +270,11 @@ export interface ContractTypes {
   Level?: Level;
   Bucket?: Bucket;
   DialLevel?: DialLevel;
+  ChannelDial?: ChannelDial;
+  ItemKind?: ItemKind;
+  Stream?: Stream;
+  NoteNow?: NoteNow;
+  WithdrawReason?: WithdrawReason;
   RuleType?: RuleType;
   KeptBy?: KeptBy;
   RowState?: RowState;
@@ -215,6 +293,7 @@ export interface ContractTypes {
   DeletedMessage?: DeletedMessage;
   ThreadSummary?: ThreadSummary;
   MessageView?: MessageView;
+  PersonStatus?: PersonStatus;
   PersonView?: PersonView;
   Preference?: Preference;
   ConversationSummary?: ConversationSummary;
@@ -222,6 +301,7 @@ export interface ContractTypes {
   ChangeMessageChanged?: ChangeMessageChanged;
   ChangeMessageDeleted?: ChangeMessageDeleted;
   ChangeReplyStarted?: ChangeReplyStarted;
+  ChangeReplyAbandoned?: ChangeReplyAbandoned;
   ChangeReactionAdded?: ChangeReactionAdded;
   ChangeReactionRemoved?: ChangeReactionRemoved;
   ChangePersonJoined?: ChangePersonJoined;
@@ -246,6 +326,7 @@ export interface ContractTypes {
   ChangeBatch?: ChangeBatch;
   ChangeApplied?: ChangeApplied;
   IAmAt?: IAmAt;
+  StaleReset?: StaleReset;
   OrganizationStopped?: OrganizationStopped;
   NewMessage?: NewMessage;
   ActionSend?: ActionSend;
@@ -270,7 +351,13 @@ export interface ContractTypes {
   ActionSaved?: ActionSaved;
   Refusal?: Refusal;
   StartAnswer?: StartAnswer;
+  ReplyInProgress?: ReplyInProgress;
   MessagesAnswer?: MessagesAnswer;
+  RowActDial?: RowActDial;
+  RowActFocusPerson?: RowActFocusPerson;
+  RowActFocusRule?: RowActFocusRule;
+  RowActDone?: RowActDone;
+  RowAct?: RowAct;
   RowChange?: RowChange;
   RowExplanation?: RowExplanation;
   FeedRow?: FeedRow;
@@ -303,12 +390,12 @@ export interface ContractTypes {
   PartUnread?: PartUnread;
   PartReadMoved?: PartReadMoved;
   PartReplyStarted?: PartReplyStarted;
+  PartReplyAbandoned?: PartReplyAbandoned;
   PartConversationAdded?: PartConversationAdded;
   PartPeopleAdded?: PartPeopleAdded;
   PartPersonAdded?: PartPersonAdded;
   PartPreference?: PartPreference;
   PartProfileLine?: PartProfileLine;
-  PartAgentStatus?: PartAgentStatus;
   ConversationPart?: ConversationPart;
   FeedPartRowChanged?: FeedPartRowChanged;
   FeedPartRowRemoved?: FeedPartRowRemoved;
@@ -324,6 +411,8 @@ export interface ContractTypes {
   LiveReset?: LiveReset;
   PieceBody?: PieceBody;
   LivePiece?: LivePiece;
+  AgentStatusBody?: AgentStatusBody;
+  LiveAgentStatus?: LiveAgentStatus;
   LiveOut?: LiveOut;
   RowUpdate?: RowUpdate;
   RowUpdatesPage?: RowUpdatesPage;
@@ -335,6 +424,7 @@ export interface ContractTypes {
   SearchDeletedChange?: SearchDeletedChange;
   SearchChange?: SearchChange;
   SearchApplied?: SearchApplied;
+  SearchRefusal?: SearchRefusal;
   NoteDue?: NoteDue;
   NoteChanged?: NoteChanged;
   NoteWithdrawn?: NoteWithdrawn;
@@ -362,7 +452,9 @@ export interface ContractTypes {
   AgentReaction?: AgentReaction;
   AgentDirect?: AgentDirect;
   AgentDirectAnswer?: AgentDirectAnswer;
-  Place?: Place;
+  FeedPlace?: FeedPlace;
+  SearchPlace?: SearchPlace;
+  SenderPlace?: SenderPlace;
   ReceiverStatus?: ReceiverStatus;
   DeliveryStatus?: DeliveryStatus;
   ParkedChange?: ParkedChange;
@@ -399,36 +491,6 @@ export interface Reaction {
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "FocusRule".
- */
-export interface FocusRule {
-  type: RuleType;
-  value: string;
-}
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "Message".
- */
-export interface Message {
-  id: string;
-  number: number;
-  version: number;
-  conversation: string;
-  thread: string | null;
-  author: string;
-  author_is_agent: boolean;
-  participants: string[] | null;
-  text: string;
-  mentions: string[];
-  level: Level | null;
-  reactions: Reaction[];
-  stopped: boolean;
-  created_at: string;
-  edited_at: string | null;
-  deleted: boolean;
-}
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "DeletedMessage".
  */
 export interface DeletedMessage {
@@ -457,6 +519,14 @@ export interface MessageView {
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "PersonStatus".
+ */
+export interface PersonStatus {
+  state: AgentState;
+  on: string | null;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "PersonView".
  */
 export interface PersonView {
@@ -464,6 +534,7 @@ export interface PersonView {
   name: string;
   is_agent: boolean;
   line: string | null;
+  status: PersonStatus | null;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -483,7 +554,7 @@ export interface ConversationSummary {
   name: string;
   people: string[];
   unread: boolean;
-  dial: DialLevel;
+  dial: ChannelDial;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -492,6 +563,7 @@ export interface ConversationSummary {
 export interface ChangeMessageCreated {
   kind: "message.created";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -504,6 +576,7 @@ export interface ChangeMessageCreated {
 export interface ChangeMessageChanged {
   kind: "message.changed";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -516,6 +589,7 @@ export interface ChangeMessageChanged {
 export interface ChangeMessageDeleted {
   kind: "message.deleted";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -528,6 +602,7 @@ export interface ChangeMessageDeleted {
 export interface ChangeReplyStarted {
   kind: "reply.started";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -538,11 +613,27 @@ export interface ChangeReplyStarted {
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "ChangeReplyAbandoned".
+ */
+export interface ChangeReplyAbandoned {
+  kind: "reply.abandoned";
+  org: string;
+  reset: number;
+  number: number;
+  previous: number;
+  at: string;
+  message: string;
+  conversation: string;
+  thread: string | null;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "ChangeReactionAdded".
  */
 export interface ChangeReactionAdded {
   kind: "reaction.added";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -559,6 +650,7 @@ export interface ChangeReactionAdded {
 export interface ChangeReactionRemoved {
   kind: "reaction.removed";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -575,6 +667,7 @@ export interface ChangeReactionRemoved {
 export interface ChangePersonJoined {
   kind: "person.joined";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -589,6 +682,7 @@ export interface ChangePersonJoined {
 export interface ChangeChannelCreated {
   kind: "channel.created";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -603,6 +697,7 @@ export interface ChangeChannelCreated {
 export interface ChangeChannelPeopleAdded {
   kind: "channel.people_added";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -616,6 +711,7 @@ export interface ChangeChannelPeopleAdded {
 export interface ChangeDirectCreated {
   kind: "direct.created";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -629,6 +725,7 @@ export interface ChangeDirectCreated {
 export interface ChangeReaderRead {
   kind: "reader.read";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -644,6 +741,7 @@ export interface ChangeReaderRead {
 export interface ChangeReaderWatchingStarted {
   kind: "reader.watching_started";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -659,6 +757,7 @@ export interface ChangeReaderWatchingStarted {
 export interface ChangeReaderWatchingEnded {
   kind: "reader.watching_ended";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -674,6 +773,7 @@ export interface ChangeReaderWatchingEnded {
 export interface ChangeReaderKeep {
   kind: "reader.keep";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -688,27 +788,13 @@ export interface ChangeReaderKeep {
 export interface ChangeReaderDone {
   kind: "reader.done";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
   person: string;
   conversation: string;
   thread: string | null;
-}
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "ChangeReaderDial".
- */
-export interface ChangeReaderDial {
-  kind: "reader.dial";
-  org: string;
-  number: number;
-  previous: number;
-  at: string;
-  person: string;
-  conversation: string;
-  thread: string | null;
-  level: DialLevel;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -717,6 +803,7 @@ export interface ChangeReaderDial {
 export interface ChangeReaderFocusRule {
   kind: "reader.focus_rule";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -731,6 +818,7 @@ export interface ChangeReaderFocusRule {
 export interface ChangeReaderFocusPerson {
   kind: "reader.focus_person";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -745,6 +833,7 @@ export interface ChangeReaderFocusPerson {
 export interface ChangeReaderFocusAutoAdd {
   kind: "reader.focus_auto_add";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -758,6 +847,7 @@ export interface ChangeReaderFocusAutoAdd {
 export interface ChangeReaderFocusOnly {
   kind: "reader.focus_only";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -771,6 +861,7 @@ export interface ChangeReaderFocusOnly {
 export interface ChangeReaderReleaseSetting {
   kind: "reader.release_setting";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -784,6 +875,7 @@ export interface ChangeReaderReleaseSetting {
 export interface ChangeReaderPreference {
   kind: "reader.preference";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -798,6 +890,7 @@ export interface ChangeReaderPreference {
 export interface ChangeReaderProfileLine {
   kind: "reader.profile_line";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -811,6 +904,7 @@ export interface ChangeReaderProfileLine {
 export interface ChangeTick {
   kind: "tick";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   at: string;
@@ -820,6 +914,9 @@ export interface ChangeTick {
  * via the `definition` "ChangeBatch".
  */
 export interface ChangeBatch {
+  /**
+   * @maxItems 100
+   */
   changes: Change[];
 }
 /**
@@ -837,6 +934,13 @@ export interface ChangeApplied {
  */
 export interface IAmAt {
   i_am_at: number;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "StaleReset".
+ */
+export interface StaleReset {
+  stale_reset: number;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -970,18 +1074,6 @@ export interface ActionDone {
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "ActionDial".
- */
-export interface ActionDial {
-  kind: "dial";
-  id: string;
-  as: string;
-  conversation: string;
-  thread: string | null;
-  level: DialLevel;
-}
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "ActionFocusRule".
  */
 export interface ActionFocusRule {
@@ -1059,7 +1151,7 @@ export interface ActionProfileLine {
  */
 export interface ActionSaved {
   saved: boolean;
-  number: number;
+  number: number | null;
   conversation?: string;
 }
 /**
@@ -1075,6 +1167,7 @@ export interface Refusal {
  */
 export interface StartAnswer {
   org: string;
+  org_name: string;
   person: PersonView;
   people: PersonView[];
   preferences: Preference[];
@@ -1084,13 +1177,54 @@ export interface StartAnswer {
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "ReplyInProgress".
+ */
+export interface ReplyInProgress {
+  message: string;
+  conversation: string;
+  thread: string | null;
+  author: string;
+  at: number;
+  text: string;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "MessagesAnswer".
  */
 export interface MessagesAnswer {
+  number: number;
   messages: MessageView[];
+  in_progress: ReplyInProgress[];
   read_up_to: number | null;
   has_before: boolean;
   has_after: boolean;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "RowActFocusPerson".
+ */
+export interface RowActFocusPerson {
+  kind: "focus_person";
+  about: string;
+  on: boolean;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "RowActFocusRule".
+ */
+export interface RowActFocusRule {
+  kind: "focus_rule";
+  rule: FocusRule;
+  on: boolean;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "RowActDone".
+ */
+export interface RowActDone {
+  kind: "done";
+  conversation: string;
+  thread: string | null;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -1098,8 +1232,8 @@ export interface MessagesAnswer {
  */
 export interface RowChange {
   label: string;
-  action: string;
-  value: string | null;
+  do: RowAct;
+  undo: RowAct | null;
   moved_last_7_days: number | null;
 }
 /**
@@ -1119,11 +1253,13 @@ export interface RowExplanation {
 export interface FeedRow {
   conversation: string;
   thread: string | null;
+  message: string;
   bucket: Bucket;
   unread: boolean;
   kept: KeptBy | null;
   why: string;
   newest: number;
+  first_new: number | null;
   author: string;
   preview: string;
   at: string;
@@ -1148,6 +1284,7 @@ export interface FeedCounts {
  * via the `definition` "FeedRowsAnswer".
  */
 export interface FeedRowsAnswer {
+  reset: number;
   edition: number;
   through: number;
   number: number;
@@ -1159,6 +1296,7 @@ export interface FeedRowsAnswer {
  * via the `definition` "ScreenFeedAnswer".
  */
 export interface ScreenFeedAnswer {
+  reset: number;
   edition: number | null;
   through: number | null;
   number: number | null;
@@ -1179,6 +1317,10 @@ export interface HistoryEntry {
   at: string;
   number: number;
   unread: boolean;
+  by: string | null;
+  emoji: string | null;
+  level: DialLevel | null;
+  kept: KeptBy | null;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -1200,15 +1342,6 @@ export interface FocusPerson {
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "LevelEntry".
- */
-export interface LevelEntry {
-  conversation: string;
-  thread: string | null;
-  level: DialLevel;
-}
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "SettingsAnswer".
  */
 export interface SettingsAnswer {
@@ -1218,6 +1351,7 @@ export interface SettingsAnswer {
   focus_only: boolean;
   release_on_act: boolean;
   rules: FocusRule[];
+  removed_rules: FocusRule[];
   levels: LevelEntry[];
 }
 /**
@@ -1225,8 +1359,10 @@ export interface SettingsAnswer {
  * via the `definition` "PreviewCounts".
  */
 export interface PreviewCounts {
-  would_leave_needs_you: number;
-  would_stay: number;
+  moved: number;
+  from: Bucket | null;
+  to: Bucket | null;
+  stay: number;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -1248,7 +1384,7 @@ export interface NotAvailable {
  */
 export interface SuggestAnswer {
   people: PersonView[];
-  channels: string[];
+  everyone: boolean;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -1256,6 +1392,8 @@ export interface SuggestAnswer {
  */
 export interface SearchResult {
   message: string;
+  number: number;
+  created_at: string;
   version: number;
   conversation: string;
   thread: string | null;
@@ -1288,6 +1426,9 @@ export interface ScreenSearchAnswer {
  */
 export interface ReplyText {
   message: string;
+  conversation: string;
+  thread: string | null;
+  author: string;
   at: number;
   text: string;
 }
@@ -1404,6 +1545,16 @@ export interface PartReplyStarted {
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "PartReplyAbandoned".
+ */
+export interface PartReplyAbandoned {
+  kind: "reply.abandoned";
+  message: string;
+  conversation: string;
+  thread: string | null;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "PartConversationAdded".
  */
 export interface PartConversationAdded {
@@ -1444,16 +1595,6 @@ export interface PartProfileLine {
   kind: "profile_line";
   person: string;
   text: string;
-}
-/**
- * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "PartAgentStatus".
- */
-export interface PartAgentStatus {
-  kind: "agent.status";
-  agent: string;
-  state: AgentState;
-  on: string | null;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -1500,7 +1641,7 @@ export interface FeedPartSettingsChanged {
  * via the `definition` "LiveConversationsUpdate".
  */
 export interface LiveConversationsUpdate {
-  stream: string;
+  stream: "conversations";
   number: number;
   after: number;
   parts: ConversationPart[];
@@ -1510,7 +1651,7 @@ export interface LiveConversationsUpdate {
  * via the `definition` "LiveFeedUpdate".
  */
 export interface LiveFeedUpdate {
-  stream: string;
+  stream: "feed";
   number: number;
   after: number;
   edition: number;
@@ -1537,7 +1678,7 @@ export interface LiveLastSent {
  * via the `definition` "LiveTooFarBehind".
  */
 export interface LiveTooFarBehind {
-  too_far_behind: string;
+  too_far_behind: Stream;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -1561,6 +1702,22 @@ export interface PieceBody {
  */
 export interface LivePiece {
   piece: PieceBody;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "AgentStatusBody".
+ */
+export interface AgentStatusBody {
+  agent: string;
+  state: AgentState;
+  on: string | null;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "LiveAgentStatus".
+ */
+export interface LiveAgentStatus {
+  agent_status: AgentStatusBody;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -1593,6 +1750,8 @@ export interface NewEdition {
  */
 export interface SearchMessage {
   id: string;
+  number: number;
+  created_at: string;
   version: number;
   conversation: string;
   thread: string | null;
@@ -1618,6 +1777,7 @@ export interface SearchDeleted {
 export interface SearchCreated {
   kind: "message.created";
   org: string;
+  reset: number;
   number: number;
   message: SearchMessage;
 }
@@ -1628,6 +1788,7 @@ export interface SearchCreated {
 export interface SearchChanged {
   kind: "message.changed";
   org: string;
+  reset: number;
   number: number;
   message: SearchMessage;
 }
@@ -1638,6 +1799,7 @@ export interface SearchChanged {
 export interface SearchDeletedChange {
   kind: "message.deleted";
   org: string;
+  reset: number;
   number: number;
   message: SearchDeleted;
 }
@@ -1652,11 +1814,20 @@ export interface SearchApplied {
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "SearchRefusal".
+ */
+export interface SearchRefusal {
+  refused: string;
+  wipe: number;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
  * via the `definition` "NoteDue".
  */
 export interface NoteDue {
   kind: "due";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   edition: number;
@@ -1675,6 +1846,7 @@ export interface NoteDue {
 export interface NoteChanged {
   kind: "changed";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   edition: number;
@@ -1689,12 +1861,13 @@ export interface NoteChanged {
 export interface NoteWithdrawn {
   kind: "withdrawn";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   edition: number;
   at: string;
   name: string;
-  because: string;
+  because: WithdrawReason;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -1703,6 +1876,7 @@ export interface NoteWithdrawn {
 export interface NoteClock {
   kind: "clock";
   org: string;
+  reset: number;
   number: number;
   previous: number;
   edition: number;
@@ -1736,7 +1910,7 @@ export interface NotificationEntry {
   delayed: boolean;
   why: string;
   text: string;
-  now: string | null;
+  now: NoteNow | null;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -1818,6 +1992,8 @@ export interface AgentEventReaction {
  * via the `definition` "AgentEvents".
  */
 export interface AgentEvents {
+  reset: number;
+  continue_from: number | null;
   events: AgentEvent[];
 }
 /**
@@ -1917,12 +2093,30 @@ export interface AgentDirectAnswer {
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
- * via the `definition` "Place".
+ * via the `definition` "FeedPlace".
  */
-export interface Place {
+export interface FeedPlace {
+  reset: number;
   through: number;
-  edition?: number;
-  wipe?: number;
+  edition: number;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "SearchPlace".
+ */
+export interface SearchPlace {
+  reset: number;
+  through: number;
+  wipe: number;
+}
+/**
+ * This interface was referenced by `ContractTypes`'s JSON-Schema
+ * via the `definition` "SenderPlace".
+ */
+export interface SenderPlace {
+  reset: number;
+  through: number;
+  edition: number;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema
@@ -2003,6 +2197,7 @@ export interface ScriptStep {
   at: string;
   who: string;
   what: string;
+  situation: string | null;
 }
 /**
  * This interface was referenced by `ContractTypes`'s JSON-Schema

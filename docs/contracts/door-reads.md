@@ -13,7 +13,7 @@ Every call is made for one organization (D-026). It is in the address of every c
 All are questions; none changes anything.
 
 ```json
-GET feed/orgs/acme/people/marco/rows                     → { "edition": 7, "through": 4861, "number": 103, "rows": [ { "conversation": "#launch", "thread": null, "bucket": "needs_you", "unread": true, "kept": false, "why": "Anna mentioned you", "newest": 4812 } ], "counts": { "focus": 1, "needs_you": 4, "fyi": true } }
+GET feed/orgs/acme/people/marco/rows                     → { "edition": 7, "through": 4861, "number": 103, "rows": [ { "conversation": "#launch", "thread": null, "bucket": "needs_you", "unread": true, "kept": null, "why": "Anna mentioned you", "newest": 4812 } ], "counts": { "focus": 1, "needs_you": 4, "fyi": true } }
 GET feed/orgs/acme/people/marco/history?tab=mentions     → entries with an unread mark each, and the tab's unread count
 GET feed/orgs/acme/people/marco/settings                 → Focus people, removed people, each thread's and channel's level as it is in effect
 GET feed/orgs/acme/people/marco/preview?change=…         → what the change would have moved in the last 7 days

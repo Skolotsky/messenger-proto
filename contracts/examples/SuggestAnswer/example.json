@@ -4,11 +4,12 @@
    "id": "marco",
    "name": "Marco Silva",
    "is_agent": false,
-   "line": "Pricing and launch"
+   "line": "Pricing and launch",
+   "status": {
+    "state": "working",
+    "on": "marco"
+   }
   }
  ],
- "channels": [
-  "launch",
-  "general"
- ]
+ "everyone": true
 }

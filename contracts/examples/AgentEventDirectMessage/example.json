@@ -1,32 +1,25 @@
 {
  "kind": "direct_message",
  "org": "acme",
- "number": 4812,
+ "number": 312,
  "reset": 2,
  "agent_chain": 2,
  "message": {
-  "id": "msg_7Q2",
-  "number": 4812,
+  "id": "msg_D41",
+  "number": 4901,
   "version": 1,
-  "conversation": "#launch",
+  "conversation": "dm:anna:marco",
   "thread": null,
   "author": "anna",
   "author_is_agent": false,
-  "participants": null,
-  "text": "@Marco can you sign off the pricing page?",
-  "mentions": [
+  "participants": [
+   "anna",
    "marco"
   ],
-  "level": "flag",
-  "reactions": [
-   {
-    "emoji": "eyes",
-    "people": [
-     "marco",
-     "lena"
-    ]
-   }
-  ],
+  "text": "Do you have a minute?",
+  "mentions": [],
+  "level": null,
+  "reactions": [],
   "stopped": false,
   "created_at": "2026-11-22T10:14:03.120Z",
   "edited_at": null,

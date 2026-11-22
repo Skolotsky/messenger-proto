@@ -1,0 +1,21 @@
+{
+ "id": "msg_D41",
+ "number": 4901,
+ "version": 1,
+ "conversation": "dm:anna:marco",
+ "thread": null,
+ "author": "anna",
+ "author_is_agent": false,
+ "participants": [
+  "anna",
+  "marco"
+ ],
+ "text": "Do you have a minute?",
+ "mentions": [],
+ "level": null,
+ "reactions": [],
+ "stopped": false,
+ "created_at": "2026-11-22T10:14:03.120Z",
+ "edited_at": null,
+ "deleted": false
+}

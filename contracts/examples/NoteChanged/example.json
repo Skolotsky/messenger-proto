@@ -1,10 +1,11 @@
 {
  "kind": "changed",
  "org": "acme",
- "number": 4812,
- "previous": 4811,
+ "reset": 2,
+ "number": 1301,
+ "previous": 1300,
  "edition": 7,
  "at": "2026-11-22T10:14:03.120Z",
  "name": "acme / marco / #launch / 4812",
- "text": "@Marco can you sign off the pricing page?"
+ "text": "@Marco @Lena can you sign off the pricing page?"
 }

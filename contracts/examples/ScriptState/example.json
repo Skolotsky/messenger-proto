@@ -5,14 +5,16 @@
   {
    "at": "2026-11-22T10:14:03.120Z",
    "who": "anna",
-   "what": "Asks Marco to sign off"
+   "what": "Asks Marco to sign off",
+   "situation": "situation"
   }
  ],
  "next": [
   {
    "at": "2026-11-22T10:14:03.120Z",
    "who": "anna",
-   "what": "Asks Marco to sign off"
+   "what": "Asks Marco to sign off",
+   "situation": "situation"
   }
  ],
  "situations": [

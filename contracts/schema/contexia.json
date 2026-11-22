@@ -6,7 +6,7 @@
  "$defs": {
   "Span": {
    "type": "array",
-   "description": "From and to, in Unicode code points.",
+   "description": "From (inclusive) and to (exclusive), in Unicode code points.",
    "prefixItems": [
     {
      "type": "integer",
@@ -41,14 +41,49 @@
     "muted",
     "needs_you",
     "fyi",
-    "off"
+    "off",
+    "auto"
+   ]
+  },
+  "ChannelDial": {
+   "enum": [
+    "focus",
+    "all",
+    "default",
+    "muted"
+   ]
+  },
+  "ItemKind": {
+   "enum": [
+    "flags",
+    "mentions",
+    "direct_messages"
+   ]
+  },
+  "Stream": {
+   "enum": [
+    "conversations",
+    "feed"
+   ]
+  },
+  "NoteNow": {
+   "enum": [
+    "read",
+    "deleted"
+   ]
+  },
+  "WithdrawReason": {
+   "enum": [
+    "read",
+    "deleted",
+    "fenced",
+    "rule_changed"
    ]
   },
   "RuleType": {
    "enum": [
     "person",
     "conversation",
-    "thread",
     "item_kind",
     "text"
    ]
@@ -178,7 +213,28 @@
     "type",
     "value"
    ],
-   "additionalProperties": false
+   "additionalProperties": false,
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "type": {
+        "const": "item_kind"
+       }
+      },
+      "required": [
+       "type"
+      ]
+     },
+     "then": {
+      "properties": {
+       "value": {
+        "$ref": "#/$defs/ItemKind"
+       }
+      }
+     }
+    }
+   ]
   },
   "Message": {
    "type": "object",
@@ -192,7 +248,7 @@
     },
     "version": {
      "type": "integer",
-     "minimum": 0
+     "minimum": 1
     },
     "conversation": {
      "type": "string"
@@ -279,7 +335,34 @@
     "edited_at",
     "deleted"
    ],
-   "additionalProperties": false
+   "additionalProperties": false,
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "deleted": {
+        "const": true
+       }
+      },
+      "required": [
+       "deleted"
+      ]
+     },
+     "then": {
+      "properties": {
+       "text": {
+        "const": ""
+       },
+       "mentions": {
+        "maxItems": 0
+       },
+       "reactions": {
+        "maxItems": 0
+       }
+      }
+     }
+    }
+   ]
   },
   "DeletedMessage": {
    "type": "object",
@@ -289,7 +372,7 @@
     },
     "version": {
      "type": "integer",
-     "minimum": 0
+     "minimum": 1
     },
     "conversation": {
      "type": "string"
@@ -364,6 +447,25 @@
    ],
    "additionalProperties": false
   },
+  "PersonStatus": {
+   "type": "object",
+   "properties": {
+    "state": {
+     "$ref": "#/$defs/AgentState"
+    },
+    "on": {
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   },
+   "required": [
+    "state",
+    "on"
+   ],
+   "additionalProperties": false
+  },
   "PersonView": {
    "type": "object",
    "properties": {
@@ -381,13 +483,24 @@
       "string",
       "null"
      ]
+    },
+    "status": {
+     "oneOf": [
+      {
+       "$ref": "#/$defs/PersonStatus"
+      },
+      {
+       "type": "null"
+      }
+     ]
     }
    },
    "required": [
     "id",
     "name",
     "is_agent",
-    "line"
+    "line",
+    "status"
    ],
    "additionalProperties": false
   },
@@ -429,7 +542,7 @@
      "type": "boolean"
     },
     "dial": {
-     "$ref": "#/$defs/DialLevel"
+     "$ref": "#/$defs/ChannelDial"
     }
    },
    "required": [
@@ -451,6 +564,10 @@
     "org": {
      "type": "string"
     },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "number": {
      "type": "integer",
      "minimum": 0
@@ -470,6 +587,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -486,6 +604,10 @@
     "org": {
      "type": "string"
     },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "number": {
      "type": "integer",
      "minimum": 0
@@ -505,6 +627,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -520,6 +643,10 @@
     },
     "org": {
      "type": "string"
+    },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
     },
     "number": {
      "type": "integer",
@@ -540,6 +667,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -555,6 +683,10 @@
     },
     "org": {
      "type": "string"
+    },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
     },
     "number": {
      "type": "integer",
@@ -587,6 +719,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -594,6 +727,57 @@
     "conversation",
     "thread",
     "author"
+   ],
+   "additionalProperties": false
+  },
+  "ChangeReplyAbandoned": {
+   "type": "object",
+   "properties": {
+    "kind": {
+     "const": "reply.abandoned"
+    },
+    "org": {
+     "type": "string"
+    },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "number": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "previous": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "at": {
+     "type": "string",
+     "format": "date-time"
+    },
+    "message": {
+     "type": "string"
+    },
+    "conversation": {
+     "type": "string"
+    },
+    "thread": {
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   },
+   "required": [
+    "kind",
+    "org",
+    "reset",
+    "number",
+    "previous",
+    "at",
+    "message",
+    "conversation",
+    "thread"
    ],
    "additionalProperties": false
   },
@@ -605,6 +789,10 @@
     },
     "org": {
      "type": "string"
+    },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
     },
     "number": {
      "type": "integer",
@@ -640,6 +828,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -660,6 +849,10 @@
     "org": {
      "type": "string"
     },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "number": {
      "type": "integer",
      "minimum": 0
@@ -694,6 +887,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -713,6 +907,10 @@
     },
     "org": {
      "type": "string"
+    },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
     },
     "number": {
      "type": "integer",
@@ -739,6 +937,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -756,6 +955,10 @@
     },
     "org": {
      "type": "string"
+    },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
     },
     "number": {
      "type": "integer",
@@ -785,6 +988,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -803,6 +1007,10 @@
     "org": {
      "type": "string"
     },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "number": {
      "type": "integer",
      "minimum": 0
@@ -828,6 +1036,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -845,6 +1054,10 @@
     "org": {
      "type": "string"
     },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "number": {
      "type": "integer",
      "minimum": 0
@@ -870,6 +1083,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -886,6 +1100,10 @@
     },
     "org": {
      "type": "string"
+    },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
     },
     "number": {
      "type": "integer",
@@ -919,6 +1137,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -938,6 +1157,10 @@
     "org": {
      "type": "string"
     },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "number": {
      "type": "integer",
      "minimum": 0
@@ -969,6 +1192,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -988,6 +1212,10 @@
     "org": {
      "type": "string"
     },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "number": {
      "type": "integer",
      "minimum": 0
@@ -1019,6 +1247,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -1038,6 +1267,10 @@
     "org": {
      "type": "string"
     },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "number": {
      "type": "integer",
      "minimum": 0
@@ -1066,6 +1299,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -1084,6 +1318,10 @@
     "org": {
      "type": "string"
     },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "number": {
      "type": "integer",
      "minimum": 0
@@ -1112,6 +1350,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -1129,6 +1368,10 @@
     },
     "org": {
      "type": "string"
+    },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
     },
     "number": {
      "type": "integer",
@@ -1161,6 +1404,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -1169,7 +1413,46 @@
     "thread",
     "level"
    ],
-   "additionalProperties": false
+   "additionalProperties": false,
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "thread": {
+        "type": "null"
+       }
+      },
+      "required": [
+       "thread"
+      ]
+     },
+     "then": {
+      "properties": {
+       "level": {
+        "enum": [
+         "focus",
+         "all",
+         "default",
+         "muted"
+        ]
+       }
+      }
+     },
+     "else": {
+      "properties": {
+       "level": {
+        "enum": [
+         "focus",
+         "needs_you",
+         "fyi",
+         "off",
+         "auto"
+        ]
+       }
+      }
+     }
+    }
+   ]
   },
   "ChangeReaderFocusRule": {
    "type": "object",
@@ -1179,6 +1462,10 @@
     },
     "org": {
      "type": "string"
+    },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
     },
     "number": {
      "type": "integer",
@@ -1205,6 +1492,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -1222,6 +1510,10 @@
     },
     "org": {
      "type": "string"
+    },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
     },
     "number": {
      "type": "integer",
@@ -1248,6 +1540,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -1266,6 +1559,10 @@
     "org": {
      "type": "string"
     },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "number": {
      "type": "integer",
      "minimum": 0
@@ -1288,6 +1585,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -1305,6 +1603,10 @@
     "org": {
      "type": "string"
     },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "number": {
      "type": "integer",
      "minimum": 0
@@ -1327,6 +1629,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -1344,6 +1647,10 @@
     "org": {
      "type": "string"
     },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "number": {
      "type": "integer",
      "minimum": 0
@@ -1366,6 +1673,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -1382,6 +1690,10 @@
     },
     "org": {
      "type": "string"
+    },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
     },
     "number": {
      "type": "integer",
@@ -1408,6 +1720,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -1425,6 +1738,10 @@
     },
     "org": {
      "type": "string"
+    },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
     },
     "number": {
      "type": "integer",
@@ -1448,6 +1765,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at",
@@ -1465,6 +1783,10 @@
     "org": {
      "type": "string"
     },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "number": {
      "type": "integer",
      "minimum": 0
@@ -1481,6 +1803,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "at"
@@ -1500,6 +1823,9 @@
     },
     {
      "$ref": "#/$defs/ChangeReplyStarted"
+    },
+    {
+     "$ref": "#/$defs/ChangeReplyAbandoned"
     },
     {
      "$ref": "#/$defs/ChangeReactionAdded"
@@ -1570,7 +1896,8 @@
      "type": "array",
      "items": {
       "$ref": "#/$defs/Change"
-     }
+     },
+     "maxItems": 100
     }
    },
    "required": [
@@ -1606,6 +1933,19 @@
    },
    "required": [
     "i_am_at"
+   ],
+   "additionalProperties": false
+  },
+  "StaleReset": {
+   "type": "object",
+   "properties": {
+    "stale_reset": {
+     "type": "integer",
+     "minimum": 0
+    }
+   },
+   "required": [
+    "stale_reset"
    ],
    "additionalProperties": false
   },
@@ -2009,7 +2349,46 @@
     "thread",
     "level"
    ],
-   "additionalProperties": false
+   "additionalProperties": false,
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "thread": {
+        "type": "null"
+       }
+      },
+      "required": [
+       "thread"
+      ]
+     },
+     "then": {
+      "properties": {
+       "level": {
+        "enum": [
+         "focus",
+         "all",
+         "default",
+         "muted"
+        ]
+       }
+      }
+     },
+     "else": {
+      "properties": {
+       "level": {
+        "enum": [
+         "focus",
+         "needs_you",
+         "fyi",
+         "off",
+         "auto"
+        ]
+       }
+      }
+     }
+    }
+   ]
   },
   "ActionFocusRule": {
    "type": "object",
@@ -2256,7 +2635,10 @@
      "type": "boolean"
     },
     "number": {
-     "type": "integer",
+     "type": [
+      "integer",
+      "null"
+     ],
      "minimum": 0
     },
     "conversation": {
@@ -2285,6 +2667,9 @@
    "type": "object",
    "properties": {
     "org": {
+     "type": "string"
+    },
+    "org_name": {
      "type": "string"
     },
     "person": {
@@ -2319,6 +2704,7 @@
    },
    "required": [
     "org",
+    "org_name",
     "person",
     "people",
     "preferences",
@@ -2328,13 +2714,59 @@
    ],
    "additionalProperties": false
   },
+  "ReplyInProgress": {
+   "type": "object",
+   "properties": {
+    "message": {
+     "type": "string"
+    },
+    "conversation": {
+     "type": "string"
+    },
+    "thread": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "author": {
+     "type": "string"
+    },
+    "at": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "text": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "message",
+    "conversation",
+    "thread",
+    "author",
+    "at",
+    "text"
+   ],
+   "additionalProperties": false
+  },
   "MessagesAnswer": {
    "type": "object",
    "properties": {
+    "number": {
+     "type": "integer",
+     "minimum": 0
+    },
     "messages": {
      "type": "array",
      "items": {
       "$ref": "#/$defs/MessageView"
+     }
+    },
+    "in_progress": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/ReplyInProgress"
      }
     },
     "read_up_to": {
@@ -2352,12 +2784,159 @@
     }
    },
    "required": [
+    "number",
     "messages",
+    "in_progress",
     "read_up_to",
     "has_before",
     "has_after"
    ],
    "additionalProperties": false
+  },
+  "RowActDial": {
+   "type": "object",
+   "properties": {
+    "kind": {
+     "const": "dial"
+    },
+    "conversation": {
+     "type": "string"
+    },
+    "thread": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "level": {
+     "$ref": "#/$defs/DialLevel"
+    }
+   },
+   "required": [
+    "kind",
+    "conversation",
+    "thread",
+    "level"
+   ],
+   "additionalProperties": false,
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "thread": {
+        "type": "null"
+       }
+      },
+      "required": [
+       "thread"
+      ]
+     },
+     "then": {
+      "properties": {
+       "level": {
+        "enum": [
+         "focus",
+         "all",
+         "default",
+         "muted"
+        ]
+       }
+      }
+     },
+     "else": {
+      "properties": {
+       "level": {
+        "enum": [
+         "focus",
+         "needs_you",
+         "fyi",
+         "off",
+         "auto"
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  "RowActFocusPerson": {
+   "type": "object",
+   "properties": {
+    "kind": {
+     "const": "focus_person"
+    },
+    "about": {
+     "type": "string"
+    },
+    "on": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "kind",
+    "about",
+    "on"
+   ],
+   "additionalProperties": false
+  },
+  "RowActFocusRule": {
+   "type": "object",
+   "properties": {
+    "kind": {
+     "const": "focus_rule"
+    },
+    "rule": {
+     "$ref": "#/$defs/FocusRule"
+    },
+    "on": {
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "kind",
+    "rule",
+    "on"
+   ],
+   "additionalProperties": false
+  },
+  "RowActDone": {
+   "type": "object",
+   "properties": {
+    "kind": {
+     "const": "done"
+    },
+    "conversation": {
+     "type": "string"
+    },
+    "thread": {
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   },
+   "required": [
+    "kind",
+    "conversation",
+    "thread"
+   ],
+   "additionalProperties": false
+  },
+  "RowAct": {
+   "oneOf": [
+    {
+     "$ref": "#/$defs/RowActDial"
+    },
+    {
+     "$ref": "#/$defs/RowActFocusPerson"
+    },
+    {
+     "$ref": "#/$defs/RowActFocusRule"
+    },
+    {
+     "$ref": "#/$defs/RowActDone"
+    }
+   ]
   },
   "RowChange": {
    "type": "object",
@@ -2365,13 +2944,17 @@
     "label": {
      "type": "string"
     },
-    "action": {
-     "type": "string"
+    "do": {
+     "$ref": "#/$defs/RowAct"
     },
-    "value": {
-     "type": [
-      "string",
-      "null"
+    "undo": {
+     "oneOf": [
+      {
+       "$ref": "#/$defs/RowAct"
+      },
+      {
+       "type": "null"
+      }
      ]
     },
     "moved_last_7_days": {
@@ -2384,8 +2967,8 @@
    },
    "required": [
     "label",
-    "action",
-    "value",
+    "do",
+    "undo",
     "moved_last_7_days"
    ],
    "additionalProperties": false
@@ -2433,6 +3016,9 @@
       "null"
      ]
     },
+    "message": {
+     "type": "string"
+    },
     "bucket": {
      "$ref": "#/$defs/Bucket"
     },
@@ -2454,6 +3040,13 @@
     },
     "newest": {
      "type": "integer",
+     "minimum": 0
+    },
+    "first_new": {
+     "type": [
+      "integer",
+      "null"
+     ],
      "minimum": 0
     },
     "author": {
@@ -2489,11 +3082,13 @@
    "required": [
     "conversation",
     "thread",
+    "message",
     "bucket",
     "unread",
     "kept",
     "why",
     "newest",
+    "first_new",
     "author",
     "preview",
     "at",
@@ -2535,6 +3130,10 @@
   "FeedRowsAnswer": {
    "type": "object",
    "properties": {
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "edition": {
      "type": "integer",
      "minimum": 0
@@ -2558,6 +3157,7 @@
     }
    },
    "required": [
+    "reset",
     "edition",
     "through",
     "number",
@@ -2569,6 +3169,10 @@
   "ScreenFeedAnswer": {
    "type": "object",
    "properties": {
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "edition": {
      "type": [
       "integer",
@@ -2614,6 +3218,7 @@
     }
    },
    "required": [
+    "reset",
     "edition",
     "through",
     "number",
@@ -2654,6 +3259,38 @@
     },
     "unread": {
      "type": "boolean"
+    },
+    "by": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "emoji": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "level": {
+     "oneOf": [
+      {
+       "$ref": "#/$defs/DialLevel"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "kept": {
+     "oneOf": [
+      {
+       "$ref": "#/$defs/KeptBy"
+      },
+      {
+       "type": "null"
+      }
+     ]
     }
    },
    "required": [
@@ -2664,7 +3301,11 @@
     "preview",
     "at",
     "number",
-    "unread"
+    "unread",
+    "by",
+    "emoji",
+    "level",
+    "kept"
    ],
    "additionalProperties": false
   },
@@ -2737,7 +3378,45 @@
     "thread",
     "level"
    ],
-   "additionalProperties": false
+   "additionalProperties": false,
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "thread": {
+        "type": "null"
+       }
+      },
+      "required": [
+       "thread"
+      ]
+     },
+     "then": {
+      "properties": {
+       "level": {
+        "enum": [
+         "focus",
+         "all",
+         "default",
+         "muted"
+        ]
+       }
+      }
+     },
+     "else": {
+      "properties": {
+       "level": {
+        "enum": [
+         "focus",
+         "needs_you",
+         "fyi",
+         "off"
+        ]
+       }
+      }
+     }
+    }
+   ]
   },
   "SettingsAnswer": {
    "type": "object",
@@ -2769,6 +3448,12 @@
       "$ref": "#/$defs/FocusRule"
      }
     },
+    "removed_rules": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/FocusRule"
+     }
+    },
     "levels": {
      "type": "array",
      "items": {
@@ -2783,6 +3468,7 @@
     "focus_only",
     "release_on_act",
     "rules",
+    "removed_rules",
     "levels"
    ],
    "additionalProperties": false
@@ -2790,18 +3476,40 @@
   "PreviewCounts": {
    "type": "object",
    "properties": {
-    "would_leave_needs_you": {
+    "moved": {
      "type": "integer",
      "minimum": 0
     },
-    "would_stay": {
+    "from": {
+     "oneOf": [
+      {
+       "$ref": "#/$defs/Bucket"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "to": {
+     "oneOf": [
+      {
+       "$ref": "#/$defs/Bucket"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "stay": {
      "type": "integer",
      "minimum": 0
     }
    },
    "required": [
-    "would_leave_needs_you",
-    "would_stay"
+    "moved",
+    "from",
+    "to",
+    "stay"
    ],
    "additionalProperties": false
   },
@@ -2838,16 +3546,13 @@
       "$ref": "#/$defs/PersonView"
      }
     },
-    "channels": {
-     "type": "array",
-     "items": {
-      "type": "string"
-     }
+    "everyone": {
+     "type": "boolean"
     }
    },
    "required": [
     "people",
-    "channels"
+    "everyone"
    ],
    "additionalProperties": false
   },
@@ -2857,9 +3562,17 @@
     "message": {
      "type": "string"
     },
-    "version": {
+    "number": {
      "type": "integer",
      "minimum": 0
+    },
+    "created_at": {
+     "type": "string",
+     "format": "date-time"
+    },
+    "version": {
+     "type": "integer",
+     "minimum": 1
     },
     "conversation": {
      "type": "string"
@@ -2888,6 +3601,8 @@
    },
    "required": [
     "message",
+    "number",
+    "created_at",
     "version",
     "conversation",
     "thread",
@@ -2962,6 +3677,18 @@
     "message": {
      "type": "string"
     },
+    "conversation": {
+     "type": "string"
+    },
+    "thread": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "author": {
+     "type": "string"
+    },
     "at": {
      "type": "integer",
      "minimum": 0
@@ -2972,6 +3699,9 @@
    },
    "required": [
     "message",
+    "conversation",
+    "thread",
+    "author",
     "at",
     "text"
    ],
@@ -3276,6 +4006,33 @@
    ],
    "additionalProperties": false
   },
+  "PartReplyAbandoned": {
+   "type": "object",
+   "properties": {
+    "kind": {
+     "const": "reply.abandoned"
+    },
+    "message": {
+     "type": "string"
+    },
+    "conversation": {
+     "type": "string"
+    },
+    "thread": {
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   },
+   "required": [
+    "kind",
+    "message",
+    "conversation",
+    "thread"
+   ],
+   "additionalProperties": false
+  },
   "PartConversationAdded": {
    "type": "object",
    "properties": {
@@ -3371,33 +4128,6 @@
    ],
    "additionalProperties": false
   },
-  "PartAgentStatus": {
-   "type": "object",
-   "properties": {
-    "kind": {
-     "const": "agent.status"
-    },
-    "agent": {
-     "type": "string"
-    },
-    "state": {
-     "$ref": "#/$defs/AgentState"
-    },
-    "on": {
-     "type": [
-      "string",
-      "null"
-     ]
-    }
-   },
-   "required": [
-    "kind",
-    "agent",
-    "state",
-    "on"
-   ],
-   "additionalProperties": false
-  },
   "ConversationPart": {
    "oneOf": [
     {
@@ -3425,6 +4155,9 @@
      "$ref": "#/$defs/PartReplyStarted"
     },
     {
+     "$ref": "#/$defs/PartReplyAbandoned"
+    },
+    {
      "$ref": "#/$defs/PartConversationAdded"
     },
     {
@@ -3438,9 +4171,6 @@
     },
     {
      "$ref": "#/$defs/PartProfileLine"
-    },
-    {
-     "$ref": "#/$defs/PartAgentStatus"
     }
    ]
   },
@@ -3548,7 +4278,7 @@
    "type": "object",
    "properties": {
     "stream": {
-     "type": "string"
+     "const": "conversations"
     },
     "number": {
      "type": "integer",
@@ -3577,7 +4307,7 @@
    "type": "object",
    "properties": {
     "stream": {
-     "type": "string"
+     "const": "feed"
     },
     "number": {
      "type": "integer",
@@ -3652,7 +4382,7 @@
    "type": "object",
    "properties": {
     "too_far_behind": {
-     "type": "string"
+     "$ref": "#/$defs/Stream"
     }
    },
    "required": [
@@ -3706,6 +4436,41 @@
    ],
    "additionalProperties": false
   },
+  "AgentStatusBody": {
+   "type": "object",
+   "properties": {
+    "agent": {
+     "type": "string"
+    },
+    "state": {
+     "$ref": "#/$defs/AgentState"
+    },
+    "on": {
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   },
+   "required": [
+    "agent",
+    "state",
+    "on"
+   ],
+   "additionalProperties": false
+  },
+  "LiveAgentStatus": {
+   "type": "object",
+   "properties": {
+    "agent_status": {
+     "$ref": "#/$defs/AgentStatusBody"
+    }
+   },
+   "required": [
+    "agent_status"
+   ],
+   "additionalProperties": false
+  },
   "LiveOut": {
    "oneOf": [
     {
@@ -3725,6 +4490,9 @@
     },
     {
      "$ref": "#/$defs/LivePiece"
+    },
+    {
+     "$ref": "#/$defs/LiveAgentStatus"
     }
    ]
   },
@@ -3799,9 +4567,17 @@
     "id": {
      "type": "string"
     },
-    "version": {
+    "number": {
      "type": "integer",
      "minimum": 0
+    },
+    "created_at": {
+     "type": "string",
+     "format": "date-time"
+    },
+    "version": {
+     "type": "integer",
+     "minimum": 1
     },
     "conversation": {
      "type": "string"
@@ -3849,6 +4625,8 @@
    },
    "required": [
     "id",
+    "number",
+    "created_at",
     "version",
     "conversation",
     "thread",
@@ -3869,7 +4647,7 @@
     },
     "version": {
      "type": "integer",
-     "minimum": 0
+     "minimum": 1
     }
    },
    "required": [
@@ -3887,6 +4665,10 @@
     "org": {
      "type": "string"
     },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "number": {
      "type": "integer",
      "minimum": 0
@@ -3898,6 +4680,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "message"
    ],
@@ -3912,6 +4695,10 @@
     "org": {
      "type": "string"
     },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "number": {
      "type": "integer",
      "minimum": 0
@@ -3923,6 +4710,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "message"
    ],
@@ -3937,6 +4725,10 @@
     "org": {
      "type": "string"
     },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "number": {
      "type": "integer",
      "minimum": 0
@@ -3948,6 +4740,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "message"
    ],
@@ -3986,6 +4779,23 @@
    ],
    "additionalProperties": false
   },
+  "SearchRefusal": {
+   "type": "object",
+   "properties": {
+    "refused": {
+     "type": "string"
+    },
+    "wipe": {
+     "type": "integer",
+     "minimum": 0
+    }
+   },
+   "required": [
+    "refused",
+    "wipe"
+   ],
+   "additionalProperties": false
+  },
   "NoteDue": {
    "type": "object",
    "properties": {
@@ -3994,6 +4804,10 @@
     },
     "org": {
      "type": "string"
+    },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
     },
     "number": {
      "type": "integer",
@@ -4033,6 +4847,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "edition",
@@ -4054,6 +4869,10 @@
     },
     "org": {
      "type": "string"
+    },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
     },
     "number": {
      "type": "integer",
@@ -4081,6 +4900,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "edition",
@@ -4098,6 +4918,10 @@
     },
     "org": {
      "type": "string"
+    },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
     },
     "number": {
      "type": "integer",
@@ -4119,12 +4943,13 @@
      "type": "string"
     },
     "because": {
-     "type": "string"
+     "$ref": "#/$defs/WithdrawReason"
     }
    },
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "edition",
@@ -4142,6 +4967,10 @@
     },
     "org": {
      "type": "string"
+    },
+    "reset": {
+     "type": "integer",
+     "minimum": 0
     },
     "number": {
      "type": "integer",
@@ -4163,6 +4992,7 @@
    "required": [
     "kind",
     "org",
+    "reset",
     "number",
     "previous",
     "edition",
@@ -4248,9 +5078,13 @@
      "type": "string"
     },
     "now": {
-     "type": [
-      "string",
-      "null"
+     "oneOf": [
+      {
+       "$ref": "#/$defs/NoteNow"
+      },
+      {
+       "type": "null"
+      }
      ]
     }
    },
@@ -4513,6 +5347,17 @@
   "AgentEvents": {
    "type": "object",
    "properties": {
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "continue_from": {
+     "type": [
+      "integer",
+      "null"
+     ],
+     "minimum": 0
+    },
     "events": {
      "type": "array",
      "items": {
@@ -4521,6 +5366,8 @@
     }
    },
    "required": [
+    "reset",
+    "continue_from",
     "events"
    ],
    "additionalProperties": false
@@ -4769,14 +5616,37 @@
    ],
    "additionalProperties": false
   },
-  "Place": {
+  "FeedPlace": {
    "type": "object",
    "properties": {
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
     "through": {
      "type": "integer",
      "minimum": 0
     },
     "edition": {
+     "type": "integer",
+     "minimum": 0
+    }
+   },
+   "required": [
+    "reset",
+    "through",
+    "edition"
+   ],
+   "additionalProperties": false
+  },
+  "SearchPlace": {
+   "type": "object",
+   "properties": {
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "through": {
      "type": "integer",
      "minimum": 0
     },
@@ -4786,7 +5656,32 @@
     }
    },
    "required": [
-    "through"
+    "reset",
+    "through",
+    "wipe"
+   ],
+   "additionalProperties": false
+  },
+  "SenderPlace": {
+   "type": "object",
+   "properties": {
+    "reset": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "through": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "edition": {
+     "type": "integer",
+     "minimum": 0
+    }
+   },
+   "required": [
+    "reset",
+    "through",
+    "edition"
    ],
    "additionalProperties": false
   },
@@ -4963,12 +5858,19 @@
     },
     "what": {
      "type": "string"
+    },
+    "situation": {
+     "type": [
+      "string",
+      "null"
+     ]
     }
    },
    "required": [
     "at",
     "who",
-    "what"
+    "what",
+    "situation"
    ],
    "additionalProperties": false
   },

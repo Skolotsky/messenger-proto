@@ -1,0 +1,7 @@
+{
+ "agent_status": {
+  "agent": "release-agent",
+  "state": "working",
+  "on": "marco"
+ }
+}

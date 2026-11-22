@@ -1,17 +1,26 @@
 {
  "org": "acme",
+ "org_name": "org_name",
  "person": {
   "id": "marco",
   "name": "Marco Silva",
   "is_agent": false,
-  "line": "Pricing and launch"
+  "line": "Pricing and launch",
+  "status": {
+   "state": "working",
+   "on": "marco"
+  }
  },
  "people": [
   {
    "id": "marco",
    "name": "Marco Silva",
    "is_agent": false,
-   "line": "Pricing and launch"
+   "line": "Pricing and launch",
+   "status": {
+    "state": "working",
+    "on": "marco"
+   }
   }
  ],
  "preferences": [
@@ -30,7 +39,7 @@
     "lena"
    ],
    "unread": true,
-   "dial": "default"
+   "dial": "focus"
   }
  ],
  "reset": 2,

@@ -16,12 +16,12 @@ import (
 const contracts = "../../../../contracts"
 
 type operation struct {
-	Contract string   `json:"contract"`
-	Name     string   `json:"name"`
-	Method   string   `json:"method"`
-	Path     string   `json:"path"`
-	Request  *string  `json:"request"`
-	Answers  []string `json:"answers"`
+	Contract string         `json:"contract"`
+	Name     string         `json:"name"`
+	Method   string         `json:"method"`
+	Path     string         `json:"path"`
+	Request  *string        `json:"request"`
+	Answers  map[string]int `json:"answers"`
 }
 
 func load(t *testing.T) (map[string]any, *jsonschema.Compiler) {
@@ -227,8 +227,14 @@ func TestOperationsCoverEveryType(t *testing.T) {
 		if op.Request != nil {
 			mark(op, *op.Request)
 		}
-		for _, a := range op.Answers {
+		if len(op.Answers) == 0 {
+			t.Errorf("%s has no answers", key)
+		}
+		for a, status := range op.Answers {
 			mark(op, a)
+			if status < 200 || status > 599 {
+				t.Errorf("%s: %s has status %d", key, a, status)
+			}
 		}
 	}
 	var unused []string

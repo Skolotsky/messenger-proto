@@ -1,6 +1,14 @@
 {
- "label": "Move Anna out of Focus",
- "action": "focus_person",
- "value": "enter",
- "moved_last_7_days": 2
+ "label": "Move Anna into Focus",
+ "do": {
+  "kind": "focus_person",
+  "about": "anna",
+  "on": true
+ },
+ "undo": {
+  "kind": "focus_person",
+  "about": "anna",
+  "on": false
+ },
+ "moved_last_7_days": 6
 }

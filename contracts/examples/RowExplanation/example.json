@@ -1,11 +1,19 @@
 {
- "what": "Asks Marco to sign off",
- "decided_by": "Anna is in your Focus people",
- "otherwise": "It would be in Needs you",
+ "what": "A message from Anna that mentions you.",
+ "decided_by": "A mention lands in Needs you.",
+ "otherwise": "With #launch muted it would still reach you.",
  "change": {
-  "label": "Move Anna out of Focus",
-  "action": "focus_person",
-  "value": "enter",
-  "moved_last_7_days": 2
+  "label": "Move Anna into Focus",
+  "do": {
+   "kind": "focus_person",
+   "about": "anna",
+   "on": true
+  },
+  "undo": {
+   "kind": "focus_person",
+   "about": "anna",
+   "on": false
+  },
+  "moved_last_7_days": 6
  }
 }

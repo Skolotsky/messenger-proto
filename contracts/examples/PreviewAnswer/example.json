@@ -1,6 +1,8 @@
 {
  "last_7_days": {
-  "would_leave_needs_you": 2,
-  "would_stay": 2
+  "moved": 14,
+  "from": "needs_you",
+  "to": "fyi",
+  "stay": 3
  }
 }

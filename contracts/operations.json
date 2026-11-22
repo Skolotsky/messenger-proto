@@ -4,243 +4,329 @@
   "name": "act",
   "method": "POST",
   "path": "/orgs/{org}/people/actions",
+  "query": {},
   "request": "PeopleAction",
-  "answers": [
-   "ActionSaved",
-   "Refusal"
-  ]
+  "answers": {
+   "ActionSaved": 200,
+   "Refusal": 409
+  },
+  "also": []
  },
  {
   "contract": "screen-to-conversations",
   "name": "start",
   "method": "GET",
   "path": "/orgs/{org}/people/{person}/start",
+  "query": {},
   "request": null,
-  "answers": [
-   "StartAnswer"
-  ]
+  "answers": {
+   "StartAnswer": 200
+  },
+  "also": []
  },
  {
   "contract": "screen-to-conversations",
   "name": "messages",
   "method": "GET",
   "path": "/orgs/{org}/conversations/{conversation}/messages",
+  "query": {
+   "around": "log number",
+   "thread": "root message ID",
+   "before": "cursor",
+   "limit": "count"
+  },
   "request": null,
-  "answers": [
-   "MessagesAnswer"
-  ]
+  "answers": {
+   "MessagesAnswer": 200
+  },
+  "also": []
  },
  {
   "contract": "screen-to-conversations",
   "name": "feed",
   "method": "GET",
   "path": "/orgs/{org}/people/{person}/feed",
+  "query": {},
   "request": null,
-  "answers": [
-   "ScreenFeedAnswer"
-  ]
+  "answers": {
+   "ScreenFeedAnswer": 200
+  },
+  "also": []
  },
  {
   "contract": "screen-to-conversations",
   "name": "history",
   "method": "GET",
   "path": "/orgs/{org}/people/{person}/history",
+  "query": {
+   "tab": "HistoryTab",
+   "after": "cursor"
+  },
   "request": null,
-  "answers": [
-   "HistoryAnswer",
-   "NotAvailable"
-  ]
+  "answers": {
+   "HistoryAnswer": 200,
+   "NotAvailable": 503
+  },
+  "also": []
  },
  {
   "contract": "screen-to-conversations",
   "name": "settings",
   "method": "GET",
   "path": "/orgs/{org}/people/{person}/settings",
+  "query": {},
   "request": null,
-  "answers": [
-   "SettingsAnswer",
-   "NotAvailable"
-  ]
+  "answers": {
+   "SettingsAnswer": 200,
+   "NotAvailable": 503
+  },
+  "also": []
  },
  {
   "contract": "screen-to-conversations",
   "name": "preview",
   "method": "GET",
   "path": "/orgs/{org}/people/{person}/preview",
+  "query": {
+   "change": "a RowAct as URL-encoded JSON"
+  },
   "request": null,
-  "answers": [
-   "PreviewAnswer",
-   "NotAvailable"
-  ]
+  "answers": {
+   "PreviewAnswer": 200,
+   "NotAvailable": 503
+  },
+  "also": []
  },
  {
   "contract": "screen-to-conversations",
   "name": "search",
   "method": "GET",
   "path": "/orgs/{org}/people/{person}/search",
+  "query": {
+   "q": "text",
+   "after": "cursor"
+  },
   "request": null,
-  "answers": [
-   "ScreenSearchAnswer"
-  ]
+  "answers": {
+   "ScreenSearchAnswer": 200
+  },
+  "also": []
  },
  {
   "contract": "screen-to-conversations",
   "name": "suggest",
   "method": "GET",
   "path": "/orgs/{org}/suggest",
+  "query": {
+   "q": "text",
+   "as": "person"
+  },
   "request": null,
-  "answers": [
-   "SuggestAnswer"
-  ]
+  "answers": {
+   "SuggestAnswer": 200
+  },
+  "also": []
  },
  {
   "contract": "conversations-to-screen",
   "name": "live",
   "method": "WS",
   "path": "/orgs/{org}/live",
+  "query": {
+   "person": "person"
+  },
   "request": "LiveIn",
-  "answers": [
-   "LiveOut"
-  ]
+  "answers": {
+   "LiveOut": 200
+  },
+  "also": []
  },
  {
   "contract": "conversations-to-screen",
   "name": "reply-text",
   "method": "GET",
   "path": "/orgs/{org}/replies/{message}",
+  "query": {},
   "request": null,
-  "answers": [
-   "ReplyText"
-  ]
+  "answers": {
+   "ReplyText": 200
+  },
+  "also": []
  },
  {
   "contract": "door-reads",
   "name": "feed-rows",
   "method": "GET",
   "path": "feed:/orgs/{org}/people/{person}/rows",
+  "query": {},
   "request": null,
-  "answers": [
-   "FeedRowsAnswer"
-  ]
+  "answers": {
+   "FeedRowsAnswer": 200
+  },
+  "also": []
  },
  {
   "contract": "door-reads",
   "name": "feed-history",
   "method": "GET",
   "path": "feed:/orgs/{org}/people/{person}/history",
+  "query": {
+   "tab": "HistoryTab",
+   "after": "cursor"
+  },
   "request": null,
-  "answers": [
-   "HistoryAnswer"
-  ]
+  "answers": {
+   "HistoryAnswer": 200
+  },
+  "also": []
  },
  {
   "contract": "door-reads",
   "name": "feed-settings",
   "method": "GET",
   "path": "feed:/orgs/{org}/people/{person}/settings",
+  "query": {},
   "request": null,
-  "answers": [
-   "SettingsAnswer"
-  ]
+  "answers": {
+   "SettingsAnswer": 200
+  },
+  "also": []
  },
  {
   "contract": "door-reads",
   "name": "feed-preview",
   "method": "GET",
   "path": "feed:/orgs/{org}/people/{person}/preview",
+  "query": {
+   "change": "a RowAct as URL-encoded JSON"
+  },
   "request": null,
-  "answers": [
-   "PreviewAnswer"
-  ]
+  "answers": {
+   "PreviewAnswer": 200
+  },
+  "also": []
  },
  {
   "contract": "door-reads",
   "name": "feed-updates",
   "method": "GET",
   "path": "feed:/orgs/{org}/updates",
+  "query": {
+   "after": "row-log number",
+   "edition": "edition",
+   "limit": "count"
+  },
   "request": null,
-  "answers": [
-   "RowUpdatesPage",
-   "NewEdition"
-  ]
+  "answers": {
+   "RowUpdatesPage": 200,
+   "NewEdition": 200
+  },
+  "also": []
  },
  {
   "contract": "door-reads",
   "name": "search-query",
   "method": "GET",
   "path": "search:/orgs/{org}/query",
+  "query": {
+   "q": "text",
+   "as": "person",
+   "after": "cursor"
+  },
   "request": null,
-  "answers": [
-   "SearchAnswer"
-  ]
+  "answers": {
+   "SearchAnswer": 200
+  },
+  "also": []
  },
  {
   "contract": "conversations-to-feed",
   "name": "change",
   "method": "POST",
   "path": "feed:/changes",
+  "query": {},
   "request": "Change",
-  "answers": [
-   "ChangeApplied",
-   "IAmAt",
-   "OrganizationStopped"
-  ]
+  "answers": {
+   "ChangeApplied": 200,
+   "IAmAt": 409,
+   "OrganizationStopped": 423,
+   "StaleReset": 409
+  },
+  "also": []
  },
  {
   "contract": "conversations-to-feed",
   "name": "change-batch",
   "method": "POST",
   "path": "feed:/changes/batch",
+  "query": {},
   "request": "ChangeBatch",
-  "answers": [
-   "ChangeApplied",
-   "IAmAt",
-   "OrganizationStopped"
-  ]
+  "answers": {
+   "ChangeApplied": 200,
+   "IAmAt": 409,
+   "OrganizationStopped": 423,
+   "StaleReset": 409
+  },
+  "also": []
  },
  {
   "contract": "conversations-to-search",
   "name": "change",
   "method": "POST",
   "path": "search:/changes",
+  "query": {},
   "request": "SearchChange",
-  "answers": [
-   "SearchApplied",
-   "Refusal"
-  ]
+  "answers": {
+   "SearchApplied": 200,
+   "SearchRefusal": 422,
+   "StaleReset": 409
+  },
+  "also": []
  },
  {
   "contract": "feed-to-notification-sender",
   "name": "note",
   "method": "POST",
   "path": "sender:/notes",
+  "query": {},
   "request": "Note",
-  "answers": [
-   "NoteTaken",
-   "NoteBehind",
-   "Refusal"
-  ]
+  "answers": {
+   "NoteTaken": 200,
+   "NoteBehind": 409,
+   "Refusal": 422,
+   "StaleReset": 409
+  },
+  "also": []
  },
  {
   "contract": "agent-door",
   "name": "events",
   "method": "GET",
   "path": "/orgs/{org}/agents/{agent}/events",
+  "query": {
+   "after": "event number",
+   "wait": "seconds, at most 25"
+  },
   "request": null,
-  "answers": [
-   "AgentEvents",
-   "TooFarBehind"
-  ]
+  "answers": {
+   "AgentEvents": 200,
+   "TooFarBehind": 410
+  },
+  "also": []
  },
  {
   "contract": "agent-door",
   "name": "post",
   "method": "POST",
   "path": "/orgs/{org}/agents/{agent}/messages",
+  "query": {},
   "request": "AgentPost",
-  "answers": [
-   "AgentPosted",
-   "Refusal"
+  "answers": {
+   "AgentPosted": 200,
+   "Refusal": 409
+  },
+  "also": [
+   429
   ]
  },
  {
@@ -248,10 +334,14 @@
   "name": "reply-start",
   "method": "POST",
   "path": "/orgs/{org}/agents/{agent}/replies",
+  "query": {},
   "request": "AgentReplyStart",
-  "answers": [
-   "AgentPosted",
-   "Refusal"
+  "answers": {
+   "AgentPosted": 200,
+   "Refusal": 409
+  },
+  "also": [
+   429
   ]
  },
  {
@@ -259,11 +349,15 @@
   "name": "reply-piece",
   "method": "POST",
   "path": "/orgs/{org}/agents/{agent}/replies/{reply}/pieces",
+  "query": {},
   "request": "AgentPiece",
-  "answers": [
-   "Empty",
-   "PieceMissing",
-   "Refusal"
+  "answers": {
+   "Empty": 200,
+   "PieceMissing": 409,
+   "Refusal": 409
+  },
+  "also": [
+   429
   ]
  },
  {
@@ -271,10 +365,14 @@
   "name": "reply-finish",
   "method": "POST",
   "path": "/orgs/{org}/agents/{agent}/replies/{reply}/finish",
+  "query": {},
   "request": "AgentReplyFinish",
-  "answers": [
-   "AgentPosted",
-   "Refusal"
+  "answers": {
+   "AgentPosted": 200,
+   "Refusal": 409
+  },
+  "also": [
+   429
   ]
  },
  {
@@ -282,9 +380,13 @@
   "name": "status",
   "method": "POST",
   "path": "/orgs/{org}/agents/{agent}/status",
+  "query": {},
   "request": "AgentStatus",
-  "answers": [
-   "Empty"
+  "answers": {
+   "Empty": 200
+  },
+  "also": [
+   429
   ]
  },
  {
@@ -292,10 +394,14 @@
   "name": "react",
   "method": "POST",
   "path": "/orgs/{org}/agents/{agent}/reactions",
+  "query": {},
   "request": "AgentReaction",
-  "answers": [
-   "AgentPosted",
-   "Refusal"
+  "answers": {
+   "AgentPosted": 200,
+   "Refusal": 409
+  },
+  "also": [
+   429
   ]
  },
  {
@@ -303,10 +409,14 @@
   "name": "direct",
   "method": "POST",
   "path": "/orgs/{org}/agents/{agent}/direct",
+  "query": {},
   "request": "AgentDirect",
-  "answers": [
-   "AgentDirectAnswer",
-   "Refusal"
+  "answers": {
+   "AgentDirectAnswer": 200,
+   "Refusal": 409
+  },
+  "also": [
+   429
   ]
  },
  {
@@ -314,212 +424,312 @@
   "name": "subscribe",
   "method": "PUT",
   "path": "/orgs/{org}/agents/{agent}/subscriptions/{conversation}",
+  "query": {},
   "request": null,
-  "answers": [
-   "Empty"
-  ]
+  "answers": {
+   "Empty": 200
+  },
+  "also": []
  },
  {
   "contract": "agent-door",
   "name": "unsubscribe",
   "method": "DELETE",
   "path": "/orgs/{org}/agents/{agent}/subscriptions/{conversation}",
+  "query": {},
   "request": null,
-  "answers": [
-   "Empty"
-  ]
+  "answers": {
+   "Empty": 200
+  },
+  "also": []
  },
  {
   "contract": "agent-door",
   "name": "read-messages",
   "method": "GET",
   "path": "/orgs/{org}/agents/{agent}/conversations/{conversation}/messages",
+  "query": {
+   "around": "log number",
+   "thread": "root message ID",
+   "before": "cursor",
+   "limit": "count"
+  },
   "request": null,
-  "answers": [
-   "MessagesAnswer"
-  ]
+  "answers": {
+   "MessagesAnswer": 200,
+   "Refusal": 409
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "nudge",
   "method": "POST",
   "path": "conversations:/orgs/{org}/nudge",
+  "query": {},
   "request": "Empty",
-  "answers": [
-   "Empty"
-  ]
+  "answers": {
+   "Empty": 204
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
-  "name": "place",
+  "name": "feed-place",
   "method": "GET",
-  "path": "{part}:/orgs/{org}/place",
+  "path": "feed:/orgs/{org}/place",
+  "query": {},
   "request": null,
-  "answers": [
-   "Place"
-  ]
+  "answers": {
+   "FeedPlace": 200
+  },
+  "also": []
+ },
+ {
+  "contract": "operations-and-control",
+  "name": "search-place",
+  "method": "GET",
+  "path": "search:/orgs/{org}/place",
+  "query": {},
+  "request": null,
+  "answers": {
+   "SearchPlace": 200
+  },
+  "also": []
+ },
+ {
+  "contract": "operations-and-control",
+  "name": "sender-place",
+  "method": "GET",
+  "path": "sender:/orgs/{org}/place",
+  "query": {},
+  "request": null,
+  "answers": {
+   "SenderPlace": 200
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "delivery-status",
   "method": "GET",
   "path": "delivery:/orgs/{org}/status",
+  "query": {},
   "request": null,
-  "answers": [
-   "DeliveryStatus"
-  ]
+  "answers": {
+   "DeliveryStatus": 200
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "parked",
   "method": "GET",
   "path": "delivery:/orgs/{org}/parked",
+  "query": {},
   "request": null,
-  "answers": [
-   "ParkedList"
-  ]
+  "answers": {
+   "ParkedList": 200
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "parked-retry",
   "method": "POST",
   "path": "delivery:/orgs/{org}/parked/{number}/retry",
+  "query": {
+   "receiver": "ReceiverName"
+  },
   "request": "Empty",
-  "answers": [
-   "Empty"
-  ]
+  "answers": {
+   "Empty": 200
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "receiver-restart",
   "method": "POST",
   "path": "delivery:/orgs/{org}/receivers/{receiver}/restart",
+  "query": {},
   "request": "RestartRequest",
-  "answers": [
-   "Empty"
-  ]
+  "answers": {
+   "Empty": 200
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "mode-read",
   "method": "GET",
   "path": "{part}:/orgs/{org}/control/mode",
+  "query": {},
   "request": null,
-  "answers": [
-   "ModeBody"
-  ]
+  "answers": {
+   "ModeBody": 200
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "mode-set",
   "method": "POST",
   "path": "{part}:/orgs/{org}/control/mode",
+  "query": {},
   "request": "ModeBody",
-  "answers": [
-   "Empty"
-  ]
+  "answers": {
+   "Empty": 200
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "wipe",
   "method": "POST",
   "path": "{part}:/orgs/{org}/control/wipe",
+  "query": {},
   "request": "Empty",
-  "answers": [
-   "Empty"
-  ]
+  "answers": {
+   "Empty": 200
+  },
+  "also": []
+ },
+ {
+  "contract": "operations-and-control",
+  "name": "mode-set-all",
+  "method": "POST",
+  "path": "{part}:/control/mode",
+  "query": {},
+  "request": "ModeBody",
+  "answers": {
+   "Empty": 200
+  },
+  "also": []
+ },
+ {
+  "contract": "operations-and-control",
+  "name": "wipe-all",
+  "method": "POST",
+  "path": "{part}:/control/wipe",
+  "query": {},
+  "request": "Empty",
+  "answers": {
+   "Empty": 200
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "rebuild",
   "method": "POST",
   "path": "demo:/orgs/{org}/rebuild",
+  "query": {},
   "request": "RebuildRequest",
-  "answers": [
-   "Empty"
-  ]
+  "answers": {
+   "Empty": 200
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "reset",
   "method": "POST",
   "path": "demo:/orgs/{org}/reset",
+  "query": {},
   "request": "Empty",
-  "answers": [
-   "Empty"
-  ]
+  "answers": {
+   "Empty": 200
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "notifications",
   "method": "GET",
   "path": "sender:/orgs/{org}/notifications",
+  "query": {
+   "person": "person"
+  },
   "request": null,
-  "answers": [
-   "NotificationList"
-  ]
+  "answers": {
+   "NotificationList": 200
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "people",
   "method": "GET",
   "path": "conversations:/orgs/{org}/people",
+  "query": {},
   "request": null,
-  "answers": [
-   "PeopleList"
-  ]
+  "answers": {
+   "PeopleList": 200
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "script-read",
   "method": "GET",
   "path": "demo:/orgs/{org}/script",
+  "query": {},
   "request": null,
-  "answers": [
-   "ScriptState"
-  ]
+  "answers": {
+   "ScriptState": 200
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "script-do",
   "method": "POST",
   "path": "demo:/orgs/{org}/script",
+  "query": {},
   "request": "ScriptRequest",
-  "answers": [
-   "Empty"
-  ]
+  "answers": {
+   "Empty": 200
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "seed-open",
   "method": "POST",
   "path": "conversations:/orgs/{org}/seed/open",
+  "query": {},
   "request": "Empty",
-  "answers": [
-   "SeedOpened",
-   "Refusal"
-  ]
+  "answers": {
+   "SeedOpened": 200,
+   "Refusal": 409
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "seed-batch",
   "method": "POST",
   "path": "conversations:/orgs/{org}/seed/{session}",
+  "query": {},
   "request": "SeedBatch",
-  "answers": [
-   "SeedThrough",
-   "Refusal"
-  ]
+  "answers": {
+   "SeedThrough": 200,
+   "Refusal": 409
+  },
+  "also": []
  },
  {
   "contract": "operations-and-control",
   "name": "seed-seal",
   "method": "POST",
   "path": "conversations:/orgs/{org}/seed/{session}/seal",
+  "query": {},
   "request": "Empty",
-  "answers": [
-   "SeedThrough",
-   "Refusal"
-  ]
+  "answers": {
+   "SeedThrough": 200,
+   "Refusal": 409
+  },
+  "also": []
  }
 ]

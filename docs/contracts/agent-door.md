@@ -12,8 +12,8 @@ Every call is made for one organization (D-026). It is in the address of every c
 
 ```json
 GET  /orgs/acme/agents/release-agent/events?after=311&wait=25
-→ [ { "org": "acme", "number": 312, "kind": "mentioned", "agent_chain": 0,
-      "message": { "id": "msg_7Q2", "version": 1, "conversation": "#launch", "author": "anna", "text": "…" } } ]
+→ { "reset": 2, "continue_from": null, "events": [ { "org": "acme", "reset": 2, "number": 312, "kind": "mentioned", "agent_chain": 0,
+      "message": { "id": "msg_7Q2", "version": 1, "conversation": "#launch", "author": "anna", "text": "…" } } ] }
 
 POST /orgs/acme/agents/release-agent/messages          { "id": "a-91", "conversation": "#launch", "thread": "msg_7Q2", "text": "On it.", "level": "info", "because_of": 312 }
 → 200 { "message": "msg_8B3", "number": 4870 }

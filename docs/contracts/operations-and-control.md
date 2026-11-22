@@ -13,13 +13,13 @@ Every call is made for one organization, except where it says "all".
 ```json
 POST conversations/orgs/acme/nudge      {}                                → 204     "this organization has news"; no data; may be lost
 
-GET  feed/orgs/acme/place                → { "through": 4861, "edition": 7 }
-GET  search/orgs/acme/place              → { "through": 4855 }
-GET  sender/orgs/acme/place              → { "through": 1285, "edition": 7 }
+GET  feed/orgs/acme/place                → { "reset": 2, "through": 4861, "edition": 7 }
+GET  search/orgs/acme/place              → { "reset": 2, "through": 4855, "wipe": 1 }
+GET  sender/orgs/acme/place              → { "reset": 2, "through": 1285, "edition": 7 }
 
 GET  delivery/orgs/acme/status           → { "receivers": [ { "name": "search", "place": 4855, "waiting": 6, "state": "running", "parked": 1 } ] }
                                             state: running · down · paused · stopped
-GET  delivery/orgs/acme/parked           → [ { "receiver": "search", "number": 4830, "reason": "refused", "tries": 3 } ]
+GET  delivery/orgs/acme/parked           → { "parked": [ { "receiver": "search", "number": 4830, "reason": "refused", "tries": 3 } ] }
 POST delivery/orgs/acme/parked/4830/retry?receiver=search        → 200
 
 POST {feed|search|sender}/orgs/acme/control/mode    { "mode": "running" }   running · slow · off      (also /control/mode with no organization: all)
@@ -28,7 +28,7 @@ POST demo/orgs/acme/rebuild              { "receiver": "feed", "rules_changed": 
 POST demo/orgs/acme/reset                                                   restores this organization's saved copies
 
 GET  sender/orgs/acme/notifications?person=marco
-→ [ { "name": "acme / marco / #launch / 4812", "state": "sent", "at": "…", "delayed": false, "why": "Anna mentioned you in #launch", "text": "…", "now": "read" } ]
+→ { "notifications": [ { "name": "acme / marco / #launch / 4812", "person": "marco", "state": "sent", "at": "…", "delayed": false, "why": "Anna mentioned you in #launch", "text": "…", "now": "read" } ] }
 
 GET  demo/orgs/acme/script               → { "running": true, "pace": 1, "happened": […], "next": […], "situations": […] }
 POST demo/orgs/acme/script               { "do": "start" }        start · pause · pace · play_situation (with "pace" or "situation")

@@ -9,7 +9,11 @@
    "preview": "@Marco can you sign off the pricing page?",
    "at": "2026-11-22T10:14:03.120Z",
    "number": 4812,
-   "unread": true
+   "unread": true,
+   "by": "lena",
+   "emoji": "eyes",
+   "level": "needs_you",
+   "kept": "flag"
   }
  ],
  "unread": 2,

@@ -54,8 +54,8 @@ POST /orgs/acme/people/actions
 → 409 { "refused": "unknown kind" }        for a kind Conversations does not know
 → 409 { "refused": "message deleted" }     an edit or reaction on a message that is gone; trying again cannot help
 
-GET /orgs/acme/people/marco/preview?change=dial&channel=%23incidents&level=muted
-→ 200 { "last_7_days": { "would_leave_needs_you": 14, "would_stay": 3 } }   or   503 { "not_available": "the feed is catching up" }
+GET /orgs/acme/people/marco/preview?change=<the change as URL-encoded JSON>
+→ 200 { "last_7_days": { "moved": 14, "from": "needs_you", "to": "fyi", "stay": 3 } }   or   503 { "not_available": "the feed is catching up" }
 ```
 
 ## 3. Guarantees

@@ -25,6 +25,7 @@ server → { "last_sent": { "conversations": 4859, "feed": 103, "feed_edition": 
 server → { "too_far_behind": "feed" }                                   the screen loads that view fresh
 server → { "reset": 3 }                                                 the organization was Reset: the screen loads everything fresh
 server → { "piece": { "message": "msg_9A1", "at": 120, "text": "ready. " } }
+server → { "agent_status": { "agent": "release-agent", "state": "waiting", "on": "marco" } }     outside the numbering; the latest counts, and a fresh load has it on the person
 ```
 
 ## 3. Guarantees

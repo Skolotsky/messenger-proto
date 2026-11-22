@@ -33,8 +33,10 @@ Every operation and event of the eight contracts has a schema and a checked exam
 
 - 2026-11-22: Harness built: clock a test build can move (`/test/clock`, absent from normal builds), troublemaker, recording receiver, start/stop/kill/freeze of real programs. Still to build after the schema review: the log writer and the mock door; two-organization support comes with the log writer.
 
+- 2026-11-22: Independent review of the schemas: 12 blockers, 12 gaps, 6 minor, all applied. One ruling that follows from accepted decisions rather than a new one: a top-level message addressing you is the row of its own thread (D-001, E-001), and opening its channel reads it because it is shown there, while unseen replies stay unread (D-032). Agent status travels outside the numbering, latest wins, as the agent door already said.
+
 ## Evidence
 
-Schemas (2026-11-22): 186 types, 163 examples, 50 operations. `./scripts/check` validates every example, refuses each example with a required field removed or an unknown field added, round-trips each through its Go type, and compares the generated TypeScript.
+Schemas (2026-11-22, after the review): 205 types, 181 examples, 54 operations. `./scripts/check` validates every example, refuses each example with a required field removed or an unknown field added, round-trips each through its Go type, and compares the generated TypeScript.
 
 Seen failing, each planted in a throwaway clone: an example breaking its schema; a bad timestamp; a schema changed without regenerating; a type without an example; a Go type losing a field (`unknown field "connection"`, on the rerun described in the log).

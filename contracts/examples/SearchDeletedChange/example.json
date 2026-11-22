@@ -1,9 +1,10 @@
 {
  "kind": "message.deleted",
  "org": "acme",
- "number": 4812,
+ "reset": 2,
+ "number": 4855,
  "message": {
   "id": "msg_7Q2",
-  "version": 1
+  "version": 3
  }
 }

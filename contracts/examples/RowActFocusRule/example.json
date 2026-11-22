@@ -1,0 +1,8 @@
+{
+ "kind": "focus_rule",
+ "rule": {
+  "type": "person",
+  "value": "anna"
+ },
+ "on": true
+}

@@ -1,9 +1,11 @@
 {
+ "reset": 2,
+ "continue_from": null,
  "events": [
   {
    "kind": "mentioned",
    "org": "acme",
-   "number": 4812,
+   "number": 312,
    "reset": 2,
    "agent_chain": 2,
    "message": {

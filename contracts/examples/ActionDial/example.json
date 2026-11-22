@@ -3,6 +3,6 @@
  "id": "act_01JD3K7Q2",
  "as": "marco",
  "conversation": "#launch",
- "thread": "msg_4C1",
- "level": "default"
+ "thread": null,
+ "level": "muted"
 }
