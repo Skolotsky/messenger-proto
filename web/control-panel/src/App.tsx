@@ -322,6 +322,10 @@ export function App({ api }: { api: Api }) {
           <h1>Control panel</h1>
           <span className="tag">OUTSIDE THE PRODUCT</span>
           {view.current && <span className="org-now">{view.current.name} <code>{view.current.org}</code></span>}
+          <nav className="pages" aria-label="The other pages">
+            <a href="/">Product</a>
+            <a href="/notifications/">Notification app</a>
+          </nav>
         </div>
         <div className="controls">
           <span className={`state ${script?.running ? 'run' : 'pause'}`} data-testid="script-state">

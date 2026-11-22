@@ -68,6 +68,8 @@ services:
     command: ["demo"]
     environment:
       CONTEXIA_DATABASE_URL: postgres://demo:demo_dev@postgres:5432/contexia
+    volumes:
+      - ../demo/content:/content:ro
 
 volumes:
   pgdata:

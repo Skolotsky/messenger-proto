@@ -39,6 +39,8 @@ h1 { font-size: 18px; margin: 0; }
 h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0; }
 .tag { font: 600 11px var(--mono); background: #111; color: #ffd479; padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
 .org-now { font-weight: 600; }
+.pages { display: inline-flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13.5px; }
+.pages a { color: var(--accent); }
 .state { font-weight: 700; min-width: 62px; }
 .state.run { color: var(--ok); }
 .state.pause { color: var(--slow); }

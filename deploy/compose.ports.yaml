@@ -11,5 +11,17 @@ services:
     ports: ["127.0.0.1:18084:8080"]
   sender:
     ports: ["127.0.0.1:18085:8080"]
+  # `make up`: the demo program also serves the three pages and is the one address
+  # people use, http://127.0.0.1:18080. It seeds the first organization by itself.
   demo:
-    ports: ["127.0.0.1:18086:8080"]
+    image: contexia-demo:dev
+    build:
+      context: ../server
+      dockerfile: ../deploy/server.Dockerfile
+      target: with-pages
+      additional_contexts:
+        webpages: ../web
+    environment:
+      CONTEXIA_WEB_DIR: /web
+      CONTEXIA_DEMO_SEED_FIRST: "1"
+    ports: ["127.0.0.1:18080:8080", "127.0.0.1:18086:8080"]

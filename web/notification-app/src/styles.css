@@ -60,3 +60,6 @@ time { flex: none; }
   .wrap { padding: 12px 16px; }
   .phone { border-radius: 20px; padding: 12px 8px 14px; }
 }
+
+.pages { display: inline-flex; flex-wrap: wrap; gap: 4px 12px; }
+.pages a { color: var(--accent); }
