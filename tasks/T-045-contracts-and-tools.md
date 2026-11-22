@@ -10,10 +10,10 @@ Every operation and event of the eight contracts has a schema and a checked exam
 
 ## Acceptance criteria
 
-- [ ] Every operation and event has a schema and at least one example. Check: a coverage list in `contracts/` compared by `./scripts/check`.
-- [ ] An example that breaks its schema fails `./scripts/check`. Check: plant one.
-- [ ] Changing a schema without regenerating the TypeScript types fails `./scripts/check`. Check: plant one.
-- [ ] Go types accept every example and round-trip it without losing a field. Check: Go test over `contracts/examples/`.
+- [x] Every operation and event has a schema and at least one example. Check: a coverage list in `contracts/` compared by `./scripts/check`.
+- [x] An example that breaks its schema fails `./scripts/check`. Check: plant one.
+- [x] Changing a schema without regenerating the TypeScript types fails `./scripts/check`. Check: plant one.
+- [x] Go types accept every example and round-trip it without losing a field. Check: Go test over `contracts/examples/`.
 - [ ] The log writer produces a valid log for one or two organizations from a seed, the same each time. Check: every entry validates against the schema; same seed, same bytes.
 - [ ] The mock door serves the people door and the live connection from fixtures. Check: its answers validate against the schemas.
 - [ ] The harness starts and stops parts, repeats, loses and delays deliveries, moves the clock, and runs two organizations with the same names and numbers. Check: its own tests against a recording receiver.
@@ -29,6 +29,10 @@ Every operation and event of the eight contracts has a schema and a checked exam
 
 - 2026-11-22: Started after D-031 and D-032. Shapes the contracts leave to the schemas: screen update parts, feed row, history entry, settings, rule vocabulary.
 
+- 2026-11-22: Correction to commit 3c9e33a: its message lists "Go type losing a field" as caught, but that planted fault did not apply (the edit missed the aligned code), so the check passed without testing it. It was rerun with a fault that applied; the result is under Evidence.
+
 ## Evidence
 
-_None yet._
+Schemas (2026-11-22): 186 types, 163 examples, 50 operations. `./scripts/check` validates every example, refuses each example with a required field removed or an unknown field added, round-trips each through its Go type, and compares the generated TypeScript.
+
+Seen failing, each planted in a throwaway clone: an example breaking its schema; a bad timestamp; a schema changed without regenerating; a type without an example; a Go type losing a field (`unknown field "connection"`, on the rerun described in the log).
