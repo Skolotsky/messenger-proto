@@ -36,7 +36,7 @@ func (s *Sender) Routes() http.Handler {
 	mux.HandleFunc("POST /notes", s.note)
 	mux.HandleFunc("GET /orgs/{org}/place", s.place)
 	mux.HandleFunc("GET /orgs/{org}/notifications", s.notifications)
-	controlRoutes(mux, s.modes, s.opt.Dir, s.wipeOrg, "notifications", "deliveries", "updates_waiting", "state")
+	controlRoutes(mux, s.modes, s.opt.Dir, s.wipeOrg, "notifications", "deliveries", "state")
 	return mux
 }
 
@@ -170,7 +170,7 @@ func (s *Sender) note(w http.ResponseWriter, r *http.Request) {
 			// A new edition: start again. The names sent stay; updates still
 			// waiting for a send are written again by the replay.
 			st.edition, st.place = n.Edition, 0
-			if _, err := tx.Exec(ctx, "DELETE FROM updates_waiting WHERE org = $1", string(org)); err != nil {
+			if _, err := tx.Exec(ctx, "DELETE FROM notifications WHERE org = $1 AND state = 'waiting'", string(org)); err != nil {
 				return err
 			}
 		}
@@ -217,26 +217,19 @@ func (s *Sender) note(w http.ResponseWriter, r *http.Request) {
 
 // seen says whether a note at or behind the place has already had its effect.
 func (s *Sender) seen(ctx context.Context, tx pgx.Tx, org ids.Org, n wireNote) (bool, error) {
-	if n.Kind == "send" {
-		if fault(FaultNoSentList) {
-			return false, nil
-		}
-		var one int
-		err := tx.QueryRow(ctx, "SELECT 1 FROM notifications WHERE org = $1 AND name = $2", string(org), n.Name).Scan(&one)
-		if errors.Is(err, pgx.ErrNoRows) {
-			return false, nil
-		}
-		return err == nil, err
-	}
+	var state string
 	var textNumber int64
 	var now *string
-	err := tx.QueryRow(ctx, `SELECT text_number, now FROM notifications WHERE org = $1 AND name = $2
-		UNION ALL SELECT text_number, now FROM updates_waiting WHERE org = $1 AND name = $2 LIMIT 1`, string(org), n.Name).Scan(&textNumber, &now)
+	err := tx.QueryRow(ctx, "SELECT state, text_number, now FROM notifications WHERE org = $1 AND name = $2", string(org), n.Name).
+		Scan(&state, &textNumber, &now)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return false, nil
 	}
 	if err != nil {
 		return false, err
+	}
+	if n.Kind == "send" {
+		return state != "waiting" && !fault(FaultNoSentList), nil
 	}
 	textDone := n.Text == nil || textNumber >= n.Number || (now != nil && *now == "deleted")
 	nowDone := n.Now == nil || (now != nil && (*now == "deleted" || *now == *n.Now))
@@ -245,13 +238,14 @@ func (s *Sender) seen(ctx context.Context, tx pgx.Tx, org ids.Org, n wireNote) (
 
 func (s *Sender) apply(ctx context.Context, tx pgx.Tx, org ids.Org, n wireNote, at, due time.Time) error {
 	if n.Kind == "update" {
-		return s.update(ctx, tx, org, n)
+		return s.update(ctx, tx, org, n, at)
 	}
 	return s.send(ctx, tx, org, n, at, due)
 }
 
 // send hands a notification over, once per name. A name listed as history is
-// never handed over, whatever arrives for it later (D-032, D-034).
+// never handed over, whatever arrives for it later (D-032, D-034). A row waiting
+// with an earlier update becomes the entry and keeps what that update said.
 func (s *Sender) send(ctx context.Context, tx pgx.Tx, org ids.Org, n wireNote, at, due time.Time) error {
 	now := s.opt.Clock.Now()
 	state, sentAt, delayed := "sent", now, false
@@ -266,61 +260,35 @@ func (s *Sender) send(ctx context.Context, tx pgx.Tx, org ids.Org, n wireNote, a
 		}
 		delayed = handed.Sub(due) > DelayedAfter
 	}
-	onConflict := "DO NOTHING"
+	only := " WHERE notifications.state = 'waiting'"
 	if fault(FaultNoSentList) {
-		onConflict = "DO UPDATE SET state = EXCLUDED.state"
+		only = ""
 	}
-	tag, err := tx.Exec(ctx, `INSERT INTO notifications (org, name, person, state, due_at, sent_at, delayed, why, body)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-		ON CONFLICT (org, name) `+onConflict, string(org), n.Name, n.Person, state, due, sentAt, delayed, n.Why, n.text())
+	tag, err := tx.Exec(ctx, `INSERT INTO notifications (org, name, person, state, due_at, arrived_at, sent_at, delayed, why, body)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+		ON CONFLICT (org, name) DO UPDATE SET person = EXCLUDED.person, state = EXCLUDED.state, due_at = EXCLUDED.due_at,
+			arrived_at = EXCLUDED.arrived_at, sent_at = EXCLUDED.sent_at, delayed = EXCLUDED.delayed, why = EXCLUDED.why,
+			body = CASE WHEN notifications.now = 'deleted' THEN '' WHEN notifications.text_number > 0 THEN notifications.body ELSE EXCLUDED.body END`+only,
+		string(org), n.Name, n.Person, state, due, now, sentAt, delayed, n.Why, n.text())
 	if err != nil {
 		return err
 	}
-	if tag.RowsAffected() == 0 {
+	if tag.RowsAffected() == 0 || state != "sent" || fault(FaultSendNothing) {
 		return nil
 	}
-	if state == "sent" && !fault(FaultSendNothing) {
-		if _, err := tx.Exec(ctx, "INSERT INTO deliveries (org, name, at) VALUES ($1, $2, $3)", string(org), n.Name, now); err != nil {
-			return err
-		}
-	}
-	// An update that came before this send takes effect now.
-	var text *string
-	var textNumber int64
-	var shown *string
-	err = tx.QueryRow(ctx, "DELETE FROM updates_waiting WHERE org = $1 AND name = $2 RETURNING text, text_number, now", string(org), n.Name).
-		Scan(&text, &textNumber, &shown)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return nil
-	}
-	if err != nil {
-		return err
-	}
-	return applyUpdate(ctx, tx, org, n.Name, text, textNumber, shown)
+	_, err = tx.Exec(ctx, "INSERT INTO deliveries (org, name, at) VALUES ($1, $2, $3)", string(org), n.Name, now)
+	return err
 }
 
-// update carries what is true now to a name on the list, or remembers it for a
-// send still to come (a parked send may be tried again after its update).
-func (s *Sender) update(ctx context.Context, tx pgx.Tx, org ids.Org, n wireNote) error {
-	var one int
-	err := tx.QueryRow(ctx, "SELECT 1 FROM notifications WHERE org = $1 AND name = $2", string(org), n.Name).Scan(&one)
-	if err == nil {
-		return applyUpdate(ctx, tx, org, n.Name, n.Text, n.Number, n.Now)
-	}
-	if !errors.Is(err, pgx.ErrNoRows) {
+// update carries what is true now to an entry, or to a waiting row for a send
+// still to come (a parked send may be tried again after its update).
+func (s *Sender) update(ctx context.Context, tx pgx.Tx, org ids.Org, n wireNote, at time.Time) error {
+	if _, err := tx.Exec(ctx, `INSERT INTO notifications (org, name, person, state, due_at, arrived_at, why, body)
+		VALUES ($1, $2, '', 'waiting', $3, $4, '', '') ON CONFLICT (org, name) DO NOTHING`,
+		string(org), n.Name, at, s.opt.Clock.Now()); err != nil {
 		return err
 	}
-	textNumber := int64(0)
-	if n.Text != nil {
-		textNumber = n.Number
-	}
-	_, err = tx.Exec(ctx, `INSERT INTO updates_waiting AS w (org, name, text, text_number, now) VALUES ($1, $2, $3, $4, $5)
-		ON CONFLICT (org, name) DO UPDATE SET
-			text = CASE WHEN EXCLUDED.text_number > w.text_number THEN EXCLUDED.text ELSE w.text END,
-			text_number = greatest(EXCLUDED.text_number, w.text_number),
-			now = CASE WHEN w.now = 'deleted' OR EXCLUDED.now IS NULL THEN w.now ELSE EXCLUDED.now END`,
-		string(org), n.Name, n.Text, textNumber, n.Now)
-	return err
+	return applyUpdate(ctx, tx, org, n.Name, n.Text, n.Number, n.Now)
 }
 
 // applyUpdate changes an entry. A newer text wins over an older one that was
@@ -375,7 +343,7 @@ func (s *Sender) notifications(w http.ResponseWriter, r *http.Request) {
 	out := contract.NotificationList{Notifications: []contract.NotificationEntry{}}
 	err := orgdb.InOrg(r.Context(), s.opt.Dir, org, func(tx pgx.Tx) error {
 		rows, err := tx.Query(r.Context(), `SELECT name, person, state, sent_at, delayed, why, body, now
-			FROM notifications WHERE org = $1 AND person = $2 ORDER BY due_at DESC, name`, string(org), person)
+			FROM notifications WHERE org = $1 AND person = $2 AND state <> 'waiting' ORDER BY due_at DESC, name`, string(org), person)
 		if err != nil {
 			return err
 		}
@@ -414,7 +382,7 @@ func (s *Sender) wipeOrg(ctx context.Context, org ids.Org) error {
 		if err != nil || !found {
 			return err // nothing was ever delivered, or it was deleted: nothing to wipe
 		}
-		if _, err := tx.Exec(ctx, "DELETE FROM updates_waiting WHERE org = $1", string(org)); err != nil {
+		if _, err := tx.Exec(ctx, "DELETE FROM notifications WHERE org = $1 AND state = 'waiting'", string(org)); err != nil {
 			return err
 		}
 		st.place = 0

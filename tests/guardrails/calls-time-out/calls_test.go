@@ -77,7 +77,7 @@ func TestRetriesGrowWithJitterAndAreSharedByEveryCopy(t *testing.T) {
 	b.Start(t, "copy-2")
 	b.Start(t, "copy-3")
 
-	wants := []time.Duration{1, 2, 4, 8, 16, 32, 60, 60, 60}
+	wants := []time.Duration{1, 2, 4, 8, 16, 20, 20, 20, 20} // at most 20 s (D-035)
 	var varied bool
 	for i, want := range wants {
 		want *= time.Second
@@ -89,7 +89,7 @@ func TestRetriesGrowWithJitterAndAreSharedByEveryCopy(t *testing.T) {
 		})
 		now := c.Now()
 		wait := at.Sub(now)
-		low, high := time.Duration(float64(want)*0.79), min(time.Duration(float64(want)*1.21), 60*time.Second)
+		low, high := time.Duration(float64(want)*0.79), min(time.Duration(float64(want)*1.21), 20*time.Second)
 		if wait < low || wait > high {
 			t.Fatalf("try %d: the wait is %v, expected about %v (from %v to %v)", i+1, wait, want, low, high)
 		}

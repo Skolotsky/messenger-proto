@@ -113,11 +113,9 @@ func (l *lane) pass(ctx context.Context, pool *pgxpool.Pool, org ids.Org, failur
 func (l *lane) load(ctx context.Context, tx pgx.Tx, org ids.Org) (spot, error) {
 	var s spot
 	if l.notes {
-		var stopped *int64
-		err := tx.QueryRow(ctx, `SELECT h.head, h.edition, p.place, p.edition, p.stopped_at
+		err := tx.QueryRow(ctx, `SELECT h.head, h.edition, p.place, p.edition
 			FROM feed.note_heads h JOIN feed.note_places p ON p.org = h.org WHERE h.org = $1`, string(org)).
-			Scan(&s.head, &s.orgEdition, &s.place, &s.edition, &stopped)
-		s.paused = stopped != nil
+			Scan(&s.head, &s.orgEdition, &s.place, &s.edition)
 		return s, err
 	}
 	err := tx.QueryRow(ctx, `SELECT l.head, p.place, p.wipe, p.refusals, p.paused
@@ -308,11 +306,16 @@ func (l *lane) deliverNotes(ctx context.Context, pool *pgxpool.Pool, org ids.Org
 			if tries < triesToPark {
 				return finish, nil
 			}
-			if fault("notes-pass") {
-				progress = e.number
-				continue
+			if fault("notes-stop") { // the planted fault of G-014: a parked note holds the rest back
+				return finish, nil
 			}
-			return finish, l.stopNotes(ctx, pool, org, e.number)
+			// Parked: step over it, so it holds nothing back (D-034). The sender
+			// moves its place past it without applying it; a retry applies it later.
+			next, err := l.stepOver(ctx, pool, org, e)
+			if err != nil || next != again {
+				return next, err
+			}
+			progress = e.number
 		default:
 			if err := save(); err != nil {
 				return holdOff, err
@@ -370,11 +373,24 @@ func (l *lane) setPaused(ctx context.Context, pool *pgxpool.Pool, org ids.Org) e
 	return err
 }
 
-// stopNotes holds this organization's notes at a refused one: a later clock note
-// must never let a notification past a withdrawal that is parked.
-func (l *lane) stopNotes(ctx context.Context, pool *pgxpool.Pool, org ids.Org, at int64) error {
-	_, err := pool.Exec(ctx, `UPDATE feed.note_places SET stopped_at = $2 WHERE org = $1`, string(org), at)
-	return err
+// stepOver tells the sender to move past a parked note without applying it.
+// Answered anything but yes, the turn ends and the note comes round again.
+func (l *lane) stepOver(ctx context.Context, pool *pgxpool.Pool, org ids.Org, e entry) (after, error) {
+	var note map[string]any
+	if err := json.Unmarshal(e.body, &note); err != nil {
+		return holdOff, err
+	}
+	note["skip"] = true
+	if held, err := l.holdsClaim(ctx, pool, org); !held || err != nil {
+		return finish, err
+	}
+	switch o := l.rc.post(ctx, "/notes", note); o.answer {
+	case applied:
+		return again, nil
+	case behind:
+		return holdOff, nil // the next turn follows the sender's place
+	}
+	return finish, nil
 }
 
 // wiped sends the worker back to the start of a search index that was wiped.
@@ -387,7 +403,7 @@ func (l *lane) wiped(ctx context.Context, pool *pgxpool.Pool, org ids.Org, wipe 
 // newEdition restarts the notes at 0 of the edition the feed now writes.
 func (l *lane) newEdition(ctx context.Context, pool *pgxpool.Pool, org ids.Org, s spot) error {
 	return pgx.BeginFunc(ctx, pool, func(tx pgx.Tx) error {
-		if _, err := tx.Exec(ctx, `UPDATE feed.note_places SET edition = $2, place = 0, stopped_at = NULL
+		if _, err := tx.Exec(ctx, `UPDATE feed.note_places SET edition = $2, place = 0
 			WHERE org = $1 AND claimed_by = $3`, string(org), s.orgEdition, l.s.me); err != nil {
 			return err
 		}
