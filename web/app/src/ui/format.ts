@@ -20,3 +20,8 @@ export const timeOf = (iso: string) =>
 export function whenOf(iso: string, now = new Date()): string {
   return `${dayLabel(iso, now)} ${timeOf(iso)}`;
 }
+
+/** The time at the right of a feed row: the hour today, otherwise the day. */
+export function rowTime(iso: string, now = new Date()): string {
+  return dayKey(iso) === dayKey(now.toISOString()) ? timeOf(iso) : dayLabel(iso, now);
+}

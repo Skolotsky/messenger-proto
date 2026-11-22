@@ -24,6 +24,8 @@ interface Props {
   onClose(): void;
   /** False while something covers this view: what is covered is not being read (D-015). */
   active?: boolean;
+  /** Opened from a feed row: where its new messages begin. */
+  newFrom?: number | null;
 }
 
 /** One conversation or one thread: its header, its messages, its message box. */
@@ -35,6 +37,7 @@ export function ConversationView({
   onOpenThread,
   onClose,
   active = true,
+  newFrom = null,
 }: Props) {
   const id = conversation.conversation;
   const key = listKey(id, thread);
@@ -107,8 +110,9 @@ export function ConversationView({
         </div>
       ) : (
         <MessageList
-          key={key}
+          key={`${key}:${newFrom ?? ''}`}
           rows={rows}
+          newFrom={newFrom}
           onPinnedChange={setPinned}
           afterFirst={
             thread ? (

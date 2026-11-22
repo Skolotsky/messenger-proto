@@ -6,6 +6,14 @@ export interface LiveHandlers {
   onConnected(connected: boolean): void;
 }
 
+const listeners = new Set<(message: LiveOut) => void>();
+
+/** Hears every update of the open connection. The feed is applied from here (T-055). */
+export function subscribeLive(listener: (message: LiveOut) => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
 /**
  * A minimal live subscription: enough for a sent message to appear on every open screen.
  * Parts are applied by message ID and version, so a repeat is harmless.
@@ -22,6 +30,7 @@ export function connectLive(person: string, startNumber: number, handlers: LiveH
 
   const receive = (data: string) => {
     const message = JSON.parse(data) as LiveOut;
+    listeners.forEach((listener) => listener(message));
     if ('stream' in message && message.stream === 'conversations') {
       number = Math.max(number, message.number);
       handlers.onParts(message.parts);

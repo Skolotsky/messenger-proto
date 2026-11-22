@@ -1,5 +1,16 @@
 import { ORG } from '../config';
-import type { ActionSaved, MessagesPage, PeopleAction, StartAnswer } from './types';
+import type {
+  ActionSaved,
+  HistoryAnswer,
+  HistoryTab,
+  MessagesPage,
+  PeopleAction,
+  PreviewAnswer,
+  RowAct,
+  ScreenFeedAnswer,
+  SettingsAnswer,
+  StartAnswer,
+} from './types';
 
 /** Why an action did not go through. A refusal is final; anything else may be tried again. */
 export class DoorError extends Error {
@@ -34,6 +45,19 @@ export function loadMessages(conversation: string, thread: string | null) {
   const query = thread ? `?thread=${encodeURIComponent(thread)}` : '';
   return call<MessagesPage>(`/conversations/${encodeURIComponent(conversation)}/messages${query}`);
 }
+
+const personPath = (person: string) => `/people/${encodeURIComponent(person)}`;
+
+export const loadFeed = (person: string) => call<ScreenFeedAnswer>(`${personPath(person)}/feed`);
+
+export const loadHistory = (person: string, tab: HistoryTab) =>
+  call<HistoryAnswer>(`${personPath(person)}/history?tab=${tab}`);
+
+export const loadSettings = (person: string) => call<SettingsAnswer>(`${personPath(person)}/settings`);
+
+/** What a change would have moved in the last 7 days. May be unavailable; the action never waits for it. */
+export const loadPreview = (person: string, change: RowAct) =>
+  call<PreviewAnswer>(`${personPath(person)}/preview?change=${encodeURIComponent(JSON.stringify(change))}`);
 
 export const act = (action: PeopleAction) =>
   call<ActionSaved>('/people/actions', {

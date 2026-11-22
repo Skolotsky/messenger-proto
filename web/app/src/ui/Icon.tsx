@@ -10,6 +10,14 @@ const PATHS = {
   chat: <path d="M4 5h16v11H9l-5 4z" />,
   pencil: <path d="M4 20l4-1 11-11-3-3L5 16z" />,
   close: <path d="M6 6l12 12M18 6L6 18" />,
+  check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
+  pin: <path d="M7 4h10v16l-5-4-5 4z" />,
+  smile: (
+    <>
+      <circle cx="11" cy="13" r="7" />
+      <path d="M8.5 14.5a3 3 0 0 0 5 0M9 11h.01M13 11h.01M19 3v4M17 5h4" />
+    </>
+  ),
   rules: (
     <>
       <path d="M4 7h10M18 7h2M4 17h2M10 17h10" />

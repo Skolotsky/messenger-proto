@@ -6,7 +6,6 @@ Work in flight. Order inside a section is priority. Finished work moves to `done
 
 ## Now
 
-- **T-055** `implement` Wave 2 · Web app: Activity, history tabs, settings. Needs T-050
 - **T-064** `implement` D-033: remove the Reset number from contracts and code; retire and delete organizations; G-031. Before T-052, T-053 and T-054. Detail: `tasks/T-064-reset-removal.md`
 
 

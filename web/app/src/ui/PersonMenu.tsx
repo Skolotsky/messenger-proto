@@ -12,7 +12,15 @@ const THEMES = [
 ] as const;
 
 /** The person's own menu at the bottom of the sidebar (D-023, points 11, 28, 30, 31). */
-export function PersonMenu({ session, onSwitch }: { session: Session; onSwitch(person: PersonView): void }) {
+export function PersonMenu({
+  session,
+  onSwitch,
+  onSettings,
+}: {
+  session: Session;
+  onSwitch(person: PersonView): void;
+  onSettings(): void;
+}) {
   const [open, setOpen] = useState(false);
   const [people, setPeople] = useState(false);
   const [theme, setTheme] = useThemePref();
@@ -93,9 +101,15 @@ export function PersonMenu({ session, onSwitch }: { session: Session; onSwitch(p
                   <small>{session.peopleList.length} members</small>
                 </span>
               </div>
-              <button className="opt" disabled title="Settings are not built yet">
+              <button
+                className="opt"
+                onClick={() => {
+                  setOpen(false);
+                  onSettings();
+                }}
+              >
                 <b>Settings</b>
-                <span>Not built yet</span>
+                <span>Account, writing, activity feed, notifications</span>
               </button>
               <div className="theme-row">
                 <span>Theme</span>
