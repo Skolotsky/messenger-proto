@@ -8,6 +8,8 @@ The web app (a person's screen), and the scripted team acting as people, call Co
 
 ## 2. Operations
 
+Every call is made for one team (D-026). The team is in the address (`/teams/acme/…`) and in every item sent, and all numbers count within that team. Nothing of another team is ever sent or accepted.
+
 Every action is one call carrying an ID the caller chose. Conversations saves it as a fact and writes it to the change log in the same step.
 
 | Action | Says |
@@ -60,4 +62,4 @@ New kinds of action may be added. An existing kind keeps its meaning; fields are
 
 ## 6. Enforced by
 
-G-003, G-004, G-005, G-024.
+G-003, G-004, G-005, G-024, G-025, G-026.

@@ -8,6 +8,8 @@ Conversations' door for people (and its live connection) calls the activity feed
 
 ## 2. Operations
 
+Every call is made for one team (D-026). The team is in the address (`/teams/acme/…`) and in every item sent, and all numbers count within that team. Nothing of another team is ever sent or accepted.
+
 All are questions; none changes anything.
 
 ```json
@@ -39,4 +41,4 @@ Fields may be added. `through`, `edition` and `number` keep their meaning.
 
 ## 6. Enforced by
 
-G-008, G-012, G-019, G-023.
+G-008, G-012, G-019, G-023, G-025, G-026.

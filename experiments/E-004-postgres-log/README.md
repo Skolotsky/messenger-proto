@@ -33,6 +33,18 @@ Raw output: `results.txt`. Three runs per numbering in the first test.
 
 Save to "a worker has fetched it", woken by NOTIFY, 400 changes at 50 a second: median 1.0 ms, 19 in 20 within 1.3 ms, worst 7.4 ms.
 
+### Second part, added the same day: many teams in one database (feeds D-026)
+
+`test_teams.py`: 8 teams, two writers each; each team's changes numbered by its own one-row counter.
+
+| | One log for everybody | A log per team |
+|---|---|---|
+| Changes a follower never saw | not applicable | 0 of 3,200 |
+| One team keeps every save open for 300 ms; a save in the other teams takes | median 27 ms, 19 in 20 within 317 ms, worst 2,602 ms | median 17 ms, 19 in 20 within 24 ms, worst 34 ms |
+| All writers flat out | 1,032 changes a second | 851 changes a second |
+
+A log per team keeps teams from holding each other up and loses nothing. It does not make one database faster: the two forms save at about the same rate.
+
 ## Conclusion
 
 **The trap is real and large: with ordinary sequence numbering a worker silently misses about a fifth of the changes under concurrent writes. Numbering one writer at a time removes it completely and costs nothing measurable** (about 1,000 changes a second either way on this machine, against roughly 0.02 a second for the seeded team and 1.5 at a hundred times its size). NOTIFY wakes a worker within about a millisecond, so the 2-second target has three orders of magnitude to spare at the database.

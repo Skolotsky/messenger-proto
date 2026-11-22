@@ -8,9 +8,11 @@ An agent (scripted, a team's own, or a coding agent through a small connector) c
 
 ## 2. Operations
 
+Every call is made for one team (D-026). The team is in the address (`/teams/acme/…`) and in every item sent, and all numbers count within that team. Nothing of another team is ever sent or accepted.
+
 ```json
 GET  /agents/release-agent/events?after=311&wait=25
-→ [ { "number": 312, "kind": "mentioned", "agent_chain": 0,
+→ [ { "team": "acme", "number": 312, "kind": "mentioned", "agent_chain": 0,
       "message": { "id": "msg_7Q2", "version": 1, "conversation": "#launch", "author": "anna", "text": "…" } } ]
 
 POST /agents/release-agent/messages          { "id": "a-91", "thread": "msg_7Q2", "text": "On it.", "level": "info", "because_of": 312 }
@@ -48,4 +50,4 @@ New kinds of event may be added; an agent ignores a kind it does not know.
 
 ## 6. Enforced by
 
-G-003, G-016, G-017, G-018.
+G-003, G-016, G-017, G-018, G-025, G-026.

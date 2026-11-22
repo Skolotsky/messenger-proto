@@ -166,8 +166,8 @@ details > .stack { gap: 10px; }
 
 <div class="ask">
   <div class="label">Where it stands</div>
-  <p><strong>All six technical decisions are taken.</strong> You decided the shape, the database, the live connection and the language (D-005), who owns what a reader did (D-017) and who decides a notification (D-018). You then asked me to decide the remaining three by best practice and the product's needs: the delivery promise (D-006), the numbers (D-007) and the agent door (D-008). Each is the recommended option in its section; any of them can be overturned.</p>
-  <p class="note">Two figures in D-007 are the ones a person will feel, should you want to change them: the 5-second hold before a notification, and the 10 seconds after which a surface says it is behind.</p>
+  <p><strong>All technical decisions are taken.</strong> You decided the shape, the database and the live connection (D-005), Go for the server (D-025), who owns what a reader did (D-017), who decides a notification (D-018), and that the architecture is ready for many teams (D-026, section 11). On your delegation I decided the delivery promise (D-006), the numbers (D-007) and the agent door (D-008). Any of them can be overturned.</p>
+  <p class="note">One open point from D-026: should the product show a second team (a switcher), or does the second team exist only for the tests?</p>
 </div>
 
 <section>
@@ -180,11 +180,11 @@ details > .stack { gap: 10px; }
         <tr><td><strong>The big picture</strong></td><td><a href="#map">1 · The map</a> · <a href="#ideas">2 · Three ideas</a></td><td>Which parts exist and what moves between them.</td><td>3 min</td></tr>
         <tr><td><strong>The parts</strong></td><td><a href="#parts">3 · Each part and its qualities</a></td><td>What each part owns and promises, how, and what a person sees when it fails.</td><td>5 min</td></tr>
         <tr><td><strong>The contracts</strong></td><td><a href="#contracts">4 · What crosses each boundary</a></td><td>What is sent, what is promised, what happens on failure.</td><td>5 min</td></tr>
-        <tr><td><strong>Your decisions</strong></td><td><a href="#d005">5</a> to <a href="#d008">10</a> · D-005, D-017, D-018, D-006, D-007, D-008</td><td>Options side by side, risk of each, best practice, recommendation.</td><td>3 min each</td></tr>
-        <tr><td><strong>The agent's smaller decisions</strong></td><td><a href="#small">11 · Seventeen choices inside the parts</a></td><td>Chosen, instead of what, and why. Object to any.</td><td>5 min</td></tr>
-        <tr><td><strong>Risks and trade-offs</strong></td><td><a href="#risks">12 · In one table</a></td><td>What can go wrong, what we do about it, what remains.</td><td>4 min</td></tr>
-        <tr><td><strong>Evidence</strong></td><td><a href="#evidence">13 · What was tried, what was not</a></td><td>Two experiments that broke a small build on purpose.</td><td>3 min</td></tr>
-        <tr><td><strong>Later and optional</strong></td><td><a href="#rest">14 · Built last, larger size, shortcuts, open points</a></td><td>What is deliberately simple, and what waits.</td><td>as needed</td></tr>
+        <tr><td><strong>Your decisions</strong></td><td><a href="#d005">5</a> to <a href="#d026">11</a> · D-005, D-017, D-018, D-006, D-007, D-008, D-026</td><td>Options side by side, risk of each, best practice, recommendation.</td><td>3 min each</td></tr>
+        <tr><td><strong>The agent's smaller decisions</strong></td><td><a href="#small">12 · Seventeen choices inside the parts</a></td><td>Chosen, instead of what, and why. Object to any.</td><td>5 min</td></tr>
+        <tr><td><strong>Risks and trade-offs</strong></td><td><a href="#risks">13 · In one table</a></td><td>What can go wrong, what we do about it, what remains.</td><td>4 min</td></tr>
+        <tr><td><strong>Evidence</strong></td><td><a href="#evidence">14 · What was tried, what was not</a></td><td>Two experiments that broke a small build on purpose.</td><td>3 min</td></tr>
+        <tr><td><strong>Later and optional</strong></td><td><a href="#rest">15 · Built last, larger size, shortcuts, open points</a></td><td>What is deliberately simple, and what waits.</td><td>as needed</td></tr>
       </tbody>
     </table>
   </div>
@@ -659,8 +659,79 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
   </div>
 </section>
 
+<section id="d026">
+  <h2>11 · D-026: ready for many teams, and how it scales</h2>
+  <p><span class="chip ok">Decided</span> You asked for the architecture to be ready for many teams in one installation, and scalable because of it. The rule that delivers both: <strong>teams are completely independent of each other</strong>. The team is part of every key and every contract, each team has its own numbered log, and the database itself keeps teams apart.</p>
+  <figure class="diagram">
+    <div class="scroll">
+      <svg viewBox="0 0 900 330" role="img" aria-label="Each team has its own numbered change log in Conversations. Delivery workers keep a place per receiver and team and take the teams in turn. Each receiver keeps each team's data apart.">
+        <defs>
+          <marker id="arrow26" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <rect class="box" x="20" y="16" width="330" height="298" rx="8"/>
+        <text class="t" x="36" y="40">Conversations</text>
+        <text class="t2" x="36" y="58">a session acts for one team and sees no other</text>
+        <rect class="box-ok" x="36" y="74" width="298" height="64" rx="6"/>
+        <text class="t" x="50" y="98">Team A · its own log</text>
+        <text class="t2" x="50" y="118">changes 1, 2, 3 … one writer at a time</text>
+        <rect class="box-ok" x="36" y="152" width="298" height="64" rx="6"/>
+        <text class="t" x="50" y="176">Team B · its own log</text>
+        <text class="t2" x="50" y="196">a slow save here delays nobody else</text>
+        <rect class="box-ok" x="36" y="230" width="298" height="64" rx="6"/>
+        <text class="t" x="50" y="254">Team C · its own log</text>
+        <text class="t2" x="50" y="274">no order is needed between teams</text>
+
+        <line class="edge" x1="334" y1="106" x2="430" y2="150" marker-end="url(#arrow26)"/>
+        <line class="edge" x1="334" y1="184" x2="430" y2="165" marker-end="url(#arrow26)"/>
+        <line class="edge" x1="334" y1="262" x2="430" y2="180" marker-end="url(#arrow26)"/>
+
+        <rect class="box-agent" x="430" y="110" width="200" height="110" rx="6"/>
+        <text class="t" x="530" y="136" text-anchor="middle">Delivery workers</text>
+        <text class="t2" x="530" y="156" text-anchor="middle">a place per receiver and team;</text>
+        <text class="t2" x="530" y="171" text-anchor="middle">teams are taken in turn, so one</text>
+        <text class="t2" x="530" y="186" text-anchor="middle">team's backlog starves no other</text>
+
+        <line class="edge" x1="630" y1="140" x2="700" y2="76" marker-end="url(#arrow26)"/>
+        <line class="edge" x1="630" y1="165" x2="700" y2="165" marker-end="url(#arrow26)"/>
+        <line class="edge" x1="630" y1="190" x2="700" y2="254" marker-end="url(#arrow26)"/>
+
+        <rect class="box" x="700" y="46" width="180" height="60" rx="6"/>
+        <text class="t" x="790" y="70" text-anchor="middle">Search index</text>
+        <text class="t2" x="790" y="88" text-anchor="middle">a query stays in one team</text>
+        <rect class="box-ok" x="700" y="135" width="180" height="60" rx="6"/>
+        <text class="t" x="790" y="159" text-anchor="middle">Activity feed</text>
+        <text class="t2" x="790" y="177" text-anchor="middle">rebuilt and fenced per team</text>
+        <rect class="box" x="700" y="224" width="180" height="60" rx="6"/>
+        <text class="t" x="790" y="248" text-anchor="middle">Notification sender</text>
+        <text class="t2" x="790" y="266" text-anchor="middle">fed by the feed, per team</text>
+      </svg>
+    </div>
+    <figcaption>Nothing crosses from one team to another, so every part can later be split by team without changing what it does.</figcaption>
+  </figure>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>How it grows</th><th>What is done</th><th>State</th></tr></thead>
+      <tbody>
+        <tr><td><strong>More teams, one machine</strong></td><td>Nothing. A team is data: its own log, its own rows, its own places.</td><td><span class="chip ok">in the design from the start</span></td></tr>
+        <tr><td><strong>More load than one copy of a program carries</strong></td><td>Several copies of Conversations, of the workers and of the feed, each taking a share of the teams.</td><td><span class="chip">ready for, not built</span></td></tr>
+        <tr><td><strong>More data than one database carries</strong></td><td>Teams are spread over several databases. Possible because no question ever spans two teams.</td><td><span class="chip">ready for, not built</span></td></tr>
+        <tr><td><strong>So many teams that assigning and balancing them is the work</strong></td><td>A message broker takes over the layer between the logs and the receivers.</td><td><span class="chip">later, if needed</span></td></tr>
+        <tr><td><strong>One very large team</strong></td><td>Not helped by any of this: it still has one log and one feed. Its log would be split by channel.</td><td><span class="chip risk">a known limit</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="split">
+    <div class="panel"><div class="label">Tried on PostgreSQL (E-004, second part)</div><p>Eight teams, two writers each. One team keeps every save open for 300 ms. With one log for everybody, a save in the <em>other</em> teams took up to <strong>2.6 s</strong>; with a log per team, at most <strong>34 ms</strong>. Nothing was stepped over (0 of 3,200). A log per team buys independence, not more speed from one database: both forms saved about 850 to 1,030 changes a second.</p></div>
+    <div class="panel"><div class="label">What a failure now touches</div><p>A receiver that is down is down for every team. Everything else is per team: a change that is parked, a fence, a feed that stops after five fences, a rebuild, a reset.</p></div>
+    <div class="panel"><div class="label">Not built</div><p>Creating or administering teams, sign-in, limits per team, one identity across teams, several copies of a program actually running. The first version runs the seeded team; a second small team exists so the tests can prove separation.</p></div>
+  </div>
+  <p class="note">Two guardrails come with it: nothing of one team is ever shown to or changed by another (enforced by the database itself, G-025), and what happens in one team does not delay another (G-026). The diagrams and examples earlier on this page show one team.</p>
+</section>
+
 <section id="small">
-  <h2>11 · The smaller decisions, made by the agent</h2>
+  <h2>12 · The smaller decisions, made by the agent</h2>
   <p>These sit inside the parts. They are mine to take under our working agreement, but each one is open to objection. Most important first.</p>
   <div class="table-wrap">
     <table>
@@ -690,7 +761,7 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
 </section>
 
 <section id="risks">
-  <h2>12 · Risks and trade-offs in one place</h2>
+  <h2>13 · Risks and trade-offs in one place</h2>
   <div class="table-wrap">
     <table>
       <thead><tr><th>Risk or trade-off</th><th>What would happen</th><th>What the design does</th><th>What remains</th></tr></thead>
@@ -706,14 +777,14 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
         <tr><td><strong>The log is kept forever and a rebuild replays all of it</strong></td><td>Rebuild time grows with history.</td><td>Two weeks of a 36-member team is small. E-003 replayed 2,400 changes in under two seconds with a subset of the rules.</td><td>At the seeded team's size: 80 s on the test build with a subset of the rules. The product's own figure comes with the build.</td></tr>
         <tr><td><strong>The screen's catch-up is our own</strong></td><td>A fault there shows as a stale or wrong screen after a dropped connection.</td><td>Numbered updates, a "too far behind: reload" answer, a test that cuts the connection mid-burst.</td><td>Not tried yet.</td></tr>
         <tr><td><strong>The rule against agents setting each other off is ours</strong></td><td>Too strict: agents cannot cooperate. Too loose: a loop floods a channel.</td><td>A cap of three agents in a row and 20 messages a minute, both settings.</td><td>No vendor documents a rule to copy. Needs watching in use.</td></tr>
-        <tr><td><strong>One copy of each part, one database</strong></td><td>If the database is lost, everything is.</td><td>Nothing; this is a local demonstration.</td><td>A known shortcut.</td></tr>
+        <tr><td><strong>Many teams share one copy of each part and one database</strong> (D-026)</td><td>If the database is lost, every team's data is. A receiver that is down is down for every team.</td><td>Teams are independent, so parts and databases can later be split by team. One team's burst, slow save or fence does not touch another.</td><td>Several copies and several databases are not built. One very large team is not helped by splitting by team.</td></tr>
       </tbody>
     </table>
   </div>
 </section>
 
 <section id="evidence">
-  <h2>13 · Evidence: what was tried, and what was not</h2>
+  <h2>14 · Evidence: what was tried, and what was not</h2>
   <div class="split">
     <div class="panel"><div class="label">E-003 · the design, built small and broken on purpose</div><p>The core, workers, search, feed and sender as separate programs; a scripted team at up to 300 actions a second. Programs were killed mid-burst, search was stopped, slowed and made to refuse, half of all deliveries were repeated or delivered late, and each receiver was wiped. <strong>75 checks, all as expected</strong>: nothing lost, a slow part delayed nobody, every receiver ended equal to the truth. Four versions broken on purpose were each caught. <a href="E-003-delivery-spine.html">Results</a>.</p></div>
     <div class="panel"><div class="label">E-004 · the log on PostgreSQL</div><p>16 writers saving 4,000 changes at once while a worker follows the log. With ordinary numbering the worker <strong>never saw 919 to 948 of 4,000</strong>. With numbering one writer at a time: <strong>0</strong>, at the same speed (about 1,000 saves a second). A worker woken by the database has the change 1 ms after it is saved.</p></div>
@@ -754,7 +825,7 @@ POST agent-door/status          { "state": "waiting", "on": "marco" }</code></pr
 </section>
 
 <section id="rest">
-  <h2>14 · Later and optional: experiments still needed, shortcuts, larger size, open points</h2>
+  <h2>15 · Later and optional: experiments still needed, shortcuts, larger size, open points</h2>
   <div class="split">
     <div class="panel agent"><div class="label">Experiments the draft needs</div>
       <ul>

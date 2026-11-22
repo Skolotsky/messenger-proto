@@ -10,7 +10,9 @@ Every place the design knowingly cuts a corner, with what the full answer would 
 | Acting on behalf of a person through the coding-agent connector (D-002) | Verification only; off unless switched on | Does not exist in a real deployment |
 | Agents may read every channel (D-008, proposed) | No access model yet | Reading rights granted per agent |
 | One database server with an area per part (D-005, proposed) | Independence is kept by rule and a check, not by hardware | A store per service |
-| One team per installation: one change log for everything, so one burst delays every delivery behind it | The first version serves one seeded team | A numbered log per team (teams need no common order), then workers per group of teams; a broker when assigning and balancing those becomes the work |
+| Ready for many teams, but none of the management is built: no creating or administering teams, no limits per team, one identity per team (D-026) | The first version runs one seeded team; a second exists for the tests | Team administration, limits, one identity across teams |
+| One copy of each program and one database serve all teams (D-026) | Teams are independent, so this is a matter of spreading them | Several copies each taking a share of the teams; teams spread over several databases; a broker when balancing them becomes the work |
+| One very large team still has one log and one feed | Teams of 30 | Split a team's log by channel; work large channels out when the feed is read |
 | Log numbers handed out one at a time (D-005, proposed) | About 1.5 messages a second at a hundred times our size | Split the log by conversation, or read the database's replication log |
 | The change log is never trimmed | Two weeks of a 36-member team is small | Keep a window, rebuild from snapshots |
 | After a fenced change is fixed, the whole feed is rebuilt, not only the fenced part | Seconds at this size, and exact | Rebuild one conversation or one reader in place |

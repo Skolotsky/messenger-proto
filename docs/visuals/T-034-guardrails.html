@@ -161,7 +161,7 @@ details > .stack { gap: 10px; }
 <header class="top">
   <div class="label">Guardrails · T-034 · 2026-11-22</div>
   <h1>What must stay true while we build</h1>
-  <p class="lede">The technical decisions are now written as seven contracts and twenty-two guardrails. Each guardrail is one sentence you can check against what you decided, and each names the test that will fail if the sentence stops being true.</p>
+  <p class="lede">The technical decisions are now written as seven contracts and twenty-four guardrails. Each guardrail is one sentence you can check against what you decided, and each names the test that will fail if the sentence stops being true.</p>
 </header>
 
 <div class="ask">
@@ -238,6 +238,8 @@ details > .stack { gap: 10px; }
       <thead><tr><th>ID</th><th>What must stay true</th><th>How it is enforced</th><th>Status</th></tr></thead>
       <tbody>
         <tr><td>G&#8209;008</td><td>No part reads or writes another part's store; the feed holds nothing original.</td><td>Each part gets its own database login with rights to its own area only; plus a rule against importing another part's storage code.</td><td><span class="chip">pending</span></td></tr>
+        <tr><td>G&#8209;025</td><td>Nothing of one team is ever shown to, sent to, or changed by another team.</td><td>The database itself keeps teams apart; plus a test with two teams that must fail when that rule is switched off.</td><td><span class="chip">pending</span></td></tr>
+        <tr><td>G&#8209;026</td><td>What happens in one team does not delay another: a slow save, a burst, a parked change or a fenced feed in one team leaves another team's saves under 100 ms and its feed within 2 s.</td><td>A test with two teams that must fail with one log for everybody.</td><td><span class="chip">pending</span></td></tr>
         <tr><td>G&#8209;023</td><td>Every call from one part to another gives up after at most 3 s and has a stated answer for failure.</td><td>One shared way of calling, with the limit built in; plus a test with a part that accepts a call and never answers.</td><td><span class="chip">pending</span></td></tr>
         <tr><td>G&#8209;021</td><td>Every contract names guardrails that exist, and every guardrail comes from an accepted decision.</td><td>The repository check; seen failing before the guardrails were registered.</td><td><span class="chip ok">enforced</span></td></tr>
         <tr><td>G&#8209;022</td><td>A guardrail test is not edited without your approval.</td><td>The project settings ask you before any edit under the guardrail tests folder. It covers the edit tools only, and is not yet seen working: no such file exists yet.</td><td><span class="chip">pending</span></td></tr>
@@ -267,7 +269,7 @@ details > .stack { gap: 10px; }
 </section>
 
 <footer class="foot">
-  <span>Belongs to T-034 · From D-005, D-006, D-007, D-008, D-015, D-017, D-018 · Behaviour already shown in experiments E-003, E-004, E-005 · An independent verifier found four blockers and six larger gaps; all are answered here, and the corrections were not re-checked</span>
+  <span>Belongs to T-034 · From D-005, D-006, D-007, D-008, D-015, D-017, D-018, D-026 · Behaviour already shown in experiments E-003, E-004, E-005 · An independent verifier found four blockers and six larger gaps; all are answered here, and the corrections were not re-checked</span>
   <span>Full list: <code>docs/guardrails.md</code> · Architecture: <a href="T-022-architecture-proposal.html">review page</a></span>
 </footer>
 </main>
