@@ -35,7 +35,8 @@ CREATE TABLE note_places (
   place         bigint NOT NULL DEFAULT 0,
   claimed_by    text,
   claimed_until timestamptz,
-  stopped_at    bigint                   -- a refused note holds this organization's notes here
+  stopped_at    bigint,                  -- a refused note holds this organization's notes here
+  halted        boolean NOT NULL DEFAULT false -- set by stop; a claim on this row can no longer be renewed
 );
 
 CREATE TABLE note_parked (

@@ -68,6 +68,10 @@ type Config struct {
 	Conversations string
 	Seed          int64  // for the jitter of retries
 	Worker        string // this copy's name in claims; random when empty
+	// ClaimFor shortens the claim for a test, so a receiver slower than the claim
+	// takes less than a minute to show. It must stay longer than any call the test
+	// makes. Zero is the real value.
+	ClaimFor time.Duration
 }
 
 // Service runs one lane per receiver and database.
@@ -87,6 +91,9 @@ type Service struct {
 func New(cfg Config) *Service {
 	if cfg.Clock == nil {
 		cfg.Clock = clock.Default()
+	}
+	if cfg.ClaimFor == 0 {
+		cfg.ClaimFor = claimFor
 	}
 	me := cfg.Worker
 	if me == "" {

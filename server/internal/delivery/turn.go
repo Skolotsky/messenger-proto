@@ -41,7 +41,7 @@ func (l *lane) turn(ctx context.Context, pool *pgxpool.Pool, org ids.Org, failur
 	start := l.s.cfg.Clock.Now()
 	result := again
 	for spent := 0; result == again && spent < turnBudget; spent += batchSize {
-		if l.s.cfg.Clock.Now().Sub(start) >= claimFor/2 {
+		if l.s.cfg.Clock.Now().Sub(start) >= l.s.cfg.ClaimFor/2 {
 			break
 		}
 		var err error
@@ -166,7 +166,7 @@ func (l *lane) deliverFeed(ctx context.Context, pool *pgxpool.Pool, org ids.Org,
 	for i, e := range items {
 		bodies[i] = e.body
 	}
-	if h, err := l.halted(ctx, pool, org); h || err != nil {
+	if held, err := l.holdsClaim(ctx, pool, org); !held || err != nil {
 		return finish, err
 	}
 	var o outcome
@@ -215,7 +215,7 @@ func (l *lane) deliverSearch(ctx context.Context, pool *pgxpool.Pool, org ids.Or
 			progress = e.number
 			continue
 		}
-		if h, err := l.halted(ctx, pool, org); h || err != nil {
+		if held, err := l.holdsClaim(ctx, pool, org); !held || err != nil {
 			if saveErr := save(); saveErr != nil {
 				return holdOff, saveErr
 			}
@@ -269,7 +269,7 @@ func (l *lane) deliverNotes(ctx context.Context, pool *pgxpool.Pool, org ids.Org
 		return l.note(ctx, pool, org, progress, 0, nil)
 	}
 	for _, e := range items {
-		if h, err := l.halted(ctx, pool, org); h || err != nil {
+		if held, err := l.holdsClaim(ctx, pool, org); !held || err != nil {
 			if saveErr := save(); saveErr != nil {
 				return holdOff, saveErr
 			}

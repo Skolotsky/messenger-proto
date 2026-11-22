@@ -95,8 +95,8 @@ func (s *Store) Retire(ctx context.Context, org ids.Org) error {
 // tables, in one transaction. Repeating it changes nothing.
 func (s *Store) DeleteOrg(ctx context.Context, org ids.Org) error {
 	err := orgdb.InOrg(ctx, s.Dir, org, func(tx pgx.Tx) error {
-		var retired *time.Time
-		err := tx.QueryRow(ctx, `SELECT retired_at FROM org_log WHERE org = $1 FOR UPDATE`, string(org)).Scan(&retired)
+		var retired, cleared *time.Time
+		err := tx.QueryRow(ctx, `SELECT retired_at, delivery_cleared_at FROM org_log WHERE org = $1 FOR UPDATE`, string(org)).Scan(&retired, &cleared)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil // already deleted
 		}
@@ -105,6 +105,9 @@ func (s *Store) DeleteOrg(ctx context.Context, org ids.Org) error {
 		}
 		if retired == nil {
 			return ErrNotRetired
+		}
+		if cleared == nil {
+			return errDeliveryRemains // its rows beside the feed's notes have no foreign key to this log
 		}
 		return orgwipe.Delete(ctx, tx, org, ownTables...)
 	})
