@@ -13,6 +13,7 @@ logs=$(mktemp -d)
 cleanup() {
   local pids; pids=$(jobs -p); [ -z "$pids" ] || kill $pids 2>/dev/null
   "${compose[@]}" down -v --remove-orphans >/dev/null 2>&1
+  docker compose -p "$project-rebuild" -f deploy/compose.yaml -f deploy/compose.test.yaml down -v --remove-orphans >/dev/null 2>&1
   rm -rf "$logs"
 }
 trap cleanup EXIT
@@ -20,6 +21,7 @@ started=$SECONDS
 
 ./scripts/check || { echo "verify: fix ./scripts/check first"; exit 1; }
 docker build -q -t contexia-test-tools:1 -f deploy/test-tools.Dockerfile deploy >/dev/null
+"${compose[@]}" build --quiet || { echo "verify: FAIL the programs did not build."; exit 1; }
 # Built once, before the two browser lanes share it.
 CONTEXIA_BUILD_ONLY=1 web/app/scripts/browser-tests > "$logs/web-build" 2>&1 || { tail -n 30 "$logs/web-build"; echo "verify: FAIL the web app did not build."; exit 1; }
 
@@ -42,7 +44,7 @@ mustfail() { # module, tags, test name, package: must FAIL in a test, not merely
 
 # ---- the lanes
 lane_system() { # the composed system: guardrails, their must-fail builds, integration tests
-  "${compose[@]}" up -d --build --wait --quiet-pull || { "${compose[@]}" ps; "${compose[@]}" logs --tail 30; return 1; }
+  "${compose[@]}" up -d --wait --quiet-pull || { "${compose[@]}" ps; "${compose[@]}" logs --tail 30; return 1; }
   local p answer
   for p in conversations delivery feed search sender demo; do
     answer=$("${compose[@]}" exec -T "$p" wget -q -O - http://127.0.0.1:8080/alive)
@@ -52,14 +54,13 @@ lane_system() { # the composed system: guardrails, their must-fail builds, integ
     esac
   done
   local others
-  others=$(CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 TOOL_DIR=tests ./scripts/tool go list ./... | grep -v -E 'guardrails/(receivers-independent|orgs-independent|freshness|orgs-apart|two-copies)(/|$)|tests/e2e|harness/router' | tr '\n' ' ')
+  others=$(CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 TOOL_DIR=tests ./scripts/tool go list ./... | grep -v -E 'guardrails/(receivers-independent|orgs-independent|freshness|orgs-apart|two-copies|rebuild)(/|$)|tests/e2e|harness/router' | tr '\n' ' ')
   [ -n "$others" ] || { echo "FAIL: could not list the test packages."; return 1; }
   gotest tests -p 1 $others || return 1
   # Each of these builds has a rule switched off, and its "Fails" tests prove the check notices.
   gotest tests -p 1 -tags standinfaults -run Fails ./guardrails/search-equals-truth/ ./guardrails/notification-once/ ./guardrails/notification-hold/ || return 1
   gotest tests -p 1 -tags deletefaults -run Fails ./guardrails/retire-and-delete/ || return 1
   gotest tests -p 1 -tags agentfaults -run Fails ./guardrails/agent-events/ ./guardrails/reply-in-progress/ ./guardrails/agent-limits/ ./guardrails/idle-organizations-cost-nothing/ || return 1
-  gotest tests -p 1 -tags demofaults -run Fails ./guardrails/rebuild/ || return 1
   gotest tests -p 1 -tags feedfaults -run Fails ./guardrails/feed-equals-replay/ ./guardrails/feed-fence/ ./guardrails/feed-two-copies/ || return 1
   mustfail tests fault_hub_handed TestTwoSaves ./guardrails/live-order/ || return 1
   mustfail tests fault_no_lease_check Frozen ./guardrails/watching-lapses/ || return 1
@@ -70,17 +71,27 @@ lane_system() { # the composed system: guardrails, their must-fail builds, integ
 }
 lane_receivers() { tests/e2e/run real -timeout 6m ./guardrails/receivers-independent; }   # G-012, private database
 lane_orgs()      { tests/e2e/run real -timeout 6m ./guardrails/orgs-independent; }        # G-026, private database
-lane_end_to_end() {                                                                       # spine, G-013, G-025, G-027
-  tests/e2e/run real -timeout 9m ./e2e/... ./harness/router/ ./guardrails/freshness/ ./guardrails/orgs-apart/ ./guardrails/two-copies/ || return 1
+lane_end_to_end() { tests/e2e/run real -timeout 9m ./e2e/... ./harness/router/ ./guardrails/freshness/ ./guardrails/orgs-apart/ ./guardrails/two-copies/; } # spine, G-013, G-025, G-027
+lane_e2e_faults() {                                                                       # the same must fail with a rule off
   tests/e2e/run real -timeout 8m -tags t057faults -run Fails ./guardrails/freshness/ ./guardrails/orgs-apart/ ./guardrails/two-copies/ || return 1
   tests/e2e/run standin -timeout 3m -tags t057faults -run Fails ./e2e/
 }
-lane_web_wide()  { CONTEXIA_SKIP_BUILD=1 web/app/scripts/browser-tests --project=wide --output=test-results/wide --reporter=line; }
-lane_web_phone() { CONTEXIA_SKIP_BUILD=1 web/app/scripts/browser-tests --project=phone --output=test-results/phone --reporter=line; }
+lane_rebuild() {                                                                          # G-020, on its own composed system
+  local project="$project-rebuild"
+  docker compose -p "$project" -f deploy/compose.yaml -f deploy/compose.test.yaml up -d --wait --quiet-pull || return 1
+  gotest tests -p 1 -timeout 6m ./guardrails/rebuild || return 1
+  gotest tests -p 1 -timeout 4m -tags demofaults -run Fails ./guardrails/rebuild/
+}
+# The tests of one width share one mock door, so each half of a width gets its own.
+web() { CONTEXIA_SKIP_BUILD=1 web/app/scripts/browser-tests --project="$1" --shard="$2/2" --output="test-results/$1-$2" --reporter=line; }
+lane_wide_1()  { web wide 1; }
+lane_wide_2()  { web wide 2; }
+lane_phone_1() { web phone 1; }
+lane_phone_2() { web phone 2; }
 lane_outside()   { tests/browser-outside/run --reporter=line; }
 
-lanes=(system web_wide web_phone outside)
-[ "$quick" -eq 1 ] || lanes+=(receivers orgs end_to_end)
+lanes=(system rebuild wide_1 wide_2 phone_1 phone_2 outside)
+[ "$quick" -eq 1 ] || lanes+=(receivers orgs end_to_end e2e_faults)
 
 echo; echo "Running ${#lanes[@]} lanes side by side: ${lanes[*]}"
 for name in "${lanes[@]}"; do

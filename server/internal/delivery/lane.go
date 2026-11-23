@@ -341,6 +341,14 @@ func collectOrgs(ctx context.Context, pool *pgxpool.Pool, sql string, args ...an
 	return out, nil
 }
 
+// dueInsertIfBehind takes the log's lock before it writes the row. A save holds
+// that lock while it marks the organization due, so writing the row first and
+// waiting for the lock afterwards (the foreign key does) would deadlock with it.
+const dueInsertIfBehind = `WITH h AS (SELECT org, head FROM org_log WHERE org = $1 FOR KEY SHARE)
+	INSERT INTO delivery_due (receiver, org, since)
+	SELECT $3, h.org, $2::timestamptz FROM h JOIN delivery_places p ON p.org = h.org AND p.receiver = $3
+	WHERE h.head > p.place ON CONFLICT DO NOTHING`
+
 // removeDue takes an organization off the due table once level, skipping a row
 // a save holds right now. A save that found the row before it went, and has not
 // committed, added none of its own; runRechecks catches it.
@@ -405,9 +413,7 @@ func (l *lane) runRechecks(ctx context.Context, pool *pgxpool.Pool) {
 				SELECT h.org, $2::timestamptz FROM feed.note_heads h JOIN feed.note_places p ON p.org = h.org
 				WHERE h.org = $1 AND h.head > p.place ON CONFLICT DO NOTHING`, string(org), l.s.cfg.Clock.Now())
 		} else {
-			_, err = pool.Exec(ctx, `INSERT INTO delivery_due (receiver, org, since)
-				SELECT $3, h.org, $2::timestamptz FROM org_log h JOIN delivery_places p ON p.org = h.org AND p.receiver = $3
-				WHERE h.org = $1 AND h.head > p.place ON CONFLICT DO NOTHING`, string(org), l.s.cfg.Clock.Now(), l.name)
+			_, err = pool.Exec(ctx, dueInsertIfBehind, string(org), l.s.cfg.Clock.Now(), l.name)
 		}
 		if err != nil {
 			continue

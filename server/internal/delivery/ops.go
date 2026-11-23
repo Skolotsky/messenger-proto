@@ -300,6 +300,9 @@ func (l *lane) retryChange(ctx context.Context, org ids.Org, number int64) (bool
 			if _, err := tx.Exec(ctx, `UPDATE delivery_places SET refusals = 0, paused = false WHERE org = $1 AND receiver = $2`, string(org), l.name); err != nil {
 				return err
 			}
+			if _, err := tx.Exec(ctx, `SELECT 1 FROM org_log WHERE org = $1 FOR KEY SHARE`, string(org)); err != nil { // before the row: see dueInsertIfBehind
+				return err
+			}
 			_, err := tx.Exec(ctx, `INSERT INTO delivery_due (receiver, org, since)
 				SELECT $1, $2, $3 WHERE NOT EXISTS (SELECT 1 FROM delivery_stopped WHERE org = $2)
 				ON CONFLICT DO NOTHING`, l.name, string(org), l.s.cfg.Clock.Now())
@@ -415,6 +418,9 @@ func (s *Service) restart(w http.ResponseWriter, r *http.Request, org ids.Org) {
 			return err
 		}
 		if _, err := tx.Exec(ctx, `DELETE FROM delivery_parked WHERE org = $1 AND receiver = $2`, string(org), name); err != nil {
+			return err
+		}
+		if _, err := tx.Exec(ctx, `SELECT 1 FROM org_log WHERE org = $1 FOR KEY SHARE`, string(org)); err != nil { // before the row: see dueInsertIfBehind
 			return err
 		}
 		_, err := tx.Exec(ctx, `INSERT INTO delivery_due (receiver, org, since) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`, name, string(org), now)

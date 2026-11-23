@@ -140,7 +140,7 @@ test('a setting that is refused goes back and says so', async ({ page, door }, i
   const dialog = await openSettings(page, info);
   const flags = dialog.getByRole('checkbox', { name: /Flags that name you/ });
   door.refuseNext = true;
-  await flags.uncheck();
+  await flags.click(); // not uncheck(): a refused change puts the switch back at once, which is the point
   await expect(dialog.getByRole('alert')).toContainText('did not go through');
   await expect(flags, 'the switch shows the truth again').toBeChecked();
 });
