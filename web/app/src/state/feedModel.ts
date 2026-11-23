@@ -126,6 +126,7 @@ export type FeedEvent =
   | { type: 'loaded'; rows: FeedRow[]; counts: FeedCounts; notice: string | null }
   /** A fresh answer while the list is in view: treated as changes, so that nothing moves. */
   | { type: 'refreshed'; rows: FeedRow[]; counts: FeedCounts; notice: string | null; inView(key: string): boolean }
+  | { type: 'notice'; notice: string | null | undefined }
   | { type: 'unavailable'; notice: string }
   | { type: 'parts'; parts: FeedPart[]; inView(key: string): boolean }
   | { type: 'deleted'; message: string; inView(key: string): boolean }
@@ -180,6 +181,8 @@ export function feedReduce(model: FeedModel, event: FeedEvent): FeedModel {
       for (const row of event.rows) next = applyChanged(next, row);
       return { ...next, counts: event.counts };
     }
+    case 'notice':
+      return model.notice === (event.notice ?? null) ? model : { ...model, notice: event.notice ?? null };
     case 'unavailable':
       return { ...model, phase: model.phase === 'loading' ? 'unavailable' : model.phase, notice: event.notice };
     case 'parts': {

@@ -60,7 +60,12 @@ interface HistoryState {
   /** The entries on screen for the open tab: new ones wait behind Show, like the feed. */
   shown: HistoryEntry[] | null;
   waiting: number;
+  /** Where the open tab's next older page starts, once the person has asked for one. */
+  paged: string | null | undefined;
 }
+
+/** One message can have several reactions, so a message is not enough to name an entry. */
+const entryKey = (e: HistoryEntry) => `${e.message}|${e.by ?? ''}|${e.emoji ?? ''}`;
 
 interface Props {
   session: Session;
@@ -78,7 +83,7 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
   const [why, setWhy] = useState<{ key: string; anchor: DOMRect } | null>(null);
   const [made, setMade] = useState<Record<string, RowChange | null>>({});
   const [keptOpen, setKeptOpen] = useState(false);
-  const [history, setHistory] = useState<HistoryState>({ answers: {}, shown: null, waiting: 0 });
+  const [history, setHistory] = useState<HistoryState>({ answers: {}, shown: null, waiting: 0, paged: undefined });
   const scroller = useRef<HTMLDivElement>(null);
   const anchor = useRef<{ key: string; top: number } | null>(null);
   const looking = useIsLooking();
@@ -105,12 +110,14 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
         if (open === 'feed') return { ...h, answers: next };
         const answer = next[open];
         if (!answer) return { ...h, answers: next };
-        if (!h.shown) return { answers: next, shown: answer.entries, waiting: 0 };
+        if (!h.shown) return { ...h, answers: next, shown: answer.entries, waiting: 0 };
         // In place: what is there shows the truth. What is new waits (D-003).
-        const known = new Set(h.shown.map((e) => e.message));
-        const fresh = new Map(answer.entries.map((e) => [e.message, e]));
-        const shown = h.shown.map((e) => fresh.get(e.message) ?? { ...e, unread: false, preview: '' });
-        return { answers: next, shown, waiting: answer.entries.filter((e) => !known.has(e.message)).length };
+        const known = new Set(h.shown.map(entryKey));
+        const fresh = new Map(answer.entries.map((e) => [entryKey(e), e]));
+        // An entry older than this answer's first page is simply not in it; it was not deleted.
+        const oldest = answer.next ? Math.min(...answer.entries.map((e) => e.number)) : -Infinity;
+        const shown = h.shown.map((e) => fresh.get(entryKey(e)) ?? (e.number < oldest ? e : { ...e, unread: false, preview: '' }));
+        return { ...h, answers: next, shown, waiting: answer.entries.filter((e) => !known.has(entryKey(e))).length };
       });
     },
     [person],
@@ -153,10 +160,10 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
     if (view === 'feed') leaveFeed();
     setWhy(null);
     if (next === 'feed') {
-      setHistory((h) => ({ ...h, shown: null, waiting: 0 }));
+      setHistory((h) => ({ ...h, shown: null, waiting: 0, paged: undefined }));
       enter();
     } else {
-      setHistory((h) => ({ ...h, shown: h.answers[next]?.entries ?? null, waiting: 0 }));
+      setHistory((h) => ({ ...h, shown: h.answers[next]?.entries ?? null, waiting: 0, paged: undefined }));
       void refreshHistory([next]);
     }
     setView(next);
@@ -223,10 +230,23 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
       if (fyiSeen.current) leaveFeed();
       feed.show();
     } else {
-      setHistory((h) => ({ ...h, shown: h.answers[view]?.entries ?? h.shown, waiting: 0 }));
+      setHistory((h) => ({ ...h, shown: h.answers[view]?.entries ?? h.shown, waiting: 0, paged: undefined }));
     }
     anchor.current = null;
     scroller.current?.scrollTo({ top: 0 }); // you asked for them: go to where they are
+  };
+
+  const loadOlder = async () => {
+    if (!person || view === 'feed') return;
+    const after = history.paged === undefined ? history.answers[view]?.next : history.paged;
+    if (!after) return;
+    const page = await loadHistory(person, view, after).catch(() => null);
+    if (!page) return;
+    setHistory((h) => {
+      if (viewRef.current !== page.tab) return h;
+      const have = new Set((h.shown ?? []).map(entryKey));
+      return { ...h, shown: [...(h.shown ?? []), ...page.entries.filter((e) => !have.has(entryKey(e)))], paged: page.next };
+    });
   };
 
   const closeWhy = useCallback(() => setWhy(null), []);
@@ -412,6 +432,8 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
               session={session}
               tab={view}
               entries={history.shown ?? history.answers[view]?.entries ?? null}
+              hasMore={Boolean(history.paged === undefined ? history.answers[view]?.next : history.paged)}
+              onMore={() => void loadOlder()}
               onOpen={(entry) => {
                 setHistory((h) => ({
                   ...h,
@@ -513,12 +535,16 @@ function HistoryList({
   session,
   tab,
   entries,
+  hasMore,
+  onMore,
   onOpen,
   onKeep,
 }: {
   session: Session;
   tab: HistoryTab;
   entries: HistoryEntry[] | null;
+  hasMore: boolean;
+  onMore(): void;
   onOpen(entry: HistoryEntry): void;
   onKeep(entry: HistoryEntry): void;
 }) {
@@ -543,7 +569,7 @@ function HistoryList({
         const name = author?.name ?? e.author;
         const gone = e.preview === '';
         return (
-          <article className={`row hrow${e.unread ? ' unread' : ''}`} key={e.message} data-row={`h:${e.message}`}>
+          <article className={`row hrow${e.unread ? ' unread' : ''}`} key={entryKey(e)} data-row={`h:${e.message}`}>
             <div className="row-main">
               <button
                 className="row-hit"
@@ -590,6 +616,13 @@ function HistoryList({
           </article>
         );
       })}
+      {hasMore && (
+        <div className="sr-more">
+          <button className="btn sm" onClick={onMore}>
+            Show older
+          </button>
+        </div>
+      )}
     </>
   );
 }

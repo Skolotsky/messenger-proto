@@ -25,11 +25,14 @@ export class DoorError extends Error {
 }
 
 const LIMIT_MS = 3000; // the screen treats an action unanswered after 3 s as not sent (screen-to-conversations.md)
+// The door itself waits up to 3 s for the feed or the index and then answers with a notice (door-reads.md),
+// so a question must wait a little longer than that, or the notice is never heard.
+const QUESTION_LIMIT_MS = 4000;
 
 export async function call<T>(path: string, init?: RequestInit): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(`/orgs/${encodeURIComponent(ORG)}${path}`, { ...init, signal: AbortSignal.timeout(LIMIT_MS) });
+    res = await fetch(`/orgs/${encodeURIComponent(ORG)}${path}`, { ...init, signal: AbortSignal.timeout(init?.method === 'POST' ? LIMIT_MS : QUESTION_LIMIT_MS) });
   } catch {
     throw new DoorError('unreachable', 'No answer from the server.');
   }
@@ -59,8 +62,8 @@ const personPath = (person: string) => `/people/${encodeURIComponent(person)}`;
 
 export const loadFeed = (person: string) => call<ScreenFeedAnswer>(`${personPath(person)}/feed`);
 
-export const loadHistory = (person: string, tab: HistoryTab) =>
-  call<HistoryAnswer>(`${personPath(person)}/history?tab=${tab}`);
+export const loadHistory = (person: string, tab: HistoryTab, after?: string) =>
+  call<HistoryAnswer>(`${personPath(person)}/history?tab=${tab}${after ? `&after=${encodeURIComponent(after)}` : ''}`);
 
 export const loadSettings = (person: string) => call<SettingsAnswer>(`${personPath(person)}/settings`);
 

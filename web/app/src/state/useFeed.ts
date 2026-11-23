@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { act, DoorError, loadFeed, loadSettings, newId } from '../api/door';
 import { subscribeLive } from '../api/live';
+import { NOTICE_AFTER_MS } from '../config';
 import type { FeedRow, PeopleAction, RowAct, SettingsAnswer } from '../api/types';
 import { emptyFeed, feedReduce, rowKey, waitingBy, type FeedModel, type Section, type ShownRow } from './feedModel';
 import type { Session } from './useSession';
+
+const BEHIND_AFTER_MS = NOTICE_AFTER_MS + 500;
 
 const inViewOf = (key: string) => {
   const box = document.querySelector('.feed-scroll');
@@ -86,6 +89,67 @@ export function useFeed(session: Session): Feed {
     },
     [person, link],
   );
+
+  // Nothing tells an open screen that the feed fell behind, so it asks: once when something happened
+  // and 10 s have passed, and every 5 s while it is saying so (D-007, G-019). Only the notice is taken
+  // from the answer: the rows keep following the numbered stream.
+  const connected = useRef(session.connected);
+  connected.current = session.connected;
+  const checkBehind = useCallback(async () => {
+    if (!person || !connected.current) return;
+    try {
+      const answer = await loadFeed(person);
+      if (!answer.counts) {
+        dispatch({ type: 'notice', notice: answer.notice ?? 'Catching up' });
+        link?.feedAway();
+      } else {
+        dispatch({ type: 'notice', notice: answer.notice });
+      }
+    } catch {
+      dispatch({ type: 'notice', notice: 'Catching up' });
+      link?.feedAway();
+    }
+  }, [person, link]);
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let latest = 0;
+    // Asked once the newest change is old enough to count as late, and again for anything newer.
+    const due = () => {
+      const left = latest + BEHIND_AFTER_MS - Date.now();
+      if (left > 0) {
+        timer = setTimeout(due, left);
+        return;
+      }
+      timer = undefined;
+      void checkBehind();
+    };
+    const off = subscribeLive((message) => {
+      if (!('stream' in message) || message.stream !== 'conversations') return;
+      latest = Date.now();
+      if (timer === undefined) timer = setTimeout(due, BEHIND_AFTER_MS);
+    });
+    return () => {
+      off();
+      clearTimeout(timer);
+    };
+  }, [checkBehind]);
+
+  const saying = Boolean(model.notice);
+  useEffect(() => {
+    if (!saying) return;
+    const timer = setInterval(() => void checkBehind(), 5000);
+    return () => clearInterval(timer);
+  }, [saying, checkBehind]);
+
+  // A mention in a channel the person is not in reaches them only through the feed, so no update
+  // announces it: a slow regular question covers that case.
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (document.visibilityState === 'visible') void checkBehind();
+    }, NOTICE_AFTER_MS);
+    return () => clearInterval(timer);
+  }, [checkBehind]);
 
   const reloadSettings = useCallback(() => {
     if (person) loadSettings(person).then(setSettings, () => undefined);

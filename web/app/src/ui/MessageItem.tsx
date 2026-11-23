@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import type { MessageRow } from '../api/types';
 import { withPending } from '../state/outbox';
 import type { Session } from '../state/useSession';
+import { AgentState } from './AgentState';
 import { Avatar } from './Avatar';
 import { timeOf, whenOf } from './format';
 import { Icon } from './Icon';
@@ -15,9 +16,11 @@ interface Props {
   inThread: boolean;
   isThreadOpen: boolean;
   onOpenThread?(id: string): void;
+  /** This is the agent's newest message here, so its current state stands beside its name. */
+  showAgentState?: boolean;
 }
 
-export function MessageItem({ row, session, inThread, isThreadOpen, onOpenThread }: Props) {
+export function MessageItem({ row, session, inThread, isThreadOpen, onOpenThread, showAgentState = false }: Props) {
   const { thread_summary: summary } = row;
   const pending = session.outbox.filter((i) => i.messageId === row.message.id);
   const m = withPending(row.message, pending, session.me?.id);
@@ -108,6 +111,7 @@ export function MessageItem({ row, session, inThread, isThreadOpen, onOpenThread
         <div className="msg-main">
           <div className="msg-head">
             <b>{author?.name ?? m.author}</b>
+            {showAgentState && <AgentState person={author} session={session} />}
             {m.level === 'flag' && <span className="tag flag">Flag</span>}
             {m.level === 'info' && <span className="tag info">Info</span>}
             <time dateTime={m.created_at}>{timeOf(m.created_at)}</time>

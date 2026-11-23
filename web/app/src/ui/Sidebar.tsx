@@ -1,5 +1,6 @@
 import type { ConversationSummary, PersonView } from '../api/types';
 import type { Session } from '../state/useSession';
+import { agentStateText } from './AgentState';
 import { Avatar } from './Avatar';
 import { conversationTitle } from './ConversationView';
 import { timeOf } from './format';
@@ -29,6 +30,8 @@ export function Sidebar({ session, open, activityOpen, onToggleActivity, onOpen,
   const directs = session.conversations.filter((c) => c.type === 'direct');
   const offline = useOfflineNotice(session.offlineSince);
 
+  const agentState = (id: string) => agentStateText(session.people.get(id), session);
+
   const item = (c: ConversationSummary) => {
     const title = conversationTitle(c, session);
     const other = c.people.find((p) => p !== session.me?.id) ?? c.people[0];
@@ -47,6 +50,7 @@ export function Sidebar({ session, open, activityOpen, onToggleActivity, onOpen,
           <Avatar id={other} person={session.people.get(other)} small />
         )}
         <span className="chat-n">{c.type === 'channel' ? c.name : title}</span>
+        {c.type === 'direct' && agentState(other) && <small className="chat-state">{agentState(other)}</small>}
         {c.unread && <span className="dot" role="img" aria-label="unread" />}
       </button>
     );
