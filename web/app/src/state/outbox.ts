@@ -33,18 +33,25 @@ interface Waiter {
 
 const SHOWN_ON_MESSAGE = new Set<PeopleAction['kind']>(['send', 'edit', 'delete', 'react']);
 
+/** These wait for an answer and go out again by themselves (screen-to-conversations.md, section 4). */
+const WAITS_FOR_AN_ANSWER = new Set<PeopleAction['kind']>(['send', 'edit', 'delete', 'react']);
+const RETRY_MS = [1000, 2000, 4000];
+
 const rowOf = (a: PeopleAction) =>
   a.kind === 'read' ? `${a.conversation}|${a.thread ?? ''}` : null;
 
 /**
  * What the person did and the door has not confirmed yet. Actions are sent one at a time, in the
- * order they were made, each with its ID. A failed new message holds back what came after it, so
- * that messages cannot overtake each other.
+ * order they were made, each with its ID. One with no answer stays first in line and holds back
+ * what came after it, so that messages cannot overtake each other.
  */
 export class Outbox {
   items: OutItem[] = [];
   private online = false;
   private running = false;
+  /** How many times in a row the action at the head of the line had no answer. */
+  private misses = 0;
+  private pause: ReturnType<typeof setTimeout> | null = null;
   private readonly waiters = new Map<string, Waiter>();
   private readonly listeners = new Set<() => void>();
 
@@ -81,10 +88,12 @@ export class Outbox {
       const held = this.items.find((i) => i.state === 'waiting' && rowOf(i.action) === row);
       if (held) this.changed(this.items.filter((i) => i !== held));
     }
+    // Behind an action with no answer, this one waits its turn and says so.
+    const direct = this.online && this.misses === 0;
     const item: OutItem = {
       id: action.id,
       action,
-      state: this.online ? 'sending' : 'waiting',
+      state: direct ? 'sending' : 'waiting',
       reason: null,
       messageId: input.messageId ?? null,
       draft: input.draft ?? null,
@@ -92,8 +101,8 @@ export class Outbox {
     };
     this.changed([...this.items, item]);
     const result = new Promise<OutResult>((resolve, reject) => {
-      if (input.answersInPlace && this.online) this.waiters.set(item.id, { resolve, reject });
-      else resolve(this.online ? 'saved' : 'waiting');
+      if (input.answersInPlace && direct) this.waiters.set(item.id, { resolve, reject });
+      else resolve(direct ? 'saved' : 'waiting');
     });
     void this.pump();
     return result;
@@ -101,9 +110,13 @@ export class Outbox {
 
   setOnline(online: boolean) {
     this.online = online;
+    this.endPause();
     if (!online) {
       // Whatever has no answer yet waits for the connection, and its message says so.
-      this.changed(this.items.map((i) => (i.state === 'sending' ? { ...i, state: 'waiting' } : i)));
+      this.misses = 0;
+      this.changed(
+        this.items.map((i) => (i.state === 'sending' || i.state === 'waiting' ? { ...i, state: 'waiting', reason: null } : i)),
+      );
       for (const waiter of this.waiters.values()) waiter.resolve('waiting');
       this.waiters.clear();
       return;
@@ -113,6 +126,7 @@ export class Outbox {
   }
 
   retry(id: string) {
+    this.endPause();
     this.patch(id, { state: 'waiting', reason: null });
     void this.pump();
   }
@@ -120,13 +134,21 @@ export class Outbox {
   discard(id: string) {
     this.waiters.get(id)?.resolve('saved');
     this.waiters.delete(id);
+    if (this.next()?.id === id) {
+      this.misses = 0;
+      this.endPause();
+    }
     this.remove(id);
     void this.pump();
   }
 
+  private endPause() {
+    if (this.pause !== null) clearTimeout(this.pause);
+    this.pause = null;
+  }
+
   private next(): OutItem | null {
     for (const item of this.items) {
-      if (item.state === 'failed' && item.action.kind === 'send') return null;
       if (item.state === 'sending' || item.state === 'waiting') return item;
     }
     return null;
@@ -137,13 +159,15 @@ export class Outbox {
     this.running = true;
     try {
       for (;;) {
-        if (!this.online) return;
+        if (!this.online || this.pause !== null) return;
         const item = this.next();
         if (!item) return;
-        if (item.state !== 'sending') this.patch(item.id, { state: 'sending' });
+        // Tried again, it keeps saying that it waits, so the line under the message does not flicker.
+        if (item.state !== 'sending' && !item.reason) this.patch(item.id, { state: 'sending' });
         try {
           const saved = await this.post(item.action);
           item.onSaved(saved);
+          this.misses = 0;
           this.remove(item.id);
           this.settle(item.id, 'resolve', 'saved');
         } catch (e) {
@@ -173,6 +197,11 @@ export class Outbox {
       this.settle(item.id, 'resolve', 'waiting');
       return;
     }
+    if (!refused && WAITS_FOR_AN_ANSWER.has(item.action.kind)) {
+      this.waitForAnswer(item, error);
+      return;
+    }
+    this.misses = 0;
     // The form that made it is still open and says it there.
     if (this.waiters.has(item.id)) {
       this.remove(item.id);
@@ -185,6 +214,23 @@ export class Outbox {
     }
     this.remove(item.id);
     this.onProblem(item, error);
+  }
+
+  /** No answer with the connection up: it stays first in line and is sent again, with its ID, after a pause. */
+  private waitForAnswer(item: OutItem, error: DoorError) {
+    const wait = RETRY_MS[Math.min(this.misses, RETRY_MS.length - 1)];
+    this.misses += 1;
+    this.changed(
+      this.items.map((i) => {
+        if (i.id === item.id) return { ...i, state: 'waiting' as const, reason: error.message };
+        return i.state === 'sending' ? { ...i, state: 'waiting' as const } : i;
+      }),
+    );
+    for (const id of [...this.waiters.keys()]) this.settle(id, 'resolve', 'waiting');
+    this.pause = setTimeout(() => {
+      this.pause = null;
+      void this.pump();
+    }, wait * (0.8 + Math.random() * 0.2));
   }
 }
 

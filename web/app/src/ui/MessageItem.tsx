@@ -114,6 +114,7 @@ export function MessageItem({ row, session, inThread, isThreadOpen, onOpenThread
             {showAgentState && <AgentState person={author} session={session} />}
             {m.level === 'flag' && <span className="tag flag">Flag</span>}
             {m.level === 'info' && <span className="tag info">Info</span>}
+            {m.stopped && <span className="tag info">stopped</span>}
             <time dateTime={m.created_at}>{timeOf(m.created_at)}</time>
             {m.edited_at && <span className="edited">edited</span>}
           </div>

@@ -26,17 +26,20 @@ export function ActionProblem({
   problem,
   onRetry,
   onDiscard,
+  waiting = false,
 }: {
   problem: Problem;
   onRetry(): void;
   /** Left out where the form already has its own way out. */
   onDiscard?(): void;
+  /** It is not over: the action goes out again by itself. */
+  waiting?: boolean;
 }) {
   const el = useRef<HTMLDivElement>(null);
   // The line appears under the message: at the bottom of a list it would otherwise be out of view.
   useEffect(() => el.current?.scrollIntoView({ block: 'nearest' }), [problem.text]);
   return (
-    <div className="send-state fail" role="alert" ref={el}>
+    <div className={`send-state ${waiting ? 'waiting' : 'fail'}`} role="alert" ref={el}>
       {problem.text}{' '}
       {problem.canRetry && (
         <button type="button" className="link" onClick={onRetry}>
@@ -73,6 +76,17 @@ export function OutLines({ session, items }: { session: Session; items: OutItem[
     <>
       {items.map((item) => {
         const kind = item.action.kind;
+        if (item.state === 'waiting' && item.reason) {
+          return (
+            <ActionProblem
+              key={item.id}
+              waiting
+              problem={{ text: `${WAITING[kind]}: no answer from the server.`, canRetry: true }}
+              onRetry={() => session.retryAction(item.id)}
+              onDiscard={() => session.discardAction(item.id)}
+            />
+          );
+        }
         if (item.state === 'waiting') {
           return (
             <div className="send-state waiting" role="status" key={item.id}>
