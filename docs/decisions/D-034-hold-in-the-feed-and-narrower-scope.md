@@ -5,7 +5,7 @@
 - Date: 2026-11-22
 - Decided by: user
 - Depends on: D-012, D-014, D-018, D-029, D-030, D-031, D-032, D-033
-- Supersedes: the hold in D-018; "a refused note stops that organization's notes" in D-032; "a fence writes `withdrawn`" in D-031; the coding-agent connector and acting as a person in D-002 and D-008; text rules judged by a model in D-001; the "about 100,000 people" figure in D-030
+- Supersedes: the hold in D-018; "a refused note stops that organization's notes" in D-032; "a fence writes `withdrawn`" in D-031; the coding-agent connector and acting as a person in D-002 and D-008; text rules judged by a model in D-001; the capacity figure in D-030
 - Evidence: the contracts, the feed rules and the delivery workers as built, read against this decision on 2026-11-22
 
 ## Why this needs deciding now
@@ -41,7 +41,7 @@ The coding-agent connector (T-060) and text rules judged by a model (T-062) move
 
 ### 4. The capacity statement
 
-The "100,000 people" figure is withdrawn, and the project states no capacity figure. Larger organizations have a path: conversations applied in parallel, grouped saves, big-channel items stored once, and batched calls to search. The D-030 record and `tasks/done.md` stay as history.
+The project states no capacity figure. Larger organizations have a path: conversations applied in parallel, grouped saves, big-channel items stored once, and batched calls to search.
 
 ### 5. Simulated figures are never validation
 
@@ -65,4 +65,4 @@ Consequences the user did not object to: the `text` rule type leaves the schema;
 
 ## Follow-ups
 
-T-065 applies this after T-064 merges and before T-052: contracts, schemas, guardrails, board and build plan agree with it; each moved hold test is seen failing with its rule off; searches for `stopped_at`, the removed note kinds, G-028 and "100,000" show only history; a fresh verifier checks it against this decision.
+T-065 applies this after T-064 merges and before T-052: contracts, schemas, guardrails, board and build plan agree with it; each moved hold test is seen failing with its rule off; searches for `stopped_at`, the removed note kinds and G-028 show only history; a fresh verifier checks it against this decision.

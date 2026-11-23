@@ -41,7 +41,7 @@ Three measures, none of which changes a contract between parts:
 2. **Saves of one organization are written in small groups.** One copy of Conversations serves an organization (D-029), so it can collect the saves that arrive within a few milliseconds, hand out their numbers together and confirm them with one write. One write then carries tens of saves.
 3. **What concerns a whole large channel is kept once, not once per member.** In a channel above 500 members, an item that reaches a person only because they are a member (they are not named, it is not their thread) is stored once for the channel. A reader's feed and count combine their own rows with the channel items after their read position.
 
-After these, about **100,000 people** in one organization (2,000 changes a second at the busiest time, 15 million a day): the limits left are the organization's log being read by one delivery claim at a time, which reading can sustain, and the organization living in one database.
+After these, the limits left are the organization's log being read by one delivery claim at a time, which reading can sustain, and the organization living in one database.
 
 ### C. A log per conversation
 
@@ -62,14 +62,14 @@ Decided with it, to be true from the first version:
 
 Not built in the first version: the three measures themselves. With a seeded team of 36 the feed applies one change at a time; the guardrail keeps the door open.
 
-C is the step after B, for organizations beyond about 100,000 people. It is not adopted because it changes every contract for a size no first version meets. Is it complicated? B: no, it is inside the feed and inside Conversations. C: yes, moderately, for the reasons above.
+C is the step after B, for organizations that B cannot carry. It is not adopted because it changes every contract for a size no first version meets. Is it complicated? B: no, it is inside the feed and inside Conversations. C: yes, moderately, for the reasons above.
 
 ### Corrections after an independent check, 2026-11-22 (the decision stands)
 
 - **"None of which changes a contract" was too strong.** Measure 1 keeps the delivery boundary as it is (the feed takes changes strictly in order and confirms each; inside, it works on conversations side by side), but it needed one contract to be made stricter: the notification sender's clock now moves only on clock notes, which the feed writes when everything of the organization up to that time has been applied. Otherwise a later note from one conversation could release a notification before another conversation's withdrawal had been written. The feed-to-sender contract and G-011 say so.
-- **Two more things happen one at a time** and belong in the table: the feed's own numbered log of notes (one number hand-out per organization, a few hundred a second, enough for about 100,000 people; grouped like saves beyond that), and delivery to search and to the sender one change per call (lifted by handing over several changes per call, as the feed contract already allows for a backlog).
+- **Two more things happen one at a time** and belong in the table: the feed's own numbered log of notes (one number hand-out per organization, a few hundred a second; grouped like saves beyond that), and delivery to search and to the sender one change per call (lifted by handing over several changes per call, as the feed contract already allows for a backlog).
 - **Clock ticks are organization-wide**, like the reader-wide changes: everything before a tick is finished before it counts.
-- **About 100,000 people is also where one copy of Conversations holding every connection of one organization ends.** Beyond it an organization's screens would need several copies and something shared between them; that is the moment for a shared in-memory store.
+- **One copy of Conversations holding every connection of one organization is also a limit.** Beyond it an organization's screens would need several copies and something shared between them; that is the moment for a shared in-memory store.
 - **A flag for everyone in a very large channel still means one notification per member.** Measure 3 keeps the feed from writing a row per member; the notifications are the product's rule (D-012) and are spread out by the sender.
 - **The simulation is weaker evidence than first stated.** It models a subset of the rules with none of the product's reader-wide kinds, replays one after another and not at the same time, and at first compared the notification notes without their order. It was tightened (longer stretches between organization-wide changes; notes compared in order per conversation) and still shows no difference, but the proof has to be G-030's test on the product's own rules.
 

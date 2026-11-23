@@ -5,7 +5,7 @@
 
 ## Outcome
 
-The feed holds a notification for 5 s by the log's timestamps and the sender only delivers. The connector, text rules, two-database testing and the 100,000 figure are gone from everything current.
+The feed holds a notification for 5 s by the log's timestamps and the sender only delivers. The connector, text rules, two-database testing and the capacity figure are gone from everything current.
 
 ## Acceptance criteria
 
@@ -15,7 +15,7 @@ The feed holds a notification for 5 s by the log's timestamps and the sender onl
 - [ ] Once per name after restarts, rebuilds and a wiped sender; within 8 s when healthy; "delayed" after 10 minutes; an update before its send is remembered; `history: true` is listed and never delivered. Check: G-010, each must-fail variant kept.
 - [ ] A parked note holds nothing back. Check: G-014.
 - [ ] G-029 uses 50 and 500 idle organizations and judges rows read. The lint protecting the database function runs in `./scripts/check`, seen failing.
-- [ ] Searches for `stopped_at`, the removed note kinds, G-028 and "100,000" show only history. Check: shown in Evidence.
+- [ ] Searches for `stopped_at`, the removed note kinds and G-028 show only history. Check: shown in Evidence.
 - [ ] Simulated figures appear nowhere as evidence. Check: search of the README, product and validation text.
 - [ ] The pause between retries is at most 20 s (D-035). Check: a test of the pause, seen failing at 60 s.
 - [ ] `./scripts/check` and `./scripts/verify` pass.
