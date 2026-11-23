@@ -99,6 +99,7 @@ code{font:11px ui-monospace,Menlo,Consolas,monospace}
 .toc a.l:hover{color:var(--ink)}
 .toc a.l.on{color:var(--accent);border-left-color:var(--accent);font-weight:600}
 .toc a.l.star{color:var(--accent)}
+.toc a.l.sub{padding-left:18px}
 .hero h1{font-size:30px;line-height:1.12;margin:0}
 .hero .lead{font-size:15px;margin-top:7px}
 .glance{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:16px}
@@ -121,7 +122,7 @@ code{font:11px ui-monospace,Menlo,Consolas,monospace}
 </head>
 <body>
 <div class="layout">
-<nav class="toc" aria-label="Contents"><div class="toc-title"><a href="#top">Contexia</a></div><div class="toc-groups"><div><b>Product</b><a class="l" href="#feed">The product bet</a><a class="l" href="#attention">What deserves attention</a><a class="l star" href="#focus">★ Focus: the core decision</a><a class="l" href="#borrowed">Borrowed and changed</a><a class="l" href="#stale">Stale, edited, deleted</a><a class="l" href="#result">What I got</a><a class="l" href="#product-ai">Product decisions with AI</a><a class="l" href="#judgement">Where I overruled the AI</a><a class="l star" href="#next-bet">★ Parked idea: LLM Focus</a></div><div><b>Technology</b><a class="l" href="#delivery">Reliable delivery</a><a class="l" href="#path">How messages reach the feed</a><a class="l" href="#guarantees">Guarantees</a><a class="l" href="#corners">Corners I cut</a><a class="l" href="#tradeoffs">Key trade-offs</a><a class="l" href="#grows">How it grows</a><a class="l" href="#design-ai">Designing with AI</a><a class="l" href="#build-ai">Building with AI</a><a class="l" href="#caught">What the process caught</a></div></div></nav>
+<nav class="toc" aria-label="Contents"><div class="toc-title"><a href="#top">Contexia</a></div><div class="toc-groups"><div><b>Product</b><a class="l" href="#feed">The product bet</a><a class="l" href="#attention">What deserves attention</a><a class="l star" href="#focus">★ Focus: the core decision</a><a class="l sub" href="#next-bet">↳ Parked idea: LLM Focus</a><a class="l" href="#borrowed">Borrowed and changed</a><a class="l" href="#stale">Stale, edited, deleted</a><a class="l" href="#result">What I got</a><a class="l" href="#product-ai">Product decisions with AI</a><a class="l" href="#judgement">Where I overruled the AI</a></div><div><b>Technology</b><a class="l" href="#delivery">Reliable delivery</a><a class="l" href="#path">How messages reach the feed</a><a class="l" href="#guarantees">Guarantees</a><a class="l" href="#corners">Corners I cut</a><a class="l" href="#tradeoffs">Key trade-offs</a><a class="l" href="#grows">How it grows</a><a class="l" href="#design-ai">Designing with AI</a><a class="l" href="#build-ai">Building with AI</a><a class="l" href="#caught">What the process caught</a></div></div></nav>
 <main>
 <header class="hero" id="top">
 <h1>Contexia</h1>
@@ -132,7 +133,7 @@ code{font:11px ui-monospace,Menlo,Consolas,monospace}
 <a href="#design-ai"><b>How I worked</b>AI proposed and built. I questioned it, decided, and verified</a>
 <a href="#next-bet"><b>Parked for later</b>Focus rules in plain language, powered by an LLM. Not built</a>
 </div>
-<details class="mtoc"><summary>Contents</summary><b>Product</b><a href="#feed">The product bet</a><a href="#attention">What deserves attention</a><a href="#focus">★ Focus: the core decision</a><a href="#borrowed">Borrowed and changed</a><a href="#stale">Stale, edited, deleted</a><a href="#result">What I got</a><a href="#product-ai">Product decisions with AI</a><a href="#judgement">Where I overruled the AI</a><a href="#next-bet">★ Parked idea: LLM Focus</a><b>Technology</b><a href="#delivery">Reliable delivery</a><a href="#path">How messages reach the feed</a><a href="#guarantees">Guarantees</a><a href="#corners">Corners I cut</a><a href="#tradeoffs">Key trade-offs</a><a href="#grows">How it grows</a><a href="#design-ai">Designing with AI</a><a href="#build-ai">Building with AI</a><a href="#caught">What the process caught</a></details>
+<details class="mtoc"><summary>Contents</summary><b>Product</b><a href="#feed">The product bet</a><a href="#attention">What deserves attention</a><a href="#focus">★ Focus: the core decision</a><a href="#next-bet">↳ Parked idea: LLM Focus</a><a href="#borrowed">Borrowed and changed</a><a href="#stale">Stale, edited, deleted</a><a href="#result">What I got</a><a href="#product-ai">Product decisions with AI</a><a href="#judgement">Where I overruled the AI</a><b>Technology</b><a href="#delivery">Reliable delivery</a><a href="#path">How messages reach the feed</a><a href="#guarantees">Guarantees</a><a href="#corners">Corners I cut</a><a href="#tradeoffs">Key trade-offs</a><a href="#grows">How it grows</a><a href="#design-ai">Designing with AI</a><a href="#build-ai">Building with AI</a><a href="#caught">What the process caught</a></details>
 </header>
 
 <div class="part first" id="product">Product</div>
@@ -211,6 +212,15 @@ code{font:11px ui-monospace,Menlo,Consolas,monospace}
 <li><b>Respects senders:</b> a message marked Info never lands in Focus.</li>
 </ul>
 <p class="note">Among the products I reviewed, none combines these in one reader-owned list for team chat. Whether people will maintain their rules is the bet that early access would test.</p>
+<section class="idea" id="next-bet">
+<div class="idea-head"><span class="idea-tag">Parked · not in this build</span><h3>Next bet: Focus rules in plain language, powered by an LLM</h3></div>
+<div class="cards">
+<div><b>The value</b>Exact rules can't express "anything about pricing or contracts". A language model could, so people could say what matters in their own words.</div>
+<div><b>The safe design</b>The model could only lift an item into Focus, never hide or lower it. It runs after the item is in the feed, so a slow or failed model breaks nothing.</div>
+<div><b>Why I parked it</b>It is a second bet, and a wrong call in the top bucket costs the most trust. So it is not in the product: I built the rule-based feed first and kept this design on record.</div>
+</div>
+<p class="idea-market"><b>The market is heading there.</b> Slack calls "intelligent prioritization" <a href="https://slack.com/blog/news/slack-activity-triage-for-notifications">the next phase of Activity</a>, Outlook's Copilot is <a href="https://support.microsoft.com/en-US/outlook/copilot-outlook/prioritize-my-inbox">rolling out priorities based on your own criteria</a>, and Gmail is <a href="https://blog.google/products-and-platforms/products/gmail/gmail-gemini">testing an AI Inbox</a>. Contexia's angle would be rules you can see and own, which can only raise an item.</p>
+</section>
 </section>
 
 <h3 id="borrowed">What I borrowed, what I changed, and why</h3>
@@ -295,15 +305,6 @@ code{font:11px ui-monospace,Menlo,Consolas,monospace}
 <li><b>Reactions as answers,</b> as teams really respond.</li>
 <li><b>History tabs,</b> kept apart from triage.</li>
 </ul>
-<section class="idea" id="next-bet">
-<div class="idea-head"><span class="idea-tag">Parked · not in this build</span><h3>Next bet: Focus rules in plain language, powered by an LLM</h3></div>
-<div class="cards">
-<div><b>The value</b>Exact rules can't express "anything about pricing or contracts". A language model could, so people could say what matters in their own words.</div>
-<div><b>The safe design</b>The model could only lift an item into Focus, never hide or lower it. It runs after the item is in the feed, so a slow or failed model breaks nothing.</div>
-<div><b>Why I parked it</b>It is a second bet, and a wrong call in the top bucket costs the most trust. So it is not in the product: I built the rule-based feed first and kept this design on record.</div>
-</div>
-<p class="idea-market"><b>The market is heading there.</b> Slack calls "intelligent prioritization" <a href="https://slack.com/blog/news/slack-activity-triage-for-notifications">the next phase of Activity</a>, Outlook's Copilot is <a href="https://support.microsoft.com/en-US/outlook/copilot-outlook/prioritize-my-inbox">rolling out priorities based on your own criteria</a>, and Gmail is <a href="https://blog.google/products-and-platforms/products/gmail/gmail-gemini">testing an AI Inbox</a>. Contexia's angle would be rules you can see and own, which can only raise an item.</p>
-</section>
 </section>
 
 <div class="part" id="technology">Technology</div>
