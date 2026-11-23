@@ -2,14 +2,11 @@
 
 Work in flight. Order inside a section is priority. Finished work moves to `done.md`. Rules: CLAUDE.md, section "Tasks".
 
-**Where we are:** The product scope is decided (2026-11-22). Accepted: D-001 the three-bucket feed; D-002 scripted participants; D-003 reading is enough, with Keep and Done; D-004 edits and deletes; D-009 the first-version surfaces; D-010 the large seeded team with a control panel; D-011 a flag has no state of its own; D-012 notifications follow the bucket; D-013 readings from E-001; D-014 reactions; D-015 what read means; D-016 history tabs. E-001 was rerun with all of them and checked independently twice: the rules hold together; a simulation with assumed traffic gave about 29 notifications a day, a sanity check only and not evidence (D-034). The architecture proposal (T-022) is drafted, tried out in E-003, E-004 and E-005 (delivery, PostgreSQL numbering, the screen's catch-up and the agent door all held; the notification hold by the log's clock, a fence around a change the feed cannot apply, and Reset from a saved copy came out of them) and checked against the look-and-feel decisions D-019 to D-023 (they fit), and waits for the user: All technical decisions are accepted (the server language changed to Go, D-025; the architecture is ready for many organizations, D-026; a message broker was tried in E-006 and dropped again, D-027 and D-028): D-005, D-017 and D-018 by the user, D-006 to D-008 by the agent on the user's delegation. Contracts and guardrails are written (T-034) and wait for the user's review. The build plan is written (T-043): T-044 to T-062 under Next. The design phase is closed (T-035): the Slack-like prototype in E-002 is the agreed look and behaviour (D-019 to D-024). The coding-agent connector and text rules judged by a model are out of scope (D-034).
+**Where we are:** The first version is built and validated (2026-11-23): the messaging product, the activity feed, reliable delivery to search and notifications, and the seeded demonstration. `make up` runs it; `make verify` passes on the final code. What was not verified, and the calls made without asking, are in `tasks/T-061-final-validation.md`.
 
 ## Now
 
-- **T-061** `validate` Wave 4 · Milestone 3: validation of the running product against the brief, contracts and guardrails; how to run it; known shortcuts up to date. Needs all above
-- **T-065** `implement` D-034: the hold moves into the feed; scope and claims narrowed. Started beside T-064's last delivery fix, at the user's request to remove bottlenecks; its delivery part follows that merge. Before T-052. Detail: `tasks/T-065-hold-in-the-feed.md`
-- **T-064** `implement` D-033: remove the Reset number from contracts and code; retire and delete organizations; G-031. Before T-052, T-053 and T-054. Detail: `tasks/T-064-reset-removal.md`
-
+_Nothing in progress._
 
 ## Waiting on user
 
@@ -18,12 +15,13 @@ Work in flight. Order inside a section is priority. Finished work moves to `done
 
 ## Next
 
-- **T-038** `implement` Rules the prototype only approximates, kept as acceptance criteria for the build. Detail: `tasks/T-038-build-acceptance-from-e002.md`
 
 
 
 ## Backlog
 
+- **T-066** `validate` Write G-015 and G-019's guardrail tests on the real system. Their behaviour is covered on the mock door and on the real main path
+- **T-067** `decide` Put "the feed is behind" on `last_sent` instead of each screen asking every 10 s
 - **T-062** `not planned` Text rules judged by a model: taken out of scope by the user (D-034)
 - **T-060** `not planned` The coding-agent connector: taken out of scope by the user (D-034)
 - **T-008** `research` Look at what Slack's Activity really does when a message is deleted or edited to add or remove a mention (undocumented; needs a real workspace). Informs D-004

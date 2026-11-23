@@ -2,6 +2,10 @@
 
 Finished work, newest first. One line each: what is now true and how it was verified. Commits carry the task ID, so `git log --grep T-nnn` finds the change.
 
+- 2026-11-23 · **T-061** `validate` The running product was validated independently against the brief, contracts and guardrails; one blocker and four other findings were fixed. Verified: `./scripts/verify` passes on the final code (11 lanes, 4 min), and the main flow passes in a browser on the real system. Detail: `tasks/T-061-final-validation.md`.
+- 2026-11-23 · **T-065** `implement` The notification hold is in the feed and the sender only delivers (D-034). Verified: G-010 and G-011 on the real system, at most 6.0 s to a healthy notification under busy traffic, none sent of 132 read or deleted inside the hold.
+- 2026-11-23 · **T-064** `implement` The Reset number is gone; Reset starts a fresh organization, with retire and delete across every part (D-033). Verified: G-031 and three independent checks; 13,734 writes to a retired organization all refused.
+- 2026-11-23 · **T-038** `implement` The prototype's rules hold in the build. Verified: rule and browser tests, and on real data by the T-061 verifier for points 2, 3, 4, 11, 16, 18 (after its fix), 19, 23 and 26.
 - 2026-11-23 · **T-058** `validate` The web app works on the real server at 1280 and 400 px; six defects found and fixed; a walk through the main flow runs as a spec. Checked: that spec on a fresh database, once seen failing. T-038 points 2, 3, 4, 11, 19, 23 and 26 were not checked on real data; they go to the independent check in T-061. Detail: `tasks/T-058-real-product.md`.
 - 2026-11-23 · **T-059** `implement` The demonstration runs: scripted team through the real doors, Reset to a fresh organization, control panel, notification app, cleanup. Checked: its own guardrail G-020 and browser test on its branch. Its independent check is in T-061.
 - 2026-11-23 · **T-057** `validate` The spine runs end to end on the real programs: message path, G-013, G-025 and G-027 pass, and one feed race they found is fixed. The full verification and independent verifier moved to T-061 at the user's request.

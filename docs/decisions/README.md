@@ -52,4 +52,16 @@ Line format: `- **D-nnn** [status] The decision as a statement, and what it comm
 
 ## Delegated: notable choices the agent made on internals
 
-_None yet._
+Made on the user's instruction to finish the build without asking (2026-11-22). Each can be overturned.
+
+- A top-level message that addresses you is one row with its replies; opening the channel reads it, unseen replies stay unread (from D-001, D-031, D-032)
+- A seeded log begins with `seed.opened`, so the feed knows from the log alone what is history (adds to D-033's reading 5)
+- `stop` on an already deleted organization answers 200 and creates nothing, so an interrupted delete can be repeated
+- G-031's protected test gained 14 fixture rows, one per new table of the agent door and the feed; no assertion changed
+- "How far behind" is the age of the oldest change waiting for a receiver
+- An open screen asks every 10 s whether the feed is behind (a known shortcut); a `behind` field on `last_sent` is the better contract (T-067)
+- The per-emoji count on a grouped row counts every reaction, so it equals the pill (T-038 point 18)
+- A person viewing a channel they are not in gets no live updates for it
+- Reset and Rebuild act at once; only Delete asks first
+- Agents are not offered in the notification app
+- The simulated "29 a day" figure is left out of the Notifications settings (D-034)

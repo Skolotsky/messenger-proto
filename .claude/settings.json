@@ -19,7 +19,21 @@
       "Edit(/tests/guardrails/agent-limits/**)",
       "Edit(/tests/guardrails/watching-lapses/**)",
       "Edit(/tests/guardrails/feed-equals-replay/**)",
-      "Edit(/tests/guardrails/feed-fence/**)"
+      "Edit(/tests/guardrails/feed-fence/**)",
+      "Edit(/tests/guardrails/search-equals-truth/**)",
+      "Edit(/tests/guardrails/parts-apart/**)",
+      "Edit(/tests/guardrails/feed-apart/**)",
+      "Edit(/tests/guardrails/notification-once/**)",
+      "Edit(/tests/guardrails/notification-hold/**)",
+      "Edit(/tests/guardrails/receivers-independent/**)",
+      "Edit(/tests/guardrails/freshness/**)",
+      "Edit(/tests/guardrails/parking/**)",
+      "Edit(/tests/guardrails/rebuild/**)",
+      "Edit(/tests/guardrails/calls-time-out/**)",
+      "Edit(/tests/guardrails/orgs-apart/**)",
+      "Edit(/tests/guardrails/orgs-independent/**)",
+      "Edit(/tests/guardrails/feed-two-copies/**)",
+      "Edit(/tests/guardrails/idle-organizations-cost-nothing/**)"
     ]
   }
 }
