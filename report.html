@@ -67,6 +67,24 @@ svg marker path{fill:var(--soft)}
 .idea .cards div{background:var(--page);border-color:transparent}
 .idea-market{margin-top:6px;font-size:12.2px;line-height:1.36}
 .idea-market a{color:var(--accent)}
+.focus{margin-top:22px;scroll-margin-top:16px;border:1.5px solid var(--green);border-radius:9px;padding:13px 15px;background:var(--panel)}
+.focus h3{margin:16px 0 6px}
+.focus .idea-head h3{margin:0;font-size:16px}
+.focus-tag{background:var(--green);color:var(--page);border-radius:999px;padding:2px 8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase}
+.focus a{color:var(--accent)}
+.focus table a{white-space:nowrap}
+.focus td,.focus th{border-bottom-color:var(--line)}
+.fstats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+.fstats a{display:block;background:var(--green-bg);border-radius:7px;padding:8px 11px;color:var(--ink);text-decoration:none;font-size:12px;line-height:1.3}
+.fstats b{display:block;font-size:23px;line-height:1.1;color:var(--green)}
+.fflow{display:grid;grid-template-columns:minmax(0,1.5fr) auto minmax(0,1fr);gap:10px;align-items:center;margin-bottom:9px}
+.frules{display:flex;flex-wrap:wrap;gap:5px}
+.frules span{background:var(--page);border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:11.6px}
+.farrow{font-size:20px;color:var(--green)}
+.fresult{background:var(--green-bg);border:1px solid var(--green);border-radius:7px;padding:8px 10px;font-size:11.6px;line-height:1.3}
+.fresult b{display:block;font-size:14px;color:var(--green)}
+.two-list{display:grid;grid-template-columns:1fr 1fr;column-gap:18px}
+@media (max-width:760px){.fstats,.two-list,.fflow{grid-template-columns:1fr}.farrow{transform:rotate(90deg);justify-self:center}}
 .take{margin-top:8px;background:var(--amber-bg);border-radius:6px;padding:7px 10px}
 .take b{color:var(--amber)}
 footer{margin-top:9px;border-top:1px solid var(--line);padding-top:6px;color:var(--soft);font-size:11.2px}
@@ -97,24 +115,24 @@ code{font:11px ui-monospace,Menlo,Consolas,monospace}
 .mtoc a{display:block;padding:4px 0;color:var(--soft);text-decoration:none}
 @media (max-width:1000px){.layout{display:block;padding:22px 16px 44px}.toc{display:none}.mtoc{display:block}}
 @media (max-width:760px){.glance{grid-template-columns:1fr 1fr}.hero h1{font-size:26px}}
-@media print{body{background:#fff;font-size:11.6px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.layout{display:block;max-width:none;padding:0}.toc,.mtoc{display:none}.part{margin-top:0;break-before:page}.part.first{break-before:auto;margin-top:22px}.chapter{break-before:page;margin-top:0}.part + .chapter{break-before:auto;margin-top:12px}h3{break-after:avoid}tr,.cards>div,.result>div,.idea,.scroll,.take{break-inside:avoid}}
+@media print{body{background:#fff;font-size:11.6px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.layout{display:block;max-width:none;padding:0}.toc,.mtoc{display:none}.part{margin-top:0;break-before:page}.part.first{break-before:auto;margin-top:22px}.chapter{break-before:page;margin-top:0}.part + .chapter{break-before:auto;margin-top:12px}h3{break-after:avoid}tr,.cards>div,.result>div,.idea,.scroll,.take,.fstats,.fflow{break-inside:avoid}}
 @page{size:A4;margin:14mm 15mm}
 </style>
 </head>
 <body>
 <div class="layout">
-<nav class="toc" aria-label="Contents"><div class="toc-title"><a href="#top">Contexia</a></div><div class="toc-groups"><div><b>Product</b><a class="l" href="#feed">The product bet</a><a class="l" href="#attention">What deserves attention</a><a class="l" href="#borrowed">Borrowed and changed</a><a class="l" href="#stale">Stale, edited, deleted</a><a class="l" href="#result">What I got</a><a class="l" href="#product-ai">Product decisions with AI</a><a class="l" href="#judgement">Where I overruled the AI</a><a class="l star" href="#next-bet">★ Parked idea: LLM Focus</a></div><div><b>Technology</b><a class="l" href="#delivery">Reliable delivery</a><a class="l" href="#path">How messages reach the feed</a><a class="l" href="#guarantees">Guarantees</a><a class="l" href="#corners">Corners I cut</a><a class="l" href="#tradeoffs">Key trade-offs</a><a class="l" href="#grows">How it grows</a><a class="l" href="#design-ai">Designing with AI</a><a class="l" href="#build-ai">Building with AI</a><a class="l" href="#caught">What the process caught</a></div></div></nav>
+<nav class="toc" aria-label="Contents"><div class="toc-title"><a href="#top">Contexia</a></div><div class="toc-groups"><div><b>Product</b><a class="l" href="#feed">The product bet</a><a class="l" href="#attention">What deserves attention</a><a class="l star" href="#focus">★ Focus: the core decision</a><a class="l" href="#borrowed">Borrowed and changed</a><a class="l" href="#stale">Stale, edited, deleted</a><a class="l" href="#result">What I got</a><a class="l" href="#product-ai">Product decisions with AI</a><a class="l" href="#judgement">Where I overruled the AI</a><a class="l star" href="#next-bet">★ Parked idea: LLM Focus</a></div><div><b>Technology</b><a class="l" href="#delivery">Reliable delivery</a><a class="l" href="#path">How messages reach the feed</a><a class="l" href="#guarantees">Guarantees</a><a class="l" href="#corners">Corners I cut</a><a class="l" href="#tradeoffs">Key trade-offs</a><a class="l" href="#grows">How it grows</a><a class="l" href="#design-ai">Designing with AI</a><a class="l" href="#build-ai">Building with AI</a><a class="l" href="#caught">What the process caught</a></div></div></nav>
 <main>
 <header class="hero" id="top">
 <h1>Contexia</h1>
 <p class="lead">A Slack-like messaging prototype built around an activity feed that protects attention, with reliable delivery of every message change to independent systems.</p>
 <div class="glance">
-<a href="#attention"><b>The bet</b>A feed that sorts by plain, visible rules that each person can shape</a>
+<a href="#focus"><b>The bet</b>A feed that sorts by plain, visible rules that each person can shape</a>
 <a href="#path"><b>The system</b>One log in PostgreSQL feeds search, the feed and notifications independently</a>
 <a href="#design-ai"><b>How I worked</b>AI proposed and built. I questioned it, decided, and verified</a>
 <a href="#next-bet"><b>Parked for later</b>Focus rules in plain language, powered by an LLM. Not built</a>
 </div>
-<details class="mtoc"><summary>Contents</summary><b>Product</b><a href="#feed">The product bet</a><a href="#attention">What deserves attention</a><a href="#borrowed">Borrowed and changed</a><a href="#stale">Stale, edited, deleted</a><a href="#result">What I got</a><a href="#product-ai">Product decisions with AI</a><a href="#judgement">Where I overruled the AI</a><a href="#next-bet">★ Parked idea: LLM Focus</a><b>Technology</b><a href="#delivery">Reliable delivery</a><a href="#path">How messages reach the feed</a><a href="#guarantees">Guarantees</a><a href="#corners">Corners I cut</a><a href="#tradeoffs">Key trade-offs</a><a href="#grows">How it grows</a><a href="#design-ai">Designing with AI</a><a href="#build-ai">Building with AI</a><a href="#caught">What the process caught</a></details>
+<details class="mtoc"><summary>Contents</summary><b>Product</b><a href="#feed">The product bet</a><a href="#attention">What deserves attention</a><a href="#focus">★ Focus: the core decision</a><a href="#borrowed">Borrowed and changed</a><a href="#stale">Stale, edited, deleted</a><a href="#result">What I got</a><a href="#product-ai">Product decisions with AI</a><a href="#judgement">Where I overruled the AI</a><a href="#next-bet">★ Parked idea: LLM Focus</a><b>Technology</b><a href="#delivery">Reliable delivery</a><a href="#path">How messages reach the feed</a><a href="#guarantees">Guarantees</a><a href="#corners">Corners I cut</a><a href="#tradeoffs">Key trade-offs</a><a href="#grows">How it grows</a><a href="#design-ai">Designing with AI</a><a href="#build-ai">Building with AI</a><a href="#caught">What the process caught</a></details>
 </header>
 
 <div class="part first" id="product">Product</div>
@@ -158,10 +176,48 @@ code{font:11px ui-monospace,Menlo,Consolas,monospace}
 </div>
 </div>
 
+<section class="focus" id="focus">
+<div class="idea-head"><span class="focus-tag">Core decision</span><h3>Focus: one short list that you own</h3></div>
+<p><b>The problem.</b> Team chat treats almost everything as equally worth a look, and agents are about to add far more messages. People need a way to say what matters to them before the product decides for them.</p>
+<div class="fstats">
+<a href="https://microsoft.com/en-us/worklab/work-trend-index/breaking-down-infinite-workday"><b>153</b>Teams messages reach the average worker each weekday</a>
+<a href="https://microsoft.com/en-us/worklab/work-trend-index/breaking-down-infinite-workday"><b>48%</b>of employees say their work feels chaotic and fragmented</a>
+</div>
+<p class="caption">Microsoft Work Trend Index, June 2025: product telemetry and a survey of 31,000 workers. Vendor research.</p>
+
+<h3>Competitors see the same problem, and each solves one slice</h3>
+<div class="tablewrap"><table class="w22">
+<tr><th>Product</th><th>Their answer</th><th>Who decides</th><th>What it leaves open</th></tr>
+<tr><td><a href="https://slack.com/help/articles/34963579361683">Slack VIPs</a></td><td>DMs and mentions from chosen people go to a "VIP unreads" section</td><td>You, by person</td><td>A channel or thread can't be what matters</td></tr>
+<tr><td><a href="https://linear.app/changelog/2026-09-03-priority-inbox">Linear Priority</a></td><td>A tab that "separates what needs your attention from what can wait"</td><td>Linear, and you can adjust</td><td>An issue tracker's inbox, not team chat</td></tr>
+<tr><td><a href="https://docs.mattermost.com/end-user-guide/collaborate/message-priority">Mattermost</a>, <a href="https://support.microsoft.com/en-us/office/mark-a-message-as-important-or-urgent-in-teams-ea99d5b6-1317-4550-8d75-86ff14cd4462">Teams</a></td><td>Senders mark a message Important, and in Mattermost Urgent</td><td>The sender</td><td>The reader has no say</td></tr>
+<tr><td><a href="https://zulip.com/help/follow-a-topic">Zulip</a></td><td>Follow the topics you care about</td><td>You, by topic</td><td>Only topics, not people</td></tr>
+<tr><td><a href="https://docs.github.com/en/subscriptions-and-notifications/how-tos/viewing-and-triaging-notifications/managing-notifications-from-your-inbox">GitHub</a></td><td>Up to 15 custom inbox filters</td><td>You, by query</td><td>Separate views to check, not one list</td></tr>
+<tr><td><a href="https://support.microsoft.com/en-US/outlook/copilot-outlook/prioritize-my-inbox">Outlook Copilot</a></td><td>AI assigns high, normal or low, guided by your criteria</td><td>AI, guided by you</td><td>Email only, and still rolling out</td></tr>
+</table></div>
+
+<h3>How Focus closes the gap</h3>
+<div class="fflow" role="img" aria-label="People, channels, threads, flags that name you and optional mentions all feed one Focus list, with one row per conversation and a stated reason.">
+<div class="frules"><span>People</span><span>Channels</span><span>Threads</span><span>Flags that name you</span><span>Any mention (optional)</span></div>
+<div class="farrow" aria-hidden="true">→</div>
+<div class="fresult"><b>Focus</b>One list, one row per conversation, each saying why it's there</div>
+</div>
+<ul class="plain two-list">
+<li><b>All the slices in one place:</b> who, where and what the sender flagged.</li>
+<li><b>Yours to change:</b> right from a row, with Undo.</li>
+<li><b>It explains itself:</b> "Direct message from Anna".</li>
+<li><b>It stays short:</b> a busy channel collapses into one row.</li>
+<li><b>Fits real moments:</b> on call this week? Put #incidents in Focus.</li>
+<li><b>Respects senders:</b> a message marked Info never lands in Focus.</li>
+</ul>
+<p class="note">Among the products I reviewed, none combines these in one reader-owned list for team chat. Whether people will maintain their rules is the bet that early access would test.</p>
+</section>
+
 <h3 id="borrowed">What I borrowed, what I changed, and why</h3>
 <div class="tablewrap"><table class="w36">
 <tr><th>Borrowed</th><th>Changed</th><th>Why</th></tr>
 <tr><td>Slack's layout: sidebar, Activity, conversation beside it</td><td>Kept it, and spent novelty only on the feed</td><td>Familiar habits cost nothing to learn</td></tr>
+<tr><td>Slack's VIPs: chosen people stand out</td><td>Focus covers people, channels, threads and flags</td><td>What matters isn't only who sent it</td></tr>
 <tr><td>One feed filtered by type</td><td>Three buckets, with type tabs kept for finding history</td><td>Triage and lookup are different jobs</td></tr>
 <tr><td>Clear each item by hand</td><td>Reading clears it, Keep is the exception</td><td>Effort falls only on the rows that matter</td></tr>
 <tr><td>Reactions grouped as applause</td><td>A reaction from someone you addressed is an answer</td><td>Teams often answer with an emoji</td></tr>
