@@ -32,7 +32,7 @@ If you ran an earlier build, remove its database once with `docker compose -f de
 
 `make verify` runs every check, including the failure tests, in about four minutes.
 
-Known limits are in `docs/known-shortcuts.md`. Capacity is about 5,000 people in one organization, estimated by analysis and not measured.
+Known limits are in `docs/known-shortcuts.md`.
 
 ## How this repo is organised
 

@@ -20,19 +20,19 @@ Assumptions, stated so they can be challenged:
 
 Three things in an organization happen one at a time:
 
-| One at a time | Why | Rate | People it carries |
-|---|---|---|---|
-| Saving a change | the organization's next number is handed out under a lock held until the save is confirmed | 300 to 1,000 a second | 15,000 to 50,000 |
-| The feed applying a change | one change after another per organization, each a transaction of 2 to 20 row writes (2 to 5 ms) | 200 to 500 a second | 10,000 to 25,000 |
-| A message that concerns a whole channel (a mention of everyone, a flag that names nobody, members who set the channel to Focus or All activity) | one row is written per member | 0.2 to 0.5 s for 10,000 members, during which that organization's feed waits | |
+| One at a time | Why | Rate |
+|---|---|---|
+| Saving a change | the organization's next number is handed out under a lock held until the save is confirmed | 300 to 1,000 a second |
+| The feed applying a change | one change after another per organization, each a transaction of 2 to 20 row writes (2 to 5 ms) | 200 to 500 a second |
+| A message that concerns a whole channel (a mention of everyone, a flag that names nobody, members who set the channel to Focus or All activity) | one row is written per member | 0.2 to 0.5 s for 10,000 members, during which that organization's feed waits |
 
-**So today: comfortable up to about 5,000 people in one organization; workable with delays after large announcements up to 10,000 to 25,000; beyond that the feed cannot keep up at the busiest time.** These are estimates from the assumptions above, not measurements.
+These rates are estimates from the assumptions above, not measurements.
 
 ## Options
 
 ### A. Leave it and state the cap
 
-Nothing to do. An organization above roughly 10,000 people is not served well.
+Nothing to do. A very large organization is not served well.
 
 ### B. Lift the cap inside the parts, keeping one log per organization
 

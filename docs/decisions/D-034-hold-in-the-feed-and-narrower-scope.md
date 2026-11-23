@@ -41,7 +41,7 @@ The coding-agent connector (T-060) and text rules judged by a model (T-062) move
 
 ### 4. The capacity statement
 
-The "100,000 people" figure is withdrawn. The only capacity statement is "about 5,000 people in one organization, estimated by analysis, not measured". Larger organizations have a path with no number: conversations applied in parallel, grouped saves, big-channel items stored once, and batched calls to search. The D-030 record and `tasks/done.md` stay as history.
+The "100,000 people" figure is withdrawn, and the project states no capacity figure. Larger organizations have a path: conversations applied in parallel, grouped saves, big-channel items stored once, and batched calls to search. The D-030 record and `tasks/done.md` stay as history.
 
 ### 5. Simulated figures are never validation
 

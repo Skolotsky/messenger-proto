@@ -21,7 +21,6 @@ The first version runs from `make up` and holds its guarantees when its parts fa
 - Conversations killed during a delivery run.
 - A real ten-minute backlog for G-006's 30-second catch-up (tested with about 130 changes).
 - G-015 and G-019 as named guardrail tests on the real system (T-066).
-- Capacity: about 5,000 people in one organization is an estimate by analysis, not measured.
 
 ## Calls made without asking
 

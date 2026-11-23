@@ -279,21 +279,20 @@ details > .stack { gap: 10px; }
 </section>
 
 <section>
-  <h2>How large can one organization be? (D-030, by analysis)</h2>
+  <h2>What happens one at a time in an organization (D-030, by analysis)</h2>
   <p>Assumptions: a person causes about 150 changes a working day, so about 0.02 a second at the busiest time; a typical production PostgreSQL confirms a small save in 1 to 3 ms. In an organization three things happen one at a time, and each sets a ceiling.</p>
   <div class="table-wrap">
     <table>
       <thead><tr><th>One at a time</th><th>Ceiling today</th><th>What lifts it</th><th>Changes a contract?</th></tr></thead>
       <tbody>
-        <tr><td><strong>The feed applies one change after another</strong> per organization.</td><td>200 to 500 changes a second: 10,000 to 25,000 people.</td><td>Apply the organization's conversations side by side. Order is kept inside a conversation; changes about a reader as a whole stay in place.</td><td>Not at the delivery boundary. One contract was made stricter for it: the notification sender's clock moves only on clock notes from the feed.</td></tr>
-        <tr><td><strong>Saves are confirmed one by one</strong>, because each takes the organization's next number.</td><td>300 to 1,000 saves a second: 15,000 to 50,000 people.</td><td>The organization's copy of Conversations confirms the saves of a few milliseconds together.</td><td>No. It is inside Conversations.</td></tr>
+        <tr><td><strong>The feed applies one change after another</strong> per organization.</td><td>200 to 500 changes a second.</td><td>Apply the organization's conversations side by side. Order is kept inside a conversation; changes about a reader as a whole stay in place.</td><td>Not at the delivery boundary. One contract was made stricter for it: the notification sender's clock moves only on clock notes from the feed.</td></tr>
+        <tr><td><strong>Saves are confirmed one by one</strong>, because each takes the organization's next number.</td><td>300 to 1,000 saves a second.</td><td>The organization's copy of Conversations confirms the saves of a few milliseconds together.</td><td>No. It is inside Conversations.</td></tr>
         <tr><td><strong>A message for a whole channel writes a row per member.</strong></td><td>About half a second for 10,000 members, during which that organization's feed waits.</td><td>In a channel above 500 members, keep such an item once for the channel and combine it with each reader's own rows when shown.</td><td>No. It is inside the feed.</td></tr>
       </tbody>
     </table>
   </div>
   <div class="split">
-    <div class="panel"><div class="label">Today</div><p><strong>About 5,000 people</strong> in one organization comfortably. Up to 10,000 to 25,000 with delays after large announcements.</p></div>
-    <div class="panel"><div class="label">For larger organizations</div><p><strong>A path, with no number (D-034).</strong> Conversations applied in parallel, grouped saves, big-channel items stored once, and batched calls to search. None is built in the first version, where the seeded team has 36. This is also where one copy of Conversations holding all of one organization's connections ends.</p></div>
+    <div class="panel"><div class="label">For larger organizations</div><p><strong>A path (D-034).</strong> Conversations applied in parallel, grouped saves, big-channel items stored once, and batched calls to search. None is built in the first version, where the seeded team has 36. This is also where one copy of Conversations holding all of one organization's connections ends.</p></div>
     <div class="panel"><div class="label">Beyond that</div><p>A numbered log per conversation instead of per organization. Possible, and a real redesign: every contract's numbers and the screen's catch-up change. Not adopted.</p></div>
   </div>
   <p><strong>Held from the first version, so that all of this stays possible (G-030):</strong> the feed's result for a conversation depends only on that conversation's changes, in their order, and on reader-wide changes at their place. Checked in a small simulation on a subset of the rules (E-008): 200 different interleavings of conversations gave the same feed every time; with the reader-wide changes moved, never. The real proof is this guardrail's test on the product's own rules.</p>
