@@ -1,127 +1,119 @@
 #!/usr/bin/env bash
-# The full suite: starts the composed system in its own throwaway project,
-# checks every part is alive, and runs the guardrail tests against it.
-# --quick leaves out the two guardrails that run for a minute (G-012, G-026), for use
-# while working. It is not a full verification and must not be reported as one.
+# The full suite. After the fast check it runs independent lanes side by side, each on
+# its own system, database or mock door, and reports every lane, so one run shows every
+# failure. No lane depends on another.
+# --quick leaves out the lanes with minute-long guardrails (G-012, G-013, G-025, G-026,
+# G-027), for use while working. It is not a full verification and must not be reported as one.
 set -uo pipefail
 quick=0; [ "${1:-}" = "--quick" ] && quick=1
-timed="./guardrails/receivers-independent ./guardrails/orgs-independent"
 cd "$(dirname "$0")/.." || exit 2
 project="contexia-verify-$$"
 compose=(docker compose -p "$project" -f deploy/compose.yaml -f deploy/compose.test.yaml)
-cleanup() { "${compose[@]}" down -v --remove-orphans >/dev/null 2>&1; }
+logs=$(mktemp -d)
+cleanup() {
+  local pids; pids=$(jobs -p); [ -z "$pids" ] || kill $pids 2>/dev/null
+  "${compose[@]}" down -v --remove-orphans >/dev/null 2>&1
+  rm -rf "$logs"
+}
 trap cleanup EXIT
+started=$SECONDS
 
 ./scripts/check || { echo "verify: fix ./scripts/check first"; exit 1; }
-
-echo; echo "Starting the system"
-if ! "${compose[@]}" up -d --build --wait --quiet-pull; then
-  "${compose[@]}" ps; "${compose[@]}" logs --tail 30
-  echo "verify: FAIL the system did not start. The logs are above."; exit 1
-fi
-
-echo; echo "Every part answers alive"
-for p in conversations delivery feed search sender demo; do
-  answer=$("${compose[@]}" exec -T "$p" wget -q -O - http://127.0.0.1:8080/alive)
-  case "$answer" in
-    *"\"part\":\"$p\""*'"status":"alive"'*) echo "  ok    $p" ;;
-    *) echo "  FAIL  $p answered: $answer. See: docker compose -f deploy/compose.yaml logs $p"; exit 1 ;;
-  esac
-done
-
-echo; echo "Guardrail tests"
-export CONTEXIA_TOOL_NETWORK="${project}_default"
 docker build -q -t contexia-test-tools:1 -f deploy/test-tools.Dockerfile deploy >/dev/null
-export CONTEXIA_TOOL_ENV="CONTEXIA_PG_HOST=postgres CONTEXIA_PROJECT=$project"
-others=$(CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 TOOL_DIR=tests ./scripts/tool go list ./... | grep -v -E 'guardrails/(receivers-independent|orgs-independent|freshness|orgs-apart|two-copies)(/|$)|tests/e2e|harness/router' | tr '\n' ' ')
-[ -n "$others" ] || { echo "verify: FAIL could not list the test packages."; exit 1; }
-if ! CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 $others ; then
-  echo "verify: FAIL a guardrail test failed. A failing guardrail is a finding: fix the cause, never the test."; exit 1
-fi
-echo; echo "Guardrail tests must fail with their rule switched off"
-if ! CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 -tags standinfaults -run 'Fails' ./guardrails/search-equals-truth/ ./guardrails/notification-once/ ./guardrails/notification-hold/ ; then
-  echo "verify: FAIL a guardrail test no longer fails with its rule switched off, so it cannot be trusted."; exit 1
-fi
-if ! CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 -tags deletefaults -run 'Fails' ./guardrails/retire-and-delete/ ; then
-  echo "verify: FAIL G-031 no longer fails for a delete that is broken, so it cannot be trusted."; exit 1
-fi
-if ! CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 -tags agentfaults -run 'Fails' ./guardrails/agent-events/ ./guardrails/reply-in-progress/ ./guardrails/agent-limits/ ./guardrails/idle-organizations-cost-nothing/ ; then
-  echo "verify: FAIL an agent-door guardrail no longer fails with its rule switched off, so it cannot be trusted."; exit 1
-fi
+# Built once, before the two browser lanes share it.
+CONTEXIA_BUILD_ONLY=1 web/app/scripts/browser-tests > "$logs/web-build" 2>&1 || { tail -n 30 "$logs/web-build"; echo "verify: FAIL the web app did not build."; exit 1; }
+
+# ---- helpers, for the lane on the composed system
+gotest() { # module, go test arguments
+  local module=$1; shift
+  CONTEXIA_TOOL_NETWORK="${project}_default" \
+  CONTEXIA_TOOL_ENV="CONTEXIA_PG_HOST=postgres CONTEXIA_PROJECT=$project" \
+  CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 \
+  TOOL_DIR=$module ./scripts/tool go test -count=1 "$@"
+}
 mustfail() { # module, tags, test name, package: must FAIL in a test, not merely fail to build
   local out
-  out=$(CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=$1 ./scripts/tool go test -count=1 -tags "$2" -run "$3" "$4" 2>&1)
+  out=$(gotest "$1" -tags "$2" -run "$3" "$4" 2>&1)
   if ! grep -q -- '--- FAIL' <<< "$out"; then
-    echo "verify: FAIL $4 did not fail a test with $2, so it cannot be trusted."; tail -5 <<< "$out"; exit 1
+    echo "FAIL: $4 did not fail a test with $2, so it cannot be trusted."; tail -5 <<< "$out"; return 1
   fi
   echo "  ok    $4 fails with $2"
 }
-if ! CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 -tags demofaults -run 'Fails' ./guardrails/rebuild/ ; then
-  echo "verify: FAIL G-020 no longer fails with its rule switched off, so it cannot be trusted."; exit 1
-fi
-mustfail tests fault_hub_handed TestTwoSaves ./guardrails/live-order/
-mustfail tests fault_no_lease_check Frozen ./guardrails/watching-lapses/
-mustfail tests fault_no_watch_end Vanished ./guardrails/watching-lapses/
-mustfail tests fault_idle_scan TestHousekeeping ./guardrails/idle-organizations-cost-nothing/
-mustfail server "integration fault_tick_from_newest" BusyOrganization ./internal/conversations
-if ! CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 -tags feedfaults -run 'Fails' ./guardrails/feed-equals-replay/ ./guardrails/feed-fence/ ./guardrails/feed-two-copies/ ; then
-  echo "verify: FAIL a feed guardrail no longer fails with its rule switched off, so it cannot be trusted."; exit 1
-fi
-if ! TOOL_DIR=server ./scripts/tool go test -count=1 -tags integration ./... ; then
-  echo "verify: FAIL a server integration test failed."; exit 1
-fi
-# The minute-long guardrails mostly wait, and the browser suites do not use this
-# system's database, so they run side by side. Both results are required.
-timed_log=$(mktemp); timed_pid=""
-if [ "$quick" -eq 0 ]; then
-  echo; echo "Timed guardrails (G-012, G-026), beside the browser tests"
-  CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 CONTEXIA_TOOL_DOCKER=1 TOOL_DIR=tests ./scripts/tool go test -count=1 -p 1 -timeout 8m $timed > "$timed_log" 2>&1 &
-  timed_pid=$!
-  # Milestone tests start their own programs on a private database (G-013, G-025, G-027).
-  e2e_log=$(mktemp)
-  env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV tests/e2e/run real -timeout 9m ./e2e/... ./harness/router/ ./guardrails/freshness/ ./guardrails/orgs-apart/ ./guardrails/two-copies/ > "$e2e_log" 2>&1 &
-  e2e_pid=$!
-fi
-finish_timed() {
-  [ -n "$timed_pid" ] || return 0
-  wait "$timed_pid"; local code=$?; timed_pid=""
-  cat "$timed_log"; rm -f "$timed_log"
-  if [ "$code" -ne 0 ]; then echo "verify: FAIL a timed guardrail failed. A failing guardrail is a finding: fix the cause, never the test."; exit 1; fi
-  wait "$e2e_pid"; code=$?
-  grep -E '^(ok|FAIL|--- FAIL)' "$e2e_log"
-  if [ "$code" -ne 0 ]; then tail -n 40 "$e2e_log"; rm -f "$e2e_log"; echo "verify: FAIL a Milestone test failed. A failing guardrail is a finding: fix the cause, never the test."; exit 1; fi
-  rm -f "$e2e_log"
+
+# ---- the lanes
+lane_system() { # the composed system: guardrails, their must-fail builds, integration tests
+  "${compose[@]}" up -d --build --wait --quiet-pull || { "${compose[@]}" ps; "${compose[@]}" logs --tail 30; return 1; }
+  local p answer
+  for p in conversations delivery feed search sender demo; do
+    answer=$("${compose[@]}" exec -T "$p" wget -q -O - http://127.0.0.1:8080/alive)
+    case "$answer" in
+      *"\"part\":\"$p\""*'"status":"alive"'*) echo "  ok    $p alive" ;;
+      *) echo "FAIL: $p answered: $answer"; return 1 ;;
+    esac
+  done
+  local others
+  others=$(CONTEXIA_TOOL_IMAGE=contexia-test-tools:1 TOOL_DIR=tests ./scripts/tool go list ./... | grep -v -E 'guardrails/(receivers-independent|orgs-independent|freshness|orgs-apart|two-copies)(/|$)|tests/e2e|harness/router' | tr '\n' ' ')
+  [ -n "$others" ] || { echo "FAIL: could not list the test packages."; return 1; }
+  gotest tests -p 1 $others || return 1
+  # Each of these builds has a rule switched off, and its "Fails" tests prove the check notices.
+  gotest tests -p 1 -tags standinfaults -run Fails ./guardrails/search-equals-truth/ ./guardrails/notification-once/ ./guardrails/notification-hold/ || return 1
+  gotest tests -p 1 -tags deletefaults -run Fails ./guardrails/retire-and-delete/ || return 1
+  gotest tests -p 1 -tags agentfaults -run Fails ./guardrails/agent-events/ ./guardrails/reply-in-progress/ ./guardrails/agent-limits/ ./guardrails/idle-organizations-cost-nothing/ || return 1
+  gotest tests -p 1 -tags demofaults -run Fails ./guardrails/rebuild/ || return 1
+  gotest tests -p 1 -tags feedfaults -run Fails ./guardrails/feed-equals-replay/ ./guardrails/feed-fence/ ./guardrails/feed-two-copies/ || return 1
+  mustfail tests fault_hub_handed TestTwoSaves ./guardrails/live-order/ || return 1
+  mustfail tests fault_no_lease_check Frozen ./guardrails/watching-lapses/ || return 1
+  mustfail tests fault_no_watch_end Vanished ./guardrails/watching-lapses/ || return 1
+  mustfail tests fault_idle_scan TestHousekeeping ./guardrails/idle-organizations-cost-nothing/ || return 1
+  mustfail server "integration fault_tick_from_newest" BusyOrganization ./internal/conversations || return 1
+  gotest server -tags integration ./...
 }
-echo; echo "Browser tests, at 1280 and 400 px"
-# The tests of one width share one mock door, so each width gets its own and they run side by side.
-browser() { env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV CONTEXIA_SKIP_BUILD=1 web/app/scripts/browser-tests --project="$1" --output="test-results/$1" --reporter=line; }
-browser_ok=1
-if ! env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV CONTEXIA_BUILD_ONLY=1 web/app/scripts/browser-tests; then browser_ok=0
-else
-  wide_log=$(mktemp); phone_log=$(mktemp)
-  browser wide > "$wide_log" 2>&1 & wide_pid=$!
-  browser phone > "$phone_log" 2>&1 & phone_pid=$!
-  wait "$wide_pid" || browser_ok=0
-  wait "$phone_pid" || browser_ok=0
-  tail -n 40 "$wide_log" | tr '\r' '\n' | grep -E "passed|failed|flaky|^\s+[0-9]+\) " ; tail -n 40 "$phone_log" | tr '\r' '\n' | grep -E "passed|failed|flaky|^\s+[0-9]+\) "
-  if [ "$browser_ok" -eq 0 ]; then cat "$wide_log" "$phone_log" | tail -n 80; fi
-  rm -f "$wide_log" "$phone_log"
-fi
-if [ "$browser_ok" -eq 0 ]; then
-  finish_timed; echo "verify: FAIL a browser test failed. See the output above."; exit 1
-fi
-echo; echo "Control panel and notification app, at 1280 and 400 px"
-if ! env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV tests/browser-outside/run --reporter=line; then
-  finish_timed; echo "verify: FAIL a browser test of the outside pages failed. See the output above."; exit 1
-fi
-finish_timed
-rm -f "$timed_log"
-if [ "$quick" -eq 0 ]; then
-  echo; echo "Milestone tests must fail with their rule switched off"
-  if ! env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV tests/e2e/run real -timeout 8m -tags t057faults -run Fails ./guardrails/freshness/ ./guardrails/orgs-apart/ ./guardrails/two-copies/ \
-    || ! env -u CONTEXIA_TOOL_NETWORK -u CONTEXIA_TOOL_ENV tests/e2e/run standin -timeout 3m -tags t057faults -run Fails ./e2e/; then
-    echo "verify: FAIL a Milestone test no longer fails with its rule switched off, so it cannot be trusted."; exit 1
+lane_receivers() { tests/e2e/run real -timeout 6m ./guardrails/receivers-independent; }   # G-012, private database
+lane_orgs()      { tests/e2e/run real -timeout 6m ./guardrails/orgs-independent; }        # G-026, private database
+lane_end_to_end() {                                                                       # spine, G-013, G-025, G-027
+  tests/e2e/run real -timeout 9m ./e2e/... ./harness/router/ ./guardrails/freshness/ ./guardrails/orgs-apart/ ./guardrails/two-copies/ || return 1
+  tests/e2e/run real -timeout 8m -tags t057faults -run Fails ./guardrails/freshness/ ./guardrails/orgs-apart/ ./guardrails/two-copies/ || return 1
+  tests/e2e/run standin -timeout 3m -tags t057faults -run Fails ./e2e/
+}
+lane_web_wide()  { CONTEXIA_SKIP_BUILD=1 web/app/scripts/browser-tests --project=wide --output=test-results/wide --reporter=line; }
+lane_web_phone() { CONTEXIA_SKIP_BUILD=1 web/app/scripts/browser-tests --project=phone --output=test-results/phone --reporter=line; }
+lane_outside()   { tests/browser-outside/run --reporter=line; }
+
+lanes=(system web_wide web_phone outside)
+[ "$quick" -eq 1 ] || lanes+=(receivers orgs end_to_end)
+
+echo; echo "Running ${#lanes[@]} lanes side by side: ${lanes[*]}"
+for name in "${lanes[@]}"; do
+  ( begun=$SECONDS; "lane_$name" > "$logs/$name" 2>&1; code=$?; echo "$code $((SECONDS - begun))" > "$logs/$name.result" ) &
+done
+wait
+
+failed=0
+echo
+for name in "${lanes[@]}"; do
+  read -r code took < "$logs/$name.result" 2>/dev/null || { code=1; took='?'; }
+  if [ "$code" -eq 0 ]; then
+    printf '  ok    %-11s %ss  %s\n' "$name" "$took" "$(tr '\r' '\n' < "$logs/$name" | grep -E '^\s+[0-9]+ passed' | tail -1 | sed 's/^ *//')"
+  else
+    failed=$((failed + 1))
+    printf '  FAIL  %-11s %ss\n' "$name" "$took"
   fi
+done
+for name in "${lanes[@]}"; do
+  read -r code _ < "$logs/$name.result" 2>/dev/null || code=1
+  if [ "$code" -ne 0 ]; then
+    echo; echo "---- $name"
+    tr '\r' '\n' < "$logs/$name" | grep -v -E '^\[[0-9]+/[0-9]+\]|\[1A|no test files' | tail -n 45
+  fi
+done
+
+echo
+if [ "$failed" -ne 0 ]; then
+  echo "verify: FAIL $failed lane(s). A failing guardrail is a finding: fix the cause, never the test."
+  exit 1
 fi
-if [ "$quick" -eq 1 ]; then echo; echo "verify --quick: passed, WITHOUT the timed guardrails G-012 and G-026. Not a full verification."; exit 0; fi
-echo; echo "verify: all passed"
+if [ "$quick" -eq 1 ]; then
+  echo "verify --quick: passed in $((SECONDS - started))s, WITHOUT the timed guardrails G-012, G-013, G-025, G-026 and G-027. Not a full verification."
+  exit 0
+fi
+echo "verify: all passed in $((SECONDS - started))s"
