@@ -1556,6 +1556,26 @@ func TestARowExplainsItselfByWhatPutItThere(t *testing.T) {
 				[]any{contract.Bucket("needs_you"), "Marco reacted check to your message",
 					"A reaction from someone you addressed is an answer, so it lands in Needs you.", m}
 		}},
+		{"once read, a row still says what put it in its bucket", func(w *W) (any, any) {
+			m := w.post("you", "#a", to("marco"))
+			w.react("marco", m, "check")
+			w.react("anna", m, "check")
+			w.react("lena", m, "check")
+			before := w.row("you", m)
+			w.read("you", "#a", before.Thread)
+			// A read row leaves the next load; a screen still showing it gets this update.
+			var r contract.FeedRow
+			for _, re := range w.last.Readers {
+				for _, part := range re.Parts {
+					if c, ok := part.Value.(contract.FeedPartRowChanged); ok && re.Person == "you" {
+						r = c.Row
+					}
+				}
+			}
+			return []any{r.Unread, r.Bucket, r.Why, r.Explanation.DecidedBy},
+				[]any{false, contract.Bucket("needs_you"), "Marco reacted check to your message",
+					"A reaction from someone you addressed is an answer, so it lands in Needs you."}
+		}},
 		{"the split counts the answer, whichever came first", func(w *W) (any, any) {
 			a := w.post("you", "#a", to("marco"))
 			w.react("marco", a, "check")

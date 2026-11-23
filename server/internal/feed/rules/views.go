@@ -98,6 +98,18 @@ func decidingItem(r *row, b Bucket) *item {
 	return found
 }
 
+// strongestItem is what a fully read row was placed by: its highest-ranked item,
+// the newest of them if several rank the same.
+func strongestItem(r *row) *item {
+	var best *item
+	for _, it := range sortedItems(r) {
+		if !it.retracted && (best == nil || it.bucket >= best.bucket) {
+			best = it
+		}
+	}
+	return best
+}
+
 // shownAsKept says the row's place comes from being kept or flagged, not from an item.
 func shownAsKept(r *row, p *person, b Bucket) bool {
 	return keptBy(r, p) != nil && b == Focus && (rowSection(r) == "kept" || decidingItem(r, b) == nil)
@@ -122,8 +134,12 @@ func (e *Engine) render(cv *conv, p *person, r *convReader, rw *row) contract.Fe
 	it := lead(rw)
 	bucket := rowBucket(rw, p)
 	shown := bucket
+	strongest := strongestItem(rw)
 	if shown == NoBucket {
 		shown = it.bucket
+		if strongest != nil {
+			shown = strongest.bucket // reading a row does not change what put it there
+		}
 	}
 	var unread, newest int64
 	var firstNew *int64
@@ -150,6 +166,8 @@ func (e *Engine) render(cv *conv, p *person, r *convReader, rw *row) contract.Fe
 	decided := it
 	if d := decidingItem(rw, bucket); d != nil {
 		decided = d
+	} else if bucket == NoBucket && strongest != nil {
+		decided = strongest
 	}
 	why := decided.reason
 	k := keptBy(rw, p)
