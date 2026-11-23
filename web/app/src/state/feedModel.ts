@@ -49,9 +49,13 @@ export const sectionOf = (row: FeedRow): Section => (row.kept && !row.unread ? '
 
 const ORDER: Section[] = ['focus', 'kept', 'needs_you', 'fyi'];
 
-/** Newest activity first within a section (D-003; T-038 point 16). */
+/**
+ * Newest activity first within a section (D-003; T-038 point 16). A marker is never laid out:
+ * it only stands in for a row already on screen, until the list is next laid out (D-039).
+ */
 export function layOut(live: Record<string, FeedRow>): ShownRow[] {
-  const rows = Object.entries(live).map(([key, row]) => ({
+  const entries = Object.entries(live).filter(([, row]) => row.state !== 'retracted');
+  const rows = entries.map(([key, row]) => ({
     key,
     row,
     section: sectionOf(row),

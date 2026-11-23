@@ -286,7 +286,9 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
     const kept = b === 'focus' ? sections.kept : [];
     const n = rows.filter((s) => s.row.unread).length;
     const live = b === 'fyi' ? null : (counts?.[b] ?? n);
-    const collapsed = kept.length > KEPT_HANDFUL && !keptOpen;
+    // A deleted row stays as a marker until Refresh, but there is nothing left to keep (D-039).
+    const stillKept = kept.filter((s) => s.row.state !== 'retracted').length;
+    const collapsed = stillKept > KEPT_HANDFUL && !keptOpen;
     return (
       <section className={`bucket b-${b}`} aria-label={BUCKET_NAME[b]} key={b} ref={b === 'fyi' ? fyiHead : undefined}>
         <header className="bk-head">
@@ -319,19 +321,21 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
         ) : null}
         {kept.length > 0 && (
           <div className="kept-sec">
+            {stillKept > 0 && (
             <div className="kept-head">
-              <b>Kept · {kept.length}</b>
+              <b>Kept · {stillKept}</b>
               <small>
                 {feed.settings?.release_on_act === false
                   ? 'Stays until you press Done'
                   : 'Stays until you press Done, reply or react'}
               </small>
-              {kept.length > KEPT_HANDFUL && (
+              {stillKept > KEPT_HANDFUL && (
                 <button className="link" aria-expanded={!collapsed} onClick={() => setKeptOpen((o) => !o)}>
-                  {collapsed ? `Show all ${kept.length}` : 'Show fewer'}
+                  {collapsed ? `Show all ${stillKept}` : 'Show fewer'}
                 </button>
               )}
             </div>
+            )}
             {(collapsed ? kept.slice(0, KEPT_HANDFUL) : kept).map((s) => (
               <FeedRowItem key={`${model.layout}:${s.key}`} {...rowProps(s)} />
             ))}

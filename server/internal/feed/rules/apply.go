@@ -462,7 +462,8 @@ func dropItem(r *convReader, rw *row, k itemKey) {
 }
 
 // retract is what is left when something aimed at a person is taken back
-// (D-004 option C). A row the person kept keeps a marker until Done; something
+// (D-004 option C). A row the person kept is marked retracted, and the screen
+// shows that only until its list is next laid out (D-039); something
 // they had read keeps a marker where it was; something never seen goes without
 // a trace. What is on screen right now is the screen's: it holds the space of
 // a row that is removed until the person moves on.

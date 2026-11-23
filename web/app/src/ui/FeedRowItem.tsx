@@ -133,13 +133,6 @@ export function FeedRowItem({ shown, session, feed, whyOpen, onWhy, onOpen }: Pr
             {where}
             {row.kept === 'you' || row.kept === 'both' ? ' · you had kept it' : ''}
           </small>
-          {keptNowOrBefore && (
-            <span className="row-side">
-              <button className="btn sm pri" onClick={() => feed.done(row)}>
-                Done
-              </button>
-            </span>
-          )}
         </div>
       </article>
     );
