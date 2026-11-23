@@ -155,19 +155,20 @@ func (e *Engine) render(cv *conv, p *person, r *convReader, rw *row) contract.Fe
 			}
 		}
 	}
-	state := contract.RowState("none")
-	switch {
-	case it.retracted:
-		state = "retracted"
-	case it.edited || it.msg.edited:
-		state = "changed"
-	}
-	// The row shows its newest item, and says why by the item that placed it (D-014, D-020).
+	// The row says why by the item that placed it, and shows that item, so the
+	// reason and the message beside it are about the same thing (D-014, D-020).
 	decided := it
 	if d := decidingItem(rw, bucket); d != nil {
 		decided = d
 	} else if bucket == NoBucket && strongest != nil {
 		decided = strongest
+	}
+	state := contract.RowState("none")
+	switch {
+	case decided.retracted:
+		state = "retracted"
+	case decided.edited || decided.msg.edited:
+		state = "changed"
 	}
 	why := decided.reason
 	k := keptBy(rw, p)
@@ -178,9 +179,9 @@ func (e *Engine) render(cv *conv, p *person, r *convReader, rw *row) contract.Fe
 		}
 	}
 	return contract.FeedRow{
-		Conversation: cv.id, Thread: rw.key.thread(), Message: it.msg.id, Bucket: shown.Contract(),
-		Unread: unread > 0, Kept: k, Why: why, Newest: newest, FirstNew: firstNew, Author: it.msg.author,
-		Preview: it.msg.text, At: it.msg.at, NewItems: unread, Reactions: reactionsOf(it.msg), State: state,
+		Conversation: cv.id, Thread: rw.key.thread(), Message: decided.msg.id, Bucket: shown.Contract(),
+		Unread: unread > 0, Kept: k, Why: why, Newest: newest, FirstNew: firstNew, Author: decided.msg.author,
+		Preview: decided.msg.text, At: decided.msg.at, NewItems: unread, Reactions: reactionsOf(decided.msg), State: state,
 		Explanation: e.explain(cv, p, r, rw, decided, bucket),
 	}
 }
@@ -243,6 +244,9 @@ func (e *Engine) explain(cv *conv, p *person, r *convReader, rw *row, it *item, 
 		ownThread = &root
 	}
 	unfollow := func(what, decided string) contract.RowExplanation {
+		if cv.direct { // a direct conversation has no threads to turn off
+			return contract.RowExplanation{What: what, DecidedBy: decided, Otherwise: "It leaves the feed once you have read it."}
+		}
 		return mk(what, decided, "With the thread off, only what names you would reach you.", "Turn this thread off",
 			dialAct(cv, ownThread, levelOff), dialAct(cv, ownThread, levelAuto))
 	}

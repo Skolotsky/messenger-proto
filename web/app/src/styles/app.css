@@ -144,7 +144,8 @@ h1, h2, h3, p { margin: 0; }
 .cbar .levels .btn.sm.on { background: var(--accent-soft); color: var(--text); }
 .cbar .levels .lv-flag.on { background: var(--flag-soft); color: var(--flag); }
 .cbar .send { padding: 5px 14px; border-radius: 7px; }
-.send-hint { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.send-hint { color: var(--muted); font-size: 12px; white-space: nowrap; background: none; border: 0; padding: 2px 4px; cursor: pointer; border-radius: 4px; }
+.send-hint:hover, .send-hint:focus-visible { color: var(--accent); text-decoration: underline; }
 @container (max-width: 400px) { .send-hint { display: none; } .levels small:not(.err) { display: none; } }
 
 /* the person's menu */

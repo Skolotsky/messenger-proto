@@ -1600,11 +1600,26 @@ func TestARowExplainsItselfByWhatPutItThere(t *testing.T) {
 		}},
 		{"an Info item in a Focus row does not explain the row", func(w *W) (any, any) {
 			dm := w.dm("anna", "you")
-			w.post("anna", dm)
-			m := w.post("anna", dm, info)
-			r := w.row("you", m)
+			placed := w.post("anna", dm)
+			w.post("anna", dm, info)
+			r := w.row("you", placed)
 			return []any{r.Bucket, r.Explanation.DecidedBy, strings.Contains(r.Why, "Info"), r.Message},
-				[]any{contract.Bucket("focus"), "Anna is in your Focus people.", false, m}
+				[]any{contract.Bucket("focus"), "Anna is in your Focus people.", false, placed}
+		}},
+		{"a row shows the message its reason is about", func(w *W) (any, any) {
+			root := w.post("you", "#a")
+			mention := w.post("anna", "#a", in(root), to("you"))
+			w.react("marco", root, "check")
+			r := w.row("you", root)
+			return []any{r.Why, r.Message, r.Author}, []any{"Anna mentioned you", mention, "anna"}
+		}},
+		{"a reaction in a direct conversation offers no thread to turn off", func(w *W) (any, any) {
+			dm := w.dm("anna", "you")
+			m := w.post("you", dm)
+			w.react("anna", m, "check")
+			r := w.row("you", m)
+			return []any{r.Bucket, r.Explanation.Otherwise, r.Explanation.Change == nil},
+				[]any{contract.Bucket("needs_you"), "It leaves the feed once you have read it.", true}
 		}},
 	})
 }

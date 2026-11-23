@@ -163,7 +163,7 @@ export function ReasonPanel({ shown, anchor, session, feed, made, onMade, onSett
                   <button className="btn sm" disabled={busy} onClick={() => void run(change.do, change)}>
                     {change.label}
                   </button>
-                  {preview && <small>{preview}</small>}
+                  <small>{preview ?? '\u00a0'}</small>
                 </div>
               </>
             )

@@ -16,6 +16,8 @@ interface Props {
   placeholder: string;
   /** Called once a message has left the box. */
   onSent?(): void;
+  /** Opens the setting for what Enter does. */
+  onSendSettings?(): void;
 }
 
 const LEVEL_NOTE: Record<Level, string> = {
@@ -24,7 +26,7 @@ const LEVEL_NOTE: Record<Level, string> = {
 };
 
 /** The message box, with `@` suggestions. What is sent stands in the list at once, waiting if need be (D-024). */
-export function Composer({ session, conversation, thread, placeholder, onSent }: Props) {
+export function Composer({ session, conversation, thread, placeholder, onSent, onSendSettings }: Props) {
   const key = listKey(conversation, thread);
   const isPhone = useIsPhone();
   const [text, setText] = useState(() => session.drafts.get(key) ?? '');
@@ -112,7 +114,9 @@ export function Composer({ session, conversation, thread, placeholder, onSent }:
             </button>
             <small>{level ? LEVEL_NOTE[level] : ''}</small>
           </div>
-          <span className="send-hint">{hint}</span>
+          <button type="button" className="send-hint" title="Change what Enter does" onClick={onSendSettings}>
+            {hint}
+          </button>
           <button className="btn pri send" disabled={!text.trim()} title={tip}>
             Send
           </button>

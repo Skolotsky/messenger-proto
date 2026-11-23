@@ -398,7 +398,8 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
               onClick={() => go(tab)}
             >
               {short}
-              {n > 0 && <span className="h-count">{n}</span>}
+              {/* Until its count is known the tab keeps the room for it, so the tabs do not move on load. */}
+              {history.answers[tab] ? n > 0 && <span className="h-count">{n}</span> : <span className="h-count wait" aria-hidden="true">0</span>}
             </button>
           );
         })}

@@ -178,6 +178,7 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
           {conversation ? (
             <ConversationView
               key={conversation.conversation}
+              onSendSettings={() => setSettings('writing')}
               session={session}
               feed={feed}
               conversation={conversation}
@@ -213,6 +214,7 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
             />
             <ConversationView
               key={thread}
+              onSendSettings={() => setSettings('writing')}
               session={session}
               feed={feed}
               conversation={conversation}

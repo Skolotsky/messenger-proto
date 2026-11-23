@@ -28,6 +28,7 @@ interface Props {
   openThread: string | null;
   onOpenThread(id: string): void;
   onClose(): void;
+  onSendSettings?(): void;
   /** False while something covers this view: what is covered is not being read (D-015). */
   active?: boolean;
   /** Opened from a feed row: where its new messages begin. */
@@ -45,6 +46,7 @@ export function ConversationView({
   openThread,
   onOpenThread,
   onClose,
+  onSendSettings,
   active = true,
   newFrom = null,
   target = null,
@@ -248,6 +250,7 @@ export function ConversationView({
         thread={thread}
         placeholder={thread ? 'Reply in thread…' : `Message ${title}…`}
         onSent={away ? goToLatest : undefined}
+        onSendSettings={onSendSettings}
       />
     </div>
   );
