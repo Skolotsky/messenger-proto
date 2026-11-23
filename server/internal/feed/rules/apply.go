@@ -656,8 +656,23 @@ func (e *Engine) isAgent(id string) bool {
 	return p != nil && p.agent
 }
 
-// applause is who counts in the grouped row: everyone except the author and
-// people whose reaction is an answer (D-014).
+// refreshSplit keeps the grouped row's count equal to the reactions on its message.
+func refreshSplit(cv *conv, m *message) {
+	r := cv.readers[m.author]
+	if r == nil || len(m.reactions) == 0 {
+		return
+	}
+	k := itemKey{m.id, itemReaction}
+	if rk, ok := r.itemRow[k]; ok {
+		if it := r.rows[rk].items[k]; it != nil && !it.retracted {
+			it.reason = splitLine(m.reactions)
+		}
+	}
+}
+
+// applause is whose reaction keeps a grouped row alive: everyone except the
+// author and people whose reaction is an answer (D-014). What the row counts is
+// every reaction on the message (T-038 point 18).
 func (e *Engine) applause(cv *conv, m *message) []*reaction {
 	var out []*reaction
 	for _, x := range m.reactions {
@@ -724,6 +739,7 @@ func (e *Engine) reactionAdded(v contract.ChangeReactionAdded, f *fx) error {
 		}
 	}
 	e.reactionToAuthor(cv, m, v.Person, v.Emoji, f)
+	refreshSplit(cv, m)
 	e.settleConversation(cv, f)
 	return nil
 }
@@ -770,7 +786,7 @@ func (e *Engine) reactionToAuthor(cv *conv, m *message, reactor, emoji string, f
 	if (!cv.direct && channelDial(cv, view{a, r}) == "muted") || r.thDial[m.root] == levelOff {
 		return
 	}
-	reason := splitLine(e.applause(cv, m))
+	reason := splitLine(m.reactions)
 	k := itemKey{m.id, itemReaction}
 	if rw := r.rows[key]; rw != nil && rw.items[k] != nil {
 		it := rw.items[k]
@@ -813,6 +829,7 @@ func (e *Engine) reactionRemoved(v contract.ChangeReactionRemoved, f *fx) error 
 		return nil
 	}
 	defer touchShowing(cv, m, f)
+	refreshSplit(cv, m)
 	a := e.people[m.author]
 	if a == nil || a.agent || cv.readers[a.id] == nil {
 		return nil
@@ -837,10 +854,8 @@ func (e *Engine) reactionRemoved(v contract.ChangeReactionRemoved, f *fx) error 
 	}
 	rw := r.rows[rk]
 	f.touch(cv, a.id, rk)
-	if rs := e.applause(cv, m); len(rs) == 0 {
+	if len(e.applause(cv, m)) == 0 {
 		retract(r, rw, rw.items[k]) // D-004: when the last reaction goes, the row is taken back
-	} else {
-		rw.items[k].reason = splitLine(rs)
 	}
 	e.settleConversation(cv, f)
 	return nil

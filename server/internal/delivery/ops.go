@@ -57,6 +57,12 @@ func (s *Service) status(w http.ResponseWriter, r *http.Request, org ids.Org) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	var stopped bool
+	if err := pool.QueryRow(ctx, `SELECT EXISTS (SELECT 1 FROM delivery_stopped WHERE org = $1)
+		OR EXISTS (SELECT 1 FROM org_log WHERE org = $1 AND retired_at IS NOT NULL)`, string(org)).Scan(&stopped); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	out := contract.DeliveryStatus{Receivers: []contract.ReceiverStatus{}}
 	for _, name := range []string{Search, Feed, Sender} {
 		l := s.lanes[name]
@@ -89,6 +95,8 @@ func (s *Service) status(w http.ResponseWriter, r *http.Request, org ids.Org) {
 			return
 		}
 		switch {
+		case stopped: // retired or stopped: what still waits will never be delivered
+			rs.State = "stopped"
 		case halted && name == Feed:
 			rs.State = "stopped"
 		case halted:
