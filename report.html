@@ -116,7 +116,7 @@ code{font:11px ui-monospace,Menlo,Consolas,monospace}
 .mtoc a{display:block;padding:4px 0;color:var(--soft);text-decoration:none}
 @media (max-width:1000px){.layout{display:block;padding:22px 16px 44px}.toc{display:none}.mtoc{display:block}}
 @media (max-width:760px){.glance{grid-template-columns:1fr 1fr}.hero h1{font-size:26px}}
-@media print{body{background:#fff;font-size:11.6px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.layout{display:block;max-width:none;padding:0}.toc,.mtoc{display:none}.part{margin-top:0;break-before:page}.part.first{break-before:auto;margin-top:22px}.chapter{break-before:page;margin-top:0}.part + .chapter{break-before:auto;margin-top:12px}h3{break-after:avoid}tr,.cards>div,.result>div,.idea,.scroll,.take,.fstats,.fflow{break-inside:avoid}}
+@media print{body{background:#fff;font-size:11.6px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.layout{display:block;max-width:none;padding:0}.toc,.mtoc{display:none}.part{margin-top:0;break-before:page}.part.first{break-before:auto;margin-top:22px}.chapter{break-before:auto;margin-top:26px}.part + .chapter{margin-top:12px}h2.ch,.chapter>.lead{break-after:avoid}h3{break-after:avoid}.tablewrap{overflow:visible;break-inside:avoid}.cards,.result,.stats,.flow{break-inside:avoid}tr,.cards>div,.result>div,.idea,.scroll,.take,.fstats,.fflow{break-inside:avoid}}
 @page{size:A4;margin:14mm 15mm}
 </style>
 </head>
@@ -239,7 +239,7 @@ code{font:11px ui-monospace,Menlo,Consolas,monospace}
 <tr><td>Text edited</td><td>The current text, in the same space. A longer edit sits behind an expander, so nothing jumps</td></tr>
 <tr><td>Edit adds a mention or flag</td><td>It reaches the person as new</td></tr>
 <tr><td>Deleted or taken back, not yet seen</td><td>No trace, and the count drops. The sender's retraction is respected</td></tr>
-<tr><td>Deleted after you saw or kept it</td><td>"Anna deleted this message" in place of the text. On a kept row it stays until Done</td></tr>
+<tr><td>Deleted, even if read or kept</td><td>It leaves the feed. If it's on screen, "Anna deleted this message" holds the space, with no Done or count, until the next Refresh</td></tr>
 <tr><td>Deleted within 5 seconds of a mention</td><td>No notification, unless something else unread still earns one. One already sent shows the current truth</td></tr>
 <tr><td>The feed is behind or a row can't update</td><td>"Catching up" on the feed, "may be out of date" on the row, and nothing moves</td></tr>
 </table></div>
@@ -275,7 +275,7 @@ code{font:11px ui-monospace,Menlo,Consolas,monospace}
 <h3>The patterns I followed</h3>
 <div class="cards">
 <div><b>Product before technology</b>No technical decision until the product scope was accepted, so the architecture served the feed.<em>Scope accepted before any architecture</em></div>
-<div><b>One decision, one brief</b>Each states why it matters now, the options, risks, best practice and a recommendation.<em>35 records, with who decided</em></div>
+<div><b>One decision, one brief</b>Each states why it matters now, the options, risks, best practice and a recommendation.<em>39 records, with who decided</em></div>
 <div><b>Top-down order</b>The bet first, then what enters the feed, how rows leave, then edits and deletes.<em>Each answer framed the next</em></div>
 <div><b>Test rules before pixels</b>I had the rules built as a runnable model before designing a screen.<em>Found a flag that could never leave</em></div>
 <div><b>Compare by using</b>Three clickable directions, same content, at desktop and phone width.<em>Chose by touch, not by description</em></div>
@@ -465,14 +465,14 @@ code{font:11px ui-monospace,Menlo,Consolas,monospace}
 
 <h3>In numbers</h3>
 <div class="stats">
-<div><b>35</b>decisions on record</div>
+<div><b>39</b>decisions on record</div>
 <div><b>8</b>experiments</div>
 <div><b>8</b>service contracts</div>
 <div><b>28 of 30</b>guardrails enforced</div>
 <div><b>200+</b>commits</div>
 </div>
 
-<p class="note"><b>Final validation:</b> the full verification passed, and the main flow passed in a browser on the real system. Still open: two screen guardrails as named tests, real phones and browsers other than Chromium, and a measured capacity.</p>
+<p class="note"><b>Final validation:</b> the full verification passed, and the main flow passed in a browser on the real system. Still open: two screen guardrails as named tests, real phones and browsers other than Chromium, and load testing.</p>
 
 <footer>Run it with <code>make up</code>, then open <code>127.0.0.1:18080</code>. The control panel can stop or slow search, the feed and the sender while you use the product. Decisions, contracts, experiments and known shortcuts are in <code>docs/</code> and <code>experiments/</code>.</footer>
 </section>
