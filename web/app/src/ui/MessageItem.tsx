@@ -99,7 +99,7 @@ export function MessageItem({ row, session, inThread, isThreadOpen, onOpenThread
             >
               <Icon name="smile" />
             </button>
-            {!inThread && m.thread === null && (
+            {!inThread && m.thread === null && onOpenThread && (
               <button aria-label="Reply in thread" title="Reply in thread" onClick={() => onOpenThread?.(m.id)}>
                 <Icon name="chat" />
               </button>

@@ -224,7 +224,7 @@ export function ConversationView({
               session={session}
               inThread={thread !== null}
               isThreadOpen={openThread === row.message.id}
-              onOpenThread={onOpenThread}
+              onOpenThread={conversation.type === 'direct' ? undefined : onOpenThread}
               showAgentState={stateOn.has(row.message.id)}
             />
           )}

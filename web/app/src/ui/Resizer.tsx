@@ -1,4 +1,4 @@
-import { useRef, type KeyboardEvent, type PointerEvent } from 'react';
+import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import type { PanelKey } from './panels';
 
 interface Props {
@@ -16,12 +16,14 @@ const STEP = 16;
 /** The line between two panels: drag it, use the arrow keys, double-click to put it back (D-023). */
 export function Resizer({ panel, label, width, fromRight, onResize, onReset }: Props) {
   const drag = useRef<{ x: number; width: number } | null>(null);
+  const [dragging, setDragging] = useState(false);
   const sign = fromRight ? -1 : 1;
 
   const down = (e: PointerEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.currentTarget.setPointerCapture(e.pointerId);
     drag.current = { x: e.clientX, width };
+    setDragging(true);
     document.body.classList.add('resizing');
   };
   const move = (e: PointerEvent<HTMLDivElement>) => {
@@ -29,6 +31,7 @@ export function Resizer({ panel, label, width, fromRight, onResize, onReset }: P
   };
   const up = () => {
     drag.current = null;
+    setDragging(false);
     document.body.classList.remove('resizing');
   };
   const key = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -40,7 +43,7 @@ export function Resizer({ panel, label, width, fromRight, onResize, onReset }: P
 
   return (
     <div
-      className={`rz${fromRight ? ' rz-left' : ''}`}
+      className={`rz${fromRight ? ' rz-left' : ''}${dragging ? ' dragging' : ''}`}
       data-rz={panel}
       role="separator"
       aria-orientation="vertical"

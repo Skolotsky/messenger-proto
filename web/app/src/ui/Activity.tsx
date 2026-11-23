@@ -382,8 +382,8 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
       </header>
       <nav className="tabs" aria-label="Activity views">
         <button className={`tab${view === 'feed' ? ' on' : ''}`} aria-current={view === 'feed' || undefined} onClick={() => go('feed')}>
-          Feed
-          {feed.attention > 0 && <span className="badge">{feed.attention}</span>}
+          <span className="tab-label" data-text="Feed">Feed</span>
+          {feed.attention > 0 ? <span className="badge">{feed.attention}</span> : <span className="badge-slot" aria-hidden="true" />}
         </button>
         <span className="tabs-sep">History</span>
         {HISTORY_TABS.map(({ tab, label, short }) => {
@@ -397,9 +397,10 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
               title={`History of your ${label.toLowerCase()}. Nothing leaves it by being read.`}
               onClick={() => go(tab)}
             >
-              {short}
+              <span className="tab-label" data-text={short}>{short}</span>
               {/* Until its count is known the tab keeps the room for it, so the tabs do not move on load. */}
-              {history.answers[tab] ? n > 0 && <span className="h-count">{n}</span> : <span className="h-count wait" aria-hidden="true">0</span>}
+              {/* The space stays when there is no count, so a count coming or going moves no tab. */}
+              {history.answers[tab] ? (n > 0 ? <span className="h-count">{n}</span> : <span className="h-count none" aria-hidden="true" />) : <span className="h-count wait" aria-hidden="true" />}
             </button>
           );
         })}
@@ -552,10 +553,6 @@ function HistoryList({
   if (!entries) return <div className="empty start" aria-busy="true" />;
   return (
     <>
-      <p className="hist-note">
-        History, for finding things again. Newest first, read and unread together; a dot marks what you have not read yet.
-        Nothing here is sorted by buckets, and nothing leaves by being read.
-      </p>
       {entries.length === 0 && (
         <div className="empty">
           <Sun />

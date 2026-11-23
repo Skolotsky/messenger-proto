@@ -117,7 +117,6 @@ test('For your information far below the view is not read by leaving', async ({ 
   await start(page);
   await expect(page.locator('.b-fyi [data-row]')).not.toBeInViewport();
   await page.getByRole('navigation', { name: 'Activity views' }).getByRole('button', { name: /^Mentions/ }).click();
-  await expect(page.locator('.hist-note')).toBeVisible();
   await settled(page);
   expect(door.sent('read')).toEqual([]);
 });
