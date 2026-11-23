@@ -400,7 +400,20 @@ export function useSession(person: string): Session {
 
   const react = useCallback(
     (message: ChatMessage, emoji: string, on: boolean) => {
-      void outbox.add({ action: { kind: 'react', id: newId('act'), as: person, message: message.id, emoji, on }, messageId: message.id });
+      void outbox.add({
+        action: { kind: 'react', id: newId('act'), as: person, message: message.id, emoji, on },
+        messageId: message.id,
+        onSaved: () => {
+          // A channel the person is not in sends no live updates, so the answer is all there is.
+          if (stateRef.current.conversations.some((c) => c.conversation === message.conversation)) return;
+          const current = message.reactions.find((r) => r.emoji === emoji)?.people ?? [];
+          const people = on ? [...new Set([...current, person])] : current.filter((p) => p !== person);
+          const others = message.reactions.filter((r) => r.emoji !== emoji);
+          const reactions = people.length ? [...others, { emoji, people }] : others;
+          const part = { kind: 'reaction.changed', conversation: message.conversation, thread: message.thread, message: message.id, reactions } as ConversationPart;
+          dispatch({ type: 'parts', parts: [part], me: person });
+        },
+      });
     },
     [person, outbox],
   );

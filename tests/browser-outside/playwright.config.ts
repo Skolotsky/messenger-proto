@@ -3,7 +3,8 @@ import { defineConfig } from '@playwright/test';
 // The pages are built for the network; each test answers their real requests itself.
 export default defineConfig({
   testDir: './specs',
-  workers: 2,
+  // The real system is one shared installation, and its specs switch parts off and reset it.
+  workers: process.env.CONTEXIA_REAL_URL ? 1 : 2,
   fullyParallel: true,
   forbidOnly: true,
   retries: 0,
