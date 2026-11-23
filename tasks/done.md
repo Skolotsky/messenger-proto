@@ -2,6 +2,7 @@
 
 Finished work, newest first. One line each: what is now true and how it was verified. Commits carry the task ID, so `git log --grep T-nnn` finds the change.
 
+- 2026-11-23 · **T-069** `implement` The Activity number counts what would notify the person; under Focus only, a quiet dot shows unread Needs you (D-036). Verified: browser tests at both widths seen failing first, `./scripts/verify` passed.
 - 2026-11-23 · **T-068** `visual` Three explainers added: the whole system as a clickable map, what can fail and what covers it, and how notifications decide. Verified: an independent read of an earlier version against the code found 21 inaccuracies, corrected; all 13 map flows run without errors at 1280 and 400 px. Not verified: the corrected wording was not re-read independently.
 - 2026-11-23 · **T-061** `validate` The running product was validated independently against the brief, contracts and guardrails; one blocker and four other findings were fixed. Verified: `./scripts/verify` passes on the final code (11 lanes, 4 min), and the main flow passes in a browser on the real system. Detail: `tasks/T-061-final-validation.md`.
 - 2026-11-23 · **T-065** `implement` The notification hold is in the feed and the sender only delivers (D-034). Verified: G-010 and G-011 on the real system, at most 6.0 s to a healthy notification under busy traffic, none sent of 132 read or deleted inside the hold.

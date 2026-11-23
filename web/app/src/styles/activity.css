@@ -29,6 +29,10 @@
 .h-count.wait, .h-count.none { visibility: hidden; }
 .tab .badge, .badge-slot { min-width: 22px; height: 18px; box-sizing: border-box; flex: none; }
 .badge-slot { visibility: hidden; }
+/* The quiet mark for Needs you under Focus only (D-036), in the place a number would take. */
+.side-item .dot { margin-left: auto; }
+.tab .dot { margin: 0 7px; }
+.nav .dot { position: absolute; top: 5px; left: calc(50% + 8px); }
 /* over the list, so that saying something went wrong moves nothing */
 .feed-problem { position: absolute; top: 0; left: 0; right: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 16px; background: var(--flag-soft); color: var(--flag); font-size: 13px; box-shadow: var(--shadow); }
 .link { color: var(--accent); font-size: 12px; font-weight: 600; white-space: nowrap; flex: none; }

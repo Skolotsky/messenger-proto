@@ -11,6 +11,7 @@ import { Icon } from './Icon';
 import type { Jump } from './jump';
 import { usePanels } from './panels';
 import { PickerProvider } from './ReactionPicker';
+import { ActivityMark } from './ActivityMark';
 import { Resizer } from './Resizer';
 import { SettingsScreen, type SettingsSection } from './SettingsScreen';
 import { Sidebar } from './Sidebar';
@@ -158,6 +159,7 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
             onSwitch={setAsking}
             onSettings={() => setSettings('account')}
             attention={feed.attention}
+            quietUnread={feed.quietUnread}
             onSearchHit={openHit}
           />
           <Resizer panel="side" label="Resize the sidebar" width={widths.side} onResize={resize} onReset={reset} />
@@ -239,7 +241,7 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
             >
               <Icon name="bell" />
               <span>Activity</span>
-              {feed.attention > 0 && <span className="badge">{feed.attention}</span>}
+              <ActivityMark attention={feed.attention} quietUnread={feed.quietUnread} />
             </button>
             <button
               className={`nav${phoneView === 'chats' ? ' on' : ''}`}

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { act, loadHistory, newId } from '../api/door';
+import { ActivityMark } from './ActivityMark';
 import { subscribeLive } from '../api/live';
 import type { FeedRow, HistoryAnswer, HistoryEntry, HistoryTab, RowChange } from '../api/types';
 import type { Section, ShownRow } from '../state/feedModel';
@@ -383,7 +384,7 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
       <nav className="tabs" aria-label="Activity views">
         <button className={`tab${view === 'feed' ? ' on' : ''}`} aria-current={view === 'feed' || undefined} onClick={() => go('feed')}>
           <span className="tab-label" data-text="Feed">Feed</span>
-          {feed.attention > 0 ? <span className="badge">{feed.attention}</span> : <span className="badge-slot" aria-hidden="true" />}
+          <ActivityMark attention={feed.attention} quietUnread={feed.quietUnread} reserve />
         </button>
         <span className="tabs-sep">History</span>
         {HISTORY_TABS.map(({ tab, label, short }) => {

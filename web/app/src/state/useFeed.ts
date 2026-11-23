@@ -26,8 +26,10 @@ export interface Feed {
   model: FeedModel;
   waitingCount: number;
   waitingBy: ReturnType<typeof waitingBy>;
-  /** Unread rows in Focus and Needs you: the one number that calls (D-019). */
+  /** Unread rows in the buckets that notify this person: the one number that calls (D-019, D-036). */
   attention: number;
+  /** Nothing calls, but Needs you has something unread: a quiet dot (D-036). */
+  quietUnread: boolean;
   /** Rises with every full load: what hangs on the feed (history tabs, settings) loads again. */
   freshLoads: number;
   problem: string | null;
@@ -53,6 +55,7 @@ export function useFeed(session: Session): Feed {
   const [model, dispatch] = useReducer(feedReduce, emptyFeed);
   const [problem, setProblem] = useState<string | null>(null);
   const [settings, setSettings] = useState<SettingsAnswer | null>(null);
+  const [settingsFailed, setSettingsFailed] = useState(false);
   const person = session.me?.id ?? null;
   const ready = session.phase === 'ready';
   const modelRef = useRef(model);
@@ -152,7 +155,14 @@ export function useFeed(session: Session): Feed {
   }, [checkBehind]);
 
   const reloadSettings = useCallback(() => {
-    if (person) loadSettings(person).then(setSettings, () => undefined);
+    if (!person) return;
+    loadSettings(person).then(
+      (answer) => {
+        setSettings(answer);
+        setSettingsFailed(false);
+      },
+      () => setSettingsFailed(true),
+    );
   }, [person]);
 
   useEffect(() => {
@@ -289,12 +299,18 @@ export function useFeed(session: Session): Feed {
 
   const counted = useMemo(() => waitingBy(model), [model]);
   const counts = model.counts;
+  // Until the setting is known nothing is counted, so Focus only never flashes the larger number.
+  // If it cannot be loaded, the default applies: better to call than to hide.
+  const focusOnly = settings?.focus_only ?? false;
+  const known = settings !== null || settingsFailed;
+  const attention = !counts || !known ? 0 : focusOnly ? counts.focus : counts.focus + counts.needs_you;
 
   return {
     model,
     waitingCount: model.waiting.length,
     waitingBy: counted,
-    attention: counts ? counts.focus + counts.needs_you : 0,
+    attention,
+    quietUnread: known && focusOnly && attention === 0 && (counts?.needs_you ?? 0) > 0,
     freshLoads,
     problem,
     clearProblem,
