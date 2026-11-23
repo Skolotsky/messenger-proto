@@ -37,5 +37,7 @@ All criteria met.
 - Old worker: 6 of 6 upgrading from a real build of commit e6f385e, with nothing cleared.
 - Real server: 10 of 10 on a private composed system (the 6 others need the local front to switch release).
 - `./scripts/check` passes. Browser lanes: wide 191 passed, phone 178 passed, 12 skipped between them; outside pages 112 passed.
-- Not run: the full `./scripts/verify` (no server code changed); browsers other than Chromium.
+- Full `./scripts/verify` on this code: all 11 lanes passed in 227 s.
+- Limit found afterwards, by a real upgrade on a private system (old build, then this one, same browser profile): if the first visit after the upgrade goes straight to `/control/` or `/notifications/`, the old worker answers it, so that one visit still lands on the product while the new worker installs. Every later visit is right. New code cannot change this: the old worker and page run before it. A browser that never held the old worker is not affected.
+- Not run: browsers other than Chromium.
 
