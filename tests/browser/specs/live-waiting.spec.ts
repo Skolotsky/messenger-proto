@@ -85,7 +85,7 @@ test('what waited and is refused says so in place, with Discard and no Try again
   await expect(pane.locator('.msg', { hasText: text })).toHaveCount(0);
 });
 
-test('a send with no answer offers Try again with the same IDs, and holds back what came after', async ({ page }, info) => {
+test('a send with no answer waits, retries by itself with the same IDs, and holds back what came after', async ({ page }, info) => {
   const sent = recordActions(page);
   await start(page);
   const pane = await openConversation(page, info, 'general');
@@ -94,28 +94,64 @@ test('a send with no answer offers Try again with the same IDs, and holds back w
     const kind = route.request().postDataJSON().kind;
     return failing && kind === 'send' ? route.fulfill({ status: 503, body: 'down' }) : route.continue();
   });
+  const sends = () => sent.filter((a) => a.kind === 'send') as { id: string; message: { id: string; text: string } }[];
   const first = unique('First');
   const second = unique('Second');
   const box = pane.getByRole('textbox', { name: 'Message' });
   await box.fill(first);
   await box.press('Control+Enter');
   const msg = pane.locator('.msg', { hasText: first });
-  await expect(msg.getByRole('alert')).toContainText('no answer');
+  await expect(msg.getByRole('alert')).toContainText('Waiting to send: no answer');
   await box.fill(second);
   await box.press('Control+Enter');
-  await expect(pane.locator('.msg', { hasText: second }), 'it stands below the first').toBeVisible();
-  expect(sent.filter((a) => a.kind === 'send').length, 'it does not overtake').toBe(1);
+  const after = pane.locator('.msg', { hasText: second });
+  await expect(after.getByRole('status'), 'it waits below the first').toContainText('Waiting to send');
+
+  // The door decides: the first is refused an answer until it has been tried again by itself.
+  await expect.poll(() => sends().length, { timeout: 8000, message: 'it retries by itself' }).toBeGreaterThanOrEqual(2);
+  expect(sends().every((a) => a.message.text === first), 'nothing overtakes').toBe(true);
+  await expect(msg.getByRole('alert'), 'still waiting, still in place').toContainText('Waiting to send');
 
   failing = false;
-  await msg.getByRole('button', { name: 'Try again' }).click();
-  await expect(msg.getByRole('alert')).toHaveCount(0);
-  await expect(pane.locator('.msg', { hasText: second }).locator('.send-state')).toHaveCount(0);
-  const sends = sent.filter((a) => a.kind === 'send');
-  expect(sends).toHaveLength(3);
-  expect(sends[1].id, 'the same action').toBe(sends[0].id);
-  expect((sends[1].message as { id: string }).id).toBe((sends[0].message as { id: string }).id);
+  await expect(msg.locator('.send-state')).toHaveCount(0, { timeout: 8000 });
+  await expect(after.locator('.send-state')).toHaveCount(0, { timeout: 8000 });
+  const all = sends();
+  const firsts = all.filter((a) => a.message.text === first);
+  const seconds = all.filter((a) => a.message.text === second);
+  expect(new Set(firsts.map((a) => a.id)).size, 'the same action').toBe(1);
+  expect(new Set(firsts.map((a) => a.message.id)).size, 'the same message').toBe(1);
+  expect(seconds, 'the second goes out once').toHaveLength(1);
+  expect(all[all.length - 1], 'and after the first').toBe(seconds[0]);
+  await expect(pane.locator('.msg-body', { hasText: first }), 'saved once').toHaveCount(1);
+  await expect(pane.locator('.msg-body', { hasText: second }), 'saved once').toHaveCount(1);
   const texts = await pane.locator('.msg-body').allTextContents();
   expect(texts.indexOf(first)).toBeLessThan(texts.indexOf(second));
+});
+
+test('Try again sends a waiting message at once, with the same IDs', async ({ page }, info) => {
+  const sent = recordActions(page);
+  await start(page);
+  const pane = await openConversation(page, info, 'general');
+  let failing = true;
+  await page.route('**/orgs/acme/people/actions', (route) => {
+    if (route.request().postDataJSON().kind !== 'send') return route.continue();
+    if (!failing) return route.continue();
+    failing = false; // only the first attempt has no answer
+    return route.fulfill({ status: 503, body: 'down' });
+  });
+  const text = unique('Sent on request');
+  const box = pane.getByRole('textbox', { name: 'Message' });
+  await box.fill(text);
+  await box.press('Control+Enter');
+  const msg = pane.locator('.msg', { hasText: text });
+  await expect(msg.getByRole('alert')).toContainText('no answer');
+  await msg.getByRole('button', { name: 'Try again' }).click();
+  await expect(msg.locator('.send-state')).toHaveCount(0);
+  const sends = sent.filter((a) => a.kind === 'send') as { id: string; message: { id: string } }[];
+  expect(sends, 'the click replaces the timed retry').toHaveLength(2);
+  expect(sends[1].id).toBe(sends[0].id);
+  expect(sends[1].message.id).toBe(sends[0].message.id);
+  await expect(pane.locator('.msg-body', { hasText: text })).toHaveCount(1);
 });
 
 test('a reaction that fails says so on its message, and Discard takes it back', async ({ page, request }, info) => {

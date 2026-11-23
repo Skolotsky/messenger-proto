@@ -34,7 +34,7 @@ interface Waiter {
 const SHOWN_ON_MESSAGE = new Set<PeopleAction['kind']>(['send', 'edit', 'delete', 'react']);
 
 /** These wait for an answer and go out again by themselves (screen-to-conversations.md, section 4). */
-const WAITS_FOR_AN_ANSWER = new Set<PeopleAction['kind']>(['edit', 'delete', 'react']);
+const WAITS_FOR_AN_ANSWER = new Set<PeopleAction['kind']>(['send', 'edit', 'delete', 'react']);
 const RETRY_MS = [1000, 2000, 4000];
 
 const rowOf = (a: PeopleAction) =>
@@ -42,8 +42,8 @@ const rowOf = (a: PeopleAction) =>
 
 /**
  * What the person did and the door has not confirmed yet. Actions are sent one at a time, in the
- * order they were made, each with its ID. A failed new message holds back what came after it, so
- * that messages cannot overtake each other.
+ * order they were made, each with its ID. One with no answer stays first in line and holds back
+ * what came after it, so that messages cannot overtake each other.
  */
 export class Outbox {
   items: OutItem[] = [];
@@ -149,7 +149,6 @@ export class Outbox {
 
   private next(): OutItem | null {
     for (const item of this.items) {
-      if (item.state === 'failed' && item.action.kind === 'send') return null;
       if (item.state === 'sending' || item.state === 'waiting') return item;
     }
     return null;
