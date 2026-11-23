@@ -86,6 +86,23 @@ func lead(r *row) *item {
 	return newest
 }
 
+// decidingItem is the newest unread item in the row's bucket: what put the row
+// there. It is nil when nothing unread reaches it and the row is only held there.
+func decidingItem(r *row, b Bucket) *item {
+	var found *item
+	for _, it := range sortedItems(r) {
+		if !it.read && !it.retracted && it.bucket == b {
+			found = it
+		}
+	}
+	return found
+}
+
+// shownAsKept says the row's place comes from being kept or flagged, not from an item.
+func shownAsKept(r *row, p *person, b Bucket) bool {
+	return keptBy(r, p) != nil && b == Focus && (rowSection(r) == "kept" || decidingItem(r, b) == nil)
+}
+
 func reactionsOf(m *message) []contract.Reaction {
 	out := []contract.Reaction{}
 	byEmoji := map[string][]string{}
@@ -129,9 +146,14 @@ func (e *Engine) render(cv *conv, p *person, r *convReader, rw *row) contract.Fe
 	case it.edited || it.msg.edited:
 		state = "changed"
 	}
-	why := it.reason
+	// The row shows its newest item, and says why by the item that placed it (D-014, D-020).
+	decided := it
+	if d := decidingItem(rw, bucket); d != nil {
+		decided = d
+	}
+	why := decided.reason
 	k := keptBy(rw, p)
-	if k != nil && bucket == Focus && rowSection(rw) == "kept" {
+	if shownAsKept(rw, p, bucket) {
 		why = "Kept by you"
 		if *k == "flag" {
 			why = "Flagged by " + e.flagAuthor(cv, rw)
@@ -141,7 +163,7 @@ func (e *Engine) render(cv *conv, p *person, r *convReader, rw *row) contract.Fe
 		Conversation: cv.id, Thread: rw.key.thread(), Message: it.msg.id, Bucket: shown.Contract(),
 		Unread: unread > 0, Kept: k, Why: why, Newest: newest, FirstNew: firstNew, Author: it.msg.author,
 		Preview: it.msg.text, At: it.msg.at, NewItems: unread, Reactions: reactionsOf(it.msg), State: state,
-		Explanation: e.explain(cv, p, r, rw, it, bucket),
+		Explanation: e.explain(cv, p, r, rw, decided, bucket),
 	}
 }
 
@@ -183,9 +205,9 @@ func (e *Engine) explain(cv *conv, p *person, r *convReader, rw *row, it *item, 
 	}
 	rowDone := contract.RowAct{Value: contract.RowActDone{Kind: "done", Conversation: cv.id, Thread: thread}}
 	rowKeep := contract.RowAct{Value: contract.RowActKeep{Kind: "keep", Conversation: cv.id, Thread: thread}}
-	if k := keptBy(rw, p); k != nil && bucket == Focus && rowSection(rw) == "kept" {
-		if *k == "flag" {
-			return mk("A message "+who+" flagged for you.", "A flag that names you is kept for you until you press Done or respond.",
+	if shownAsKept(rw, p, bucket) {
+		if *keptBy(rw, p) == "flag" {
+			return mk("A message "+e.flagAuthor(cv, rw)+" flagged for you.", "A flag that names you is kept for you until you press Done or respond.",
 				"Done releases it; it then leaves the feed.", "Mark done", rowDone, rowKeep)
 		}
 		return mk("A row you kept.", "You kept it, so it stays in Focus until you mark it done.",

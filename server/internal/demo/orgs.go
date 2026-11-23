@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"sync"
 	"time"
 
 	"contexia/internal/democontent"
@@ -21,6 +22,8 @@ import (
 const (
 	seedBatch  = 200
 	stepBudget = 60 * time.Second // how long one step of Delete or Rebuild waits out an outage
+	sizeBudget = time.Second      // how long listing organizations waits for their current sizes
+	sizeCalls  = 8                // how many sizes are asked for at once
 )
 
 // refusal is a request the demo program answers with 409.
@@ -67,7 +70,40 @@ func (s *Service) organizations(ctx context.Context) ([]contract.OrganizationEnt
 	if list == nil {
 		list = []contract.OrganizationEntry{}
 	}
+	s.currentSizes(ctx, list)
 	return list, nil
+}
+
+// currentSizes replaces each stored size by the head of Conversations' log, as
+// delivery reports it (a log-fed receiver's place plus what it has waiting). An
+// organization whose head cannot be had within the budget keeps its stored size.
+func (s *Service) currentSizes(ctx context.Context, list []contract.OrganizationEntry) {
+	ctx, cancel := context.WithTimeout(ctx, sizeBudget)
+	defer cancel()
+	slots := make(chan struct{}, sizeCalls)
+	var wg sync.WaitGroup
+	for i := range list {
+		wg.Add(1)
+		go func(e *contract.OrganizationEntry) {
+			defer wg.Done()
+			select {
+			case slots <- struct{}{}:
+				defer func() { <-slots }()
+			case <-ctx.Done():
+				return
+			}
+			var status contract.DeliveryStatus
+			if err := s.dlv.JSON(ctx, http.MethodGet, "/orgs/"+e.Org+"/status", nil, &status); err != nil {
+				return
+			}
+			for _, r := range status.Receivers {
+				if r.Name == "search" {
+					e.ApproxChanges = max(e.ApproxChanges, r.Place+r.Waiting)
+				}
+			}
+		}(&list[i])
+	}
+	wg.Wait()
 }
 
 // abandonUnfinished retires any organization whose seed a crash left half done:

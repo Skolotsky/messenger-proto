@@ -38,7 +38,7 @@ var bg = context.Background()
 const rebuildLimit = 2 * time.Minute // G-020
 
 type system struct {
-	admin                     *pgxpool.Pool
+	admin, demoPool           *pgxpool.Pool
 	content                   *democontent.Content
 	demo                      *demo.Service
 	conv, ops, search, sender string
@@ -117,7 +117,7 @@ func newSystem(t *testing.T, limit time.Duration) *system {
 	if err != nil {
 		t.Fatal(err)
 	}
-	s := &system{admin: admin, content: content}
+	s := &system{admin: admin, demoPool: demoDB.Pool, content: content}
 	store := &conversations.Store{Dir: convDB, Clock: clock.Real{}}
 	mux := http.NewServeMux()
 	store.Routes(mux)

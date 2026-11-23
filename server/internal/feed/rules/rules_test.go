@@ -1534,6 +1534,61 @@ func TestRowExplanation(t *testing.T) {
 	})
 }
 
+// TestARowExplainsItselfByWhatPutItThere: the reason and the explanation come
+// from the unread item that decided the bucket, not from the newest one (D-014,
+// D-020), and the split counts every reaction, as the pill does (T-038 point 18).
+func TestARowExplainsItselfByWhatPutItThere(t *testing.T) {
+	split := func(w *W, id string) string {
+		k := itemKey{id, itemReaction}
+		r := w.e.conv("#a").readers["you"]
+		if rk, ok := r.itemRow[k]; ok {
+			return r.rows[rk].items[k].reason
+		}
+		return "nothing"
+	}
+	runCases(t, "D-014, D-020, T-038 point 18", []ruleCase{
+		{"an answer stays named when applause arrives after it", func(w *W) (any, any) {
+			m := w.post("you", "#a", to("marco"))
+			w.react("marco", m, "check")
+			w.react("anna", m, "check")
+			r := w.row("you", m)
+			return []any{r.Bucket, r.Why, r.Explanation.DecidedBy, r.Message},
+				[]any{contract.Bucket("needs_you"), "Marco reacted check to your message",
+					"A reaction from someone you addressed is an answer, so it lands in Needs you.", m}
+		}},
+		{"the split counts the answer, whichever came first", func(w *W) (any, any) {
+			a := w.post("you", "#a", to("marco"))
+			w.react("marco", a, "check")
+			w.react("anna", a, "check")
+			b := w.post("you", "#a", to("marco"))
+			w.react("anna", b, "check")
+			w.react("marco", b, "check")
+			return []any{split(w, a), split(w, b)}, []any{"check 2 on your message", "check 2 on your message"}
+		}},
+		{"the split counts the author's own reaction, as the pill does", func(w *W) (any, any) {
+			m := w.post("you", "#a")
+			w.react("anna", m, "check")
+			w.react("you", m, "check")
+			return split(w, m), "check 2 on your message"
+		}},
+		{"the split follows when an answer is taken back", func(w *W) (any, any) {
+			m := w.post("you", "#a", to("marco"))
+			w.react("anna", m, "check")
+			w.react("marco", m, "check")
+			w.unreact("marco", m, "check")
+			return w.row("you", m).Why, "check 1 on your message"
+		}},
+		{"an Info item in a Focus row does not explain the row", func(w *W) (any, any) {
+			dm := w.dm("anna", "you")
+			w.post("anna", dm)
+			m := w.post("anna", dm, info)
+			r := w.row("you", m)
+			return []any{r.Bucket, r.Explanation.DecidedBy, strings.Contains(r.Why, "Info"), r.Message},
+				[]any{contract.Bucket("focus"), "Anna is in your Focus people.", false, m}
+		}},
+	})
+}
+
 func TestCountsAndOrder(t *testing.T) {
 	runCases(t, "D-003, T-038 points 12, 13, 15, 16 and 17", []ruleCase{
 		{"counts are unread rows, and a dot for For your information", func(w *W) (any, any) {
