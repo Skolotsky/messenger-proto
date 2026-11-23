@@ -41,8 +41,8 @@ export function FeedRowItem({ shown, session, feed, whyOpen, onWhy, onOpen }: Pr
   const swallow = useRef(false);
   const [offset, setOffset] = useState(0);
 
-  // Nothing jumps (D-001, D-004): content that changes in place keeps the row's exact height.
-  const content = `${row.preview}|${row.state}|${row.reactions.length}|${row.why}|${done}|${keptNow}`;
+  // Nothing jumps (D-001, D-004): whatever changes in place keeps the row's exact height. This runs on
+  // every render because even going from unread to read rewraps the text: bold is wider than regular.
   useLayoutEffect(() => {
     const el = main.current;
     if (!el) return;
@@ -54,7 +54,7 @@ export function FeedRowItem({ shown, session, feed, whyOpen, onWhy, onOpen }: Pr
     width.current = w;
     if (height.current === null) height.current = el.offsetHeight;
     else if (el.offsetHeight !== height.current) el.style.height = `${height.current}px`;
-  }, [content]);
+  });
 
   useLayoutEffect(() => {
     const el = main.current;

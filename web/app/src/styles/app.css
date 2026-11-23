@@ -214,7 +214,8 @@ body.resizing { cursor: col-resize; user-select: none; }
   .sk.act-closed { grid-template-columns: var(--w-side) minmax(300px, 1fr); }
   .sk.act-closed .main { display: none; }
   .sk.act-closed .pane:not(.tpane) { border-left: 0; }
-  .sk.has-thread { grid-template-columns: var(--w-side) minmax(340px, var(--w-act)) minmax(300px, 1fr) minmax(320px, var(--w-thread)); }
+  /* Opening a thread takes its room from the thread first: Activity narrows only when nothing else can give (300 + 320). */
+  .sk.has-thread { grid-template-columns: var(--w-side) minmax(max(340px, min(var(--w-act), calc(100vw - var(--w-side) - 620px))), var(--w-act)) minmax(300px, 1fr) minmax(320px, var(--w-thread)); }
   .sk.has-thread.act-closed { grid-template-columns: var(--w-side) minmax(300px, 1fr) minmax(320px, var(--w-thread)); }
   .bottom { display: none; }
 }

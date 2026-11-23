@@ -79,6 +79,8 @@
 .why-btn:hover, .row.why-on .why-btn { color: var(--text); }
 .row-preview { color: var(--text); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
 .row-preview b { font-weight: 600; }
+/* Beside other panels the width can change while someone reads: two lines are always kept, so text rewrapping moves no row. */
+@media (min-width: 761px) { .row:not(.gone):not(.hrow) .row-preview { min-height: 44px; } }
 .row-rxs { flex-wrap: nowrap; overflow: hidden; }
 .rx { flex: none; }
 button.rx { cursor: pointer; }

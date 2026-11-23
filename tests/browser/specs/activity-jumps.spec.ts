@@ -146,3 +146,56 @@ test('hovering a row moves nothing and takes no room', async ({ page, door }, in
   await expectStill(page, watched, before, 'hover');
   expect(await place(), 'the text keeps its place and width').toEqual(sideways);
 });
+
+/** Rows whose previews run from just under to just over a line, so that some wrap only while bold. */
+const aroundALine = () =>
+  Array.from({ length: 34 }, (_, i) =>
+    row({
+      conversation: `#c${i}`,
+      thread: null,
+      message: `msg_line${i}`,
+      author: 'priya',
+      why: 'New in the channel',
+      bucket: 'fyi',
+      unread: true,
+      preview: 'word '.repeat(10 + i),
+      newest: 3000 + i,
+    }),
+  );
+
+const places = (page: Page) =>
+  page.locator('[data-row]').evaluateAll((els) =>
+    els.map((el) => {
+      const r = el.getBoundingClientRect();
+      return [el.getAttribute('data-row'), Math.round(r.top * 10) / 10, Math.round(r.height * 10) / 10];
+    }),
+  );
+
+test('marking rows read moves nothing, also where the text wrapped only while bold', async ({ page, door }) => {
+  door.rows = aroundALine();
+  await start(page);
+  const before = await places(page);
+  await page.getByRole('region', { name: 'For your information' }).getByRole('button', { name: 'Mark all read' }).click();
+  await expect(page.locator('article.row.unread')).toHaveCount(0);
+  await settled(page);
+  expect(await places(page)).toEqual(before);
+});
+
+for (const width of [1440, 1300]) {
+  test(`opening a thread at ${width} px changes no row's height`, async ({ page, door }, info) => {
+    test.skip(isPhone(info), 'a phone shows one screen at a time');
+    await page.setViewportSize({ width, height: 900 });
+    door.rows = [...aroundALine(), row({ conversation: '#launch', thread: 'msg_t', message: 'msg_t', author: 'tomas', why: 'Tomas mentioned you', newest: 4000 })];
+    await start(page);
+    const heights = async () => (await places(page)).map(([key, , height]) => [key, height]);
+    const before = await heights();
+    const activity = await page.getByTestId('feed').evaluate((el) => el.getBoundingClientRect().width);
+    await page.locator(`[data-row="${KEY('#launch', 'msg_t')}"] .row-hit`).click();
+    await expect(page.locator('.tpane')).toBeVisible();
+    await settled(page);
+    expect(await heights()).toEqual(before);
+    if (width === 1440) {
+      expect(await page.getByTestId('feed').evaluate((el) => el.getBoundingClientRect().width), 'Activity kept its width').toBeCloseTo(activity, 0);
+    }
+  });
+}
