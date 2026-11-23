@@ -265,3 +265,10 @@ body.resizing { cursor: col-resize; user-select: none; }
   .viewband .vb-note { display: none; }
   .viewband b { flex: 1; overflow: hidden; text-overflow: ellipsis; }
 }
+
+/* An agent's current state, beside its name (agent-door.md; E-002) */
+.agent-state{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:400;color:var(--muted);white-space:nowrap}
+.agent-state .st-dot{width:7px;height:7px;border-radius:50%;background:var(--focus)}
+.agent-state.s-waiting .st-dot{background:var(--flag)}
+.agent-state.s-done .st-dot{background:var(--muted)}
+.chat-state{margin-left:auto;font-size:11px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%}

@@ -6,7 +6,7 @@ Work in flight. Order inside a section is priority. Finished work moves to `done
 
 ## Now
 
-- **T-058** `validate` Wave 3 · Milestone 2: the web app on the real programs at both widths (G-015, G-019, all of T-038); independent verifier. Needs T-053, T-055, T-056, T-057
+- **T-061** `validate` Wave 4 · Milestone 3: validation of the running product against the brief, contracts and guardrails; how to run it; known shortcuts up to date. Needs all above
 - **T-065** `implement` D-034: the hold moves into the feed; scope and claims narrowed. Started beside T-064's last delivery fix, at the user's request to remove bottlenecks; its delivery part follows that merge. Before T-052. Detail: `tasks/T-065-hold-in-the-feed.md`
 - **T-064** `implement` D-033: remove the Reset number from contracts and code; retire and delete organizations; G-031. Before T-052, T-053 and T-054. Detail: `tasks/T-064-reset-removal.md`
 
@@ -18,7 +18,6 @@ Work in flight. Order inside a section is priority. Finished work moves to `done
 
 ## Next
 
-- **T-061** `validate` Wave 4 · Milestone 3: validation of the running product against the brief, contracts and guardrails; how to run it; known shortcuts up to date. Needs all above
 - **T-038** `implement` Rules the prototype only approximates, kept as acceptance criteria for the build. Detail: `tasks/T-038-build-acceptance-from-e002.md`
 
 

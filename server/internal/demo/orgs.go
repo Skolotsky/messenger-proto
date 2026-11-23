@@ -73,6 +73,10 @@ func (s *Service) organizations(ctx context.Context) ([]contract.OrganizationEnt
 // abandonUnfinished retires any organization whose seed a crash left half done:
 // its log is not empty, so it can never be finished, and it was never shown.
 func (s *Service) abandonUnfinished(ctx context.Context) error {
+	// Seeding holds this lock from start to finish, so a seed this program is
+	// running right now (a Reset as it starts) is never taken for a crashed one.
+	s.prepareMu.Lock()
+	defer s.prepareMu.Unlock()
 	_, err := s.cfg.Pool.Exec(ctx, `UPDATE organizations SET state = 'retired' WHERE state = 'preparing' AND through IS NULL`)
 	return err
 }

@@ -3,6 +3,7 @@ import type { ConversationSummary } from '../api/types';
 import { listKey } from '../state/lists';
 import type { Feed } from '../state/useFeed';
 import type { Session } from '../state/useSession';
+import { AgentState, agentStateText } from './AgentState';
 import { Avatar } from './Avatar';
 import { Composer } from './Composer';
 import { useIsLooking } from './hooks';
@@ -117,6 +118,18 @@ export function ConversationView({
   const shownRows = rows ? [...rows, ...drafts] : rows;
   const writing = Object.values(session.replies).filter((r) => r.conversation === id && r.thread === thread);
 
+  // An agent's state is about now, so it stands on its newest message here, or on the reply it is writing.
+  const stateOn = new Set<string>();
+  const stateSeen = new Set(writing.map((r) => r.author));
+  for (const { message: m } of [...(shownRows ?? [])].reverse()) {
+    if (!m.author_is_agent || m.deleted || stateSeen.has(m.author)) continue;
+    stateSeen.add(m.author);
+    stateOn.add(m.id);
+  }
+  const directWith =
+    conversation.type === 'direct' ? session.people.get(conversation.people.find((p) => p !== session.me?.id) ?? '') : undefined;
+  const directState = !thread ? agentStateText(directWith, session) : null;
+
   const replies = thread && rows ? rows.slice(1).filter((r) => !r.message.deleted).length : 0;
   const subtitle = thread
     ? title
@@ -124,7 +137,7 @@ export function ConversationView({
       ? conversation.people.length
         ? `${conversation.people.length} members`
         : 'Channel'
-      : 'Direct message';
+      : directState ?? 'Direct message';
 
   return (
     <div className={`conv k-${thread ? 'thread side-thread' : conversation.type}`}>
@@ -181,6 +194,7 @@ export function ConversationView({
                   <div className="msg-main">
                     <div className="msg-head">
                       <b>{author?.name ?? r.author}</b>
+                      <AgentState person={author} session={session} />
                       <span className="edited">writing…</span>
                     </div>
                     <div className="msg-body">{r.text}</div>
@@ -209,6 +223,7 @@ export function ConversationView({
               inThread={thread !== null}
               isThreadOpen={openThread === row.message.id}
               onOpenThread={onOpenThread}
+              showAgentState={stateOn.has(row.message.id)}
             />
           )}
         />

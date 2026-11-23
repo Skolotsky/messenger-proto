@@ -27,6 +27,11 @@ type door struct {
 }
 
 func (d *door) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if strings.HasSuffix(r.URL.Path, "/status") { // a status has no ID and is not a step
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("{}"))
+		return
+	}
 	body, _ := io.ReadAll(r.Body)
 	var head struct {
 		Id string `json:"id"`

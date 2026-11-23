@@ -5,7 +5,7 @@ Every place the design knowingly cuts a corner, with what the full answer would 
 | Shortcut | Why it is acceptable now | The full answer |
 |---|---|---|
 | No sign-in, roles or private channels; a person switcher (D-009) | The bet is the feed, not access | Accounts, permissions checked at every door |
-| Search and notifications are fakes; the tray stands for push (brief, D-009) | The brief allows it; their boundaries are real | A search engine and a push or email provider behind the same contracts |
+| Search and notifications are stand-ins; a separate notification app stands for a phone (brief, D-022) | The brief allows it; their boundaries are real | A search engine and a push or email provider behind the same contracts |
 | People and agents are scripted (D-002) | Agents are not the product | Teams connect their own |
 | Agents may read every channel (D-008, proposed) | No access model yet | Reading rights granted per agent |
 | One database server with an area per part (D-005, proposed) | Independence is kept by rule and a check, not by hardware | A store per service |
@@ -22,4 +22,7 @@ Every place the design knowingly cuts a corner, with what the full answer would 
 | Every post writes a feed row per affected reader | Channels of 30 | Work out large channels when the feed is read |
 | No encryption between parts, no rate limits except on agents | Everything is local | Both |
 | Edit history, undoing a delete, snooze, do-not-disturb, email, digests (D-003, D-004, D-012) | Outside the bet | Product work |
+| An open screen asks every 10 s whether the feed is behind (every 5 s while the notice shows), so that cost grows with open screens | A few screens in a demonstration | A "behind" field on the regular `last_sent` message |
+| Actions waiting while offline live in the page's memory; reloading the page loses them | The product says they are waiting; a reload is a deliberate act | Keep them in the browser's storage |
+| Settings, dials, new channels and new direct messages are not queued offline | They say "Not saved" and change nothing | The same queue as messages |
 | Not offline; no real push (D-009) | Installable is enough for the first version | A service worker with a send queue; push |

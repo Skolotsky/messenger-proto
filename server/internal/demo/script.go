@@ -370,6 +370,9 @@ func (t *team) perform(ctx context.Context, p *play, index int, st democontent.S
 		if st.As != "" {
 			p.aliases[st.As] = m
 		}
+		if t.isAgent(st.Who) {
+			t.agentState(ctx, p, index, st, m.level)
+		}
 		return nil
 	}
 	if st.Do != "dial" && target == nil {
@@ -453,6 +456,28 @@ func (t *team) agentPost(ctx context.Context, st democontent.Step, id, conv stri
 	var posted contract.AgentPosted
 	err := t.agentCall(ctx, st.Who, "/messages", contract.AgentPost{Id: id, Conversation: conv, Thread: thread, Text: st.Text, Level: level, Mentions: t.mentions(st.Text)}, &posted)
 	return posted.Message, posted.Number, err
+}
+
+// agentState says what the agent is doing after this message, as a real agent would through its
+// door: stopped for the person a flag names, done after its last step here, otherwise working.
+// It is a courtesy on the screen, so a lost status never holds the script up.
+func (t *team) agentState(ctx context.Context, p *play, index int, st democontent.Step, level *contract.Level) {
+	status := contract.AgentStatus{State: "working"}
+	if level != nil && *level == "flag" {
+		for _, person := range t.mentions(st.Text) {
+			if !t.isAgent(person) {
+				status = contract.AgentStatus{State: "waiting", On: &person}
+				break
+			}
+		}
+	}
+	if status.State == "working" && !slices.ContainsFunc(p.sit.Steps[index+1:], func(next democontent.Step) bool { return next.Who == st.Who }) {
+		status.State = "done"
+	}
+	path := "/orgs/" + string(t.org) + "/agents/" + st.Who + "/status"
+	if err := t.s.conv.JSON(ctx, http.MethodPost, path, status, nil); err != nil {
+		slog.Warn("agent status not saved", "agent", st.Who, "err", err)
+	}
 }
 
 func (t *team) agentCall(ctx context.Context, agent, path string, in, out any) error {
