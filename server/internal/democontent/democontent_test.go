@@ -90,7 +90,7 @@ func TestSameSeedSameBytes(t *testing.T) {
 }
 
 // pinnedHistory is the SHA-256 of the default history's JSONL.
-const pinnedHistory = "094626e315e3bc94787d40e633aed4d23c946b881cf09bf05d59e17d5341a17d"
+const pinnedHistory = "3911537f6d248f594d342d94ae3d9fd855e4a4a5d472b1695b2b8045ea0f7734"
 
 func TestHistoryIsAValidLog(t *testing.T) {
 	c := load(t)
@@ -253,7 +253,8 @@ func TestSituationsCompileToValidChanges(t *testing.T) {
 		if len(out) == 0 {
 			t.Fatalf("situation %s writes nothing", s.ID)
 		}
-		checkLog(t, c, out, schema, h.Through)
+		// Whole: a situation may build on what stands in the seeded history (D-038).
+		checkLog(t, c, append(slices.Clip(h.Changes), out...), schema, 0)
 	}
 }
 

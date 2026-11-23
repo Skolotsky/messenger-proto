@@ -74,6 +74,11 @@ func TestSituationsProduceTheirOutcomesInTheRealRules(t *testing.T) {
 			prefix := fmt.Sprintf("replay%d_", i)
 			applied := 0
 			ids := map[string]string{}
+			for _, st := range s.Before {
+				if st.Do == "post" {
+					ids[st.As] = BeforeID(s.ID, st.As)
+				}
+			}
 			for n, st := range s.Steps {
 				partial := s
 				partial.Steps = s.Steps[:n+1]

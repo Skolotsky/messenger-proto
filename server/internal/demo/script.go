@@ -102,7 +102,13 @@ func (t *team) schedule() []*play {
 
 func (t *team) newPlay(sit *democontent.Situation, onCall bool) *play {
 	t.plays++
-	return &play{sit: sit, id: fmt.Sprintf("%s-%d", ids.New("p"), t.plays), onCall: onCall, aliases: map[string]*sent{}}
+	aliases := map[string]*sent{}
+	for _, st := range sit.Before { // already in the seeded history (D-038)
+		if st.Do == "post" {
+			aliases[st.As] = &sent{id: democontent.BeforeID(sit.ID, st.As), conv: st.In, level: levelOf(st.Level)}
+		}
+	}
+	return &play{sit: sit, id: fmt.Sprintf("%s-%d", ids.New("p"), t.plays), onCall: onCall, aliases: aliases}
 }
 
 func (t *team) nudge() {

@@ -205,7 +205,11 @@ export function feedReduce(model: FeedModel, event: FeedEvent): FeedModel {
       return { ...model, shown };
     }
     case 'show': {
-      return { ...model, shown: layOut(model.live), waiting: [], layout: model.layout + 1 };
+      // What was read leaves now, also if the feed has not confirmed it yet (D-003).
+      const live = Object.fromEntries(
+        Object.entries(model.live).filter(([, r]) => r.unread || r.kept || r.state === 'retracted'),
+      );
+      return { ...model, live, shown: layOut(live), waiting: [], layout: model.layout + 1 };
     }
     case 'read':
       return changeRow(model, event.key, (r) => ({ ...r, unread: false }), {});

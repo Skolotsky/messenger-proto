@@ -135,6 +135,7 @@ func (c *Content) Build(o Options) (*History, error) {
 	b.resolveFlags()
 	b.keptRows()
 	b.threadDials()
+	b.standingBefore()
 	b.visits()
 
 	slices.SortStableFunc(b.events, func(x, y event) int {
@@ -542,6 +543,36 @@ func (b *builder) threadDials() {
 			}
 			return nil
 		})
+	}
+}
+
+// standingBefore writes what the situations build on, on Monday evening: the viewer's
+// own messages and levels, so that the live script never has to act as the viewer (D-038).
+func (b *builder) standingBefore() {
+	evening := b.end.Truncate(24 * time.Hour).Add(-6 * time.Hour)
+	for i := range b.c.Situations {
+		s := &b.c.Situations[i]
+		made := map[string]*msg{}
+		for k, st := range s.Before {
+			at := evening.Add(time.Duration(i*3+k) * time.Minute)
+			b.schedule(at, func() error {
+				if st.Do == "dial" {
+					var thread *string
+					if m := made[st.To]; m != nil {
+						thread = &m.id
+					}
+					b.w.dial(at, st.Who, st.In, thread, st.Dial)
+					return nil
+				}
+				b.w.named = BeforeID(s.ID, st.As)
+				m, err := b.w.post(at, st.Who, st.In, nil, st.Text, st.Level)
+				if err != nil {
+					return fmt.Errorf("%s before: %w", s.ID, err)
+				}
+				made[st.As] = m
+				return nil
+			})
+		}
 	}
 }
 

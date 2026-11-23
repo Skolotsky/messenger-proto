@@ -2,6 +2,8 @@
 
 Finished work, newest first. One line each: what is now true and how it was verified. Commits carry the task ID, so `git log --grep T-nnn` finds the change.
 
+- 2026-11-23 · **T-072** `implement` The scripted team no longer acts as Maya (D-038). Verified: `./scripts/verify`; the whole demo played on a private copy, 42 of 42 steps, none failed, no log entry acting as Maya.
+- 2026-11-23 · **T-071** `implement` Activity has a Refresh button and shows two marks (D-037). Verified: browser tests at both widths, `./scripts/verify`, a screenshot of the played demo.
 - 2026-11-23 · **T-069** `implement` The Activity number counts what would notify the person; under Focus only, a quiet dot shows unread Needs you (D-036). Verified: browser tests at both widths seen failing first, `./scripts/verify` passed.
 - 2026-11-23 · **T-070** `visual` The project report is in the repo root and linked from the README: product, architecture, how AI was used, trade-offs and what was left out. Verified: links and layout in a browser at four widths; `./scripts/check`.
 - 2026-11-23 · **T-068** `visual` Three explainers added: the whole system as a clickable map, what can fail and what covers it, and how notifications decide. Verified: an independent read of an earlier version against the code found 21 inaccuracies, corrected; all 13 map flows run without errors at 1280 and 400 px. Not verified: the corrected wording was not re-read independently.

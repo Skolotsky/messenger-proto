@@ -21,18 +21,19 @@
 .badge { background: var(--flag); color: #fff; font-size: 11px; font-weight: 700; border-radius: 99px; min-width: 18px; height: 18px; padding: 0 5px; display: inline-grid; place-items: center; line-height: 1; }
 :root[data-theme="dark"] .badge { color: #2a0b08; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .badge { color: #2a0b08; } }
-.sk .side-item .badge { margin-left: auto; }
+.side-item .marks { margin-left: auto; }
 .nav { position: relative; }
-.nav .badge { position: absolute; top: 2px; left: calc(50% + 6px); }
+.nav .marks { position: absolute; top: 2px; left: calc(50% + 6px); }
 .h-count { font-size: 11px; font-weight: 700; color: var(--muted); background: var(--panel2); border-radius: 99px; min-width: 22px; height: 18px; box-sizing: border-box; padding: 0 4px; line-height: 18px; text-align: center; }
 .tab.on .h-count { color: var(--text); }
 .h-count.wait, .h-count.none { visibility: hidden; }
-.tab .badge, .badge-slot { min-width: 22px; height: 18px; box-sizing: border-box; flex: none; }
-.badge-slot { visibility: hidden; }
-/* The quiet mark for Needs you under Focus only (D-036), in the place a number would take. */
-.side-item .dot { margin-left: auto; }
-.tab .dot { margin: 0 7px; }
-.nav .dot { position: absolute; top: 5px; left: calc(50% + 8px); }
+/* Focus and Needs you, in their section colours; under Focus only the second is a dot (D-037). */
+.marks { display: inline-flex; align-items: center; gap: 3px; flex: none; }
+.marks .badge { box-sizing: border-box; }
+.marks .m-focus { background: var(--focus); }
+.marks .m-needs { background: var(--needs); }
+.marks .dot { background: var(--needs); margin: 0 5px; }
+.tab .marks { min-width: 41px; }
 /* over the list, so that saying something went wrong moves nothing */
 .feed-problem { position: absolute; top: 0; left: 0; right: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 16px; background: var(--flag-soft); color: var(--flag); font-size: 13px; box-shadow: var(--shadow); }
 .link { color: var(--accent); font-size: 12px; font-weight: 600; white-space: nowrap; flex: none; }

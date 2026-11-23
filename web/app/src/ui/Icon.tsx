@@ -6,6 +6,7 @@ const PATHS = {
     </>
   ),
   back: <path d="M15 5l-7 7 7 7" />,
+  refresh: <path d="M19 12a7 7 0 1 1-2.1-5M19 4v4h-4" />,
   chev: <path d="M6 9l6 6 6-6" />,
   chat: <path d="M4 5h16v11H9l-5 4z" />,
   pencil: <path d="M4 20l4-1 11-11-3-3L5 16z" />,

@@ -158,8 +158,7 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
             onOpen={openConversation}
             onSwitch={setAsking}
             onSettings={() => setSettings('account')}
-            attention={feed.attention}
-            quietUnread={feed.quietUnread}
+            marks={feed.marks}
             onSearchHit={openHit}
           />
           <Resizer panel="side" label="Resize the sidebar" width={widths.side} onResize={resize} onReset={reset} />
@@ -241,7 +240,7 @@ function Shell({ person, onChoose }: { person: string; onChoose(id: string): voi
             >
               <Icon name="bell" />
               <span>Activity</span>
-              <ActivityMark attention={feed.attention} quietUnread={feed.quietUnread} />
+              <ActivityMark marks={feed.marks} />
             </button>
             <button
               className={`nav${phoneView === 'chats' ? ' on' : ''}`}

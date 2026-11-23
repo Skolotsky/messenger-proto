@@ -1,4 +1,5 @@
 import type { ConversationSummary, PersonView } from '../api/types';
+import type { ActivityMarks } from '../state/useFeed';
 import type { Session } from '../state/useSession';
 import { agentStateText } from './AgentState';
 import { ActivityMark } from './ActivityMark';
@@ -20,14 +21,13 @@ interface Props {
   onOpen(conversation: string): void;
   onSwitch(person: PersonView): void;
   onSettings(): void;
-  /** What calls this person. It stays here while Activity is closed (D-023 point 12, D-036). */
-  attention: number;
-  quietUnread: boolean;
+  /** It stays here while Activity is closed (D-023 point 12, D-037). */
+  marks: ActivityMarks;
   onSearchHit(jump: Jump): void;
 }
 
 /** Organization, Activity, channels, direct messages, and the person's own menu (D-019, D-023). */
-export function Sidebar({ session, open, activityOpen, onToggleActivity, onOpen, onSwitch, onSettings, attention, quietUnread, onSearchHit }: Props) {
+export function Sidebar({ session, open, activityOpen, onToggleActivity, onOpen, onSwitch, onSettings, marks, onSearchHit }: Props) {
   const channels = session.conversations.filter((c) => c.type === 'channel');
   const directs = session.conversations.filter((c) => c.type === 'direct');
   const offline = useOfflineNotice(session.offlineSince);
@@ -84,7 +84,7 @@ export function Sidebar({ session, open, activityOpen, onToggleActivity, onOpen,
       >
         <Icon name="bell" />
         <span>Activity</span>
-        <ActivityMark attention={attention} quietUnread={quietUnread} />
+        <ActivityMark marks={marks} />
       </button>
       <div className="side-scroll">
         <nav className="chats" aria-label="Conversations">

@@ -5,7 +5,7 @@ test('choosing a tab moves no tab, and the tabs do not scroll up and down', asyn
   test.skip(isPhone(info), 'on a phone the row of tabs scrolls sideways');
   await start(page);
   const tabs = page.getByRole('navigation', { name: 'Activity views' });
-  const places = () => tabs.getByRole('button').evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().left * 10) / 10));
+  const places = () => tabs.getByRole('button').evaluateAll((els) => els.map((el) => Math.round((el.getBoundingClientRect().left + el.parentElement!.scrollLeft) * 10) / 10));
   await expect(tabs.locator('.h-count.wait')).toHaveCount(0); // the counts have arrived
   const before = await places();
   for (const name of [/^Direct/, /^Mentions/, /^Threads/, /^Reactions/, /^Feed/]) {

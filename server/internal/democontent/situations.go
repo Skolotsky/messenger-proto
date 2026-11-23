@@ -3,6 +3,7 @@ package democontent
 import (
 	"fmt"
 	"slices"
+	"strings"
 	"time"
 
 	"contexia/internal/shared/contract"
@@ -41,7 +42,10 @@ type Situation struct {
 	Outcome string `json:"outcome"`
 	Covers  string `json:"covers"`
 	Viewer  string `json:"viewer"`
-	Steps   []Step `json:"steps"`
+	// Before is what already stands in the seeded history when the script plays it:
+	// the viewer's own messages and levels. The script never acts as the viewer (D-038).
+	Before []Step `json:"before,omitempty"`
+	Steps  []Step `json:"steps"`
 }
 
 func (c *Content) checkSituation(s *Situation) error {
@@ -52,10 +56,30 @@ func (c *Content) checkSituation(s *Situation) error {
 		return fmt.Errorf("unknown viewer %q", s.Viewer)
 	}
 	seen := map[string]bool{}
+	for i, st := range s.Before {
+		if _, ok := c.people[st.Who]; !ok {
+			return fmt.Errorf("before %d: unknown person %q", i, st.Who)
+		}
+		if st.Do != "post" && st.Do != "dial" {
+			return fmt.Errorf("before %d: only a post or a dial can stand in the history", i)
+		}
+		if c.members[st.In] == nil {
+			return fmt.Errorf("before %d: no conversation %q", i, st.In)
+		}
+		if st.To != "" && !seen[st.To] {
+			return fmt.Errorf("before %d: %q is not an earlier message", i, st.To)
+		}
+		if st.As != "" {
+			seen[st.As] = true
+		}
+	}
 	expects := 0
 	for i, st := range s.Steps {
 		if _, ok := c.people[st.Who]; !ok {
 			return fmt.Errorf("step %d: unknown person %q", i, st.Who)
+		}
+		if st.Who == s.Viewer {
+			return fmt.Errorf("step %d: the script does not act as %s, who is watching (D-038)", i, st.Who)
 		}
 		needsTo := slices.Contains([]string{"reply", "edit", "delete", "react", "unreact", "read", "keep", "done"}, st.Do)
 		switch {
@@ -96,11 +120,27 @@ func (c *Content) checkSituation(s *Situation) error {
 	return nil
 }
 
+// BeforeID is the fixed ID of a message that stands in the seeded history for a situation.
+func BeforeID(situation, alias string) string {
+	return "msg_before_" + strings.ReplaceAll(situation, "-", "_") + "_" + alias
+}
+
 // Compile turns a situation into the changes it writes when played after the given
 // number and time. Each play gets its own message IDs through idPrefix.
 func (c *Content) Compile(s Situation, afterNumber int64, at time.Time, idPrefix string) ([]contract.Change, error) {
 	w := newWriter(c, afterNumber, at, idPrefix)
 	byAlias := map[string]*msg{}
+	for _, st := range s.Before {
+		if st.Do != "post" {
+			continue
+		}
+		mentions, err := w.checkedMentions(st.In, st.Who, st.Text)
+		if err != nil {
+			return nil, fmt.Errorf("%s before: %w", s.ID, err)
+		}
+		byAlias[st.As] = &msg{id: BeforeID(s.ID, st.As), conv: st.In, author: st.Who, number: 1, version: 1,
+			text: st.Text, mentions: mentions, level: st.Level, created: at.UTC().Format(stampFormat)}
+	}
 	now := at
 	for i, st := range s.Steps {
 		now = now.Add(time.Duration(st.AfterS * float64(time.Second)))

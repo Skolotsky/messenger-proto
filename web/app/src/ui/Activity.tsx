@@ -237,6 +237,12 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
     scroller.current?.scrollTo({ top: 0 }); // you asked for them: go to where they are
   };
 
+  /** The person asks for the list as it is now: what they read leaves, what waits comes in. */
+  const refresh = async () => {
+    if (view !== 'feed') await refreshHistory([view]);
+    showNew();
+  };
+
   const loadOlder = async () => {
     if (!person || view === 'feed') return;
     const after = history.paged === undefined ? history.answers[view]?.next : history.paged;
@@ -374,6 +380,9 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
             <button onClick={showNew}>Show</button>
           </div>
         )}
+        <button className="icon-btn" aria-label="Refresh" title="Refresh: clear what you have read and show what is new" onClick={() => void refresh()}>
+          <Icon name="refresh" />
+        </button>
         <button className="icon-btn" aria-label="Settings" title="Settings" onClick={() => onSettings('feed')}>
           <Icon name="rules" />
         </button>
@@ -384,7 +393,7 @@ export function Activity({ session, feed, onClose, onOpenRow, onOpenEntry, onSet
       <nav className="tabs" aria-label="Activity views">
         <button className={`tab${view === 'feed' ? ' on' : ''}`} aria-current={view === 'feed' || undefined} onClick={() => go('feed')}>
           <span className="tab-label" data-text="Feed">Feed</span>
-          <ActivityMark attention={feed.attention} quietUnread={feed.quietUnread} reserve />
+          <ActivityMark marks={feed.marks} reserve />
         </button>
         <span className="tabs-sep">History</span>
         {HISTORY_TABS.map(({ tab, label, short }) => {

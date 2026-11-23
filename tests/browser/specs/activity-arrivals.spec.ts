@@ -80,7 +80,7 @@ test('with Activity closed, or another view open, arrivals still raise the count
   const badge = isPhone(info)
     ? page.getByRole('navigation', { name: 'Main' }).locator('.badge')
     : page.locator('.side-item .badge');
-  await expect(badge).toHaveText(expected);
+  await expect.poll(async () => String((await badge.allTextContents()).reduce((sum, n) => sum + Number(n), 0))).toBe(expected);
 });
 
 test('coming back to the feed lays it out afresh, with no Show needed (D-003)', async ({ page, door }, info) => {

@@ -34,6 +34,7 @@ type writer struct {
 	at       time.Time
 	nextID   int
 	idPrefix string
+	named    string // the ID of the next message, when it must be known in advance
 
 	top      map[string]int64 // conversation: newest top-level number
 	inThread map[string]int64 // thread root: newest number in it
@@ -116,7 +117,11 @@ func (w *writer) post(at time.Time, author, conv string, root *msg, text, level 
 	}
 	n, prev, stamp := w.next(at)
 	w.nextID++
-	m := &msg{id: fmt.Sprintf("msg_%s%05d", w.idPrefix, w.nextID), conv: conv, author: author, root: root,
+	id := fmt.Sprintf("msg_%s%05d", w.idPrefix, w.nextID)
+	if w.named != "" {
+		id, w.named = w.named, ""
+	}
+	m := &msg{id: id, conv: conv, author: author, root: root,
 		number: n, version: 1, text: text, mentions: mentions, level: level, created: stamp}
 	w.add(contract.ChangeMessageCreated{Kind: "message.created", Org: w.org, Number: n, Previous: prev, At: stamp, Message: w.wire(m)})
 	if root == nil {
