@@ -29,7 +29,7 @@ Every operation and event of the eight contracts has a schema and a checked exam
 
 - 2026-11-22: Started after D-031 and D-032. Shapes the contracts leave to the schemas: screen update parts, feed row, history entry, settings, rule vocabulary.
 
-- 2026-11-22: Correction to commit 3c9e33a: its message lists "Go type losing a field" as caught, but that planted fault did not apply (the edit missed the aligned code), so the check passed without testing it. It was rerun with a fault that applied; the result is under Evidence.
+- 2026-11-22: Correction to commit 411ad1f: its message lists "Go type losing a field" as caught, but that planted fault did not apply (the edit missed the aligned code), so the check passed without testing it. It was rerun with a fault that applied; the result is under Evidence.
 
 - 2026-11-22: Harness built: clock a test build can move (`/test/clock`, absent from normal builds), troublemaker, recording receiver, start/stop/kill/freeze of real programs. Still to build after the schema review: the log writer and the mock door; two-organization support comes with the log writer.
 

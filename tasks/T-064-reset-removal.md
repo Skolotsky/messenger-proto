@@ -13,7 +13,7 @@ No contract, schema or product code knows a Reset number. A retired organization
 - [x] A retired organization accepts no action and workers deliver nothing more for it; doors answer `410 { "organization_gone": true }`. Check: integration tests.
 - [x] `seed.sealed` closes a seed session, and the feed rules write no notes before it. Check: rule test.
 - [x] Deleting one of two organizations, also when interrupted and repeated, leaves the other's rows, log entries and notifications unchanged and removes every row of the deleted one from every part. Check: `tests/guardrails/retire-and-delete` (G-031), seen failing.
-- [x] `tests/guardrails/saved-once` changes only by losing the `reset` key from its test data. Check: its diff (commit dd45ad6; T-064's branch left it and the other enforced tests byte-for-byte unchanged).
+- [x] `tests/guardrails/saved-once` changes only by losing the `reset` key from its test data. Check: its diff (commit a3dfb85; T-064's branch left it and the other enforced tests byte-for-byte unchanged).
 - [ ] `./scripts/check` and `./scripts/verify` pass. A fresh verifier checks this against D-033.
 
 ## Moved to later tasks, because the parts do not exist yet
@@ -25,7 +25,7 @@ No contract, schema or product code knows a Reset number. A retired organization
 ## Log
 
 - 2026-11-22: Started after the user accepted D-033 and its five readings.
-- 2026-11-22: `reset` removed (bd1da42). Retire, stop, delete per part, `seed.sealed` and G-031 built (f2a2b9f).
+- 2026-11-22: `reset` removed (8cf954f). Retire, stop, delete per part, `seed.sealed` and G-031 built (570ce6b).
 - 2026-11-22: A rule reading the log in order cannot tell a seeded change from a live one, so the log now says it: `seed.opened` starts a seeded history and `seed.sealed` ends it. A session without the opener writes no seal, so G-005 and G-003 needed no change. The rules decide from the log alone.
 - 2026-11-22: An independent verifier found that with two delivery copies a finished delete could leave rows in search, and that retiring alone did not stop delivery. Every copy now reads the durable mark (stopped or retired) before each receiver call; stop answers only when no copy holds a live claim, otherwise 503 "ask again". Place questions and wipes create nothing for a deleted organization, and no copy keeps a private memory of a stop.
 - 2026-11-22: A second independent check found that a receiver slower than the claim kept being delivered to after Delete. A copy now confirms and renews its claim in one statement before every receiver call and ends its turn if it is gone; a missing row counts as halted. `delivery_stopped` has a foreign key to the log; delivery's delete notes on the log row that its rows are gone, and Conversations refuses to delete before that; restart on a deleted organization answers 404.

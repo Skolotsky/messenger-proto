@@ -25,7 +25,7 @@ The real programs run together. What a person does at the door reaches search, t
 ## Log
 
 - 2026-11-23: harness, router and stand-in feed built while T-052 is in progress.
-- 2026-11-23: merged `main` at a27ef7c (T-052, T-053, T-054, T-056); every test now runs on the real feed.
+- 2026-11-23: merged `main` at 4c3567a (T-052, T-053, T-054, T-056); every test now runs on the real feed.
 
 ## Findings
 
@@ -46,7 +46,7 @@ The real programs run together. What a person does at the door reaches search, t
 
 ## Evidence
 
-Run on the real feed, merged at a27ef7c: `tests/e2e/run real -timeout 15m -tags t057faults -v ./e2e/... ./harness/router/ ./guardrails/freshness/ ./guardrails/orgs-apart/ ./guardrails/two-copies/`. It exits 1, for F-1 only.
+Run on the real feed, merged at 4c3567a: `tests/e2e/run real -timeout 15m -tags t057faults -v ./e2e/... ./harness/router/ ./guardrails/freshness/ ./guardrails/orgs-apart/ ./guardrails/two-copies/`. It exits 1, for F-1 only.
 
 - Spine: passes; the unread mention was sent about 5.3 s after its log timestamp.
 - G-013: 3,000 changes in 60 s; 19 in 20 within 26 ms (search), 33 ms (feed), 8 ms (another screen). With each feed delivery held 2.9 s it fails at 55 s.

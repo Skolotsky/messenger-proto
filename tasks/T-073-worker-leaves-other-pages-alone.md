@@ -34,7 +34,7 @@ All criteria met.
 
 - Before the fix: the spec failed at both widths on `/control/`, `/notifications/`, `/ops/feed/alive`, and on the entry address.
 - After: `service-worker.spec.ts` 16 of 16 on the built pages.
-- Old worker: 6 of 6 upgrading from a real build of commit e6f385e, with nothing cleared.
+- Old worker: 6 of 6 upgrading from a real build of commit 2109d09, with nothing cleared.
 - Real server: 10 of 10 on a private composed system (the 6 others need the local front to switch release).
 - `./scripts/check` passes. Browser lanes: wide 191 passed, phone 178 passed, 12 skipped between them; outside pages 112 passed.
 - Full `./scripts/verify` on this code: all 11 lanes passed in 227 s.
