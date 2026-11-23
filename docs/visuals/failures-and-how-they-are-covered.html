@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Failures, covered</title>
+<style>
+/* Layout: one reading column. Diagrams, tables and code may run wider inside their own scroll box. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --sunken: #eceef2; --line: #d8dce4;
+  --ink: #17202b; --ink-2: #445063; --ink-3: #5f6b7d;
+  --agent: #2351c9; --agent-soft: #e5ecfc; /* the agent's work, links */
+  --you: #a64b08; --you-soft: #fcebd9;     /* where the user's attention is needed */
+  --ok: #1b7548; --ok-soft: #e1f3e8;       /* recommended, holds, verified */
+  --risk: #b3261e; --risk-soft: #fbe8e6;   /* risk, broken, not verified */
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Cascadia Code", "Cascadia Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+    --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+    --agent: #86a8ff; --agent-soft: #1b2a4c;
+    --you: #f2a766; --you-soft: #3b2814;
+    --ok: #62cf99; --ok-soft: #14301f;
+    --risk: #ff8f85; --risk-soft: #3d1815;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+  --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+  --agent: #86a8ff; --agent-soft: #1b2a4c;
+  --you: #f2a766; --you-soft: #3b2814;
+  --ok: #62cf99; --ok-soft: #14301f;
+  --risk: #ff8f85; --risk-soft: #3d1815;
+  color-scheme: dark;
+}
+
+/* Base */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--font); }
+.page {
+  max-width: 880px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 34px;
+}
+section, .stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+h1 { font: 650 27px/1.2 var(--display); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h2 { font: 650 18.5px/1.3 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 650 14.5px/1.35 var(--font); margin: 0; }
+p { margin: 0; max-width: 68ch; }
+ul, ol { margin: 0; padding-left: 1.25em; display: flex; flex-direction: column; gap: 5px; max-width: 68ch; }
+a { color: var(--agent); }
+strong { font-weight: 650; }
+code { font: 0.88em var(--mono); background: var(--sunken); border: 1px solid var(--line); border-radius: 4px; padding: 0.08em 0.36em; overflow-wrap: anywhere; }
+:focus-visible { outline: 2px solid var(--agent); outline-offset: 2px; }
+.label { font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.note { color: var(--ink-3); font-size: 13.5px; }
+
+/* Header */
+.top { display: flex; flex-direction: column; gap: 8px; }
+.lede { font-size: 16.5px; color: var(--ink-2); max-width: 62ch; }
+
+/* Needs you: the one thing the user has to decide or answer */
+.ask { background: var(--you-soft); border: 1px solid color-mix(in srgb, var(--you) 40%, transparent); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.ask .label { color: var(--you); }
+
+/* Chips */
+.chip { display: inline-flex; align-items: center; font: 600 12px/1 var(--font); padding: 4px 9px; border-radius: 999px; background: var(--sunken); color: var(--ink-2); white-space: nowrap; }
+.chip.you { background: var(--you-soft); color: var(--you); }
+.chip.agent { background: var(--agent-soft); color: var(--agent); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.risk { background: var(--risk-soft); color: var(--risk); }
+
+/* Panels side by side */
+.split { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.panel.you .label { color: var(--you); }
+.panel.agent .label { color: var(--agent); }
+.files { list-style: none; padding: 0; gap: 7px; }
+.files li { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.files span { color: var(--ink-2); font-size: 13.5px; }
+
+/* Lanes: who does what, phase by phase. Children in order: three .head cells, then .phase, .you, .agent per row */
+.lanes { display: grid; grid-template-columns: minmax(128px, 0.75fr) 1.25fr 1.5fr; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.lanes > * { padding: 12px 14px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin: -1px 0 0 -1px; min-width: 0; }
+.lanes > .head { background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.lanes > .head.you { color: var(--you); background: var(--sunken); }
+.lanes > .head.agent { color: var(--agent); }
+.lanes > .phase { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.lanes > .phase strong { font: 650 15px/1.3 var(--display); }
+.lanes > .phase .say { color: var(--ink-2); font-size: 13.5px; }
+.lanes > .you { background: color-mix(in srgb, var(--you-soft) 60%, var(--surface)); }
+.lanes > .you.idle { background: var(--surface); color: var(--ink-3); }
+@media (max-width: 600px) {
+  .lanes { grid-template-columns: 1fr 1.2fr; }
+  .lanes > .head.first { display: none; }
+  .lanes > .phase { grid-column: 1 / -1; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--sunken); padding-block: 8px; }
+}
+
+/* Options: a choice, side by side */
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.option { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.option.pick { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+.option header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.option dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; font-size: 14px; }
+.option dt { font-weight: 650; color: var(--ink-3); }
+.option dd { margin: 0; min-width: 0; }
+.brief { border: 1px dashed var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+/* Steps: what happens, in order */
+.steps { list-style: none; padding: 0; gap: 0; counter-reset: step; max-width: none; }
+.steps > li { counter-increment: step; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding-bottom: 16px; position: relative; }
+.steps > li::before { content: counter(step); width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; font: 600 13px var(--mono); color: var(--ink-2); position: relative; z-index: 1; }
+.steps > li:not(:last-child)::after { content: ""; position: absolute; left: 13.5px; top: 28px; bottom: 0; width: 1px; background: var(--line); }
+.steps > li:last-child { padding-bottom: 0; }
+.steps .body { display: flex; flex-direction: column; gap: 5px; padding-top: 3px; min-width: 0; }
+
+/* Figures: diagrams and snippets */
+figure { margin: 0; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+figcaption { font-size: 13px; color: var(--ink-3); max-width: 68ch; }
+.diagram .scroll { overflow-x: auto; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; }
+.diagram svg { display: block; min-width: 680px; width: 100%; height: auto; color: var(--ink-3); font-family: var(--font); }
+.diagram .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
+.diagram .box-you { fill: var(--you-soft); stroke: var(--you); stroke-width: 1.25; }
+.diagram .box-agent { fill: var(--agent-soft); stroke: var(--agent); stroke-width: 1.25; }
+.diagram .box-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.25; }
+.diagram .box-risk { fill: var(--risk-soft); stroke: var(--risk); stroke-width: 1.25; }
+.diagram .t { fill: var(--ink); font-size: 13px; font-weight: 650; }
+.diagram .t2 { fill: var(--ink-2); font-size: 11px; }
+.diagram .edge { stroke: currentColor; stroke-width: 1.5; fill: none; }
+.diagram .edge-label { fill: var(--ink-2); font-size: 11px; }
+.snippet pre { margin: 0; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; overflow-x: auto; font: 13px/1.5 var(--mono); }
+.snippet pre code { background: none; border: 0; padding: 0; font: inherit; overflow-wrap: normal; }
+.snippet mark { background: var(--you-soft); color: inherit; border-radius: 3px; padding: 0 2px; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+thead th { border-top: 0; background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Depth on demand */
+details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 0 16px; }
+details > summary { cursor: pointer; padding: 11px 0; font-weight: 650; }
+details[open] { padding-bottom: 14px; }
+details > .stack { gap: 10px; }
+
+/* Footer */
+.foot { border-top: 1px solid var(--line); padding-top: 14px; color: var(--ink-3); font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body>
+<main class="page">
+<header class="top">
+  <div class="label">Contexia · failure map</div>
+  <h1>What can fail, and what covers it</h1>
+  <p class="lede">Fourteen failures, from a copy of a program dying to the clock jumping backwards. The table shows what people see and what covers each one. Three are explained below, along with the one failure that is not covered.</p>
+</header>
+
+<div class="ask">
+  <div class="label">Status</div>
+  <p>This page describes the designed behaviour. Timings come from the contracts, and each guardrail's current status is in <code>docs/guardrails.md</code>. The demonstration runs one copy of each program, and two copies run only in the tests, behind a small router.</p>
+</div>
+
+<section>
+  <h2>Four ideas cover almost everything</h2>
+  <div class="split">
+    <div class="panel"><div class="label">1 · The truth is saved first</div><p>Apart from the live pieces of an agent's unfinished reply, nothing is pushed, delivered or answered before it is committed in PostgreSQL together with its log entry. Everything after that can be repeated from the log.</p></div>
+    <div class="panel"><div class="label">2 · Everyone keeps their own place</div><p>Each screen, each worker per receiver, each agent, the feed and the notification sender remember the last number they have. After any failure they ask "what comes after my number?".</p></div>
+    <div class="panel"><div class="label">3 · Repeating is harmless</div><p>Actions carry an ID. The feed takes only the next change. Search keeps the newest version. A notification name is sent once. So "send it again" is always safe.</p></div>
+  </div>
+  <div class="split">
+    <div class="panel"><div class="label">4 · Whatever is held, is held with a time limit</div><p>A worker's claim, a copy's lease and a "watching" each end by themselves if their holder disappears. A held notification is saved and waits for the feed to return.</p></div>
+    <div class="panel"><div class="label">And programs keep nothing that matters in memory</div><p>Any copy can be killed. Connections are rebuilt from what screens and the database know, and an agent's per-minute count starts fresh.</p></div>
+    <div class="panel"><div class="label">A part that is behind says so</div><p>"Reconnecting", "Catching up", "may be out of date", "the last N minutes may be missing". A surface more than about 10 seconds behind says so.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>The map</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Failure</th><th>Covered by</th><th>People notice</th></tr></thead>
+    <tbody>
+      <tr><td><a href="#f1">1</a></td><td>A copy of Conversations dies</td><td>Another copy takes its organizations; screens resume by number</td><td>"Reconnecting" if away over 10 s</td></tr>
+      <tr><td>2</td><td>It dies around the moment of saving</td><td>One transaction, action IDs</td><td>A message "waiting" for a moment</td></tr>
+      <tr><td>3</td><td>A live update is lost, or a connection drops</td><td>Numbered updates, resume</td><td>Usually nothing</td></tr>
+      <tr><td>4</td><td>A delivery worker dies</td><td>Claims that run out; places in the database</td><td>Nothing</td></tr>
+      <tr><td>5</td><td>The feed dies or is down</td><td>Changes wait in the log; the feed takes only the next one</td><td>"Catching up" in Activity only</td></tr>
+      <tr><td>6</td><td>Search is down or slow</td><td>Its own worker and place; retries with growing pauses</td><td>"Search is unavailable" only</td></tr>
+      <tr><td>7</td><td>A receiver refuses one change</td><td>Parking after three tries</td><td>Nothing, or one stale search result</td></tr>
+      <tr><td><a href="#f8">8</a></td><td>The feed's own code fails on one change</td><td>A fence around one conversation</td><td>Its rows "may be out of date"</td></tr>
+      <tr><td><a href="#f9">9</a></td><td>The notification sender is down, or dies while sending</td><td>Notes wait in order; names sent once; the feed holds by the log's clock</td><td>A late notification, marked "delayed" after 10 minutes</td></tr>
+      <tr><td>10</td><td>A nudge is lost</td><td>A check every 5 seconds</td><td>A badge up to 5 s late</td></tr>
+      <tr><td>11</td><td>A copy freezes, then wakes up</td><td>Leases; a dead copy can start no watching</td><td>Waiting messages and paused updates</td></tr>
+      <tr><td>12</td><td>The machine clock steps backwards</td><td>Log timestamps never decrease; holds counted by the log's clock</td><td>Nothing</td></tr>
+      <tr><td>13</td><td>An agent is away, or dies mid-reply</td><td>Its own numbered events; abandoned replies are closed</td><td>A reply marked "stopped"</td></tr>
+      <tr><td><a href="#f14">14</a></td><td>PostgreSQL is down</td><td><strong>Not covered</strong> in this build</td><td>Everything stops</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="f1"><h2>1 · A copy of Conversations dies</h2><p>Suppose two copies run, as they do in the tests. Each organization is served by one of them. Copy A, which serves acme, dies. Copy B needs nothing prepared: it holds no state about acme and learns everything from the screens and the database.</p><figure class="diagram"><div class="scroll"><svg viewBox="0 0 900 692" role="img" aria-label="Copy A of Conversations dies. Lena&#x27;s screen reconnects, the router sends the organization to copy B, the screen says its last numbers, B reads the missing changes from PostgreSQL and sends them, waiting actions are sent again with their IDs, and housekeeping cleans up what A held."><defs><marker id="ar11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs><rect class="box-you" x="32" y="14" width="128" height="36" rx="6"/><text class="t" x="96" y="37" text-anchor="middle">Lena&#x27;s screen</text><line class="edge" x1="96" y1="50" x2="96" y2="684" stroke-dasharray="2 5"/><rect class="box" x="209" y="14" width="128" height="36" rx="6"/><text class="t" x="273" y="37" text-anchor="middle">Router</text><line class="edge" x1="273" y1="50" x2="273" y2="684" stroke-dasharray="2 5"/><rect class="box-agent" x="386" y="14" width="128" height="36" rx="6"/><text class="t" x="450" y="37" text-anchor="middle">Copy A</text><line class="edge" x1="450" y1="50" x2="450" y2="684" stroke-dasharray="2 5"/><rect class="box-agent" x="563" y="14" width="128" height="36" rx="6"/><text class="t" x="627" y="37" text-anchor="middle">Copy B</text><line class="edge" x1="627" y1="50" x2="627" y2="684" stroke-dasharray="2 5"/><rect class="box-ok" x="740" y="14" width="128" height="36" rx="6"/><text class="t" x="804" y="37" text-anchor="middle">PostgreSQL</text><line class="edge" x1="804" y1="50" x2="804" y2="684" stroke-dasharray="2 5"/><rect class="box-risk" x="365" y="76" width="170" height="46" rx="6"/><text class="t" x="450" y="95" text-anchor="middle">dies</text><text class="t2" x="450" y="111" text-anchor="middle">its connections break</text><line class="edge" x1="96" y1="170" x2="269" y2="170" marker-end="url(#ar11)"/><text class="edge-label" style="paint-order:stroke;stroke:var(--sunken);stroke-width:5px;stroke-linejoin:round" x="184" y="162" text-anchor="middle">reconnect to /orgs/acme/live</text><text class="t" style="paint-order:stroke;stroke:var(--sunken);stroke-width:5px;stroke-linejoin:round" x="22" y="174" text-anchor="middle">1</text><rect class="box-agent" x="87" y="176" width="194" height="18" rx="9"/><text class="t2" x="184" y="189" text-anchor="middle">after 0.1 s, doubling to 1 s</text><rect class="box-ok" x="183" y="204" width="180" height="46" rx="6"/><text class="t" x="273" y="223" text-anchor="middle">A is taken out:</text><text class="t2" x="273" y="239" text-anchor="middle">acme now goes to B</text><line class="edge" x1="273" y1="298" x2="623" y2="298" marker-end="url(#ar11)"/><text class="edge-label" style="paint-order:stroke;stroke:var(--sunken);stroke-width:5px;stroke-linejoin:round" x="450" y="290" text-anchor="middle">the connection, for acme</text><text class="t" style="paint-order:stroke;stroke:var(--sunken);stroke-width:5px;stroke-linejoin:round" x="22" y="302" text-anchor="middle">2</text><line class="edge" x1="96" y1="342" x2="623" y2="342" marker-end="url(#ar11)"/><text class="edge-label" style="paint-order:stroke;stroke:var(--sunken);stroke-width:5px;stroke-linejoin:round" x="362" y="334" text-anchor="middle">resume { conversations 4855, feed 97 }</text><text class="t" style="paint-order:stroke;stroke:var(--sunken);stroke-width:5px;stroke-linejoin:round" x="22" y="346" text-anchor="middle">3</text><rect class="box-ok" x="258" y="348" width="207" height="18" rx="9"/><text class="t2" x="362" y="361" text-anchor="middle">the screen keeps its own place</text><line class="edge" x1="627" y1="406" x2="800" y2="406" marker-end="url(#ar11)"/><text class="edge-label" style="paint-order:stroke;stroke:var(--sunken);stroke-width:5px;stroke-linejoin:round" x="716" y="398" text-anchor="middle">acme&#x27;s changes after 4855?</text><text class="t" style="paint-order:stroke;stroke:var(--sunken);stroke-width:5px;stroke-linejoin:round" x="22" y="410" text-anchor="middle">4</text><line class="edge" x1="627" y1="450" x2="100" y2="450" marker-end="url(#ar11)"/><text class="edge-label" style="paint-order:stroke;stroke:var(--sunken);stroke-width:5px;stroke-linejoin:round" x="362" y="442" text-anchor="middle">updates 4856 … 4861, in order</text><text class="t" style="paint-order:stroke;stroke:var(--sunken);stroke-width:5px;stroke-linejoin:round" x="22" y="454" text-anchor="middle">5</text><rect class="box-ok" x="252" y="456" width="220" height="18" rx="9"/><text class="t2" x="362" y="469" text-anchor="middle">level within 2 s of reconnecting</text><line class="edge" x1="96" y1="514" x2="623" y2="514" marker-end="url(#ar11)"/><text class="edge-label" style="paint-order:stroke;stroke:var(--sunken);stroke-width:5px;stroke-linejoin:round" x="362" y="506" text-anchor="middle">actions that were waiting, with the same IDs</text><text class="t" style="paint-order:stroke;stroke:var(--sunken);stroke-width:5px;stroke-linejoin:round" x="22" y="518" text-anchor="middle">6</text><rect class="box-ok" x="305" y="520" width="112" height="18" rx="9"/><text class="t2" x="362" y="533" text-anchor="middle">idempotency key</text><line class="edge" x1="96" y1="578" x2="623" y2="578" marker-end="url(#ar11)"/><text class="edge-label" style="paint-order:stroke;stroke:var(--sunken);stroke-width:5px;stroke-linejoin:round" x="362" y="570" text-anchor="middle">&quot;#launch is open in front of me&quot;</text><text class="t" style="paint-order:stroke;stroke:var(--sunken);stroke-width:5px;stroke-linejoin:round" x="22" y="582" text-anchor="middle">7</text><rect class="box-ok" x="646" y="592" width="250" height="62" rx="6"/><text class="t" x="771" y="611" text-anchor="middle">A&#x27;s lease runs out after 15 s</text><text class="t2" x="771" y="627" text-anchor="middle">housekeeping ends what A was watching</text><text class="t2" x="771" y="643" text-anchor="middle">A can start no watching</text></svg></div></figure><div class="split"><div class="panel you"><div class="label">What people see</div><p>Screens reconnect by themselves. If that takes more than 10 seconds, they say "Reconnecting". What is on screen stays. A message typed meanwhile shows as waiting and is sent afterwards. Other organizations on copy B notice nothing.</p></div><div class="panel"><div class="label">What covers it</div><p>The screen reconnects by itself and states its last numbers. The router sends acme to a live copy. That copy reads the missing changes from the log. Waiting actions are sent again with the same IDs, so nothing is saved twice. The screen says again what is open in front of it. Agents ask again from their own place.</p></div><div class="panel"><div class="label">How long · guardrail</div><p>Level within 2 s of reconnecting. In the tests, the test itself moves acme. A production router would use health checks, and it is not built. Watchings held by A end within about 25 s. Guardrails: G-015 and G-027 (an organization moved between two copies mid-burst).</p></div></div></section>
+<section id="f8"><h2>8 · The feed cannot apply one change</h2><p>A fault in the feed’s own rules on one particular change. The feed cannot skip it (order matters) and must not stop everything.</p><div class="split"><div class="panel you"><div class="label">What people see</div><p>Rows in that conversation, or that reader's rows in it, are marked "may be out of date". Every other row is exact.</p></div><div class="panel"><div class="label">What covers it</div><p>The change is set aside and a fence goes up around the one conversation, or the one reader in it. Later changes inside the fence are set aside too; notifications on hold inside it are dropped. A fault on an organization-wide change, or more than five fences, stops that organization’s feed and no other. Repair: fix the fault, rebuild that organization’s feed from the log.</p></div><div class="panel"><div class="label">How long · guardrail</div><p>Until the rebuild, which takes under 2 minutes for the seeded team. Guardrails: G-009 and G-020.</p></div></div></section><section id="f9"><h2>9 · The notification sender is down, or dies while sending</h2><p>The sender stops for minutes, or dies between sending a notification and noting that it did.</p><div class="split"><div class="panel you"><div class="label">What people see</div><p>A notification arrives late; more than 10 minutes late it is marked "delayed". Never one for something read within the 5-second hold. If you read it after that while the sender is down, it still arrives late, marked as read.</p></div><div class="panel"><div class="label">What covers it</div><p>Notes wait in the feed’s own log and are delivered in order. Each notification has a fixed name and a name is sent once; the list of sent names survives even a wipe of the sender. The feed runs the 5-second hold by timestamps in the log, so a read within the hold cancels it however late the feed is, and the sender is never told. With a real push provider the rule would be "rather twice than never", with the name as the provider’s duplicate key.</p></div><div class="panel"><div class="label">How long · guardrail</div><p>As long as the outage. Guardrails: G-010 (stopped 5 and 11 minutes, killed between sending and noting, wiped) and G-011.</p></div></div></section><section id="f14">
+  <h2>14 · PostgreSQL is down: not covered</h2>
+  <p>Every program survives the loss of a copy of itself, but all of them depend on the one database. If it stops, nothing can be saved or read until it is back. Nothing saved is lost, and everything resumes from its place afterwards, but the product is down meanwhile.</p>
+  <div class="split">
+    <div class="panel you"><div class="label">What people see</div><p>"Reconnecting", and messages that stay waiting.</p></div>
+    <div class="panel"><div class="label">The production answer</div><p>A standby database that confirms each write and takes over automatically, usually within tens of seconds. The design allows it; it is not built or tested here.</p></div>
+    <div class="panel"><div class="label">Also not built</div><p>The router in front of Conversations; a second database for spreading organizations; trimming of old log entries.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>The last resort: rebuild</h2>
+  <p>The feed, the search index and the notification sender hold copies, never originals. If one is damaged or its rules were wrong, it is emptied for one organization and filled again from that organization's log. The sender keeps its list of names already sent, so nobody is notified twice. Guardrail G-020: under 2 minutes for the seeded team, and the other organization untouched.</p>
+</section>
+
+<footer class="foot"><span>Contexia. <a href="the-whole-map.html">The whole map</a> · <a href="how-notifications-decide.html">How notifications decide</a></span></footer>
+</main>
+</body>
+</html>

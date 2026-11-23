@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How Notifications Decide</title>
+<style>
+/* Layout: one reading column. Diagrams, tables and code may run wider inside their own scroll box. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --sunken: #eceef2; --line: #d8dce4;
+  --ink: #17202b; --ink-2: #445063; --ink-3: #5f6b7d;
+  --agent: #2351c9; --agent-soft: #e5ecfc; /* the agent's work, links */
+  --you: #a64b08; --you-soft: #fcebd9;     /* where the user's attention is needed */
+  --ok: #1b7548; --ok-soft: #e1f3e8;       /* recommended, holds, verified */
+  --risk: #b3261e; --risk-soft: #fbe8e6;   /* risk, broken, not verified */
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Cascadia Code", "Cascadia Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+    --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+    --agent: #86a8ff; --agent-soft: #1b2a4c;
+    --you: #f2a766; --you-soft: #3b2814;
+    --ok: #62cf99; --ok-soft: #14301f;
+    --risk: #ff8f85; --risk-soft: #3d1815;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10151c; --surface: #181f29; --sunken: #131921; --line: #2b3543;
+  --ink: #e8edf4; --ink-2: #b7c1cf; --ink-3: #8b97a8;
+  --agent: #86a8ff; --agent-soft: #1b2a4c;
+  --you: #f2a766; --you-soft: #3b2814;
+  --ok: #62cf99; --ok-soft: #14301f;
+  --risk: #ff8f85; --risk-soft: #3d1815;
+  color-scheme: dark;
+}
+
+/* Base */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--font); }
+.page {
+  max-width: 880px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 34px;
+}
+section, .stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+h1 { font: 650 27px/1.2 var(--display); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h2 { font: 650 18.5px/1.3 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 650 14.5px/1.35 var(--font); margin: 0; }
+p { margin: 0; max-width: 68ch; }
+ul, ol { margin: 0; padding-left: 1.25em; display: flex; flex-direction: column; gap: 5px; max-width: 68ch; }
+a { color: var(--agent); }
+strong { font-weight: 650; }
+code { font: 0.88em var(--mono); background: var(--sunken); border: 1px solid var(--line); border-radius: 4px; padding: 0.08em 0.36em; overflow-wrap: anywhere; }
+:focus-visible { outline: 2px solid var(--agent); outline-offset: 2px; }
+.label { font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.note { color: var(--ink-3); font-size: 13.5px; }
+
+/* Header */
+.top { display: flex; flex-direction: column; gap: 8px; }
+.lede { font-size: 16.5px; color: var(--ink-2); max-width: 62ch; }
+
+/* Needs you: the one thing the user has to decide or answer */
+.ask { background: var(--you-soft); border: 1px solid color-mix(in srgb, var(--you) 40%, transparent); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.ask .label { color: var(--you); }
+
+/* Chips */
+.chip { display: inline-flex; align-items: center; font: 600 12px/1 var(--font); padding: 4px 9px; border-radius: 999px; background: var(--sunken); color: var(--ink-2); white-space: nowrap; }
+.chip.you { background: var(--you-soft); color: var(--you); }
+.chip.agent { background: var(--agent-soft); color: var(--agent); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.risk { background: var(--risk-soft); color: var(--risk); }
+
+/* Panels side by side */
+.split { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.panel.you .label { color: var(--you); }
+.panel.agent .label { color: var(--agent); }
+.files { list-style: none; padding: 0; gap: 7px; }
+.files li { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.files span { color: var(--ink-2); font-size: 13.5px; }
+
+/* Lanes: who does what, phase by phase. Children in order: three .head cells, then .phase, .you, .agent per row */
+.lanes { display: grid; grid-template-columns: minmax(128px, 0.75fr) 1.25fr 1.5fr; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.lanes > * { padding: 12px 14px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin: -1px 0 0 -1px; min-width: 0; }
+.lanes > .head { background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.lanes > .head.you { color: var(--you); background: var(--sunken); }
+.lanes > .head.agent { color: var(--agent); }
+.lanes > .phase { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.lanes > .phase strong { font: 650 15px/1.3 var(--display); }
+.lanes > .phase .say { color: var(--ink-2); font-size: 13.5px; }
+.lanes > .you { background: color-mix(in srgb, var(--you-soft) 60%, var(--surface)); }
+.lanes > .you.idle { background: var(--surface); color: var(--ink-3); }
+@media (max-width: 600px) {
+  .lanes { grid-template-columns: 1fr 1.2fr; }
+  .lanes > .head.first { display: none; }
+  .lanes > .phase { grid-column: 1 / -1; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--sunken); padding-block: 8px; }
+}
+
+/* Options: a choice, side by side */
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.option { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.option.pick { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+.option header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.option dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; font-size: 14px; }
+.option dt { font-weight: 650; color: var(--ink-3); }
+.option dd { margin: 0; min-width: 0; }
+.brief { border: 1px dashed var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+/* Steps: what happens, in order */
+.steps { list-style: none; padding: 0; gap: 0; counter-reset: step; max-width: none; }
+.steps > li { counter-increment: step; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding-bottom: 16px; position: relative; }
+.steps > li::before { content: counter(step); width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; font: 600 13px var(--mono); color: var(--ink-2); position: relative; z-index: 1; }
+.steps > li:not(:last-child)::after { content: ""; position: absolute; left: 13.5px; top: 28px; bottom: 0; width: 1px; background: var(--line); }
+.steps > li:last-child { padding-bottom: 0; }
+.steps .body { display: flex; flex-direction: column; gap: 5px; padding-top: 3px; min-width: 0; }
+
+/* Figures: diagrams and snippets */
+figure { margin: 0; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+figcaption { font-size: 13px; color: var(--ink-3); max-width: 68ch; }
+.diagram .scroll { overflow-x: auto; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; }
+.diagram svg { display: block; min-width: 680px; width: 100%; height: auto; color: var(--ink-3); font-family: var(--font); }
+.diagram .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.25; }
+.diagram .box-you { fill: var(--you-soft); stroke: var(--you); stroke-width: 1.25; }
+.diagram .box-agent { fill: var(--agent-soft); stroke: var(--agent); stroke-width: 1.25; }
+.diagram .box-ok { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.25; }
+.diagram .box-risk { fill: var(--risk-soft); stroke: var(--risk); stroke-width: 1.25; }
+.diagram .t { fill: var(--ink); font-size: 13px; font-weight: 650; }
+.diagram .t2 { fill: var(--ink-2); font-size: 11px; }
+.diagram .edge { stroke: currentColor; stroke-width: 1.5; fill: none; }
+.diagram .edge-label { fill: var(--ink-2); font-size: 11px; }
+.snippet pre { margin: 0; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; overflow-x: auto; font: 13px/1.5 var(--mono); }
+.snippet pre code { background: none; border: 0; padding: 0; font: inherit; overflow-wrap: normal; }
+.snippet mark { background: var(--you-soft); color: inherit; border-radius: 3px; padding: 0 2px; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+thead th { border-top: 0; background: var(--sunken); font: 600 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Depth on demand */
+details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 0 16px; }
+details > summary { cursor: pointer; padding: 11px 0; font-weight: 650; }
+details[open] { padding-bottom: 14px; }
+details > .stack { gap: 10px; }
+
+/* Footer */
+.foot { border-top: 1px solid var(--line); padding-top: 14px; color: var(--ink-3); font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body>
+<main class="page">
+<style>
+.pos{border-left:4px solid var(--ok);background:var(--ok-soft);border-radius:0 8px 8px 0;padding:12px 16px;display:flex;flex-direction:column;gap:6px}
+.pos .label{color:var(--ok)}.pos p{font-size:16px;line-height:1.55;max-width:70ch}
+.ask10{font:600 19px/1.4 var(--display);color:var(--ink);border-left:4px solid var(--you);padding:2px 0 2px 14px;max-width:62ch}
+.why10{color:var(--ink-2)}
+.push{display:flex;flex-direction:column;gap:9px}.push div{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:9px 13px}.push b{display:block;font-weight:650;margin-bottom:2px}
+.conc{border-left:4px solid var(--risk);background:var(--risk-soft);border-radius:0 8px 8px 0;padding:10px 16px}.conc b{color:var(--risk)}
+.wd{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px}.wd div{background:var(--sunken);border-radius:7px;padding:8px 12px;font-size:14px}.wd b{display:block;font-weight:650}
+.lad{display:flex;flex-direction:column;gap:6px}.lad>div{display:grid;grid-template-columns:150px minmax(0,1fr) 112px;gap:10px;align-items:center;padding:9px 12px;border-radius:7px;border:1px solid var(--line);background:var(--surface)}
+.lad b{font-weight:650}.lad .st{font:650 12px var(--mono);text-align:right}.lad .a{border-color:var(--ok);background:var(--ok-soft)}.lad .b{border-color:var(--agent);background:var(--agent-soft)}.lad .c{border-color:var(--you);background:var(--you-soft)}.lad .d{border-style:dashed}
+.tl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.tl>div{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px}.tl ol{font-size:14px;margin-top:5px}.tl .bad{border-color:var(--risk)}.tl .good{border-color:var(--ok)}
+.toc a{display:block;padding:3px 0}
+@media (max-width:640px){.lad>div{grid-template-columns:minmax(0,1fr)}.lad .st{text-align:left}.tl{grid-template-columns:minmax(0,1fr)}.ask10{font-size:17px}}
+</style><style>
+.rule12{display:flex;flex-direction:column;gap:9px}
+.big12{font:600 19px/1.4 var(--display);border-left:4px solid var(--you);padding:2px 0 2px 14px;max-width:62ch}
+.say12{border-left:4px solid var(--ok);background:var(--ok-soft);border-radius:0 8px 8px 0;padding:12px 16px}
+.say12 p{font-size:16px;max-width:70ch}.say12 .label{color:var(--ok);margin-bottom:5px}
+.tlc{display:flex;flex-direction:column;gap:3px}.tlh{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}.tlh b{font-weight:650}
+.res{font:650 12px var(--mono);padding:2px 8px;border-radius:5px;white-space:nowrap}.res.y{background:var(--you-soft);color:var(--you)}.res.n{background:var(--ok-soft);color:var(--ok)}
+.tlc svg{display:block;width:100%;min-width:640px;height:auto}.tlc .wrap12{overflow-x:auto;background:var(--sunken);border:1px solid var(--line);border-radius:7px}
+.tlc .why12{font-size:14px;color:var(--ink-2)}
+.yes{color:var(--you);font-weight:650}.no{color:var(--ink-3)}
+</style>
+<header class="top">
+  <div class="label">Contexia · notification rules</div>
+  <h1>How notifications decide</h1>
+  <p class="lede">The feed waits for you. A notification interrupts you. So the rules are about one question: when is it worth breaking someone’s concentration? This page explains those rules, the five-second wait, and what happens afterwards. It is about behaviour, not about the program that delivers them.</p>
+</header>
+
+<div class="ask">
+  <div class="label">Status</div>
+  <p>These rules come from the product decisions D-004, D-012, D-014, D-015 and D-034, and they are built in the Activity feed.</p>
+</div>
+
+<section class="rule12">
+  <h2>The whole thing in six rules</h2>
+  <div class="table-wrap"><table><thead><tr><th></th><th>Rule</th><th>Why</th></tr></thead><tbody>
+    <tr><td>1</td><td><strong>Only Focus and Needs you can notify.</strong> For your information never does.</td><td>An interruption should mean “this is for you”.</td></tr>
+    <tr><td>2</td><td><strong>One notification per row, not per message.</strong></td><td>Six replies in a thread are one reason to look.</td></tr>
+    <tr><td>3</td><td><strong>A row can notify again</strong> after you read it and something new arrives, or if it moves up into Focus while unread.</td><td>Those are new reasons to look.</td></tr>
+    <tr><td>4</td><td><strong>Wait five seconds first.</strong> If it stops being deserved in that time, nobody is interrupted.</td><td>A notification cannot be taken back, while a typo or a quick delete is common.</td></tr>
+    <tr><td>5</td><td><strong>Count those seconds by the log’s time,</strong> never by a machine’s clock.</td><td>A system running late must reach the same decision as a healthy one.</td></tr>
+    <tr><td>6</td><td><strong>Once sent, deliver it only once, and keep its entry truthful.</strong></td><td>It cannot be recalled, but it can stop being misleading.</td></tr>
+  </tbody></table></div>
+</section>
+
+<section class="rule12">
+  <h2>The life of one notification</h2>
+<figure class="diagram"><div class="scroll"><svg viewBox="0 0 900 300" role="img" aria-label="A row becomes unread in a bucket that notifies. The notification is held for five seconds. If it stops being deserved it is cancelled and nobody is interrupted. If not, it is released and delivered once. After that it cannot be recalled, but its entry shows the current truth.">
+<defs><marker id="l12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+<rect class="box-you" x="16" y="40" width="190" height="82" rx="7"/><text class="t" x="111" y="68" text-anchor="middle">A row becomes unread</text><text class="t2" x="111" y="88" text-anchor="middle">in Focus or Needs you</text><text class="t2" x="111" y="105" text-anchor="middle">“this deserves an interruption”</text>
+<rect class="box-agent" x="256" y="40" width="170" height="82" rx="7"/><text class="t" x="341" y="68" text-anchor="middle">Held for 5 seconds</text><text class="t2" x="341" y="88" text-anchor="middle">time to make it</text><text class="t2" x="341" y="105" text-anchor="middle">unnecessary</text>
+<rect class="box-ok" x="476" y="40" width="170" height="82" rx="7"/><text class="t" x="561" y="68" text-anchor="middle">Delivered once</text><text class="t2" x="561" y="88" text-anchor="middle">with the latest text</text><text class="t2" x="561" y="105" text-anchor="middle">cannot be recalled</text>
+<rect class="box" x="696" y="40" width="188" height="82" rx="7"/><text class="t" x="790" y="68" text-anchor="middle">Shows current truth</text><text class="t2" x="790" y="88" text-anchor="middle">“read”, “message deleted”,</text><text class="t2" x="790" y="105" text-anchor="middle">or the edited text</text>
+<rect class="box-risk" x="246" y="196" width="190" height="82" rx="7"/><text class="t" x="341" y="224" text-anchor="middle">Cancelled</text><text class="t2" x="341" y="244" text-anchor="middle">nobody was interrupted</text><text class="t2" x="341" y="261" text-anchor="middle">the sender never hears of it</text>
+<line class="edge" x1="206" y1="81" x2="252" y2="81" marker-end="url(#l12)"/><line class="edge" x1="426" y1="81" x2="472" y2="81" marker-end="url(#l12)"/><line class="edge" x1="646" y1="81" x2="692" y2="81" marker-end="url(#l12)"/><line class="edge" x1="341" y1="122" x2="341" y2="192" marker-end="url(#l12)"/>
+<text class="edge-label" x="350" y="152">nothing unread on the row</text><text class="edge-label" x="350" y="168">deserves it any more</text><text class="edge-label" x="449" y="32" text-anchor="middle">5 s passed</text><text class="edge-label" x="669" y="32" text-anchor="middle">later</text>
+</svg></div><figcaption>The whole idea: decide that something deserves an interruption, wait briefly in case it stops deserving one, then deliver it exactly once.</figcaption></figure>
+</section>
+
+<section class="rule12" id="who">
+  <h2>Who holds this logic</h2>
+  <p class="big12">The Activity feed holds all of it. Everyone else either supplies facts or delivers the result.</p>
+  <figure class="diagram"><div class="scroll"><svg viewBox="0 0 900 590" role="img" aria-label="Conversations records facts and clock ticks in the change log. A delivery worker hands them in order to the Activity feed. Inside the feed, the rules decide whether something should interrupt, a held notification waits, a clock tick releases it, and a send note goes into the note log. A second delivery worker hands the note to the notification sender, which delivers each name once to the notification app.">
+  <defs><marker id="w12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+  <rect class="box-you" x="16" y="24" width="130" height="72" rx="7"/><text class="t" x="81" y="52" text-anchor="middle">Screens</text><text class="t2" x="81" y="71" text-anchor="middle">send, read,</text><text class="t2" x="81" y="86" text-anchor="middle">edit, delete</text>
+  <rect class="box-agent" x="196" y="24" width="210" height="72" rx="7"/><text class="t" x="301" y="48" text-anchor="middle">Conversations</text><text class="t2" x="301" y="67" text-anchor="middle">records what happened</text><text class="t2" x="301" y="84" text-anchor="middle">housekeeping writes clock ticks</text>
+  <rect class="box-ok" x="456" y="24" width="150" height="72" rx="7"/><text class="t" x="531" y="52" text-anchor="middle">Change log</text><text class="t2" x="531" y="71" text-anchor="middle">facts and ticks,</text><text class="t2" x="531" y="86" text-anchor="middle">in one order</text>
+  <rect class="box-agent" x="656" y="24" width="228" height="72" rx="7"/><text class="t" x="770" y="52" text-anchor="middle">Delivery worker</text><text class="t2" x="770" y="71" text-anchor="middle">hands each change to the feed</text><text class="t2" x="770" y="86" text-anchor="middle">knows nothing about notifications</text>
+  <line class="edge" x1="146" y1="60" x2="192" y2="60" marker-end="url(#w12)"/><line class="edge" x1="406" y1="60" x2="452" y2="60" marker-end="url(#w12)"/><line class="edge" x1="606" y1="60" x2="652" y2="60" marker-end="url(#w12)"/>
+  <rect x="16" y="150" width="868" height="256" rx="10" fill="var(--you-soft)" stroke="var(--you)" stroke-width="2"/><text class="t" x="34" y="176">Activity feed: all the notification logic lives here</text>
+  <path class="edge" d="M770 96 L770 124 L140 124 L140 196" marker-end="url(#w12)"/><path class="edge" d="M745 124 L745 196" marker-end="url(#w12)"/>
+  <text class="edge-label" x="150" y="118">messages, reads, edits, deletes, dials</text><text class="edge-label" x="664" y="118">clock ticks</text>
+  <rect class="box-ok" x="36" y="200" width="210" height="88" rx="7"/><text class="t" x="141" y="225" text-anchor="middle">1 · The rules</text><text class="t2" x="141" y="245" text-anchor="middle">Should this interrupt this person?</text><text class="t2" x="141" y="261" text-anchor="middle">Is it still deserved?</text><text class="t2" x="141" y="277" text-anchor="middle">bucket, one per row, Focus only</text>
+  <rect class="box-agent" x="336" y="200" width="210" height="88" rx="7"/><text class="t" x="441" y="225" text-anchor="middle">2 · Held notifications</text><text class="t2" x="441" y="245" text-anchor="middle">a table in the feed</text><text class="t2" x="441" y="261" text-anchor="middle">name, person, row, due time</text><text class="t2" x="441" y="277" text-anchor="middle">saved with the row</text>
+  <rect class="box-ok" x="640" y="200" width="226" height="88" rx="7"/><text class="t" x="753" y="225" text-anchor="middle">3 · Release</text><text class="t2" x="753" y="245" text-anchor="middle">on each tick: which held entries</text><text class="t2" x="753" y="261" text-anchor="middle">are more than 5 s old</text><text class="t2" x="753" y="277" text-anchor="middle">by the log’s time?</text>
+  <line class="edge" x1="246" y1="232" x2="332" y2="232" marker-end="url(#w12)"/><text class="edge-label" x="289" y="224" text-anchor="middle">add</text>
+  <line class="edge" x1="246" y1="264" x2="332" y2="264" stroke="var(--risk)" marker-end="url(#w12)"/><text class="edge-label" x="289" y="281" text-anchor="middle">or cancel</text>
+  <line class="edge" x1="640" y1="244" x2="550" y2="244" marker-end="url(#w12)"/><text class="edge-label" x="595" y="236" text-anchor="middle">take</text>
+  <rect class="box-agent" x="640" y="322" width="226" height="66" rx="7"/><text class="t" x="753" y="346" text-anchor="middle">4 · Note log</text><text class="t2" x="753" y="365" text-anchor="middle">send · update</text><text class="t2" x="753" y="380" text-anchor="middle">the feed’s own outbox</text>
+  <line class="edge" x1="753" y1="288" x2="753" y2="318" marker-end="url(#w12)"/><text class="edge-label" x="760" y="308">send</text>
+  <path class="edge" d="M141 288 L141 356 L636 356" marker-end="url(#w12)"/><text class="edge-label" x="154" y="349">after it was sent: update (“read”, “deleted”, new text)</text>
+  <rect class="box-agent" x="640" y="460" width="226" height="72" rx="7"/><text class="t" x="753" y="488" text-anchor="middle">Delivery worker</text><text class="t2" x="753" y="507" text-anchor="middle">hands each note to the sender</text><text class="t2" x="753" y="522" text-anchor="middle">retries until confirmed</text>
+  <rect class="box" x="336" y="460" width="230" height="72" rx="7"/><text class="t" x="451" y="484" text-anchor="middle">Notification sender</text><text class="t2" x="451" y="503" text-anchor="middle">makes no decisions</text><text class="t2" x="451" y="519" text-anchor="middle">remembers names, sends each once</text>
+  <rect class="box-you" x="36" y="460" width="210" height="72" rx="7"/><text class="t" x="141" y="488" text-anchor="middle">Notification app</text><text class="t2" x="141" y="507" text-anchor="middle">stands in for a phone</text><text class="t2" x="141" y="522" text-anchor="middle">shows each entry’s current truth</text>
+  <line class="edge" x1="753" y1="388" x2="753" y2="456" marker-end="url(#w12)"/><line class="edge" x1="640" y1="496" x2="570" y2="496" marker-end="url(#w12)"/><line class="edge" x1="336" y1="496" x2="250" y2="496" marker-end="url(#w12)"/>
+  <text class="edge-label" x="450" y="568" text-anchor="middle">Nothing below the feed can change whether a notification is deserved.</text>
+  </svg></div><figcaption>Green decides, blue stores or moves, and the outlined area is the one owner. The cancel path never leaves the feed, so the sender does not know a cancelled notification existed.</figcaption></figure>
+  <div class="split">
+    <div class="panel"><div class="label">Why the feed</div><p>Whether something deserves an interruption depends on buckets, dials, Focus rules and what the person has read. The feed is the only part that already knows all of these.</p></div>
+    <div class="panel"><div class="label">Why not the sender</div><p>It would need a second copy of the rules and of everyone’s read state. In production it would be an outside service we do not own.</p></div>
+    <div class="panel"><div class="label">The cost</div><p>If the feed is down, no new notification can be decided. They wait and go out late. A late notification was judged better than a wrong one.</p></div>
+  </div>
+</section>
+
+<section class="rule12">
+  <h2>Rule 1 · What is allowed to interrupt</h2>
+  <p class="big12">A notification means a row just became unread in a bucket that notifies.</p>
+  <p>There are no separate notification settings per channel. The dials you already use for the feed decide, because they decide the bucket. That keeps one mental model: if something would land in Needs you, it can notify. If it would land in For your information, it stays quiet.</p>
+  <div class="split">
+    <div class="panel"><div class="label">Default</div><p>Focus and Needs you notify.</p></div>
+    <div class="panel"><div class="label">“Focus only”</div><p>One personal switch. Only Focus notifies, so you hear about what you chose and what was flagged for you.</p></div>
+    <div class="panel"><div class="label">Left out on purpose</div><p>Quiet hours, sounds, email, digests and reminders. Each is real product work, and none is needed to test the idea.</p></div>
+  </div>
+</section>
+
+<section class="rule12">
+  <h2>Rule 4 · The five-second wait</h2>
+  <p class="big12">Send nothing for five seconds, so that a mistake or a quick read can make the interruption unnecessary.</p>
+  <p>Notifications are the one thing in the product that cannot be undone. Once a phone has buzzed, the attention is already spent. And the first seconds after sending are exactly when people fix typos, delete the wrong message, or when the other person is already reading. A short wait removes those interruptions at a cost nobody notices.</p>
+  <h3>What cancels it</h3>
+  <div class="table-wrap"><table><thead><tr><th>During the hold</th><th>What happens</th></tr></thead><tbody>
+    <tr><td>You read the row, on any device</td><td>Cancelled</td></tr>
+    <tr><td>The message is deleted</td><td>Cancelled, unless something else unread on the row still deserves it</td></tr>
+    <tr><td>Your mention is edited away, or a reaction is taken back</td><td>Same rule</td></tr>
+    <tr><td>You turn that channel or thread’s dial down</td><td>Same rule: if nothing there still earns a notifying bucket, it is cancelled</td></tr>
+    <tr><td>The text is edited</td><td>Not cancelled. It goes out with the latest text</td></tr>
+    <tr><td>The feed cannot apply a change in that conversation (a fence)</td><td>Cancelled, because the row can no longer be trusted</td></tr>
+  </tbody></table></div>
+  <h3>Four situations, on a clock</h3>
+<div class="tlc"><div class="tlh"><b>Nothing happens</b><span class="res y">sent at about 6 s</span></div><div class="wrap12"><svg viewBox="0 0 680 118" role="img" aria-label="Nothing happens: sent at about 6 s"><rect x="34" y="52" width="300" height="14" rx="3" fill="var(--you-soft)" stroke="var(--you)"/><text x="329" y="63" text-anchor="end" font-size="10" fill="var(--you)">hold</text><line x1="334" y1="59" x2="634" y2="59" stroke="var(--ink-3)" stroke-width="1"/><line x1="34" y1="66" x2="34" y2="71" stroke="var(--ink-3)"/><text x="34" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">0s</text><line x1="94" y1="66" x2="94" y2="71" stroke="var(--ink-3)"/><text x="94" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">1s</text><line x1="154" y1="66" x2="154" y2="71" stroke="var(--ink-3)"/><text x="154" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">2s</text><line x1="214" y1="66" x2="214" y2="71" stroke="var(--ink-3)"/><text x="214" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">3s</text><line x1="274" y1="66" x2="274" y2="71" stroke="var(--ink-3)"/><text x="274" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">4s</text><line x1="334" y1="66" x2="334" y2="71" stroke="var(--ink-3)"/><text x="334" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">5s</text><line x1="394" y1="66" x2="394" y2="71" stroke="var(--ink-3)"/><text x="394" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">6s</text><line x1="454" y1="66" x2="454" y2="71" stroke="var(--ink-3)"/><text x="454" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">7s</text><line x1="514" y1="66" x2="514" y2="71" stroke="var(--ink-3)"/><text x="514" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">8s</text><line x1="574" y1="66" x2="574" y2="71" stroke="var(--ink-3)"/><text x="574" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">9s</text><line x1="634" y1="66" x2="634" y2="71" stroke="var(--ink-3)"/><text x="634" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">10s</text><line x1="34" y1="52" x2="34" y2="34" stroke="var(--agent)" stroke-width="1.5"/><circle cx="34" cy="59" r="4" fill="var(--agent)"/><text x="34" y="28" text-anchor="start" font-size="11" font-weight="600" fill="var(--ink)">Anna mentions you</text><path d="M394 8 L394 48" stroke="var(--risk)" stroke-width="2"/><path d="M389 42 L394 51 L399 42" fill="none" stroke="var(--risk)" stroke-width="2"/><text x="401" y="16" font-size="11" font-weight="650" fill="var(--risk)">sent</text></svg></div><p class="why12">The hold passes, and the next clock tick in the log releases it.</p></div><div class="tlc"><div class="tlh"><b>You read it quickly</b><span class="res n">nothing sent</span></div><div class="wrap12"><svg viewBox="0 0 680 118" role="img" aria-label="You read it quickly: nothing sent"><rect x="34" y="52" width="300" height="14" rx="3" fill="var(--you-soft)" stroke="var(--you)"/><text x="329" y="63" text-anchor="end" font-size="10" fill="var(--you)">hold</text><line x1="334" y1="59" x2="634" y2="59" stroke="var(--ink-3)" stroke-width="1"/><line x1="34" y1="66" x2="34" y2="71" stroke="var(--ink-3)"/><text x="34" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">0s</text><line x1="94" y1="66" x2="94" y2="71" stroke="var(--ink-3)"/><text x="94" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">1s</text><line x1="154" y1="66" x2="154" y2="71" stroke="var(--ink-3)"/><text x="154" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">2s</text><line x1="214" y1="66" x2="214" y2="71" stroke="var(--ink-3)"/><text x="214" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">3s</text><line x1="274" y1="66" x2="274" y2="71" stroke="var(--ink-3)"/><text x="274" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">4s</text><line x1="334" y1="66" x2="334" y2="71" stroke="var(--ink-3)"/><text x="334" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">5s</text><line x1="394" y1="66" x2="394" y2="71" stroke="var(--ink-3)"/><text x="394" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">6s</text><line x1="454" y1="66" x2="454" y2="71" stroke="var(--ink-3)"/><text x="454" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">7s</text><line x1="514" y1="66" x2="514" y2="71" stroke="var(--ink-3)"/><text x="514" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">8s</text><line x1="574" y1="66" x2="574" y2="71" stroke="var(--ink-3)"/><text x="574" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">9s</text><line x1="634" y1="66" x2="634" y2="71" stroke="var(--ink-3)"/><text x="634" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">10s</text><line x1="34" y1="52" x2="34" y2="34" stroke="var(--agent)" stroke-width="1.5"/><circle cx="34" cy="59" r="4" fill="var(--agent)"/><text x="34" y="28" text-anchor="start" font-size="11" font-weight="600" fill="var(--ink)">Anna mentions you</text><line x1="154" y1="86" x2="154" y2="95" stroke="var(--agent)" stroke-width="1.5"/><circle cx="154" cy="59" r="4" fill="var(--agent)"/><text x="154" y="108" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">you read it</text></svg></div><p class="why12">This is the most common case the hold exists for.</p></div><div class="tlc"><div class="tlh"><b>Anna deletes it</b><span class="res n">nothing sent</span></div><div class="wrap12"><svg viewBox="0 0 680 118" role="img" aria-label="Anna deletes it: nothing sent"><rect x="34" y="52" width="300" height="14" rx="3" fill="var(--you-soft)" stroke="var(--you)"/><text x="329" y="63" text-anchor="end" font-size="10" fill="var(--you)">hold</text><line x1="334" y1="59" x2="634" y2="59" stroke="var(--ink-3)" stroke-width="1"/><line x1="34" y1="66" x2="34" y2="71" stroke="var(--ink-3)"/><text x="34" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">0s</text><line x1="94" y1="66" x2="94" y2="71" stroke="var(--ink-3)"/><text x="94" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">1s</text><line x1="154" y1="66" x2="154" y2="71" stroke="var(--ink-3)"/><text x="154" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">2s</text><line x1="214" y1="66" x2="214" y2="71" stroke="var(--ink-3)"/><text x="214" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">3s</text><line x1="274" y1="66" x2="274" y2="71" stroke="var(--ink-3)"/><text x="274" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">4s</text><line x1="334" y1="66" x2="334" y2="71" stroke="var(--ink-3)"/><text x="334" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">5s</text><line x1="394" y1="66" x2="394" y2="71" stroke="var(--ink-3)"/><text x="394" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">6s</text><line x1="454" y1="66" x2="454" y2="71" stroke="var(--ink-3)"/><text x="454" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">7s</text><line x1="514" y1="66" x2="514" y2="71" stroke="var(--ink-3)"/><text x="514" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">8s</text><line x1="574" y1="66" x2="574" y2="71" stroke="var(--ink-3)"/><text x="574" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">9s</text><line x1="634" y1="66" x2="634" y2="71" stroke="var(--ink-3)"/><text x="634" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">10s</text><line x1="34" y1="52" x2="34" y2="34" stroke="var(--agent)" stroke-width="1.5"/><circle cx="34" cy="59" r="4" fill="var(--agent)"/><text x="34" y="28" text-anchor="start" font-size="11" font-weight="600" fill="var(--ink)">Anna mentions you</text><line x1="214" y1="86" x2="214" y2="95" stroke="var(--agent)" stroke-width="1.5"/><circle cx="214" cy="59" r="4" fill="var(--agent)"/><text x="214" y="108" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">Anna deletes it</text></svg></div><p class="why12">A deleted mistake stays deleted, and you never knew it happened.</p></div><div class="tlc"><div class="tlh"><b>Someone replied before the delete</b><span class="res y">sent, about the reply</span></div><div class="wrap12"><svg viewBox="0 0 680 118" role="img" aria-label="Someone replied before the delete: sent, about the reply"><rect x="34" y="52" width="300" height="14" rx="3" fill="var(--you-soft)" stroke="var(--you)"/><text x="329" y="63" text-anchor="end" font-size="10" fill="var(--you)">hold</text><line x1="334" y1="59" x2="634" y2="59" stroke="var(--ink-3)" stroke-width="1"/><line x1="34" y1="66" x2="34" y2="71" stroke="var(--ink-3)"/><text x="34" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">0s</text><line x1="94" y1="66" x2="94" y2="71" stroke="var(--ink-3)"/><text x="94" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">1s</text><line x1="154" y1="66" x2="154" y2="71" stroke="var(--ink-3)"/><text x="154" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">2s</text><line x1="214" y1="66" x2="214" y2="71" stroke="var(--ink-3)"/><text x="214" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">3s</text><line x1="274" y1="66" x2="274" y2="71" stroke="var(--ink-3)"/><text x="274" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">4s</text><line x1="334" y1="66" x2="334" y2="71" stroke="var(--ink-3)"/><text x="334" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">5s</text><line x1="394" y1="66" x2="394" y2="71" stroke="var(--ink-3)"/><text x="394" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">6s</text><line x1="454" y1="66" x2="454" y2="71" stroke="var(--ink-3)"/><text x="454" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">7s</text><line x1="514" y1="66" x2="514" y2="71" stroke="var(--ink-3)"/><text x="514" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">8s</text><line x1="574" y1="66" x2="574" y2="71" stroke="var(--ink-3)"/><text x="574" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">9s</text><line x1="634" y1="66" x2="634" y2="71" stroke="var(--ink-3)"/><text x="634" y="82" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">10s</text><line x1="34" y1="52" x2="34" y2="34" stroke="var(--agent)" stroke-width="1.5"/><circle cx="34" cy="59" r="4" fill="var(--agent)"/><text x="34" y="28" text-anchor="start" font-size="11" font-weight="600" fill="var(--ink)">Anna replies</text><line x1="154" y1="86" x2="154" y2="95" stroke="var(--agent)" stroke-width="1.5"/><circle cx="154" cy="59" r="4" fill="var(--agent)"/><text x="154" y="108" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">Lena replies</text><line x1="244" y1="52" x2="244" y2="34" stroke="var(--agent)" stroke-width="1.5"/><circle cx="244" cy="59" r="4" fill="var(--agent)"/><text x="244" y="28" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">Anna deletes it</text><path d="M394 8 L394 48" stroke="var(--risk)" stroke-width="2"/><path d="M389 42 L394 51 L399 42" fill="none" stroke="var(--risk)" stroke-width="2"/><text x="401" y="16" font-size="11" font-weight="650" fill="var(--risk)">sent</text></svg></div><p class="why12">In a thread you started, Anna replies, Lena replies, and Anna deletes hers. The row is still unread and Lena’s reply still earns Needs you, so the notification survives and now speaks of Lena’s reply. It must never show the deleted text.</p></div>
+</section>
+
+<section class="rule12">
+  <h2>Rule 5 · Why the time comes from the log</h2>
+  <p>This is the part that sounds technical, but the idea is simple. “Five seconds” must mean five seconds <em>between the events</em>, not five seconds on the clock of whichever program happens to be looking. Every change in the log has a timestamp. The feed handles changes in log order. So it always sees a read before it sees any time later than that read.</p>
+<div class="tl">
+<div class="bad"><b>Counting on a machine’s clock</b><ol><li>10:14:00 Anna mentions Marco</li><li>10:14:01 Marco reads it</li><li>The feed is two minutes behind</li><li>It reaches the mention at 10:16:00: “that is old, send it”</li></ol><p style="margin-top:6px;font-size:14px;color:var(--risk)">Marco is notified about something already read two minutes ago.</p></div>
+<div class="good"><b>Counting on the log’s clock</b><ol><li>10:14:00 Anna mentions Marco</li><li>10:14:01 Marco reads it</li><li>The feed is two minutes behind, but takes the log in order</li><li>It meets the read before any tick past 10:14:05</li></ol><p style="margin-top:6px;font-size:14px;color:var(--ok)">Cancelled. However late the feed is, the answer is the same.</p></div>
+</div>
+  <h3>The clock tick</h3>
+  <p>One problem remains. If nothing else happens after a mention, the log goes silent and nothing would ever say “five seconds have passed”. So the log gets a small entry called a <strong>tick</strong>, about once a second while an organization is active, until one is stamped at least six seconds after the last real change. An idle organization gets no ticks and costs nothing.</p>
+  <div class="split">
+    <div class="panel"><div class="label">Why “within 8 seconds”</div><p>5 s of hold, up to about 1.5 s for the next tick that is late enough, then delivery. That is the promise when everything is healthy.</p></div>
+    <div class="panel"><div class="label">The term</div><p>Time from the log is <strong>event time</strong>; time on a machine is <strong>processing time</strong>. A tick works as a <strong>watermark</strong>: “everything up to this moment has been seen”.</p></div>
+  </div>
+</section>
+
+<section class="rule12">
+  <h2>Rule 6 · After it is sent</h2>
+  <p>A notification already delivered cannot be recalled. What we can do is make sure its entry never misleads. The notification app shows each entry in its current state: the edited text, “message deleted”, or read. This is the same principle the whole product follows: show the current truth.</p>
+  <p>Each notification has a fixed name, such as <code>acme / marco / #launch:msg_7Q2 / 4812</code>: the organization, the person, the row and the change that caused it. The sender remembers the names it has sent, so a repeated delivery changes nothing.</p>
+</section>
+
+<footer class="foot"><span>Contexia. <a href="the-whole-map.html">The whole map</a> · <a href="failures-and-how-they-are-covered.html">What can fail</a></span></footer>
+</main>
+</body>
+</html>
