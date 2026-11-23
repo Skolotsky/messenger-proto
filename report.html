@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contexia Project Report</title>
+<style>
+:root{--bg:#e9ecf1;--page:#fff;--ink:#1c2230;--soft:#566072;--line:#d8dde6;--panel:#f5f7fa;--accent:#2f5fd0;--accent-bg:#e8effd;--green:#1d7a55;--green-bg:#e4f4ed;--amber:#94600a;--amber-bg:#fcf1dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1116;--page:#14181f;--ink:#e8ebf1;--soft:#a3adbd;--line:#333b48;--panel:#1d232d;--accent:#8fb0f5;--accent-bg:#20304f;--green:#6fd0a8;--green-bg:#17352a;--amber:#ecbd6a;--amber-bg:#3b2d14}}
+:root[data-theme="dark"]{--bg:#0e1116;--page:#14181f;--ink:#e8ebf1;--soft:#a3adbd;--line:#333b48;--panel:#1d232d;--accent:#8fb0f5;--accent-bg:#20304f;--green:#6fd0a8;--green-bg:#17352a;--amber:#ecbd6a;--amber-bg:#3b2d14}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:12.6px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+h2.ch{font-size:22px;line-height:1.2;margin:0}
+h3{font-size:14.5px;margin:20px 0 7px}
+p{margin:0}
+.lead{font-size:13.4px;margin-top:4px;color:var(--soft)}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;list-style:none;padding:0;margin:0}
+.flow.six{grid-template-columns:repeat(6,1fr)}
+.flow li{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 7px;font-size:11.2px;line-height:1.3;color:var(--soft)}
+.flow b{display:block;color:var(--ink);font-size:11.8px}
+.note{margin-top:6px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.attention{display:grid;grid-template-columns:292px 1fr;gap:14px}
+.feed{border:1px solid var(--line);border-radius:8px;padding:7px;background:var(--panel);font-size:11.3px;line-height:1.28}
+.feed h3{font-size:10.3px;margin:5px 2px 3px;text-transform:uppercase;letter-spacing:.05em}
+.feed h3:first-child{margin-top:0}
+.f{color:var(--accent)}.n{color:var(--amber)}.i{color:var(--soft)}
+.row{background:var(--page);border:1px solid var(--line);border-radius:5px;padding:4px 6px;margin-bottom:3px}
+.row small{display:block;color:var(--soft);font-size:10.3px}
+.caption{font-size:10.3px;color:var(--soft);margin:3px 2px 0}
+ul.plain{margin:0;padding-left:15px}
+ul.plain li{margin-bottom:2px}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11.8px;line-height:1.3}
+th{font-size:11px;text-align:left;color:var(--soft);font-weight:600}
+th,td{padding:3px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+td:first-child,th:first-child{padding-left:0}
+.w36 td:first-child,.w36 th:first-child{width:36%}
+.w22 td:first-child,.w22 th:first-child{width:22%}
+.result{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:6px}
+.result div{background:var(--green-bg);border-radius:6px;padding:6px 8px;font-size:11.3px;line-height:1.28}
+.result b{display:block;font-size:12px;color:var(--green)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cards div{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:7px 9px;font-size:11.5px;line-height:1.32}
+.cards b{display:block;font-size:12.2px;margin-bottom:2px}
+.cards em{display:block;font-style:normal;color:var(--green);margin-top:3px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.stats div{background:var(--accent-bg);border-radius:6px;padding:6px 8px;font-size:11px;line-height:1.25;color:var(--soft)}
+.stats b{display:block;font-size:18px;line-height:1.1;color:var(--accent)}
+.quote{margin-top:7px;border-left:3px solid var(--accent);padding:2px 0 2px 10px}
+.scroll{overflow-x:auto}
+svg{display:block;width:100%;min-width:620px;height:auto}
+svg text{font:11px system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;fill:var(--soft)}
+svg .t{font-size:12.5px;font-weight:650;fill:var(--ink)}
+svg .b{fill:var(--panel);stroke:var(--line)}
+svg .k{fill:var(--accent-bg);stroke:var(--accent)}
+svg .a{stroke:var(--soft);stroke-width:1.4;fill:none;marker-end:url(#arr)}
+svg .d{stroke-dasharray:4 3}
+svg marker path{fill:var(--soft)}
+.note a{color:var(--accent)}
+.ideas{display:grid;grid-template-columns:1fr 1fr;column-gap:18px}
+@media (max-width:760px){.ideas{grid-template-columns:1fr}}
+.idea{margin-top:20px;scroll-margin-top:16px;background:var(--accent-bg);border:1.5px solid var(--accent);border-radius:9px;padding:9px 11px}
+.idea-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.idea-head h3{margin:0;font-size:15px}
+.idea-tag{background:var(--accent);color:var(--page);border-radius:999px;padding:2px 8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase}
+.idea .cards div{background:var(--page);border-color:transparent}
+.idea-market{margin-top:6px;font-size:12.2px;line-height:1.36}
+.idea-market a{color:var(--accent)}
+.take{margin-top:8px;background:var(--amber-bg);border-radius:6px;padding:7px 10px}
+.take b{color:var(--amber)}
+footer{margin-top:9px;border-top:1px solid var(--line);padding-top:6px;color:var(--soft);font-size:11.2px}
+code{font:11px ui-monospace,Menlo,Consolas,monospace}
+@media (max-width:760px){.flow,.flow.six,.result,.cards,.stats{grid-template-columns:repeat(2,1fr)}.two,.attention{grid-template-columns:1fr}table{min-width:560px}}
+.layout{display:grid;grid-template-columns:220px minmax(0,820px);gap:44px;max-width:1130px;margin:0 auto;padding:34px 28px 60px}
+.toc{position:sticky;top:24px;align-self:start;max-height:calc(100vh - 48px);overflow-y:auto;font-size:12.6px}
+.toc-title{font-weight:700;font-size:15px;margin-bottom:12px}
+.toc-title a{color:var(--ink);text-decoration:none}
+.toc b{display:block;margin:14px 0 4px;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent)}
+.toc a.l{display:block;padding:3px 8px;border-left:2px solid var(--line);color:var(--soft);text-decoration:none;line-height:1.3}
+.toc a.l:hover{color:var(--ink)}
+.toc a.l.on{color:var(--accent);border-left-color:var(--accent);font-weight:600}
+.toc a.l.star{color:var(--accent)}
+.hero h1{font-size:30px;line-height:1.12;margin:0}
+.hero .lead{font-size:15px;margin-top:7px}
+.glance{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:16px}
+.glance a{display:block;background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:9px 10px;color:var(--soft);text-decoration:none;font-size:11.8px;line-height:1.34}
+.glance a:hover{border-color:var(--accent)}
+.glance b{display:block;color:var(--ink);font-size:12.6px;margin-bottom:2px}
+.part{margin:44px 0 0;padding-top:9px;border-top:3px solid var(--accent);font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.chapter{margin-top:14px;scroll-margin-top:16px}
+.chapter + .chapter{margin-top:38px}
+.chapter h3{scroll-margin-top:16px}
+.mtoc{display:none;margin-top:12px;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:13px}
+.mtoc summary{cursor:pointer;font-weight:600}
+.mtoc b{display:block;margin:10px 0 3px;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent)}
+.mtoc a{display:block;padding:4px 0;color:var(--soft);text-decoration:none}
+@media (max-width:1000px){.layout{display:block;padding:22px 16px 44px}.toc{display:none}.mtoc{display:block}}
+@media (max-width:760px){.glance{grid-template-columns:1fr 1fr}.hero h1{font-size:26px}}
+@media print{body{background:#fff;font-size:11.6px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.layout{display:block;max-width:none;padding:0}.toc,.mtoc{display:none}.part{margin-top:0;break-before:page}.part.first{break-before:auto;margin-top:22px}.chapter{break-before:page;margin-top:0}.part + .chapter{break-before:auto;margin-top:12px}h3{break-after:avoid}tr,.cards>div,.result>div,.idea,.scroll,.take{break-inside:avoid}}
+@page{size:A4;margin:14mm 15mm}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc" aria-label="Contents"><div class="toc-title"><a href="#top">Contexia</a></div><div class="toc-groups"><div><b>Product</b><a class="l" href="#feed">The product bet</a><a class="l" href="#attention">What deserves attention</a><a class="l" href="#borrowed">Borrowed and changed</a><a class="l" href="#stale">Stale, edited, deleted</a><a class="l" href="#result">What I got</a><a class="l" href="#product-ai">Product decisions with AI</a><a class="l" href="#judgement">Where I overruled the AI</a><a class="l star" href="#next-bet">★ Parked idea: LLM Focus</a></div><div><b>Technology</b><a class="l" href="#delivery">Reliable delivery</a><a class="l" href="#path">How messages reach the feed</a><a class="l" href="#guarantees">Guarantees</a><a class="l" href="#corners">Corners I cut</a><a class="l" href="#tradeoffs">Key trade-offs</a><a class="l" href="#grows">How it grows</a><a class="l" href="#design-ai">Designing with AI</a><a class="l" href="#build-ai">Building with AI</a><a class="l" href="#caught">What the process caught</a></div></div></nav>
+<main>
+<header class="hero" id="top">
+<h1>Contexia</h1>
+<p class="lead">A Slack-like messaging prototype built around an activity feed that protects attention, with reliable delivery of every message change to independent systems.</p>
+<div class="glance">
+<a href="#attention"><b>The bet</b>A feed that sorts by plain, visible rules that each person can shape</a>
+<a href="#path"><b>The system</b>One log in PostgreSQL feeds search, the feed and notifications independently</a>
+<a href="#design-ai"><b>How I worked</b>AI proposed and built. I questioned it, decided, and verified</a>
+<a href="#next-bet"><b>Parked for later</b>Focus rules in plain language, powered by an LLM. Not built</a>
+</div>
+<details class="mtoc"><summary>Contents</summary><b>Product</b><a href="#feed">The product bet</a><a href="#attention">What deserves attention</a><a href="#borrowed">Borrowed and changed</a><a href="#stale">Stale, edited, deleted</a><a href="#result">What I got</a><a href="#product-ai">Product decisions with AI</a><a href="#judgement">Where I overruled the AI</a><a href="#next-bet">★ Parked idea: LLM Focus</a><b>Technology</b><a href="#delivery">Reliable delivery</a><a href="#path">How messages reach the feed</a><a href="#guarantees">Guarantees</a><a href="#corners">Corners I cut</a><a href="#tradeoffs">Key trade-offs</a><a href="#grows">How it grows</a><a href="#design-ai">Designing with AI</a><a href="#build-ai">Building with AI</a><a href="#caught">What the process caught</a></details>
+</header>
+
+<div class="part first" id="product">Product</div>
+<section class="chapter" id="feed">
+<h2 class="ch">An activity feed that protects attention</h2>
+<p class="lead">When agents write as much as people, attention becomes the scarce resource. My bet: people will trust a feed that sorts by plain, visible rules and lets them shape what comes first.</p>
+
+<h3 id="approach">How I approached it</h3>
+<ol class="flow">
+<li><b>Picked an audience</b>Startup teams of 30+, mixed roles, heavy AI use</li>
+<li><b>Studied products</b>Slack, Teams, Linear, GitHub, Zulip, Mattermost</li>
+<li><b>Chose one bet</b>Every later decision had to serve it</li>
+<li><b>Modelled the rules</b>A simulation exposed gaps before any UI</li>
+<li><b>Tried three designs</b>Clickable prototypes at desktop and phone width</li>
+</ol>
+
+<h3 id="attention">What deserves someone's attention, and what doesn't</h3>
+<div class="attention">
+<div>
+<div class="feed" role="img" aria-label="Illustration of the feed with Focus, Needs you and For your information sections, each row showing the reason it is there">
+<h3 class="f">Focus · notifies</h3>
+<div class="row"><b>Anna:</b> need your call on pricing today<small>Flagged for you · stays until Done</small></div>
+<div class="row"><b>Deployer:</b> waiting for approval to ship<small>Agent stopped and flagged you</small></div>
+<h3 class="n">Needs you · notifies</h3>
+<div class="row"><b>Marco:</b> @Maya can you check this?<small>Mentioned you in #launch</small></div>
+<h3 class="i">For your information · silent</h3>
+<div class="row">🎉 3 · 👍 2 on your announcement<small>Reactions to your message</small></div>
+</div>
+<p class="caption">Illustration based on the seeded team.</p>
+</div>
+<div>
+<ul class="plain">
+<li><b>Focus is yours:</b> your rules for people, channels and threads, plus flags that name you.</li>
+<li><b>Needs you is directed at you:</b> mentions, replies in your threads, and answers given by reaction.</li>
+<li><b>For your information</b> concerns you but isn't waiting on you. It never interrupts.</li>
+<li><b>Doesn't reach you:</b> ordinary channel traffic you didn't ask for, and agent text still being written.</li>
+<li><b>Both sides shape it:</b> senders mark <i>Flag</i> or <i>Info</i>, readers set a dial per channel and thread.</li>
+<li><b>Every row explains itself,</b> with one click to change the rule.</li>
+<li><b>Reading clears a row.</b> Keep holds what you still need to handle.</li>
+</ul>
+</div>
+</div>
+
+<h3 id="borrowed">What I borrowed, what I changed, and why</h3>
+<div class="tablewrap"><table class="w36">
+<tr><th>Borrowed</th><th>Changed</th><th>Why</th></tr>
+<tr><td>Slack's layout: sidebar, Activity, conversation beside it</td><td>Kept it, and spent novelty only on the feed</td><td>Familiar habits cost nothing to learn</td></tr>
+<tr><td>One feed filtered by type</td><td>Three buckets, with type tabs kept for finding history</td><td>Triage and lookup are different jobs</td></tr>
+<tr><td>Clear each item by hand</td><td>Reading clears it, Keep is the exception</td><td>Effort falls only on the rows that matter</td></tr>
+<tr><td>Reactions grouped as applause</td><td>A reaction from someone you addressed is an answer</td><td>Teams often answer with an emoji</td></tr>
+</table></div>
+
+<h3 id="stale">What stale, edited and deleted entries look like</h3>
+<div class="tablewrap"><table class="w36">
+<tr><th>What happened</th><th>What the person sees</th></tr>
+<tr><td>Text edited</td><td>The current text, in the same space. A longer edit sits behind an expander, so nothing jumps</td></tr>
+<tr><td>Edit adds a mention or flag</td><td>It reaches the person as new</td></tr>
+<tr><td>Deleted or taken back, not yet seen</td><td>No trace, and the count drops. The sender's retraction is respected</td></tr>
+<tr><td>Deleted after you saw or kept it</td><td>"Anna deleted this message" in place of the text. On a kept row it stays until Done</td></tr>
+<tr><td>Deleted within 5 seconds of a mention</td><td>No notification, unless something else unread still earns one. One already sent shows the current truth</td></tr>
+<tr><td>The feed is behind or a row can't update</td><td>"Catching up" on the feed, "may be out of date" on the row, and nothing moves</td></tr>
+</table></div>
+
+<h3 id="result">What I got</h3>
+<div class="result">
+<div><b>Full message loop</b>Messages, replies, mentions, reactions, edits, deletes</div>
+<div><b>Feed and history</b>Three buckets, plus DM, mention, thread and reaction tabs</div>
+<div><b>A busy team</b>30 people, 6 agents, 20 channels, 16 playable situations</div>
+<div><b>Desktop and phone</b>Installable web app, control panel, notification view</div>
+</div>
+<p><b>Next test:</b> the rules are checked for consistency, not yet with real users. Early access would ask one thing: do people clear their feed daily and stop checking every channel?</p>
+</section>
+
+<section class="chapter" id="product-ai">
+<h2 class="ch">How I made product decisions with AI</h2>
+<p class="lead">AI widened and tested the options. The product calls stayed mine, each on record with its reasoning.</p>
+
+<h3>The loop behind every product decision</h3>
+<div class="scroll">
+<svg viewBox="0 0 720 116" role="img" aria-label="AI researches and prepares options. I make the decision. AI tests it in a model or prototype, a separate agent checks it, and findings reopen the decision.">
+<defs><marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z"/></marker></defs>
+<rect class="b" x="4" y="6" width="122" height="66" rx="6"/><text class="t" x="65" y="33" text-anchor="middle">Research</text><text x="65" y="51" text-anchor="middle">AI maps the practice</text>
+<rect class="b" x="150" y="6" width="122" height="66" rx="6"/><text class="t" x="211" y="33" text-anchor="middle">Options</text><text x="211" y="51" text-anchor="middle">risks + a proposal</text>
+<rect class="k" x="296" y="6" width="122" height="66" rx="6"/><text class="t" x="357" y="33" text-anchor="middle">My decision</text><text x="357" y="51" text-anchor="middle">accept or reshape</text>
+<rect class="b" x="442" y="6" width="122" height="66" rx="6"/><text class="t" x="503" y="33" text-anchor="middle">Try it</text><text x="503" y="51" text-anchor="middle">model or prototype</text>
+<rect class="b" x="588" y="6" width="128" height="66" rx="6"/><text class="t" x="652" y="33" text-anchor="middle">Fresh check</text><text x="652" y="51" text-anchor="middle">a separate AI agent</text>
+<path class="a" d="M126 39H149"/><path class="a" d="M272 39H295"/><path class="a" d="M418 39H441"/><path class="a" d="M564 39H587"/>
+<path class="a d" d="M652 72V98H357V73"/><text x="505" y="111" text-anchor="middle">findings reopen the decision</text>
+</svg>
+</div>
+
+<h3>The patterns I followed</h3>
+<div class="cards">
+<div><b>Product before technology</b>No technical decision until the product scope was accepted, so the architecture served the feed.<em>Scope accepted before any architecture</em></div>
+<div><b>One decision, one brief</b>Each states why it matters now, the options, risks, best practice and a recommendation.<em>35 records, with who decided</em></div>
+<div><b>Top-down order</b>The bet first, then what enters the feed, how rows leave, then edits and deletes.<em>Each answer framed the next</em></div>
+<div><b>Test rules before pixels</b>I had the rules built as a runnable model before designing a screen.<em>Found a flag that could never leave</em></div>
+<div><b>Compare by using</b>Three clickable directions, same content, at desktop and phone width.<em>Chose by touch, not by description</em></div>
+<div><b>Fresh eyes on everything</b>Separate agents, given only the decisions, tried to break the model and the prototype.<em>6 blockers found in the prototype</em></div>
+</div>
+
+<h3 id="judgement">Where my judgement changed the AI's recommendation</h3>
+<div class="tablewrap"><table class="w22">
+<tr><th>Question</th><th>AI recommended</th><th>I decided</th><th>Why</th></tr>
+<tr><td>How a row leaves</td><td>Stay until marked Done</td><td>Reading is enough, with an explicit Keep</td><td>Nobody marks every message done</td></tr>
+<tr><td>What a flag is</td><td>A shared open or closed state, plus ways out</td><td>No state: a marker for each reader's feed</td><td>Fewer states, and the hole disappears</td></tr>
+<tr><td>Size of the demo team</td><td>12 people, 3 agents</td><td>30 people, 6 agents</td><td>Focus pays off under pressure</td></tr>
+<tr><td>Look and feel</td><td>A new, reason-led layout</td><td>Slack-like</td><td>People already have the habits</td></tr>
+<tr><td>Where notifications show</td><td>Inside the control panel</td><td>A separate mock app</td><td>A phone isn't our interface</td></tr>
+<tr><td>DMs in Focus</td><td>One on or off rule</td><td>A list of people that fills itself</td><td>Removing a person stays simple</td></tr>
+</table></div>
+
+<h3>And where AI changed my mind</h3>
+<p>I first wanted direct mentions in Focus. The AI pushed back: many are a courtesy ("thanks @sam"), so Focus would become Needs you under another name. I agreed, and made it a one-click rule.</p>
+
+<h3>The ideas I brought to the product</h3>
+<ul class="plain ideas">
+<li><b>Focus:</b> a top bucket each person owns.</li>
+<li><b>Flag and Info:</b> senders set a message's weight.</li>
+<li><b>Keep:</b> triage effort only where it's needed.</li>
+<li><b>Nothing jumps</b> when messages change.</li>
+<li><b>Reactions as answers,</b> as teams really respond.</li>
+<li><b>History tabs,</b> kept apart from triage.</li>
+</ul>
+<section class="idea" id="next-bet">
+<div class="idea-head"><span class="idea-tag">Parked · not in this build</span><h3>Next bet: Focus rules in plain language, powered by an LLM</h3></div>
+<div class="cards">
+<div><b>The value</b>Exact rules can't express "anything about pricing or contracts". A language model could, so people could say what matters in their own words.</div>
+<div><b>The safe design</b>The model could only lift an item into Focus, never hide or lower it. It runs after the item is in the feed, so a slow or failed model breaks nothing.</div>
+<div><b>Why I parked it</b>It is a second bet, and a wrong call in the top bucket costs the most trust. So it is not in the product: I built the rule-based feed first and kept this design on record.</div>
+</div>
+<p class="idea-market"><b>The market is heading there.</b> Slack calls "intelligent prioritization" <a href="https://slack.com/blog/news/slack-activity-triage-for-notifications">the next phase of Activity</a>, Outlook's Copilot is <a href="https://support.microsoft.com/en-US/outlook/copilot-outlook/prioritize-my-inbox">rolling out priorities based on your own criteria</a>, and Gmail is <a href="https://blog.google/products-and-platforms/products/gmail/gmail-gemini">testing an AI Inbox</a>. Contexia's angle would be rules you can see and own, which can only raise an item.</p>
+</section>
+</section>
+
+<div class="part" id="technology">Technology</div>
+<section class="chapter" id="delivery">
+<h2 class="ch">Reliable delivery to independent systems</h2>
+<p class="lead">Every message, edit and delete must reach search, notifications and the feed, even when one of them is slow or down.</p>
+
+<h3 id="path">How messages make their way to the activity feed</h3>
+<div class="scroll">
+<svg viewBox="0 0 720 222" role="img" aria-label="Screens call Conversations, which saves each change and its log entry together in PostgreSQL. Delivery workers read the log and feed search and the activity feed separately. The feed writes notification notes, which a delivery worker carries to the notification sender.">
+<rect class="b" x="4" y="72" width="96" height="66" rx="6"/><text class="t" x="52" y="100" text-anchor="middle">Screens</text><text x="52" y="118" text-anchor="middle">web app</text>
+<rect class="b" x="150" y="72" width="120" height="66" rx="6"/><text class="t" x="210" y="100" text-anchor="middle">Conversations</text><text x="210" y="118" text-anchor="middle">rules, live updates</text>
+<rect class="k" x="310" y="58" width="128" height="94" rx="6"/><text class="t" x="374" y="84" text-anchor="middle">PostgreSQL</text><text x="374" y="104" text-anchor="middle">message + log entry</text><text x="374" y="120" text-anchor="middle">in one transaction</text><text x="374" y="138" text-anchor="middle">source of truth</text>
+<rect class="b" x="478" y="10" width="86" height="202" rx="6"/><text class="t" x="521" y="100" text-anchor="middle">Delivery</text><text x="521" y="118" text-anchor="middle">one lane per</text><text x="521" y="133" text-anchor="middle">receiver</text>
+<rect class="b" x="610" y="10" width="106" height="50" rx="6"/><text class="t" x="663" y="32" text-anchor="middle">Search</text><text x="663" y="49" text-anchor="middle">fake, over HTTP</text>
+<rect class="k" x="610" y="82" width="106" height="58" rx="6"/><text class="t" x="663" y="106" text-anchor="middle">Activity feed</text><text x="663" y="124" text-anchor="middle">what to notify</text>
+<rect class="b" x="610" y="162" width="106" height="50" rx="6"/><text class="t" x="663" y="184" text-anchor="middle">Notifications</text><text x="663" y="201" text-anchor="middle">fake, sends once</text>
+<path class="a" d="M100 96H149"/><path class="a" d="M150 116H101"/><path class="a" d="M270 105H309"/><path class="a" d="M438 105H477"/>
+<path class="a" d="M564 35H609"/><path class="a" d="M564 98H609"/><path class="a d" d="M610 126H565"/><path class="a" d="M564 187H609"/>
+<text x="587" y="91" text-anchor="middle">changes</text><text x="587" y="139" text-anchor="middle">notes</text>
+</svg>
+</div>
+<p class="note">A change is saved together with a numbered log entry. A delivery worker reads the log and calls the feed, which applies changes strictly in order and works out each reader's row. Open screens get the result live and catch up by number after a disconnect.</p>
+<p class="note"><b>Explore it:</b> <a href="docs/visuals/the-whole-map.html">the clickable system map</a> · <a href="docs/visuals/failures-and-how-they-are-covered.html">what can fail</a> · <a href="docs/visuals/how-notifications-decide.html">how notifications decide</a></p>
+
+<div class="two">
+<div>
+<h3 id="guarantees">What guarantees it provides</h3>
+<ul class="plain">
+<li><b>Nothing saved is lost.</b> The change and its log entry commit together.</li>
+<li><b>Repeats are harmless.</b> Delivery is at least once, and receivers ignore repeats and older versions.</li>
+<li><b>Failures stay contained.</b> Each receiver has its own lane and position, and retries with backoff.</li>
+<li><b>Bad changes are set aside</b> after three refusals, visibly, and can be resent.</li>
+<li><b>A notification goes out once,</b> after a 5-second hold that lets a read or delete cancel it.</li>
+<li><b>The feed can be rebuilt</b> from the log, because it holds nothing original.</li>
+</ul>
+</div>
+<div>
+<h3 id="corners">Where I knowingly cut corners</h3>
+<ul class="plain">
+<li>Sign-in, permissions and private channels.</li>
+<li>A database standby: PostgreSQL is a single point of failure.</li>
+<li>Real search and push providers, which sit behind the same contracts.</li>
+<li>Old data is never trimmed.</li>
+<li>Load testing. Capacity of about 5,000 people per organization is an estimate from analysis, not a measurement.</li>
+</ul>
+</div>
+</div>
+
+<h3 id="tradeoffs">The key trade-offs</h3>
+<div class="tablewrap"><table class="w22">
+<tr><th>Question</th><th>I chose</th><th>Over</th><th>Because</th></tr>
+<tr><td>How changes travel</td><td>A log in PostgreSQL, saved with the change</td><td>A message broker</td><td>No outside consumers yet, and one system holds the truth</td></tr>
+<tr><td>Delivery promise</td><td>At least once, with safe repeats</td><td>Claiming exactly once</td><td>Networks repeat, so receivers must cope anyway</td></tr>
+<tr><td>Who decides to notify</td><td>The feed</td><td>The sender</td><td>Only the feed knows buckets, dials and what was read</td></tr>
+<tr><td>Feed storage</td><td>Each reader's rows computed on write</td><td>Computing at read time</td><td>Fast to open, and simple at team size</td></tr>
+<tr><td>Ordering</td><td>One log per organization</td><td>One log per conversation</td><td>Simple strict order, with a clear next step</td></tr>
+</table></div>
+
+<h3 id="grows">How it grows</h3>
+<p>Parts without memory scale by adding copies. Organizations spread across databases, and a large one moves to parallel conversations and then a log per conversation. A broker becomes right when other teams consume the changes or traffic reaches the high hundreds of changes a second. Because receivers already ignore repeats, adding one replaces a single layer.</p>
+
+<p class="take"><b>Where I overbuilt:</b> the agent door and the multi-tenant lifecycle go beyond the brief. I knew that when I built them and let curiosity win. The organization in every key earns its place, and the rest could have stayed a documented path.</p>
+</section>
+
+<section class="chapter" id="design-ai">
+<h2 class="ch">How I designed it with AI, and made sure I understood it</h2>
+<p class="lead">An agent can produce a convincing architecture in minutes. The real work was understanding what it had designed and built, well enough to question it, change it, defend it, or knowingly trust it.</p>
+
+<h3>The loop: understand enough to change it, keep it or trust it</h3>
+<div class="scroll">
+<svg viewBox="0 0 720 116" role="img" aria-label="The agent proposes a design and proves it with small experiments. It explains the design visually. I question it until I can explain it myself, then change it, keep it, or knowingly trust the agent's call. A fresh verifier attacks the result, and findings return to my questions.">
+<rect class="b" x="4" y="6" width="102" height="66" rx="6"/><text class="t" x="55" y="33" text-anchor="middle">Propose</text><text x="55" y="51" text-anchor="middle">agent's design</text>
+<rect class="b" x="126" y="6" width="102" height="66" rx="6"/><text class="t" x="177" y="33" text-anchor="middle">Prove</text><text x="177" y="51" text-anchor="middle">small experiments</text>
+<rect class="b" x="248" y="6" width="102" height="66" rx="6"/><text class="t" x="299" y="33" text-anchor="middle">Explain</text><text x="299" y="51" text-anchor="middle">visuals, top-down</text>
+<rect class="k" x="370" y="6" width="102" height="66" rx="6"/><text class="t" x="421" y="33" text-anchor="middle">Understand</text><text x="421" y="51" text-anchor="middle">I keep asking why</text>
+<rect class="k" x="492" y="6" width="102" height="66" rx="6"/><text class="t" x="543" y="33" text-anchor="middle">Decide</text><text x="543" y="51" text-anchor="middle">change, keep, trust</text>
+<rect class="b" x="614" y="6" width="102" height="66" rx="6"/><text class="t" x="665" y="33" text-anchor="middle">Attack</text><text x="665" y="51" text-anchor="middle">a fresh verifier</text>
+<path class="a" d="M106 39H125"/><path class="a" d="M228 39H247"/><path class="a" d="M350 39H369"/><path class="a" d="M472 39H491"/><path class="a" d="M594 39H613"/>
+<path class="a d" d="M665 72V98H421V73"/><text x="543" y="111" text-anchor="middle">findings and new questions go back to understanding</text>
+</svg>
+</div>
+
+<h3 id="understanding">How I built my understanding, layer by layer</h3>
+<div class="tablewrap"><table class="w22">
+<tr><th>Layer</th><th>What I asked the agent</th><th>What I needed to be able to explain</th></tr>
+<tr><td>The big picture</td><td>"HTML with visuals, from high level to lower level, from core to optional"</td><td>The parts, their boundaries and their contracts</td></tr>
+<tr><td>One message, end to end</td><td>"How does the person I'm messaging actually receive it?"</td><td>Save, log, delivery and the live update</td></tr>
+<tr><td>Inside each service</td><td>"I need a good explanation of how Conversations works inside"</td><td>What runs on events, and what runs on timers</td></tr>
+<tr><td>State</td><td>"What state do we have? DB tables and in-memory caches?"</td><td>What is the truth, and what can be rebuilt</td></tr>
+<tr><td>Single fields</td><td>"What does this field mean? I still don't understand why we need it"</td><td>Why each stored value exists</td></tr>
+<tr><td>Failure</td><td>"If that event is lost, how will the user eventually get the message?"</td><td>How every gap is detected and repaired</td></tr>
+<tr><td>Running copies</td><td>"How exactly does one instance take the load of a dead one?"</td><td>Leases, takeover and what users would notice</td></tr>
+</table></div>
+
+<h3>What that understanding led to</h3>
+<div class="tablewrap"><table class="w36">
+<tr><th>What I questioned</th><th>What it exposed</th><th>My decision</th></tr>
+<tr><td>"Why stop? Can we make the blast radius smaller?"</td><td>One bad change could stop the whole feed</td><td>A fence now isolates only what it touches</td></tr>
+<tr><td>A <code>reset</code> field in the delivery data</td><td>A demo button was shaping every contract</td><td>Removed. Reset starts a fresh organization</td></tr>
+<tr><td>Who really owns the 5-second hold?</td><td>One judgement was split across two services</td><td>The feed decides, the sender only delivers</td></tr>
+<tr><td>"Did Kafka make everything worse?"</td><td>Slower, with a new way to lose data</td><td>I reversed my own choice</td></tr>
+<tr><td>"One copy per organization means no right to fail"</td><td>Takeover costs seconds, and the alternative adds shared state</td><td>Kept it, now as a conscious trade-off</td></tr>
+<tr><td>Delivery promise, quality targets, agent rules</td><td>Established practice covered them, and the options were clear</td><td>Trusted the agent's call, on record</td></tr>
+</table></div>
+
+<h3>How I kept the explanations honest</h3>
+<div class="cards">
+<div><b>Evidence before attention</b>I had designs tried in experiments before spending time reviewing them.</div>
+<div><b>Plain words first</b>When an explanation hid behind jargon, I sent it back until it was clear.</div>
+<div><b>Checked against the code</b>Explanations were compared with what was built, and corrected where they had drifted.</div>
+<div><b>Drawn, not described</b>Flows, boundaries and trade-offs became visuals: 23 pages sit in the repo.</div>
+<div><b>Trust is a decision too</b>Once I knew the stakes, I could hand a call to the agent. The record says who decided and why.</div>
+<div><b>Costs made visible</b>I had complexity measured per feature, which is how I saw where I had overbuilt.</div>
+</div>
+</section>
+
+<section class="chapter" id="build-ai">
+<h2 class="ch">How I built it with AI</h2>
+<p class="lead">A coding agent wrote the implementation. My work was deciding the architecture and the guarantees, and building the process that made the agent's output trustworthy.</p>
+
+<h3>The loop behind every piece of work</h3>
+<div class="scroll">
+<svg viewBox="0 0 720 116" role="img" aria-label="A contract is written first. A test is written and seen failing. An agent builds it in its own worktree. A verified commit records how it was checked. An independent agent then checks it, and findings return as new failing tests.">
+<rect class="k" x="4" y="6" width="122" height="66" rx="6"/><text class="t" x="65" y="33" text-anchor="middle">Contract</text><text x="65" y="51" text-anchor="middle">the promise I agree</text>
+<rect class="b" x="150" y="6" width="122" height="66" rx="6"/><text class="t" x="211" y="33" text-anchor="middle">Test first</text><text x="211" y="51" text-anchor="middle">must be seen failing</text>
+<rect class="b" x="296" y="6" width="122" height="66" rx="6"/><text class="t" x="357" y="33" text-anchor="middle">Agent builds</text><text x="357" y="51" text-anchor="middle">in its own worktree</text>
+<rect class="b" x="442" y="6" width="122" height="66" rx="6"/><text class="t" x="503" y="33" text-anchor="middle">Verified commit</text><text x="503" y="51" text-anchor="middle">records the check</text>
+<rect class="b" x="588" y="6" width="128" height="66" rx="6"/><text class="t" x="652" y="33" text-anchor="middle">Fresh check</text><text x="652" y="51" text-anchor="middle">a read-only agent</text>
+<path class="a" d="M126 39H149"/><path class="a" d="M272 39H295"/><path class="a" d="M418 39H441"/><path class="a" d="M564 39H587"/>
+<path class="a d" d="M652 72V98H211V73"/><text x="431" y="111" text-anchor="middle">findings become new tests and fixes</text>
+</svg>
+</div>
+
+<h3>The patterns I followed</h3>
+<div class="cards">
+<div><b>The repo is the memory</b>Goal, board, decisions and contracts live in files, so every new session starts from the truth.<em>The brief itself is edit-protected</em></div>
+<div><b>Contracts before code</b>Parts meet only through written contracts, so agents could build them in parallel.<em>19 work packages, each in its own worktree</em></div>
+<div><b>A test must fail first</b>A check that has never failed proves nothing.<em>With a plain sequence, the log test caught 34 skipped changes</em></div>
+<div><b>Test the tests</b>Faults are planted on purpose to see whether a check notices.<em>3 web checks missed their fault and were rewritten. 22 planted faults are now caught</em></div>
+<div><b>Passing checks are protected</b>Once a guardrail test passes, an agent's edit to it asks for my approval.<em>28 guardrail tests protected</em></div>
+<div><b>Independent verification</b>For significant work, a separate verifier that can't edit anything and doesn't see the builder's reasoning.<em>Broke my first scaling claim in 4 places</em></div>
+<div><b>Evidence over preference</b>I chose Kafka at first, then had it tried under failure before committing.<em>Slower, could lose data, so I reversed it</em></div>
+<div><b>The right model for the job</b>Cheap models fetch and search. The strongest model handles design, judgement and verification.<em>A written delegation practice</em></div>
+<div><b>Say what wasn't checked</b>"Done" means verified, and each task lists what was not.<em>Over 95% of commits record how they were checked</em></div>
+</div>
+
+<h3 id="caught">What this process actually caught</h3>
+<div class="tablewrap"><table class="w36">
+<tr><th>Found</th><th>By</th><th>Result</th></tr>
+<tr><td>Kafka in the middle: 121 ms against 7 ms, and a relay fault that lost changes</td><td>A one-node failure experiment</td><td>Dropped before the contracts were rewritten</td></tr>
+<tr><td>A scaling design with four real holes</td><td>Independent verifier</td><td>Redesigned, with new guardrails</td></tr>
+<tr><td>Four blockers in the service contracts</td><td>Independent verifier</td><td>Corrected before any code was written</td></tr>
+<tr><td>A deadlock between delivery and saves</td><td>Running the full checks side by side</td><td>Fixed, with a test that recreates it</td></tr>
+<tr><td>Six defects between the web app and the server</td><td>Using the real product at both widths</td><td>Fixed, and the walkthrough became a test</td></tr>
+<tr><td>One blocker and four other findings</td><td>Final independent validation of the running product</td><td>Fixed, and the full verification passed</td></tr>
+</table></div>
+
+<h3>In numbers</h3>
+<div class="stats">
+<div><b>35</b>decisions on record</div>
+<div><b>8</b>experiments</div>
+<div><b>8</b>service contracts</div>
+<div><b>28 of 30</b>guardrails enforced</div>
+<div><b>200+</b>commits</div>
+</div>
+
+<p class="note"><b>Final validation:</b> the full verification passed, and the main flow passed in a browser on the real system. Still open: two screen guardrails as named tests, real phones and browsers other than Chromium, and a measured capacity.</p>
+
+<footer>Run it with <code>make up</code>, then open <code>127.0.0.1:18080</code>. The control panel can stop or slow search, the feed and the sender while you use the product. Decisions, contracts, experiments and known shortcuts are in <code>docs/</code> and <code>experiments/</code>.</footer>
+</section>
+</main>
+</div>
+<script>
+(function(){var a=[].slice.call(document.querySelectorAll('.toc a.l')),s=a.map(function(l){return document.querySelector(l.getAttribute('href'))});
+function f(){var c=0;s.forEach(function(e,i){if(e.getBoundingClientRect().top<120)c=i});if(window.innerHeight+window.scrollY>=document.documentElement.scrollHeight-2)c=s.length-1;a.forEach(function(l,i){l.classList.toggle('on',i===c)})}
+addEventListener('scroll',f,{passive:true});addEventListener('resize',f);f()})();
+</script>
+</body>
+</html>

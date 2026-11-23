@@ -4,6 +4,8 @@ A prototype of a real-time team messaging system, focused on the messaging exper
 
 **Status:** the first version is built: the messaging product, the activity feed, reliable delivery to search and notifications, and a seeded demonstration.
 
+**Start here:** [the project report](report.html) explains the product, the architecture and how they were built. Open it in a browser.
+
 ## Run it
 
 You need Docker and make. Nothing else is installed on the host.
