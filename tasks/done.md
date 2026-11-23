@@ -2,6 +2,7 @@
 
 Finished work, newest first. One line each: what is now true and how it was verified. Commits carry the task ID, so `git log --grep T-nnn` finds the change.
 
+- 2026-11-23 · **T-073** `implement` The product's worker answers only the product at a named organization: the control panel, notification app, operator calls and the entry address reach the server, and a browser with the old worker recovers by itself. Verified: new browser spec seen failing, then passing at both widths; upgrade from a real build of the previous commit; a private real system; `./scripts/check` and all five browser lanes. Not run: the full `./scripts/verify`, browsers other than Chromium.
 - 2026-11-23 · **T-072** `implement` The scripted team no longer acts as Maya (D-038). Verified: `./scripts/verify`; the whole demo played on a private copy, 42 of 42 steps, none failed, no log entry acting as Maya.
 - 2026-11-23 · **T-071** `implement` Activity has a Refresh button and shows two marks (D-037). Verified: browser tests at both widths, `./scripts/verify`, a screenshot of the played demo.
 - 2026-11-23 · **T-069** `implement` The Activity number counts what would notify the person; under Focus only, a quiet dot shows unread Needs you (D-036). Verified: browser tests at both widths seen failing first, `./scripts/verify` passed.

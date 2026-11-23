@@ -33,7 +33,12 @@ export default defineConfig({
       workbox: {
         // Installable, not offline (D-009): only the app's own files are cached, never an answer from the door.
         globPatterns: ['**/*.{js,css,html,svg,png}'],
-        navigateFallbackDenylist: [/^\/orgs/, /^\/demo/],
+        // The worker answers only the product at a named organization (/?org=…; Workbox matches
+        // path plus query). The same address also serves the control panel, the notification app
+        // and the operator calls, and a bare / must reach the server, which picks the current
+        // organization (D-033). That is also why / is not mapped to the stored index.html.
+        navigateFallbackAllowlist: [/^\/\?(?:.*&)?org=/],
+        directoryIndex: null,
         runtimeCaching: [],
       },
     }),

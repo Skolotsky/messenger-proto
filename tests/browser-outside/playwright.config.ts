@@ -11,7 +11,10 @@ export default defineConfig({
   timeout: 30_000,
   expect: { timeout: 5_000 },
   reporter: [['list']],
-  webServer: { command: 'node serve.mjs', url: 'http://127.0.0.1:4190/alive', reuseExistingServer: false },
+  webServer: [
+    { command: 'node serve.mjs', url: 'http://127.0.0.1:4190/alive', reuseExistingServer: false },
+    { command: 'node front.mjs', url: 'http://127.0.0.1:4191/alive', reuseExistingServer: false },
+  ],
   use: {
     baseURL: 'http://127.0.0.1:4190',
     locale: 'en-GB',

@@ -7,9 +7,11 @@ root="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$root"
 image=mcr.microsoft.com/playwright:v1.49.1-noble
 
-for dir in web/control-panel web/notification-app tests/browser-outside; do
+for dir in web/app web/control-panel web/notification-app tests/browser-outside; do
   [ -d "$dir/node_modules" ] || TOOL_DIR="$dir" ./scripts/tool npm ci --no-audit --no-fund
 done
+# The product with its service worker, in its own folder: other lanes may be serving dist.
+CONTEXIA_TOOL_ENV="VITE_API=network VITE_PERSON=maya" TOOL_DIR=web/app ./scripts/tool npx vite build --outDir dist-outside --emptyOutDir
 for dir in web/control-panel web/notification-app; do
   # The default build answers from its fixtures; the network build makes the real calls the tests answer.
   TOOL_DIR="$dir" ./scripts/tool npm run build
